@@ -51,3 +51,22 @@ class DueController:
     def disconnect(self):
         self.serialPort.Disconnect()
 
+    def GetConnectionPort():
+        try:
+            from serial.tools.list_ports import comports
+        except ImportError:
+            return ""
+        
+        if comports:
+            com_ports_list = list(comports())
+            ebb_ports_list = []
+            for port in com_ports_list:               
+                if port.vid ==0x1B9F:
+                    return port.name
+        return ""
+                    
+                
+        
+        
+
+
