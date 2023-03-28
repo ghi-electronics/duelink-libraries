@@ -12,5 +12,8 @@ setuptools.setup(
     classifiers=[
         "Development Status :: Python 3",        
     ],
+    install_requires=[
+   'pyserial'   
+    ],    
     python_requires='>=3.6'
 )
