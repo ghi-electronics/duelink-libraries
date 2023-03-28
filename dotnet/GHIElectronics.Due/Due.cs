@@ -74,6 +74,7 @@ namespace GHIElectronics.Due {
         }
         static public string GetConnectionPort() {
             var vid = "VID_1B9F";
+            var pid = "PID_F300";
 
             var serialports = new ArrayList();
 
@@ -88,8 +89,11 @@ namespace GHIElectronics.Due {
                                     if (devFnKey.ToString().IndexOf(vid.ToUpper()) >= 0
                                         || devFnKey.ToString().IndexOf(vid.ToLower()) >= 0) {
 
-
-                                        serialports.Add(portName);
+                                        if (devFnKey.ToString().IndexOf(pid.ToUpper()) >= 0
+                                       || devFnKey.ToString().IndexOf(pid.ToLower()) >= 0) {
+                                            serialports.Add(portName);
+                                        }
+    
 
                                     }
 

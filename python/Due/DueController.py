@@ -61,7 +61,7 @@ class DueController:
             com_ports_list = list(comports())
             ebb_ports_list = []
             for port in com_ports_list:               
-                if port.vid ==0x1B9F:
+                if port.vid ==0x1B9F and port.pid==0xF300:
                     return port.name
         return ""
                     
