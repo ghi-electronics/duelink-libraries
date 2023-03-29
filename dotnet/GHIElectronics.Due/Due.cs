@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
@@ -79,55 +80,57 @@ namespace GHIElectronics.Due {
             var vid = "VID_1B9F";
             var pid = "PID_F300";
 
-            var serialports = new ArrayList();
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                var serialports = new ArrayList();
 
-            using (var enumUsbKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Enum\USB")) {
-                if (enumUsbKey != null) {
-                    foreach (var devBaseKey in GetSubKeys(enumUsbKey)) {
-                        foreach (var devFnKey in GetSubKeys(devBaseKey)) {
-                            using (var devParamsKey = devFnKey.OpenSubKey("Device Parameters")) {
-                                var portName = (string)devParamsKey?.GetValue("PortName");
-                                if (portName != null) {
+                using (var enumUsbKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Enum\USB")) {
+                    if (enumUsbKey != null) {
+                        foreach (var devBaseKey in GetSubKeys(enumUsbKey)) {
+                            foreach (var devFnKey in GetSubKeys(devBaseKey)) {
+                                using (var devParamsKey = devFnKey.OpenSubKey("Device Parameters")) {
+                                    var portName = (string)devParamsKey?.GetValue("PortName");
+                                    if (portName != null) {
 
-                                    if (devFnKey.ToString().IndexOf(vid.ToUpper()) >= 0
-                                        || devFnKey.ToString().IndexOf(vid.ToLower()) >= 0) {
+                                        if (devFnKey.ToString().IndexOf(vid.ToUpper()) >= 0
+                                            || devFnKey.ToString().IndexOf(vid.ToLower()) >= 0) {
 
-                                        if (devFnKey.ToString().IndexOf(pid.ToUpper()) >= 0
-                                       || devFnKey.ToString().IndexOf(pid.ToLower()) >= 0) {
-                                            serialports.Add(portName);
+                                            if (devFnKey.ToString().IndexOf(pid.ToUpper()) >= 0
+                                           || devFnKey.ToString().IndexOf(pid.ToLower()) >= 0) {
+                                                serialports.Add(portName);
+                                            }
+
+
                                         }
-    
+
 
                                     }
-
-
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            try {
-                var key = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM");
-                if (key != null) {
-                    foreach (var name in key.GetValueNames()) {
-                        if (name != null) {
-                            var val = (string)key.GetValue(name);
+                try {
+                    var key = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM");
+                    if (key != null) {
+                        foreach (var name in key.GetValueNames()) {
+                            if (name != null) {
+                                var val = (string)key.GetValue(name);
 
-                            if (val != null && val != string.Empty) {
+                                if (val != null && val != string.Empty) {
 
-                                foreach (var p in serialports) {
-                                    if (p.ToString().CompareTo(val) == 0)
-                                        return val;
+                                    foreach (var p in serialports) {
+                                        if (p.ToString().CompareTo(val) == 0)
+                                            return val;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            catch {
+                catch {
+                }
             }
 
             return string.Empty;
