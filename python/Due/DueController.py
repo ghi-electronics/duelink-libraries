@@ -18,7 +18,7 @@ from Due.Uart import UartController
 from Due.Led import LedController
 from Due.Script import ScriptController
 from enum import Enum
-
+import platform
 class DueController:
 
     def __init__(self, comPort: str):
@@ -64,7 +64,11 @@ class DueController:
             ebb_ports_list = []
             for port in com_ports_list:               
                 if port.vid ==0x1B9F and port.pid==0xF300:
-                    return port.name
+                    if (platform.system() == 'Windows'):
+                        return port.name
+                    if (platform.system() == 'Linux'):
+                        return port.device
+
         return ""
                     
                 
