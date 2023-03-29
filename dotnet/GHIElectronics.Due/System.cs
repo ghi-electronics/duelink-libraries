@@ -31,8 +31,8 @@ namespace GHIElectronics.Due {
 
             }
 
-            public int GetMicroTicks() {
-                var cmd = string.Format("print(getticks())");
+            public int GetTickMicroseconds() {
+                var cmd = string.Format("print(tickus())");
 
                 this.serialPort.WriteLine(cmd);
 
@@ -52,8 +52,8 @@ namespace GHIElectronics.Due {
                 return -1;
             }
 
-            public int GetSeconds() {
-                var cmd = string.Format("print(getseconds())");
+            public int GetTickMilliseconds() {
+                var cmd = string.Format("print(tickms())");
 
                 this.serialPort.WriteLine(cmd);
 

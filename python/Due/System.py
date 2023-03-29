@@ -15,8 +15,8 @@ class SystemController:
         # The device will reset in bootloader or system reset
         self.serialPort.Disconnect()
 
-    def GetMicroTicks(self):
-        cmd = "print(getticks())"
+    def GetTickMicroseconds(self):
+        cmd = "print(tickus())"
         self.serialPort.WriteLine(cmd)
         res = self.serialPort.ReadRespone()
         if res.success:
@@ -26,8 +26,8 @@ class SystemController:
                 pass
         return -1
     
-    def GetSecond(self):
-        cmd = "print(getseconds())"
+    def GetTickMilliseconds(self):
+        cmd = "print(tickms())"
         self.serialPort.WriteLine(cmd)
         res = self.serialPort.ReadRespone()
         if res.success:
