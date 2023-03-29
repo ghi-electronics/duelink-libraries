@@ -35,6 +35,7 @@ namespace GHIElectronics.Due {
             }
 
             public bool Load(string script) {
+                var ret = true;
                 var cmd = string.Format("$");
 
                 CmdRespone respone;
@@ -46,19 +47,19 @@ namespace GHIElectronics.Due {
                 script = script.Replace("\r", string.Empty);
 
 
-                var startId = 0;
+                var startIdx = 0;
 
                 for (var i = 0; i < script.Length; i++) {
                     var subscript = string.Empty;
 
                     if (script[i] == '\n') {
-                        subscript = script.Substring(startId, i - startId);
+                        subscript = script.Substring(startIdx, i - startIdx);
 
-                        startId = i + 1;
+                        startIdx = i + 1;
                     }
                     else if (i == script.Length - 1) {
 
-                        subscript = script.Substring(startId, i - startId + 1);
+                        subscript = script.Substring(startIdx, i - startIdx + 1);
                     }
 
                     this.serialPort.WriteCommand(subscript);
@@ -67,6 +68,7 @@ namespace GHIElectronics.Due {
                     respone = this.serialPort.ReadRespone();
 
                     if (respone.success == false) {
+                        ret = false;
                         break;
                     }
                 }
@@ -77,7 +79,7 @@ namespace GHIElectronics.Due {
 
                 respone = this.serialPort.ReadRespone();
 
-                return respone.success;
+                return ret && respone.success;
 
             }
 
