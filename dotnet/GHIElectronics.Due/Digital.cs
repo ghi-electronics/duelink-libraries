@@ -36,7 +36,7 @@ namespace GHIElectronics.Due {
 
 
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var respone = this.serialPort.ReadRespone();
 
@@ -64,7 +64,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("dwrite({0},{1})", pin, (value == true ? 1 : 0));
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var respone = this.serialPort.ReadRespone();
 

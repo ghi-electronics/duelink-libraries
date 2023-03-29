@@ -24,7 +24,7 @@ namespace GHIElectronics.Due {
             public void Reset(ResetOption option) {
 
                 var cmd = string.Format("reset({0})", option == ResetOption.Bootloader ? 1 : 0 );
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 // The device will reset in bootloader or system reset
                 this.serialPort.Disconnect();
@@ -34,7 +34,7 @@ namespace GHIElectronics.Due {
             public int GetTickMicroseconds() {
                 var cmd = string.Format("print(tickus())");
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -55,7 +55,7 @@ namespace GHIElectronics.Due {
             public int GetTickMilliseconds() {
                 var cmd = string.Format("print(tickms())");
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 

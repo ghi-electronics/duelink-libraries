@@ -40,6 +40,8 @@ namespace GHIElectronics.Due {
 
         public LedController Led { get; internal set; }
 
+        public ScriptController Script { get; internal set; }
+
         public string Version { get; internal set; } = string.Empty;
 
         public DueController(string comPort) {
@@ -65,6 +67,7 @@ namespace GHIElectronics.Due {
             this.Display = new DisplayController(this.serialPort);
             this.Touch = new TouchController(this.serialPort);
             this.Led = new LedController(this.serialPort);
+            this.Script = new ScriptController(this.serialPort);    
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {

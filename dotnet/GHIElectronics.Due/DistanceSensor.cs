@@ -22,7 +22,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("print(distance({0},{1}))", pulsePin, echoPin);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 

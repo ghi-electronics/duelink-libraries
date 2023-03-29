@@ -35,7 +35,7 @@ namespace GHIElectronics.Due {
                 var cmd = string.Format("sound({0},{1},{2})", frequency.ToString(), duration_ms.ToString(), volume.ToString());
 
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -51,7 +51,7 @@ namespace GHIElectronics.Due {
                 var cmd = string.Format("sound({0},{1},{2})", frequency.ToString(), duration_ms.ToString(), dutycyle.ToString());
 
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 

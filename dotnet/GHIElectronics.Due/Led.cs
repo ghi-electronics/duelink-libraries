@@ -17,7 +17,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("led({0},{1},{2})", highPeriod, lowPeriod, count);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 

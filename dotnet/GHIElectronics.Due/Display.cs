@@ -19,7 +19,7 @@ namespace GHIElectronics.Due {
             public bool Show() {
                 var cmd = string.Format("lcdshow()");
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -29,7 +29,7 @@ namespace GHIElectronics.Due {
             public bool Clear(uint color) {
                 var cmd = string.Format("lcdclear({0})", color);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -41,7 +41,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("lcdpixel({0},{1},{2})", color, x, y);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -53,7 +53,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("lcdcircle({0},{1},{2},{3})", color, x, y, radius);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -64,7 +64,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("lcdrect({0},{1},{2},{3},{4})", color, x, y, width, height);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -75,7 +75,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("lcdline({0},{1},{2},{3},{4})", color, x1, y1, x2, y2);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -86,7 +86,7 @@ namespace GHIElectronics.Due {
                 var cmd = string.Format("lcdtext(\"{0}\",{1},{2},{3})", text, color, x, y);
                 
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -97,7 +97,7 @@ namespace GHIElectronics.Due {
                 var cmd = string.Format("lcdtexts(\"{0}\",{1},{2},{3},{4},{5})", text, color, x, y, scalewidth, scaleheight);
 
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -108,7 +108,7 @@ namespace GHIElectronics.Due {
             public bool Stream(byte[] data) {
                 var cmd = string.Format("lcdstream()");
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 

@@ -37,7 +37,7 @@ namespace GHIElectronics.Due {
                 CmdRespone res;
                 var cmd = string.Format("i2cstream({0},{1},{2})", address, countWrite, countRead) ;
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 res = this.serialPort.ReadRespone();
 
@@ -87,7 +87,7 @@ namespace GHIElectronics.Due {
 
                 CmdRespone res;
                 for (var i = 0; i < countWrite; i++) {
-                    this.serialPort.WriteLine(cmd_var[i]);
+                    this.serialPort.WriteCommand(cmd_var[i]);
 
                     res = this.serialPort.ReadRespone();
 
@@ -98,7 +98,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("i2cbytes({0},{1},{2})", address, countWrite, countRead);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 res = this.serialPort.ReadRespone();
 
@@ -110,7 +110,7 @@ namespace GHIElectronics.Due {
                     for (var i = 0;i < countRead; i++) {
                         var variable = (char)('a' + i);
                         cmd = string.Format("print({0})", variable);
-                        this.serialPort.WriteLine(cmd);
+                        this.serialPort.WriteCommand(cmd);
 
                         res = this.serialPort.ReadRespone();
 

@@ -50,6 +50,8 @@ namespace GHIElectronics.Due {
 
         public void DiscardInBuffer() => this.port.DiscardInBuffer();
 
+        public void DiscardOutBuffer() => this.port.DiscardOutBuffer();
+
 
         public virtual void Disconnect() {
 
@@ -64,7 +66,7 @@ namespace GHIElectronics.Due {
         }
 
         public void Synchronize() {
-            
+
             // Send 127 code to exit running mode 
             this.WriteRawData(new byte[] { 127 }, 0, 1);
 
@@ -72,6 +74,8 @@ namespace GHIElectronics.Due {
             var orig = this.ReadTimeout;
 
             this.ReadTimeout = TimeSpan.FromSeconds(1);
+
+            this.port.ReadTimeout = (int)this.ReadTimeout.TotalMilliseconds;
 
             var tryCount = 3;
 
@@ -99,6 +103,7 @@ namespace GHIElectronics.Due {
             }
 
             this.ReadTimeout = orig;
+            this.port.ReadTimeout = (int)this.ReadTimeout.TotalMilliseconds;
         }
 
         private bool echo = true;
@@ -124,9 +129,6 @@ namespace GHIElectronics.Due {
 
             var version = this.ReadRespone();
 
-
-
-            this.ReadCommandComplete();
 
             if (version.success) {
                 if (this.echo && version.respone.Contains(command)) {
@@ -160,16 +162,18 @@ namespace GHIElectronics.Due {
         //        throw new UnexpectedResultException($"Expected {expected}, got {actual}.");
         //}
         //public void WriteCommand(char command) => this.WriteLine(new string(command, 1));
-        public void WriteCommand(string command) => this.WriteLine(command);
+        public void WriteCommand(string command) {
 
-        public void WriteLine(string str) {
+            this.DiscardInBuffer();
+            this.DiscardOutBuffer();
+
+            this.WriteLine(command);
+        }
+
+        private void WriteLine(string str) {
             str += '\n';
 
             this.port.Write(Encoding.UTF8.GetBytes(str), 0, Encoding.UTF8.GetByteCount(str));
-        }
-
-        public void ReadCommandComplete() {
-            //this.CheckResult(this.ReadRespone(), SerialInterface.CommandCompleteText);
         }
 
 
@@ -198,6 +202,9 @@ namespace GHIElectronics.Due {
                         var idx1 = str.IndexOf(">");
                         var idx2 = str.IndexOf("&");
 
+                        if (idx1 == -1)
+                            idx1 = str.IndexOf("$");
+
                         if (idx1 == -1 && idx2 == -1) {
                             //Thread.Sleep(1);
 
@@ -223,6 +230,75 @@ namespace GHIElectronics.Due {
 
                         return respone;
                     }
+
+                }
+
+                this.leftOver = string.Empty;
+
+                this.port.DiscardInBuffer();
+                this.port.DiscardOutBuffer();
+            }
+
+            respone.success = false;
+            respone.respone = string.Empty;
+
+            return respone;
+        }
+
+        public CmdRespone ReadRespone2() {
+            var str = this.leftOver;
+            var end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks;
+
+            var respone = new CmdRespone();
+
+
+            lock (this.objlock) {
+
+
+                while (end > DateTime.UtcNow.Ticks) {
+
+                    if (this.port.BytesToRead > 0) {
+                        var data = this.port.ReadByte();
+
+
+
+                        str += (char)data;
+
+                        //str = str.Replace("\n", string.Empty);
+                        //str = str.Replace("\r", string.Empty);
+
+                        var idx1 = str.IndexOf(">");
+                        var idx2 = str.IndexOf("&");
+
+                        if (idx1 == -1)
+                            idx1 = str.IndexOf("$");
+
+                        if (idx1 == -1 && idx2 == -1) {
+                            //Thread.Sleep(1);
+
+
+                            continue;
+                        }
+
+                        var idx = idx1 == -1 ? idx2 : idx1;
+
+                        this.leftOver = str.Substring(idx + 1);
+
+                        respone.success = true;
+                        respone.respone = str.Substring(0, idx);
+
+                        //return str.Substring(0, idx);
+                        var idx3 = str.IndexOf("!");
+
+                        if (idx3 != -1 && (respone.respone.Contains("error") || respone.respone.Contains("unknown"))) {
+                            //respone.respone = respone.respone.Substring(0, respone.respone);
+                            respone.success = false;
+                        }
+
+
+                        return respone;
+                    }
+
                 }
 
                 this.leftOver = string.Empty;
@@ -254,7 +330,7 @@ namespace GHIElectronics.Due {
                 else return 5;
 
             }
-        } 
+        }
         public void WriteRawData(byte[] buffer, int offset, int count) {
 
 
@@ -299,6 +375,7 @@ namespace GHIElectronics.Due {
             lock (this.objlock) {
 
                 while (end > DateTime.UtcNow.Ticks) {
+
                     var read = this.port.Read(buffer, offset + totalRead, count - totalRead);
                     totalRead += read;
 
@@ -309,6 +386,8 @@ namespace GHIElectronics.Due {
                     if (totalRead == count) {
                         break;
                     }
+
+
                 }
             }
 

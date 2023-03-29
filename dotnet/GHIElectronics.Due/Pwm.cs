@@ -26,7 +26,7 @@ namespace GHIElectronics.Due {
                 var cmd = string.Format("awrite({0},{1})", pin.ToString(), dutycyle.ToString());
      
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 

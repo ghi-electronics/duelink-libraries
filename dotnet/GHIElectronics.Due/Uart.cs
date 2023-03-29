@@ -17,7 +17,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("uartinit({0})", baurdate);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -27,7 +27,7 @@ namespace GHIElectronics.Due {
             public bool Write(byte data) {
                 var cmd = string.Format("uartwrite({0})", data);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -37,7 +37,7 @@ namespace GHIElectronics.Due {
             public int BytesToRead() {
                 var cmd = string.Format("print(uartcount())");
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -58,7 +58,7 @@ error:
             public byte Read() {
                 var cmd = string.Format("print(uartread())");
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 

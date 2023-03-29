@@ -14,7 +14,7 @@ namespace GHIElectronics.Due {
 
             public int Read() {
                 var cmd = "print(irread())";
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
                 var val = 255;
@@ -48,7 +48,7 @@ namespace GHIElectronics.Due {
             public bool Enable(bool enable) {
                 var cmd = string.Format("irenable({0})", enable == true?1:0);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 

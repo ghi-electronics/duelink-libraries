@@ -43,7 +43,7 @@ namespace GHIElectronics.Due {
                 var cmd = string.Format("spistream({0},{1},{2})", countWrite.ToString(), countRead.ToString(), chipselect.ToString());
 
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 res = this.serialPort.ReadRespone();
 
@@ -89,7 +89,7 @@ namespace GHIElectronics.Due {
                 CmdRespone res;
                 var cmd = string.Format("print(spibyte({0}))", data.ToString());
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 res = this.serialPort.ReadRespone();
 
@@ -123,7 +123,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("spi4bpp({0},{1})", count.ToString(), chipselect.ToString());
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -144,7 +144,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("palette({0},{1})", id.ToString(), color.ToString());
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
                 return res.success;

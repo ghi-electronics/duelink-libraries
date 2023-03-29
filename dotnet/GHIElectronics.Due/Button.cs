@@ -29,7 +29,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("btnenable({0},{1})", pin, enable==true? 1:0);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -49,7 +49,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("print(btndown({0}))", pin);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -78,7 +78,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("print(btnup({0}))", pin);
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 

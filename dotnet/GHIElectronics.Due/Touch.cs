@@ -16,7 +16,7 @@ namespace GHIElectronics.Due {
 
             public bool Read(int pin) {
                 var cmd = string.Format("print(touchread({0}))", pin);
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
                 var val = false;

@@ -18,7 +18,7 @@ namespace GHIElectronics.Due {
 
             public bool Show(int count) {
                 var cmd = string.Format("neoshow({0})", count.ToString());
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 // each led ned 1.25us delay blocking mode
                 var delay = (MAX_LED_NUM * 3 * 8 * 1.25) / 1000;
@@ -33,7 +33,7 @@ namespace GHIElectronics.Due {
 
             public bool Clear() {
                 var cmd = string.Format("neoclear()");
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -48,7 +48,7 @@ namespace GHIElectronics.Due {
                 var cmd = string.Format("neoset({0},{1},{2},{3})", id.ToString(), red.ToString(), green.ToString(), blue.ToString());
 
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
@@ -62,7 +62,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("neostream({0})", data.Length.ToString());
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 

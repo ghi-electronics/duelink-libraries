@@ -23,7 +23,7 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("servoset({0},{1})", pin.ToString(), position.ToString());
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var respone = this.serialPort.ReadRespone();
 

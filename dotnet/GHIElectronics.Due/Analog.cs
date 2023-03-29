@@ -20,13 +20,11 @@ namespace GHIElectronics.Due {
 
                 var cmd = string.Format("print(aread({0}))", pin.ToString());
 
-                this.serialPort.WriteLine(cmd);
+                this.serialPort.WriteCommand(cmd);
 
                 var respone = this.serialPort.ReadRespone();
 
-                if (respone.success) {
-
-                    respone.respone = this.serialPort.RemoveEchoRespone(respone.respone, cmd);
+                if (respone.success) {                   
                     try {
                         var value = int.Parse(respone.respone);
 
