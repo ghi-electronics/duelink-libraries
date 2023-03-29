@@ -16,6 +16,7 @@ from Due.Spi import SpiController
 from Due.Touch import TouchController
 from Due.Uart import UartController
 from Due.Led import LedController
+from Due.Script import ScriptController
 from enum import Enum
 
 class DueController:
@@ -41,6 +42,7 @@ class DueController:
         self.Display = DisplayController(self.serialPort)
         self.Touch = TouchController(self.serialPort)
         self.Led = LedController(self.serialPort)
+        self.Script = ScriptController(self.serialPort)
 
         self.Version: str = self.serialPort.GetVersion().split("\n")[0]
 

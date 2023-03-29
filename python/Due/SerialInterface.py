@@ -88,17 +88,21 @@ class SerialInterface:
     # def CheckResult(self, actual, expected):
     #     if actual != expected:
     #         raise Exception(f"Expected {expected}, got {actual}.")
+    def DiscardInBuffer(self):
+        self.portName.reset_input_buffer()
+
+    def DiscardOutBuffer(self):
+        self.portName.reset_output_buffer()
 
     def WriteCommand(self, command):
-        self.WriteLine(command)
+        self.DiscardInBuffer()
+        self.DiscardOutBuffer()
+        self.__WriteLine(command)
 
-    def WriteLine(self, string):
+    def __WriteLine(self, string):
         string += "\n"
         # print(string)
         self.portName.write(bytes(string, 'utf-8'))
-
-    def ReadCommandComplete(self):
-        self.CheckResult(self.ReadRespone().respone, SerialInterface.CommandCompleteText)
 
     def ReadRespone(self):
         str = self.leftOver
@@ -116,6 +120,58 @@ class SerialInterface:
             # print(str)
             idx1 = str.find(">")
             idx2 = str.find("&")
+
+            if idx1 == -1:
+                idx1 = str.find("$")
+
+            if idx1 == -1 and idx2 == -1:
+                continue
+
+            idx = idx2 if idx1 == -1 else idx1
+
+            self.leftOver = str[idx + 1:]
+            respone.success = True
+            respone.respone = str[:idx]
+            # print(respone.respone)
+            idx3 = str.find("!")
+            if idx3 != -1 and 'error' in respone.respone:
+                respone.success = False
+
+            if idx3 != -1 and 'unknown' in respone.respone:
+                respone.success = False
+
+
+            return respone
+
+        self.leftOver = ""
+
+        self.portName.reset_input_buffer()
+        self.portName.reset_output_buffer()
+
+        respone.success = False
+        respone.respone = ""
+
+        return respone
+    
+    def ReadRespone2(self):
+        str = self.leftOver
+        end = datetime.utcnow() + timedelta(seconds=self.ReadTimeout)
+
+        respone = CmdRespone()
+
+        while datetime.utcnow() < end:
+            data = self.portName.read()
+
+            str += data.decode()
+
+            #str = str.replace("\n", "")
+            #str = str.replace("\r", "")
+            # print(str)
+            idx1 = str.find(">")
+            idx2 = str.find("&")
+
+            if idx1 == -1:
+                idx1 = str.find("$")
 
             if idx1 == -1 and idx2 == -1:
                 continue
