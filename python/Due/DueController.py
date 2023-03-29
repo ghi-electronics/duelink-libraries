@@ -65,8 +65,8 @@ class DueController:
             for port in com_ports_list:               
                 if port.vid ==0x1B9F and port.pid==0xF300:
                     if (platform.system() == 'Windows'):
-                        return port.name
-                    if (platform.system() == 'Linux'):
+                        return port.name                    
+                    else:
                         return port.device
 
         return ""
