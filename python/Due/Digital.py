@@ -23,7 +23,7 @@ class DigitalController:
             pull = "2"
 
         cmd = f"print(dread({pin},{pull}))"
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         respone = self.serialPort.ReadRespone()
 
@@ -42,7 +42,7 @@ class DigitalController:
             raise ValueError("Invalid pin")
 
         cmd = f"dwrite({pin},{1 if value else 0})"
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         respone = self.serialPort.ReadRespone()
 

@@ -34,7 +34,7 @@ class SpiController:
             chipselect = 255
 
         cmd = f"spistream({countWrite},{countRead},{chipselect})"
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 
@@ -70,7 +70,7 @@ class SpiController:
             raise ValueError("Invalid arguments")
         
         cmd = f"spi4bpp({countWrite},{chipselect})"
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 
@@ -88,7 +88,7 @@ class SpiController:
         
         cmd = f"palette({id},{color})"
 
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
         return res.success

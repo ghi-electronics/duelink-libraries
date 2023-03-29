@@ -12,7 +12,7 @@ class ButtonController:
 
         cmd = f"btnenable({pin}, {int(enable)})"
 
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
 
         return res.success
@@ -24,7 +24,7 @@ class ButtonController:
             
         cmd = f"print(btndown({pin}))"
 
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
 
         if res.success:
@@ -42,7 +42,7 @@ class ButtonController:
             
         cmd = f"print(btnup({pin}))"
 
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
 
         if res.success:

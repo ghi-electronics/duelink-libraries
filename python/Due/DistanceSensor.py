@@ -13,7 +13,7 @@ class DistanceSensorController:
             raise ValueError('Invalid pin')
 
         cmd = f'print(distance({pulsePin},{echoPin}))'
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 

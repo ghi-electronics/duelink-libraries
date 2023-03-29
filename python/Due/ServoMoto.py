@@ -11,7 +11,7 @@ class ServoMotoController:
             raise ValueError('Position must be in the range 0..180')
 
         cmd = 'servoset({}, {})'.format(pin, position)
-        self.serial_port.WriteLine(cmd)
+        self.serial_port.WriteCommand(cmd)
 
         response = self.serial_port.ReadRespone()
 

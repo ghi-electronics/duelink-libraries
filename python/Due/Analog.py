@@ -11,7 +11,7 @@ class AnalogController:
 
         cmd = "print(aread({0}))".format(str(pin))
 
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 

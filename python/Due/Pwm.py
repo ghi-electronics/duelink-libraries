@@ -13,7 +13,7 @@ class PwmController:
             raise ValueError('Duty cycle must be in the range 0..1000')
 
         cmd = f'awrite({pin}, {duty_cycle})'
-        self.serial_port.WriteLine(cmd)
+        self.serial_port.WriteCommand(cmd)
 
         res = self.serial_port.ReadRespone()
         if res.success:

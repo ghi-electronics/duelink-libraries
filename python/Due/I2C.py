@@ -21,7 +21,7 @@ class I2cController:
             raise ValueError("Invalid range for dataRead")
 
         cmd = f"i2cstream({address},{countWrite},{countRead})"
-        self.serialPort.WriteLine(cmd)        
+        self.serialPort.WriteCommand(cmd)        
 
         res = self.serialPort.ReadRespone()
 

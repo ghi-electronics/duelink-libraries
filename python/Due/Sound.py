@@ -16,7 +16,7 @@ class SoundController:
 
         cmd = "sound({}, {}, {})".format(frequency, duration_ms, volume)
 
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 
@@ -29,7 +29,7 @@ class SoundController:
 
         cmd = "sound({}, {}, {})".format(frequency, duration_ms, volume)
 
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 

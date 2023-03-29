@@ -4,7 +4,7 @@ class LedController:
 
     def Set(self, highPeriod: int, lowPeriod: int, count: int) -> bool:
         cmd = f"led({highPeriod},{lowPeriod},{count})"
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
         return res.success

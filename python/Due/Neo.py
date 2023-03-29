@@ -9,7 +9,7 @@ class NeoController:
 
     def Show(self, count):
         cmd = "neoshow({0})".format(count)
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         # each led need 1.25us delay blocking mode
         delay = (self.MAX_LED_NUM * 3 * 8 * 1.25) / 1000000
@@ -21,7 +21,7 @@ class NeoController:
 
     def Clear(self):
         cmd = "neoclear()"
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 
@@ -32,7 +32,7 @@ class NeoController:
             return False
 
         cmd = "neoset({0},{1},{2},{3})".format(id, red, green, blue)
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 
@@ -43,7 +43,7 @@ class NeoController:
             return False
 
         cmd = "neostream({0})".format(len(data))
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 

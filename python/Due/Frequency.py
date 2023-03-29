@@ -15,7 +15,7 @@ class FrequencyController:
             raise ValueError("dutycyle must be in range 0..1000")
 
         cmd = "freq({}, {}, {})".format(frequency, duration_ms, dutycyle)
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 

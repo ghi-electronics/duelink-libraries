@@ -273,9 +273,9 @@ class CmdRespone:
     #     return respone
     #
     # def WriteCommand(self, command):
-    #     self.WriteLine(command)
+    #     self.WriteCommand(command)
     #
-    # def WriteLine(self, string):
+    # def WriteCommand(self, string):
     #     string += "\n"
     #     print(string)
     #     self.portName.write(bytes(string, 'utf-8'))

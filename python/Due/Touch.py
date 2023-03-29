@@ -4,7 +4,7 @@ class TouchController:
 
     def Read(self, pin):
         cmd = "print(touchread({0}))".format(pin)
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
         val = False

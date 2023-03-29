@@ -11,13 +11,13 @@ class SystemController:
 
     def Reset(self, option : Enum):
         cmd = "reset({0})".format(1 if option.value == 1 else 0)
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
         # The device will reset in bootloader or system reset
         self.serialPort.Disconnect()
 
     def GetTickMicroseconds(self):
         cmd = "print(tickus())"
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         if res.success:
             try:
@@ -28,7 +28,7 @@ class SystemController:
     
     def GetTickMilliseconds(self):
         cmd = "print(tickms())"
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         if res.success:
             try:

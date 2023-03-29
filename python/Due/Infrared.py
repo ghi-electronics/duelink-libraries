@@ -4,7 +4,7 @@ class InfraredController:
 
     def Read(self):
         cmd = "print(irread())"
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         if res.success:
             try:
@@ -15,7 +15,7 @@ class InfraredController:
 
     def Enable(self, enable):
         cmd = "irenable({})".format(int(enable))
-        self.serialPort.WriteLine(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
 
