@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Xml.Linq;
 
-namespace GHIElectronics.Due {
+namespace GHIElectronics.DUE {
     public class SerialInterface {
         protected const string CommandCompleteText = ">";
 

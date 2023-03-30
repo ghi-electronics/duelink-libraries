@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
-namespace GHIElectronics.Due {
-    public partial class DueController {
+namespace GHIElectronics.DUE {
+    public partial class DUEController {
         const int MAX_IO = 21;
         const int MAX_IO_ANALOG = 11;
 
@@ -41,7 +41,7 @@ namespace GHIElectronics.Due {
 
         public string Version { get; internal set; } = string.Empty;
 
-        public DueController(string comPort) {
+        public DUEController(string comPort) {
             if (comPort == null)
                 throw new ArgumentNullException("Invalid comport");
 

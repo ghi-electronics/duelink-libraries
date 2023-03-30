@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GHIElectronics.Due {
+namespace GHIElectronics.DUE {
 
-    public partial class DueController {
+    public partial class DUEController {
         public class NeoController {
 
             SerialInterface serialPort;

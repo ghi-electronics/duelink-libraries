@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using static GHIElectronics.Due.SerialInterface;
 
-namespace GHIElectronics.Due {
-    public partial class DueController {
+namespace GHIElectronics.DUE {
+    public partial class DUEController {
 
         public class I2cController {
 

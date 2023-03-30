@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static GHIElectronics.Due.DueController;
+using static GHIElectronics.Due.DUEController;
 
-namespace GHIElectronics.Due {
+namespace GHIElectronics.DUE {
 
-    public partial class DueController {
+    public partial class DUEController {
       
         public class ButtonController {
             public enum Buttons {

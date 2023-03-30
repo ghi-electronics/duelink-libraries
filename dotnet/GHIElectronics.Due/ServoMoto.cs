@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GHIElectronics.Due {
-    public partial class DueController {
+namespace GHIElectronics.DUE {
+    public partial class DUEController {
         
         public class ServoMotoController {
 

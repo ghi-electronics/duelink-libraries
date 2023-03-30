@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static GHIElectronics.Due.DueController;
+using static GHIElectronics.Due.DUEController;
 using static GHIElectronics.Due.SerialInterface;
 
-namespace GHIElectronics.Due {
-    public partial class DueController {
+namespace GHIElectronics.DUE {
+    public partial class DUEController {
         public class ScriptController {
 
             SerialInterface serialPort;
