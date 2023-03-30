@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static GHIElectronics.Due.DUEController;
-using static GHIElectronics.Due.SerialInterface;
+using static GHIElectronics.DUE.DUEController;
+using static GHIElectronics.DUE.SerialInterface;
 
 namespace GHIElectronics.DUE {
     public partial class DUEController {

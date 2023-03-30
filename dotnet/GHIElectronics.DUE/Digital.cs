@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static GHIElectronics.Due.DUEController.DigitalController;
+using static GHIElectronics.DUE.DUEController.DigitalController;
 
 namespace GHIElectronics.DUE {
     public partial class DUEController {

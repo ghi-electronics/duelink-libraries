@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static GHIElectronics.Due.DUEController;
+using static GHIElectronics.DUE.DUEController;
 
 namespace GHIElectronics.DUE {
 
