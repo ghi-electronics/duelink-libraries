@@ -1,11 +1,7 @@
-using System;
+
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Win32;
 
 namespace GHIElectronics.Due {
@@ -68,7 +64,7 @@ namespace GHIElectronics.Due {
             this.Display = new DisplayController(this.serialPort);
             this.Touch = new TouchController(this.serialPort);
             this.Led = new LedController(this.serialPort);
-            this.Script = new ScriptController(this.serialPort);    
+            this.Script = new ScriptController(this.serialPort);
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {
@@ -79,6 +75,7 @@ namespace GHIElectronics.Due {
         static public string GetConnectionPort() {
             var vid = "VID_1B9F";
             var pid = "PID_F300";
+
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 var serialports = new ArrayList();
@@ -131,6 +128,32 @@ namespace GHIElectronics.Due {
 
                 catch {
                 }
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+                var process = new Process();
+
+                var processInfo = new ProcessStartInfo {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    FileName = "ls",
+                    Arguments = "/dev/",
+                    WorkingDirectory = null,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+
+                };
+                process.StartInfo = processInfo;
+
+                process.Start();
+
+                var output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+
+                if (output.Contains("cu.usbmodemDUE_SC131"))
+                    return "/dev/cu.usbmodemDUE_SC131";
+                else if (output.Contains("cu.usbmodemDUE_SC0071"))
+                    return "/dev/cu.usbmodemDUE_SC0071";
+
             }
 
             return string.Empty;
