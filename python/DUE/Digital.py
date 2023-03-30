@@ -1,5 +1,5 @@
 
-from Due.Const import MAX_IO
+from DUE.Const import MAX_IO
 
 class Input:
     PULL_NONE = 0

@@ -1,4 +1,4 @@
-from Due.Const import MAX_IO
+from DUE.Const import MAX_IO
 
 class ServoMotoController:
     def __init__(self, serial_port):

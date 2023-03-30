@@ -1,4 +1,4 @@
-from Due.Const import MAX_IO_ANALOG
+from DUE.Const import MAX_IO_ANALOG
 
 class AnalogController:
     def __init__(self, serialPort):

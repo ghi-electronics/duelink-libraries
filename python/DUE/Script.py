@@ -1,5 +1,5 @@
 import time
-from Due.SerialInterface import SerialInterface
+from DUE.SerialInterface import SerialInterface
 
 class ScriptController:
     def __init__(self, serialPort : SerialInterface):

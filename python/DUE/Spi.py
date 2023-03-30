@@ -1,6 +1,6 @@
 from typing import Optional
 
-from Due.Const import MAX_IO
+from DUE.Const import MAX_IO
 
 import time
 
