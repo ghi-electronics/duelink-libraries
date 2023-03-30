@@ -1,6 +1,7 @@
 
 using System.Collections;
 using System.Diagnostics;
+using System.IO.Ports;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
@@ -129,31 +130,17 @@ namespace GHIElectronics.DUE {
                 catch {
                 }
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-                var process = new Process();
+            else {
+                var ports = SerialPort.GetPortNames();
 
-                var processInfo = new ProcessStartInfo {
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    FileName = "ls",
-                    Arguments = "/dev/",
-                    WorkingDirectory = null,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-
-                };
-                process.StartInfo = processInfo;
-
-                process.Start();
-
-                var output = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
-
-                if (output.Contains("cu.usbmodemDUE_SC131"))
-                    return "/dev/cu.usbmodemDUE_SC131";
-                else if (output.Contains("cu.usbmodemDUE_SC0071"))
-                    return "/dev/cu.usbmodemDUE_SC0071";
-
+                if (ports != null) {
+                    foreach (var port in ports) {
+                        if (port.Contains("usbmodemDUE_SC131"))
+                            return "/dev/tty.usbmodemDUE_SC131";
+                        else if (port.Contains("usbmodemDUE_SC0071"))
+                            return  "/dev/tty.usbmodemDUE_SC0071";
+                    }
+                }                
             }
 
             return string.Empty;
