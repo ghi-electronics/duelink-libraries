@@ -19,7 +19,7 @@ from DUE.Led import LedController
 from DUE.Script import ScriptController
 from enum import Enum
 import platform
-class DueController:
+class DUEController:
 
     def __init__(self, comPort: str):
         if comPort is None:
