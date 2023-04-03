@@ -74,7 +74,7 @@ namespace GHIElectronics.DUE {
                 return -1;
             }
 
-            public void Beep(uint pin, uint frequency, uint durationms) {
+            public bool Beep(uint pin, uint frequency, uint durationms) {
                 if (durationms > 1000) {
                     throw new Exception("Max duration is 1000 (one second)");
                 }
@@ -87,8 +87,11 @@ namespace GHIElectronics.DUE {
 
                 this.serialPort.WriteCommand(cmd);
 
-                this.serialPort.ReadRespone();
-                
+                var res = this.serialPort.ReadRespone();
+
+                return res.success;
+
+
             }
 
             

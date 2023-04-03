@@ -93,4 +93,18 @@ class SpiController:
         res = self.serialPort.ReadRespone()
         return res.success
     
+    def Configuration(self,mode: int,  frequencyKHz: int)-> bool:
+        if mode > 3 or mode < 0:
+            raise ValueError("Mode must be in range 0...3.")
+        
+        if frequencyKHz < 200  or frequencyKHz > 20000:
+            raise ValueError("FrequencyKHz must be in range 200KHz to 20MHz.")
+        
+        cmd = f"palette({mode},{frequencyKHz})"
+
+        self.serialPort.WriteCommand(cmd)
+
+        res = self.serialPort.ReadRespone()
+        return res.success
+    
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -149,6 +150,21 @@ namespace GHIElectronics.DUE {
                 var res = this.serialPort.ReadRespone();
                 return res.success;
 
+            }
+
+            public bool Configuration(uint mode, uint frequencyKHz ) {
+                if (mode > 3 )
+                    throw new ArgumentOutOfRangeException("Mode must be in range 0...3");
+
+                if (frequencyKHz < 200 || frequencyKHz > 20000)
+                    throw new ArgumentOutOfRangeException("frequency must be in range 200KHz to 20MHz ");
+
+                var cmd = string.Format("spicfg({0},{1})", mode.ToString(), frequencyKHz.ToString());
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+                return res.success;
             }
         }
     }

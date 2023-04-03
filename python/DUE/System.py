@@ -37,7 +37,7 @@ class SystemController:
                 pass
         return -1
     
-    def Beep(self, pin:int, frequency:int, duration:int):
+    def Beep(self, pin:int, frequency:int, duration:int)->bool:
         if frequency < 0 or frequency > 10000:
             raise ValueError("Frequency is within range[0,10000] Hz")
         if duration < 0 or duration > 1000:
@@ -45,7 +45,9 @@ class SystemController:
         
         cmd = "beep({0}, {1}, {2})".format(pin, frequency, duration)
         self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadRespone()
+        res = self.serialPort.ReadRespone()
+        return res.success
+    
 
 
 
