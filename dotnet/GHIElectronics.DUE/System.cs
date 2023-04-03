@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace GHIElectronics.DUE {
 
     public partial class DUEController {
@@ -71,6 +72,23 @@ namespace GHIElectronics.DUE {
                 }
 
                 return -1;
+            }
+
+            public void Beep(uint pin, uint frequency, uint durationms) {
+                if (durationms > 1000) {
+                    throw new Exception("Max duration is 1000 (one second)");
+                }
+
+                if (frequency > 10000) {
+                    throw new Exception("Frequency is within range[0,10000] Hz");
+                }
+
+                var cmd = string.Format("beep({0},{1},{2})", pin, frequency, durationms);
+
+                this.serialPort.WriteCommand(cmd);
+
+                this.serialPort.ReadRespone();
+                
             }
 
             

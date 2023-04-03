@@ -37,34 +37,16 @@ class SystemController:
                 pass
         return -1
     
-    def IsProgramMode(self)->bool:
-        cmd = bytearray(1)
-        data = bytearray(1)
-    
-        cmd[0] = 255
+    def Beep(self, pin:int, frequency:int, duration:int):
+        if frequency < 0 or frequency > 10000:
+            raise ValueError("Frequency is within range[0,10000] Hz")
+        if duration < 0 or duration > 1000:
+            raise ValueError("duration is within range[0,1000] millisecond")
         
-        self.serialPort.WriteRawData(cmd, 0, 1)
+        cmd = "beep({0}, {1}, {2})".format(pin, frequency, duration)
+        self.serialPort.WriteCommand(cmd)
+        self.serialPort.ReadRespone()
 
-        time.sleep(0.01)
-
-        self.serialPort.ReadRawData(data,0,1)
-
-        if (data[0]== 255):
-            return True
-        
-        return False
-    
-    def ExitProgramMode(self) -> bool:
-        cmd = bytearray(1)
-        cmd[0] = 127
-
-        self.serialPort.WriteRawData(cmd, 0, 1)
-
-        time.sleep(0.01)
-
-        res = self.serialPort.ReadRespone()
-
-        return res.success
 
 
 
