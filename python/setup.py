@@ -2,11 +2,10 @@ import setuptools
 
 setuptools.setup(
     name = "DUE",
-    version = "0.0.0.5000",
+    version = "0.0.0.7000",
     author = "GHI Electronics",
     author_email = "support@ghielectronics.com",
     description = "GHI Electronics DUE Python library.",
-    license = "MIT",
     url = "https://www.duelink.com/",
     packages=setuptools.find_packages(),
     classifiers=[
