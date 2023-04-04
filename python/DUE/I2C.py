@@ -26,14 +26,14 @@ class I2cController:
         res = self.serialPort.ReadRespone()
 
         if not res.success:
-            return False
+            raise ValueError("I2c error:" + res.respone)
 
         if countWrite > 0:
             self.serialPort.WriteRawData(dataWrite, offsetWrite, countWrite)
 
         if countRead > 0:
             if self.serialPort.ReadRawData(dataRead, offsetRead, countRead) != countRead:
-                return False
+                raise ValueError("I2c error:" + res.respone)
 
         res = self.serialPort.ReadRespone()
         return res.success
