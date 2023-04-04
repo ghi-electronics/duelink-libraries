@@ -91,7 +91,7 @@ namespace GHIElectronics.DUE {
                     var version = this.GetVersion();
 
                     if (version != string.Empty && version[2] == '.' && version[4] == '.') {
-                        if (version.IndexOf('P') >= 0) {
+                        if (version.IndexOf('P') >= 0 || version.IndexOf('I') >=0 || version.IndexOf('F') >= 0) {
                             this.isPulseFamily = true;
                         }
                         break;
