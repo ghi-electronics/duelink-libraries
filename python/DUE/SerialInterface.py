@@ -111,8 +111,7 @@ class SerialInterface:
         respone = CmdRespone()
 
         while datetime.utcnow() < end:
-            data = self.portName.read()
-
+            data = self.portName.read(1)
             str += data.decode()
 
             str = str.replace("\n", "")

@@ -27,8 +27,7 @@ class DigitalController:
 
         respone = self.serialPort.ReadRespone()
 
-        if respone.success:
-            respone.respone = self.serialPort.RemoveEchoRespone(respone.respone, cmd)
+        if respone.success:            
             try:
                 value = int(respone.respone)
                 return value == 1

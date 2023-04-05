@@ -42,7 +42,8 @@ namespace GHIElectronics.DUE {
                 res = this.serialPort.ReadRespone();
 
                 if (!res.success) {
-                    return false;
+
+                    throw new Exception("I2C error: " + res.respone);
                 }
 
                 if (countWrite > 0) {
@@ -52,7 +53,8 @@ namespace GHIElectronics.DUE {
                 if (countRead > 0) {
                     if (this.serialPort.ReadRawData(dataRead, offsetRead, countRead) != countRead) {
 
-                        return false;
+
+                        throw new Exception("I2C error: " + res.respone);
                     }
                 }
 
