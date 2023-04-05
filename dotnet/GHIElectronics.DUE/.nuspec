@@ -3,13 +3,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
 	<id>GHIElectronics.DUE</id>
-	<version>0.0.0.7000</version>
+	<version>0.0.0.8000</version>
 	<title />
 	<authors>GHI Electronics LLC</authors>
 	<owners>GHI Electronics LLC</owners>	
-	<description>The driver for Due</description>
+	<description>The driver for DUE</description>
 	<iconUrl>http://files.ghielectronics.com/downloads/Logos/GHIElectronicsTinyCLRNuGet.png</iconUrl>
-	<tags>Due BrainPad TinyCLR TinyCLROS FEZ</tags>
+	<tags>DUE BrainPad TinyCLR TinyCLROS FEZ</tags>
 	<licenseUrl>http://files.ghielectronics.com/downloads/TinyCLR/License.txt</licenseUrl>
 	<requireLicenseAcceptance>true</requireLicenseAcceptance>
 	<copyright>Copyright GHI Electronics, LLC 2023</copyright>
