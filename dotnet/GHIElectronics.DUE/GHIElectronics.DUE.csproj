@@ -10,13 +10,13 @@
     <Copyright>Copyright GHI Electronics, LLC 2023</Copyright>
     <PackageProjectUrl>https://ghielectronics.com/</PackageProjectUrl>
     <PackageTags>BrainPad Due</PackageTags>
-    <AssemblyVersion>0.0.0.5000</AssemblyVersion>
-    <FileVersion>0.0.0.5000</FileVersion>
-    <Version>0.0.0.5000</Version>
+    <AssemblyVersion>0.0.0.8000</AssemblyVersion>
+    <FileVersion>0.0.0.8000</FileVersion>
+    <Version>0.0.0.8000</Version>
     <Authors>GHI Electronics, LLC</Authors>
 	<Owner>GHI Electronics, LLC</Owner>
     <Company>GHI Electronics, LLC</Company>
-    <PackageIcon>GHIElectronicsTinyCLRNuGet.png</PackageIcon>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="GHIElectronicsTinyCLRNuGet.png">
+    <None Include="images\icon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
