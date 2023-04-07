@@ -23,17 +23,18 @@ class I2cController:
         cmd = f"i2cstream({address},{countWrite},{countRead})"
         self.serialPort.WriteCommand(cmd)        
 
-        res = self.serialPort.ReadRespone()
-
-        if not res.success:
-            raise ValueError("I2c error:" + res.respone)
-
         if countWrite > 0:
+            res = self.serialPort.ReadRespone()
+
+            if not res.success:
+                raise ValueError("I2c error:" + res.respone)
+            
             self.serialPort.WriteRawData(dataWrite, offsetWrite, countWrite)
 
         if countRead > 0:
+ 
             if self.serialPort.ReadRawData(dataRead, offsetRead, countRead) != countRead:
-                raise ValueError("I2c error:" + res.respone)
+                raise ValueError("I2C read raw data error.")
 
         res = self.serialPort.ReadRespone()
         return res.success

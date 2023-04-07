@@ -39,22 +39,23 @@ namespace GHIElectronics.DUE {
 
                 this.serialPort.WriteCommand(cmd);
 
-                res = this.serialPort.ReadRespone();
-
-                if (!res.success) {
-
-                    throw new Exception("I2C error: " + res.respone);
-                }
-
                 if (countWrite > 0) {
+                    res = this.serialPort.ReadRespone(); // Read '&' to check device ready before send
+
+                    if (!res.success) {
+
+                        throw new Exception("I2C error: " + res.respone);
+                    }
+
                     this.serialPort.WriteRawData(dataWrite, offsetWrite, countWrite);
                 }
 
-                if (countRead > 0) {
+                if (countRead > 0) {                    
+
                     if (this.serialPort.ReadRawData(dataRead, offsetRead, countRead) != countRead) {
 
 
-                        throw new Exception("I2C error: " + res.respone);
+                        throw new Exception("I2C read raw data error.");
                     }
                 }
 
