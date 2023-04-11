@@ -14,7 +14,7 @@ namespace GHIElectronics.DUE {
             public AnalogController(SerialInterface serialPort) => this.serialPort = serialPort;
 
             public int Read(int pin) {
-                if (pin < 0 || pin >= MAX_IO_ANALOG)
+                if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinAnalog)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
 

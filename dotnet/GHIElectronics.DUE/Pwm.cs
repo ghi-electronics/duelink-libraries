@@ -16,7 +16,7 @@ namespace GHIElectronics.DUE {
 
 
             public bool Set(int pin, int dutycyle) {
-                if (pin < 0 || pin >= MAX_IO)
+                if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 if (dutycyle < 0 || dutycyle > 1000) {

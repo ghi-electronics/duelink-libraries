@@ -1,2 +1,0 @@
-MAX_IO = 21
-MAX_IO_ANALOG = 11

@@ -10,9 +10,9 @@
     <Copyright>Copyright GHI Electronics, LLC 2023</Copyright>
     <PackageProjectUrl>https://ghielectronics.com/</PackageProjectUrl>
     <PackageTags>BrainPad Due</PackageTags>
-    <AssemblyVersion>0.0.0.8000</AssemblyVersion>
-    <FileVersion>0.0.0.8000</FileVersion>
-    <Version>0.0.0.8000</Version>
+    <AssemblyVersion>0.0.0.8003</AssemblyVersion>
+    <FileVersion>0.0.0.8003</FileVersion>
+    <Version>0.0.0.8003</Version>
     <Authors>GHI Electronics, LLC</Authors>
 	<Owner>GHI Electronics, LLC</Owner>
     <Company>GHI Electronics, LLC</Company>
@@ -44,5 +44,5 @@
 	</Target>
 	<Import Project=".\packages\GHIElectronics.Tools.NuGetPacker.1.0.3\build\GHIElectronics.Tools.NuGetPacker.targets" Condition="Exists('.\packages\GHIElectronics.Tools.NuGetPacker.1.0.3\build\GHIElectronics.Tools.NuGetPacker.targets')" />
 	<Import Project=".\packages\GHIElectronics.Tools.AssemblySigner.1.0.3\build\GHIElectronics.Tools.AssemblySigner.targets" Condition="'$(DoAssemblySign)'=='true' And Exists('.\packages\GHIElectronics.Tools.AssemblySigner.1.0.3\build\GHIElectronics.Tools.AssemblySigner.targets')" />
-	-->
+-->
 </Project>

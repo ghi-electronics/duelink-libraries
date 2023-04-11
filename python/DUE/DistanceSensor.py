@@ -1,15 +1,15 @@
+from DUE.SerialInterface import SerialInterface
 
 class DistanceSensorController:
-    def __init__(self, serialPort):
+    def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
-        self.MAX_IO = 20
 
     def Read(self, pulsePin, echoPin):
 
-        if pulsePin < 0 or pulsePin >= self.MAX_IO:
+        if pulsePin < 0 or pulsePin >= self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError('Invalid pin')
 
-        if echoPin < 0 or echoPin >= self.MAX_IO:
+        if echoPin < 0 or echoPin >= self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError('Invalid pin')
 
         cmd = f'print(distance({pulsePin},{echoPin}))'

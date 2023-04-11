@@ -14,7 +14,7 @@ namespace GHIElectronics.DUE {
             public ServoMotoController(SerialInterface serialPort) => this.serialPort = serialPort;
 
             public bool Set(int pin, int position) {
-                if (pin < 0 || pin >= MAX_IO)
+                if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 if (position < 0 || position > 180) {

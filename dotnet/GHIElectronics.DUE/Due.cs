@@ -2,15 +2,29 @@
 using System.Collections;
 using System.Diagnostics;
 using System.IO.Ports;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
 namespace GHIElectronics.DUE {
+
+    public class DeviceConfiguration {
+        public bool IsPulse { get; internal set; } = false;
+        public bool IsPico { get; internal set; } = false;
+        public bool IsFlea { get; internal set; } = false;
+        public bool IsEdge { get; internal set; } = false;
+        public uint MaxPinIO { get; set; }
+        public uint MaxPinAnalog { get; set; }
+
+
+    }
     public partial class DUEController {
-        const int MAX_IO = 21;
-        const int MAX_IO_ANALOG = 11;
+        //const int MAX_IO = 21;
+        //const int MAX_IO_ANALOG = 11;
 
         SerialInterface serialPort = default!;
+
+        public DeviceConfiguration DeviceConfig { get; set; }
 
         public AnalogController Analog { get; internal set; }
         public DigitalController Digital { get; internal set; }
@@ -42,6 +56,15 @@ namespace GHIElectronics.DUE {
 
         public string Version { get; internal set; } = string.Empty;
 
+        public bool IsPulse { get; internal set; } = false;
+        public bool IsPico { get; internal set; } = false;
+        public bool IsFlea { get; internal set; } = false;
+        public bool IsEdge { get; internal set; } = false;
+
+      
+        public int MaxIO { get; internal set; } 
+        public int MaxAnalog { get; internal set; }
+
         public DUEController(string comPort) {
             if (comPort == null)
                 throw new ArgumentNullException("Invalid comport");
@@ -66,6 +89,7 @@ namespace GHIElectronics.DUE {
             this.Touch = new TouchController(this.serialPort);
             this.Led = new LedController(this.serialPort);
             this.Script = new ScriptController(this.serialPort);
+            
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {
@@ -138,9 +162,9 @@ namespace GHIElectronics.DUE {
                         if (port.Contains("usbmodemDUE_SC131"))
                             return "/dev/tty.usbmodemDUE_SC131";
                         else if (port.Contains("usbmodemDUE_SC0071"))
-                            return  "/dev/tty.usbmodemDUE_SC0071";
+                            return "/dev/tty.usbmodemDUE_SC0071";
                     }
-                }                
+                }
             }
 
             return string.Empty;
@@ -150,8 +174,45 @@ namespace GHIElectronics.DUE {
             this.serialPort.Connect();
 
             this.Version = this.serialPort.GetVersion().Substring(0);
-        }
 
+            if (this.Version!= null && this.Version != string.Empty && this.Version.Length == 7 ) {
+
+                this.DeviceConfig = new DeviceConfiguration();
+
+                if (this.Version[this.Version.Length -1] == 'P') {
+                    this.DeviceConfig.IsPulse = true;
+                    this.DeviceConfig.MaxPinIO = 23;
+                    this.DeviceConfig.MaxPinAnalog = 29;
+
+                }
+                else if (this.Version[this.Version.Length - 1] == 'I') {
+                    this.DeviceConfig.IsPico = true;
+                    this.DeviceConfig.MaxPinIO = 29;
+                    this.DeviceConfig.MaxPinAnalog = 29;
+
+                }
+                else if (this.Version[this.Version.Length - 1] == 'F') {
+                    this.DeviceConfig.IsFlea = true;
+                    this.DeviceConfig.MaxPinIO = 11;
+                    this.DeviceConfig.MaxPinAnalog = 29;
+
+                }
+                else if (this.Version[this.Version.Length - 1] == 'E') {
+                    this.DeviceConfig.IsEdge = true;
+                    this.DeviceConfig.MaxPinIO = 22;
+                    this.DeviceConfig.MaxPinAnalog = 11;
+
+                }
+                else {
+                    throw new Exception("Not support the version " + this.Version);
+                }
+
+                this.serialPort.DeviceConfig = this.DeviceConfig;
+            }
+            else {
+                throw new Exception("The device is not supported.");
+            }
+        }
 
         public void Disconnect() => this.serialPort.Disconnect();
 

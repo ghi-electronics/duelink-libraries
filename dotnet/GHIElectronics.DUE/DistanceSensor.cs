@@ -14,10 +14,10 @@ namespace GHIElectronics.DUE {
             public DistanceSensorController(SerialInterface serialPort) => this.serialPort = serialPort;
 
             public int Read(int pulsePin, int echoPin) {
-                if (pulsePin < 0 || pulsePin >= MAX_IO)
+                if (pulsePin < 0 || pulsePin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
-                if (echoPin < 0 || echoPin >= MAX_IO)
+                if (echoPin < 0 || echoPin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 var cmd = string.Format("print(distance({0},{1}))", pulsePin, echoPin);

@@ -24,7 +24,7 @@ namespace GHIElectronics.DUE {
           
 
             public bool Read(int pin, Input input = Input.PULL_NONE) {
-                if (pin < 0 || pin >= MAX_IO)
+                if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 var pull = "0";
@@ -57,7 +57,7 @@ namespace GHIElectronics.DUE {
             }
 
             public bool Write(int pin, bool value) {
-                if (pin < 0 || pin >= MAX_IO)
+                if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 var v = (value == true ? 1 : 0);

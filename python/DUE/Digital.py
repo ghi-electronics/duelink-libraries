@@ -1,5 +1,5 @@
 
-from DUE.Const import MAX_IO
+from DUE.SerialInterface import SerialInterface
 
 class Input:
     PULL_NONE = 0
@@ -9,11 +9,11 @@ class Input:
 
 class DigitalController:    
 
-    def __init__(self, serialPort):
+    def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
     def Read(self, pin: int, inputType: Input = Input.PULL_NONE) -> bool:
-        if pin < 0 or pin >= MAX_IO:
+        if pin < 0 or pin >= self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError("Invalid pin")
 
         pull = "0"
@@ -37,7 +37,7 @@ class DigitalController:
         return False
 
     def Write(self, pin: int, value: bool) -> bool:
-        if pin < 0 or pin >= MAX_IO:
+        if pin < 0 or pin >= self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError("Invalid pin")
 
         cmd = f"dwrite({pin},{1 if value else 0})"

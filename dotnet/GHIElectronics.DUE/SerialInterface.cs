@@ -9,6 +9,9 @@ using System.Xml.Linq;
 
 namespace GHIElectronics.DUE {
     public class SerialInterface {
+
+        
+
         protected const string CommandCompleteText = ">";
 
         protected SerialPort port;
@@ -24,7 +27,9 @@ namespace GHIElectronics.DUE {
         public TimeSpan ReadTimeout { get; set; } = new TimeSpan(0, 0, 0, 3);
         public string PortName { get; } = string.Empty;
 
-        private bool isPulseFamily = false;
+        internal DeviceConfiguration DeviceConfig { get; set; }
+
+        //private bool isPulseFamily = false;
         public SerialInterface(string portName) {
 
             this.leftOver = string.Empty;
@@ -90,10 +95,7 @@ namespace GHIElectronics.DUE {
                 try {
                     var version = this.GetVersion();
 
-                    if (version != string.Empty && version[2] == '.' && version[4] == '.') {
-                        if (version.IndexOf('P') >= 0 || version.IndexOf('I') >=0 || version.IndexOf('F') >= 0) {
-                            this.isPulseFamily = true;
-                        }
+                    if (version != string.Empty && version[2] == '.' && version[4] == '.' ) {                        
                         break;
                     }
                 }
@@ -317,7 +319,7 @@ namespace GHIElectronics.DUE {
 
         public int TransferBlockSizeMax {
             get {
-                if (this.isPulseFamily)
+                if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
                     return 1024;
                 else return 512;
 
@@ -325,7 +327,7 @@ namespace GHIElectronics.DUE {
         }
         public int TransferBlockDelay {
             get {
-                if (this.isPulseFamily)
+                if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
                     return 2;
                 else return 5;
 

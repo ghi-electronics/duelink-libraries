@@ -1,16 +1,19 @@
 import time
 import serial
 from datetime import datetime, timedelta
+from DUE.DeviceConfiguration import DeviceConfiguration
 
 class SerialInterface:
     CommandCompleteText = ">"
     DefaultBaudRate = 115200
 
+    DeviceConfig : DeviceConfiguration
+
     def __init__(self, portName):
         self.leftOver = ""        
         self.ReadTimeout = 3
         self.portName = portName
-        self.echo = True
+        self.echo = True        
 
     def Connect(self):
         self.portName = serial.Serial(self.portName, self.DefaultBaudRate, parity=serial.PARITY_NONE, bytesize=8, stopbits=serial.STOPBITS_ONE)

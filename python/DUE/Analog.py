@@ -1,12 +1,12 @@
-from DUE.Const import MAX_IO_ANALOG
+from DUE.SerialInterface import SerialInterface
 
 class AnalogController:
-    def __init__(self, serialPort):
+    def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
-    def read(self, pin):
+    def Read(self, pin):
 
-        if pin < 0 or pin >= MAX_IO_ANALOG:
+        if pin < 0 or pin >= self.serialPort.DeviceConfig.MaxPinAnalog:
             raise ValueError("Invalid pin")
 
         cmd = "print(aread({0}))".format(str(pin))

@@ -17,6 +17,7 @@ from DUE.Touch import TouchController
 from DUE.Uart import UartController
 from DUE.Led import LedController
 from DUE.Script import ScriptController
+from DUE.DeviceConfiguration import DeviceConfiguration
 from enum import Enum
 import platform
 class DUEController:
@@ -43,12 +44,39 @@ class DUEController:
         self.Touch = TouchController(self.serialPort)
         self.Led = LedController(self.serialPort)
         self.Script = ScriptController(self.serialPort)
-
-        self.Version: str = self.serialPort.GetVersion().split("\n")[0]
-
+    
     def connect(self, comPort: str):
         self.serialPort = SerialInterface(comPort)
         self.serialPort.Connect()
+
+        self.Version = self.serialPort.GetVersion().split("\n")[0]
+
+        if self.Version == "" or len(self.Version) != 7:
+            raise Exception("The device is not supported.")
+        
+        self.DeviceConfig = DeviceConfiguration()
+
+        if self.Version[len(self.Version) -1] == 'P':
+            self.DeviceConfig.IsPulse = True
+            self.DeviceConfig.MaxPinIO = 23
+            self.DeviceConfig.MaxPinAnalog = 29
+        elif self.Version[len(self.Version) -1] == 'I':
+            self.DeviceConfig.IsPico = True
+            self.DeviceConfig.MaxPinIO = 29
+            self.DeviceConfig.MaxPinAnalog = 29  
+        elif self.Version[len(self.Version) -1] == 'F':
+            self.DeviceConfig.IsFlea = True
+            self.DeviceConfig.MaxPinIO = 11
+            self.DeviceConfig.MaxPinAnalog = 29    
+        elif self.Version[len(self.Version) -1] == 'E':
+            self.DeviceConfig.IsFlea = True
+            self.DeviceConfig.MaxPinIO = 22
+            self.DeviceConfig.MaxPinAnalog = 11  
+
+        self.serialPort.DeviceConfig = self.DeviceConfig
+            
+
+
 
     def disconnect(self):
         self.serialPort.Disconnect()

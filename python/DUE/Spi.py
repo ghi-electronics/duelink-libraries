@@ -1,12 +1,10 @@
 from typing import Optional
 
-from DUE.Const import MAX_IO
-
 import time
-
+from DUE.SerialInterface import SerialInterface
 
 class SpiController:
-    def __init__(self, serialPort):
+    def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
     def Write(self, dataWrite: bytes, chipselect: int = -1) -> bool:
@@ -18,7 +16,7 @@ class SpiController:
     def WriteRead(self, dataWrite: Optional[bytes], offsetWrite: int, countWrite: int,
                   dataRead: Optional[bytearray], offsetRead: int, countRead: int,
                   chipselect: int = -1) -> bool:
-        if chipselect >= MAX_IO:
+        if chipselect >= self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError("InvalidPin")
 
         if (dataWrite is None and dataRead is None) or (countWrite == 0 and countRead == 0):
@@ -63,7 +61,7 @@ class SpiController:
         return res.success
     
     def Write4bpp(self, dataWrite: Optional[bytes], offsetWrite: int, countWrite: int,  chipselect: int = -1) -> bool:   
-        if chipselect >= MAX_IO:
+        if chipselect >= self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError("InvalidPin")
         
         if (dataWrite is None ) or (countWrite == 0):

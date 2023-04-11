@@ -25,7 +25,7 @@ namespace GHIElectronics.DUE {
             public bool WriteRead(byte[] dataWrite, byte[] dataRead, int chipselect = -1) => this.WriteRead(dataWrite, 0, dataWrite.Length, dataRead, 0, dataRead.Length, chipselect);
 
             public bool WriteRead(byte[]? dataWrite, int offsetWrite, int countWrite, byte[]? dataRead, int offsetRead, int countRead, int chipselect = -1) {
-                if (chipselect >= MAX_IO)
+                if (chipselect >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 if ((dataWrite == null && dataRead == null) || (countWrite == 0 && countRead == 0))
@@ -113,7 +113,7 @@ namespace GHIElectronics.DUE {
             public bool Write4bpp(byte[] dataWrite, int chipselect = -1) => this.Write4bpp(dataWrite, 0, dataWrite.Length, chipselect);
 
             public bool Write4bpp(byte[] dataWrite, int offset, int count, int chipselect = -1) {
-                if (chipselect >= MAX_IO)
+                if (chipselect >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 if (dataWrite == null)
