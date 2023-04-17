@@ -39,23 +39,30 @@ class SpiController:
         if not res.success:
             return False
 
-        transaction_step = 0
         while countWrite > 0 or countRead > 0:
+            num = countRead
+
+            if countWrite < countRead:
+                num = countWrite
+
+            if countWrite == 0 :
+                num = countRead
+
+            if countRead == 0 :
+                num = countWrite
+
+            if (num > self.serialPort.TransferBlockSizeMax) :
+                num = self.serialPort.TransferBlockSizeMax
+
             if countWrite > 0:
-                self.serialPort.WriteRawData(dataWrite, offsetWrite, 1)
-                offsetWrite += 1
-                countWrite -= 1
+                self.serialPort.WriteRawData(dataWrite, offsetWrite, num)
+                offsetWrite += num
+                countWrite -= num
 
             if countRead > 0:
-                self.serialPort.ReadRawData(dataRead, offsetRead, 1)
-                offsetRead += 1
-                countRead -= 1
-
-            transaction_step += 1
-
-            if transaction_step % self.serialPort.TransferBlockSizeMax == 0:
-                # each block needs delay for the device vcom get all data
-                time.sleep(self.serialPort.TransferBlockDelay)
+                self.serialPort.ReadRawData(dataRead, offsetRead, num)
+                offsetRead += num
+                countRead -= num            
 
         res = self.serialPort.ReadRespone()
         return res.success
