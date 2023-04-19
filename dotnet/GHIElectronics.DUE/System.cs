@@ -74,7 +74,7 @@ namespace GHIElectronics.DUE {
                 return -1;
             }
 
-            public bool Beep(uint pin, uint frequency, uint durationms) {
+            public bool Beep(int pin, uint frequency, uint durationms) {
                 if (durationms > 1000) {
                     throw new Exception("Max duration is 1000 (one second)");
                 }
@@ -82,6 +82,9 @@ namespace GHIElectronics.DUE {
                 if (frequency > 10000) {
                     throw new Exception("Frequency is within range[0,10000] Hz");
                 }
+
+                if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinAnalog)
+                    throw new Exception("Invalid pin.");
 
                 var cmd = string.Format("beep({0},{1},{2})", pin, frequency, durationms);
 
