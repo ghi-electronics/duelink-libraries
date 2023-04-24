@@ -69,6 +69,12 @@ namespace GHIElectronics.DUE {
             public bool I2cBytes(byte address, byte[]? dataWrite, int offsetWrite, int countWrite, byte[]? dataRead, int offsetRead, int countRead) {
 
                 if ((dataWrite == null && dataRead == null) || (countWrite == 0 && countRead == 0))
+                    throw new Exception("At least one of dataWrite or dataRead must be specified");
+
+                if (dataWrite == null && countWrite != 0 )
+                    throw new ArgumentNullException();
+
+                if (dataRead == null  && countRead != 0)
                     throw new ArgumentNullException();
 
                 if (dataWrite != null && offsetWrite + countWrite > dataWrite.Length)

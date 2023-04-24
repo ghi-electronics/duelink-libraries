@@ -13,6 +13,12 @@ class I2cController:
     def WriteRead(self, address: int, dataWrite: Optional[bytes], offsetWrite: int, countWrite: int, dataRead: Optional[bytearray], offsetRead: int, countRead: int) -> bool:
         if (dataWrite is None and dataRead is None) or (countWrite == 0 and countRead == 0):
             raise ValueError("At least one of dataWrite or dataRead must be specified")
+        
+        if dataWrite == 0 and countWrite != 0:
+            raise Exception("dataWrite null but countWrite not zero")
+
+        if dataRead == 0 and countRead != 0:
+            raise Exception("dataRead null but countRead not zero")
 
         if dataWrite is not None and offsetWrite + countWrite > len(dataWrite):
             raise ValueError("Invalid range for dataWrite")
