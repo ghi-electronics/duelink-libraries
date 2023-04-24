@@ -136,10 +136,13 @@ class SerialInterface:
             respone.respone = str[:idx]
             # print(respone.respone)
             idx3 = str.find("!")
-            if idx3 != -1 and 'error' in respone.respone:
-                respone.success = False
+            #if idx3 != -1 and 'error' in respone.respone:
+            #    respone.success = False
 
-            if idx3 != -1 and 'unknown' in respone.respone:
+            #if idx3 != -1 and 'unknown' in respone.respone:
+            #    respone.success = False
+
+            if idx3 != -1:
                 respone.success = False
 
 
