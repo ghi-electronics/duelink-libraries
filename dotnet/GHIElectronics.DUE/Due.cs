@@ -67,9 +67,18 @@ namespace GHIElectronics.DUE {
 
         public DUEController(string comPort) {
             if (comPort == null)
-                throw new ArgumentNullException(string.Format("Invalid comport: {0}", comPort));
+                throw new Exception(string.Format("Invalid comport: {0}", comPort));
 
-            this.Connect(comPort);
+            try {
+                this.Connect(comPort);
+            }
+            catch {
+                throw new Exception(string.Format("Could not connect to the comport: {0}", comPort));
+            }
+
+            if (this.serialPort == null) {
+                throw new ArgumentNullException("serialPort is null");
+            }
 
             this.Analog = new AnalogController(this.serialPort);
             this.Digital = new DigitalController(this.serialPort);
