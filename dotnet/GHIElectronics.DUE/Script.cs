@@ -35,6 +35,32 @@ namespace GHIElectronics.DUE {
             }
 
             public bool Load(string script) {
+                var cmd = "pgmstream()";
+
+                var raw = UTF8Encoding.UTF8.GetBytes(script);
+
+                var data = new byte[raw.Length + 1];
+
+                Array.Copy(raw, data, raw.Length);
+
+                data[raw.Length] = 0;// stop the stream
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                if (!res.success) {
+                    return false;
+                }
+
+                this.serialPort.WriteRawData(data, 0, data.Length);
+
+                res = this.serialPort.ReadRespone();
+                return res.success;
+            }
+
+            [Obsolete("The Load2 method is for testing purpose only.", false)]
+            private bool Load2(string script) {
                 var ret = true;
                 var cmd = string.Format("$");
 

@@ -19,6 +19,30 @@ class ScriptController:
         return res.success
     
     def Load(self, script : str) -> bool:
+        cmd = "pgmstream()"
+
+        raw = script.encode('ASCII')
+
+        data = bytearray(len(raw) + 1)
+
+        data[len(raw)] = 0
+
+        data[0:len(raw)] = raw        
+
+        self.serialPort.WriteCommand(cmd)
+
+        res = self.serialPort.ReadRespone()
+
+        if (res.success == False) :
+            return False
+        
+        self.serialPort.WriteRawData(data, 0, len(data))
+
+        res = self.serialPort.ReadRespone()
+        return res.success
+            
+    
+    def __Load2(self, script : str) -> bool:
         ret = True
         cmd = "$"
         self.serialPort.WriteCommand(cmd)

@@ -224,7 +224,7 @@ namespace GHIElectronics.DUE {
                         //return str.Substring(0, idx);
                         var idx3 = str.IndexOf("!");
 
-                        if (idx3 != -1 && (respone.respone.Contains("error") || respone.respone.Contains("unknown"))) {
+                        if (idx3 != -1 && (respone.respone.Contains("error") || respone.respone.Contains("expected"))) {
                             //respone.respone = respone.respone.Substring(0, respone.respone);
                             respone.success = false;
                         }
