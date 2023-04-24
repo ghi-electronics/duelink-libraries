@@ -14,10 +14,10 @@ class I2cController:
         if (dataWrite is None and dataRead is None) or (countWrite == 0 and countRead == 0):
             raise ValueError("At least one of dataWrite or dataRead must be specified")
         
-        if dataWrite == 0 and countWrite != 0:
+        if dataWrite is None and countWrite != 0:
             raise Exception("dataWrite null but countWrite not zero")
 
-        if dataRead == 0 and countRead != 0:
+        if dataRead is None and countRead != 0:
             raise Exception("dataRead null but countRead not zero")
 
         if dataWrite is not None and offsetWrite + countWrite > len(dataWrite):
