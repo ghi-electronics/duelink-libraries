@@ -3,7 +3,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
 	<id>GHIElectronics.DUE</id>
-	<version>0.0.0.8004</version>
+	<version>0.0.0.8005</version>
 	<title />
 	<authors>GHI Electronics LLC</authors>
 	<owners>GHI Electronics LLC</owners>	
