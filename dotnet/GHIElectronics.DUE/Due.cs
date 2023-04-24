@@ -113,11 +113,9 @@ namespace GHIElectronics.DUE {
                                     var portName = (string)devParamsKey?.GetValue("PortName");
                                     if (portName != null) {
 
-                                        if (devFnKey.ToString().IndexOf(vid.ToUpper()) >= 0
-                                            || devFnKey.ToString().IndexOf(vid.ToLower()) >= 0) {
+                                        if (devFnKey.Name.IndexOf(vid, StringComparison.InvariantCultureIgnoreCase) >=0) {
 
-                                            if (devFnKey.ToString().IndexOf(pid.ToUpper()) >= 0
-                                           || devFnKey.ToString().IndexOf(pid.ToLower()) >= 0) {
+                                            if (devFnKey.Name.IndexOf(pid, StringComparison.InvariantCultureIgnoreCase) >= 0)  {
                                                 serialports.Add(portName);
                                             }
 
