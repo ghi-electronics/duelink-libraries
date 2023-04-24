@@ -67,7 +67,7 @@ namespace GHIElectronics.DUE {
 
         public DUEController(string comPort) {
             if (comPort == null)
-                throw new ArgumentNullException("Invalid comport");
+                throw new ArgumentNullException(string.Format("Invalid comport: {0}", comPort));
 
             this.Connect(comPort);
 

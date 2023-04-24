@@ -24,7 +24,7 @@ class DUEController:
 
     def __init__(self, comPort: str):
         if comPort is None:
-            raise ValueError("Invalid comport")
+            raise ValueError(f"Invalid comport: {comPort}")
         self.connect(comPort)
         self.Analog = AnalogController(self.serialPort)
         self.Digital = DigitalController(self.serialPort)
