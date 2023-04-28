@@ -88,7 +88,7 @@ public class SerialPort {
         SerialPortLowlevelFlush(handeId);
     }
     
-    public func IsOpened() {
-        SerialPortLowlevelIsOpened(handeId);
+    public func IsOpened()-> Bool {
+        return SerialPortLowlevelIsOpened(handeId) != 0;
     }
 }
