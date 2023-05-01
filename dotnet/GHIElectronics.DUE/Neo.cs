@@ -41,7 +41,48 @@ namespace GHIElectronics.DUE {
 
             }
 
-            public bool SetColor(int id, byte red, byte green, byte blue) {
+            //private bool SetColor(int id, byte red, byte green, byte blue) {
+            //    if (id < 0 || id > MAX_LED_NUM) {
+            //        return false;
+            //    }
+            //    var cmd = string.Format("neoset({0},{1},{2},{3})", id.ToString(), red.ToString(), green.ToString(), blue.ToString());
+
+
+            //    this.serialPort.WriteCommand(cmd);
+
+            //    var res = this.serialPort.ReadRespone();
+
+            //    return res.success;
+            //}
+
+            //public bool Stream(byte[] data) {
+            //    if (data.Length > MAX_LED_NUM * 3) {
+            //        return false;
+            //    }
+
+            //    var cmd = string.Format("neostream({0})", data.Length.ToString());
+
+            //    this.serialPort.WriteCommand(cmd);
+
+            //    var res = this.serialPort.ReadRespone();
+
+            //    if (res.success) {
+
+            //        this.serialPort.WriteRawData(data, 0, data.Length);
+
+            //        res = this.serialPort.ReadRespone();
+            //    }
+
+            //    return res.success;
+            //}
+
+            public bool SetColor(int id, uint color) {
+                var red = (byte)((color >> 16) & 0xff);
+                var green = (byte)((color >> 8) & 0xff);
+                var blue = (byte)((color >> 0) & 0xff);
+
+                //return this.SetColor(id, red, green, blue);
+
                 if (id < 0 || id > MAX_LED_NUM) {
                     return false;
                 }
@@ -55,9 +96,17 @@ namespace GHIElectronics.DUE {
                 return res.success;
             }
 
-            public bool Stream(byte[] data) {
-                if (data.Length > MAX_LED_NUM * 3) {
+            public bool SetMultiple(uint[] color, int offset, int length) {
+                if (length > MAX_LED_NUM) {
                     return false;
+                }
+
+                var data = new byte[length *  3];
+
+                for (int i = offset; i < length; i++) {
+                    data[i + 0 - offset] = (byte)((color[i] >> 16) & 0xff);
+                    data[i + 1 - offset] = (byte)((color[i] >> 8) & 0xff);
+                    data[i + 2 - offset] = (byte)((color[i] >> 0) & 0xff);
                 }
 
                 var cmd = string.Format("neostream({0})", data.Length.ToString());

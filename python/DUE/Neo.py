@@ -27,7 +27,11 @@ class NeoController:
 
         return res.success
 
-    def SetColor(self, id, red, green, blue):
+    def SetColor(self, id: int, color: int):
+        red = (color >> 16) & 0xFF
+        green = (color >> 16) & 0xFF
+        blue = (color >> 16) & 0xFF
+
         if id < 0 or id > self.MAX_LED_NUM:
             return False
 
@@ -38,9 +42,16 @@ class NeoController:
 
         return res.success
 
-    def Stream(self, data):
-        if len(data) > self.MAX_LED_NUM * 3:
+    def SetMultiple(self, color, offset: int, length: int):
+        if len(color) > self.MAX_LED_NUM:
             return False
+
+        data = bytearray(length*3)
+
+        for i in range(offset, length + offset):
+            data[i + 0 - offset] = (color[i] >> 16) & 0xff
+            data[i + 1 - offset] = (color[i] >> 8) & 0xff
+            data[i + 2 - offset] = (color[i] >> 0) & 0xff
 
         cmd = "neostream({0})".format(len(data))
         self.serialPort.WriteCommand(cmd)
