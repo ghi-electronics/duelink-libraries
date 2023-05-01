@@ -8,7 +8,6 @@ from DUE.I2C import I2cController
 from DUE.Infrared import InfraredController
 from DUE.Neo import NeoController
 from DUE.System import SystemController
-from DUE.Pwm import PwmController
 from DUE.SerialInterface import SerialInterface
 from DUE.ServoMoto import ServoMotoController
 from DUE.Sound import SoundController
@@ -41,7 +40,6 @@ class DUEController:
         self.Spi = SpiController(self.serialPort)
         self.Infrared = InfraredController(self.serialPort)
         self.Neo = NeoController(self.serialPort)
-        self.Pwm = PwmController(self.serialPort)
         self.System = SystemController(self.serialPort)
         self.Uart = UartController(self.serialPort)
         self.Button = ButtonController(self.serialPort)

@@ -32,6 +32,7 @@
   <ItemGroup>
     <Compile Remove="Configuration.cs" />
     <Compile Remove="Pin.cs" />
+    <Compile Remove="Pwm.cs" />
   </ItemGroup>
 
   <ItemGroup>

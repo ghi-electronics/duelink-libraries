@@ -38,8 +38,6 @@ namespace GHIElectronics.DUE {
 
         public NeoController Neo { get; internal set; }
 
-        public PwmController PWM { get; internal set; }
-
         public SystemController System { get; internal set; }
 
         public UartController Uart { get; internal set; }
@@ -88,7 +86,6 @@ namespace GHIElectronics.DUE {
             this.Spi = new SpiController(this.serialPort);
             this.Infrared = new InfraredController(this.serialPort);
             this.Neo = new NeoController(this.serialPort);
-            this.PWM = new PwmController(this.serialPort);
             this.System = new SystemController(this.serialPort);
             this.Uart = new UartController(this.serialPort);
             this.Button = new ButtonController(this.serialPort);
