@@ -105,7 +105,7 @@ namespace GHIElectronics.DUE {
 
             }
 
-            public bool Stream(byte[] data) {
+            private bool Stream(byte[] data) {
                 var cmd = string.Format("lcdstream()");
 
                 this.serialPort.WriteCommand(cmd);
@@ -122,6 +122,37 @@ namespace GHIElectronics.DUE {
                 }
 
                 return res.success;
+
+            }
+
+            public bool DrawBuffer(uint[] color, int offset, int length) {
+                const int WIDTH = 128;
+                const int HEIGHT = 64;
+
+                if (length > WIDTH * HEIGHT)
+                    throw new Exception("Only 64*128 supported.");
+
+               
+
+                var data = new byte[WIDTH * HEIGHT / 8];
+                var i = 0;
+
+                for (int y = 0; y < HEIGHT; y++) {
+                    for (int x = 0; x < WIDTH; x++) {
+
+                        var index = (y >> 3) * WIDTH + x;
+
+                        if ((color[i] & 0x00FFFFFF) != 0) { // no alpha
+                            data[index] |= (byte)(1 << (y & 7));
+                        }
+                        else {
+                            data[index] &= (byte)(~(1 << (y & 7)));
+                        }
+                        i++;
+                    }
+                }
+
+                return Stream(data);
 
             }
 

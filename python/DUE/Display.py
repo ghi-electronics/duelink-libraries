@@ -50,7 +50,7 @@ class DisplayController:
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def Stream(self, data):
+    def __Stream(self, data):
         cmd = "lcdstream()"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
@@ -61,4 +61,29 @@ class DisplayController:
             res = self.serialPort.ReadRespone()
 
         return res.success
+    
+    def DrawBuffer(self, color, offset: int, length: int):
+        WIDTH = 128
+        HEIGHT = 64
+
+        if (length > WIDTH * HEIGHT) :
+            raise Exception("Only 64*128 supported.")
+
+        data = bytearray(int(WIDTH*HEIGHT/8))
+        i = 0
+
+        for y in range(0, HEIGHT):
+            for x in range(0, WIDTH):
+
+                index = (y >> 3) * WIDTH + x
+
+                if ((color[i] & 0x00FFFFFF) != 0): # no alpha
+                    data[index] |= (1 << (y & 7)) & 0xFF
+                
+                else:
+                    data[index] &= (~(1 << (y & 7))) & 0xFF
+                
+                i += 1                
+
+        return self.__Stream(data)
 
