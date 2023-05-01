@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name = "DUE",
-    version = "0.0.0.8005",
+    version = "0.0.0.8006",
     author = "GHI Electronics",
     author_email = "support@ghielectronics.com",
     description = "GHI Electronics DUE Python library.",
