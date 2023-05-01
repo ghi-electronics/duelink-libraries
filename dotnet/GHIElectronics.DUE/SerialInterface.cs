@@ -62,6 +62,7 @@ namespace GHIElectronics.DUE {
 
             try {
                 this.port.Close();
+                this.port.Dispose();
             }
             catch {
 

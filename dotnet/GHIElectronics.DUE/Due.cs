@@ -177,7 +177,7 @@ namespace GHIElectronics.DUE {
 
             return string.Empty;
         }
-        public void Connect(string comPort) {
+        private void Connect(string comPort) {
             this.serialPort = new SerialInterface(comPort);
             this.serialPort.Connect();
 
@@ -222,7 +222,6 @@ namespace GHIElectronics.DUE {
             }
         }
 
-        public void Disconnect() => this.serialPort.Disconnect();
-
+        public void Disconnect() => this.serialPort.Disconnect();   
     }
 }

@@ -25,7 +25,7 @@ class DUEController:
         if comPort is None:
             raise ValueError(f"Invalid comport: {comPort}")
         try:
-            self.connect(comPort)
+            self.__Connect(comPort)
         except:
             raise Exception(f"Could not connect to the comport: {comPort}")
         
@@ -50,7 +50,7 @@ class DUEController:
         self.Led = LedController(self.serialPort)
         self.Script = ScriptController(self.serialPort)
     
-    def connect(self, comPort: str):
+    def __Connect(self, comPort: str):
         self.serialPort = SerialInterface(comPort)
         self.serialPort.Connect()
 
@@ -81,9 +81,7 @@ class DUEController:
         self.serialPort.DeviceConfig = self.DeviceConfig
             
 
-
-
-    def disconnect(self):
+    def Disconnect(self):
         self.serialPort.Disconnect()
 
     def GetConnectionPort():
