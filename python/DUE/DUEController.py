@@ -106,6 +106,11 @@ class DUEController:
         ButtonA = 97
         ButtonB = 98 
         Led = 108
+
+    class Input:
+        PullNone = 0
+        PullUp = 1
+        PullDown = 2
                     
                 
         

@@ -1,25 +1,19 @@
 
 from DUE.SerialInterface import SerialInterface
 
-class Input:
-    PULL_NONE = 0
-    PULL_UP = 1
-    PULL_DOWN = 2
-
-
 class DigitalController:    
 
     def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
-    def Read(self, pin: int, inputType: Input = Input.PULL_NONE) -> bool:
-        if pin < 0 or pin >= self.serialPort.DeviceConfig.MaxPinIO:
+    def Read(self, pin: int, inputType: 0) -> bool:
+        if pin < 0 or (pin >= self.serialPort.DeviceConfig.MaxPinIO and pin != 97 and pin != 98 and pin != 108): #A, B, Led
             raise ValueError("Invalid pin")
 
         pull = "0"
-        if inputType == Input.PULL_UP:
+        if inputType == 1:
             pull = "1"
-        elif inputType == Input.PULL_DOWN:
+        elif inputType == 2:
             pull = "2"
 
         cmd = f"print(dread({pin},{pull}))"
@@ -37,7 +31,7 @@ class DigitalController:
         return False
 
     def Write(self, pin: int, value: bool) -> bool:
-        if pin < 0 or pin >= self.serialPort.DeviceConfig.MaxPinIO:
+        if pin < 0 or (pin >= self.serialPort.DeviceConfig.MaxPinIO and pin != 108): # Led
             raise ValueError("Invalid pin")
 
         cmd = f"dwrite({pin},{1 if value else 0})"
