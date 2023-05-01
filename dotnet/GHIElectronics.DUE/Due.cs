@@ -19,8 +19,12 @@ namespace GHIElectronics.DUE {
 
     }
     public partial class DUEController {
-        //const int MAX_IO = 21;
-        //const int MAX_IO_ANALOG = 11;
+
+        public enum Pin {
+            ButtonA = 97,
+            ButtonB = 98,
+            Led = 108,
+        }
 
         SerialInterface serialPort = default!;
 

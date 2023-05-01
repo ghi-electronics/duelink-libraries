@@ -51,9 +51,5 @@ class ButtonController:
             except:
                 pass
 
-        return False
-
-    class Buttons:
-        A = 97
-        B = 98    
+        return False   
        

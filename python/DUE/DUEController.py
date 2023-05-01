@@ -103,6 +103,11 @@ class DUEController:
                         return port.device
 
         return ""
+    
+    class Pin:
+        ButtonA = 97
+        ButtonB = 98 
+        Led = 108
                     
                 
         

@@ -10,10 +10,7 @@ namespace GHIElectronics.DUE {
     public partial class DUEController {
       
         public class ButtonController {
-            public enum Buttons {
-                A = 97,
-                B = 98
-            }
+
 
             SerialInterface serialPort;
             public ButtonController(SerialInterface serialPort) => this.serialPort = serialPort;
