@@ -91,7 +91,7 @@ class ScriptController:
 
         return res.respone
     
-    def IsRuning(self) -> bool:
+    def IsRunning(self) -> bool:
         self.serialPort.DiscardInBuffer()
 
         dataWrite = bytearray(1)

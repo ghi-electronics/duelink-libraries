@@ -131,7 +131,7 @@ namespace GHIElectronics.DUE {
                 return respone.success;
             }
 
-            public bool IsRuning() {
+            public bool IsRunning() {
                 this.serialPort.DiscardInBuffer();
 
                
