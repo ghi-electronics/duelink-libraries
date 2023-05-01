@@ -104,9 +104,9 @@ namespace GHIElectronics.DUE {
                 var data = new byte[length *  3];
 
                 for (int i = offset; i < length; i++) {
-                    data[i + 0 - offset] = (byte)((color[i] >> 16) & 0xff);
-                    data[i + 1 - offset] = (byte)((color[i] >> 8) & 0xff);
-                    data[i + 2 - offset] = (byte)((color[i] >> 0) & 0xff);
+                    data[(i - offset) * 3 + 0 ] = (byte)((color[i] >> 16) & 0xff);
+                    data[(i - offset) * 3 + 1 ] = (byte)((color[i] >> 8) & 0xff);
+                    data[(i - offset) * 3 + 2 ] = (byte)((color[i] >> 0) & 0xff);
                 }
 
                 var cmd = string.Format("neostream({0})", data.Length.ToString());
