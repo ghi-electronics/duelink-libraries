@@ -40,7 +40,7 @@ namespace GHIElectronics.DUE {
 
             public int FixedFrequency { get; } = 50;
             public bool Write(int pin, int dutycyle) {
-                if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
+                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO ))
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 if (dutycyle < 0 || dutycyle > 1000) {
