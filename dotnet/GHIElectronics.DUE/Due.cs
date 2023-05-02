@@ -46,7 +46,7 @@ namespace GHIElectronics.DUE {
 
         public UartController Uart { get; internal set; }
         public ButtonController Button { get; internal set; }
-        public DistanceSensorController DistanceSensor { get; internal set; }
+        public DistanceSensorController Distance { get; internal set; }
         public SoundController Sound { get; internal set; }
         public DisplayController Display { get; internal set; }
 
@@ -93,7 +93,7 @@ namespace GHIElectronics.DUE {
             this.System = new SystemController(this.serialPort);
             this.Uart = new UartController(this.serialPort);
             this.Button = new ButtonController(this.serialPort);
-            this.DistanceSensor = new DistanceSensorController(this.serialPort);
+            this.Distance = new DistanceSensorController(this.serialPort);
             this.Sound = new SoundController(this.serialPort);
             this.Display = new DisplayController(this.serialPort);
             this.Touch = new TouchController(this.serialPort);
