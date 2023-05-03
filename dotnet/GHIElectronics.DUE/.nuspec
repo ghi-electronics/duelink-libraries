@@ -3,7 +3,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
 	<id>GHIElectronics.DUE</id>
-	<version>0.1.0.0</version>
+	<version>1.0.0.0</version>
 	<title />
 	<authors>GHI Electronics LLC</authors>
 	<owners>GHI Electronics LLC</owners>	
@@ -18,7 +18,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="$TargetDir$bin\debug\net6.0\GHIElectronics.DUE.dll" target="lib\net6.0"/>
+    <file src="$TargetDir$bin\release\net6.0\GHIElectronics.DUE.dll" target="lib\net6.0"/>
 	<file src="$TargetDir$images\icon.png" target="images\" />
   </files>
 </package>
