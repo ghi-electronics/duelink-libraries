@@ -1,15 +1,16 @@
 import setuptools
 
 setuptools.setup(
-    name = "DUE",
-    version = "1.0.0.0",
+    name = "PYDUE",
+    version = "1.0.0",
     author = "GHI Electronics",
     author_email = "support@ghielectronics.com",
+    license='MIT', 
     description = "GHI Electronics DUE Python library.",
     url = "https://www.duelink.com/",
     packages=setuptools.find_packages(),
     classifiers=[
-        "Development Status :: Python 3",        
+        "Programming Language :: Python :: 3",        
     ],
     install_requires=[
    'pyserial'   
