@@ -37,6 +37,17 @@ namespace GHIElectronics.DUE {
 
             }
 
+            public bool Config(uint slaveAddress) {
+                var cmd = string.Format("lcdconfig({0})", slaveAddress);
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                return res.success;
+
+            }
+
             public bool SetPixel(uint color, int x, int y) {
 
                 var cmd = string.Format("lcdpixel({0},{1},{2})", color, x, y);

@@ -14,6 +14,12 @@ class DisplayController:
         res = self.serialPort.ReadRespone()
         return res.success
 
+    def Config(self, slaveAddress):
+        cmd = f"lcdconfig({slaveAddress})"
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+        return res.success
+
     def SetPixel(self, color, x, y):
         cmd = f"lcdpixel({color},{x},{y})"
         self.serialPort.WriteCommand(cmd)
