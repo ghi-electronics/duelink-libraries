@@ -99,7 +99,19 @@ namespace GHIElectronics.DUE {
 
             public bool Print(string text) {
 
-                var cmd = string.Format("print({0})", text);
+                var cmd = string.Format("print(\"{0}\")", text);
+
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                return res.success;
+            }
+
+            public bool Println(string text) {
+
+                var cmd = string.Format("println(\"{0}\")", text);
 
 
                 this.serialPort.WriteCommand(cmd);
@@ -112,8 +124,9 @@ namespace GHIElectronics.DUE {
 
                 var cmd = string.Format("wait({0})", millisecond);
 
-
                 this.serialPort.WriteCommand(cmd);
+
+                Thread.Sleep(millisecond);
 
                 var res = this.serialPort.ReadRespone();
 

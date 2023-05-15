@@ -49,14 +49,21 @@ class SystemController:
         return res.success
     
     def Print(self, text: str)->bool:
-        cmd = f"print{text}"
+        cmd = f"print(\"{text}\")"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
     
-    def Wait(self, text: str)->bool:
-        cmd = f"wait{text}"
+    def Println(self, text: str)->bool:
+        cmd = f"println(\"{text}\")"
         self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+        return res.success
+    
+    def Wait(self, millisecond: int)->bool:
+        cmd = f"wait({millisecond})"       
+        self.serialPort.WriteCommand(cmd)
+        time.sleep(millisecond / 1000)
         res = self.serialPort.ReadRespone()
         return res.success
 
