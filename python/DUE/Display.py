@@ -14,12 +14,6 @@ class DisplayController:
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def Config(self, slaveAddress):
-        cmd = f"lcdconfig({slaveAddress})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
-        return res.success
-
     def SetPixel(self, color, x, y):
         cmd = f"lcdpixel({color},{x},{y})"
         self.serialPort.WriteCommand(cmd)
@@ -34,6 +28,12 @@ class DisplayController:
 
     def DrawRectangle(self, color, x, y, width, height):
         cmd = f"lcdrect({color},{x},{y},{width},{height})"
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+        return res.success
+    
+    def FillRectangle(self, color, x, y, width, height):
+        cmd = f"lcdfill({color},{x},{y},{width},{height})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
@@ -92,4 +92,11 @@ class DisplayController:
                 i += 1                
 
         return self.__Stream(data)
+    
+    def Config(self, target: int, slaveAddress: int)-> bool:
+        cmd = f"lcdconfig({target},{slaveAddress})"
+
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+        return res.success
 

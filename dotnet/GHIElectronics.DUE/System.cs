@@ -97,7 +97,30 @@ namespace GHIElectronics.DUE {
 
             }
 
-            
+            public bool Print(string text) {
+
+                var cmd = string.Format("print({0})", text);
+
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                return res.success;
+            }
+            public bool Wait(int millisecond) {
+
+                var cmd = string.Format("wait({0})", millisecond);
+
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                return res.success;
+            }
+
+
         }
     }
 }

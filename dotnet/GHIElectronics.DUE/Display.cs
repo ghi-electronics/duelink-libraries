@@ -37,17 +37,6 @@ namespace GHIElectronics.DUE {
 
             }
 
-            public bool Config(uint slaveAddress) {
-                var cmd = string.Format("lcdconfig({0})", slaveAddress);
-
-                this.serialPort.WriteCommand(cmd);
-
-                var res = this.serialPort.ReadRespone();
-
-                return res.success;
-
-            }
-
             public bool SetPixel(uint color, int x, int y) {
 
                 var cmd = string.Format("lcdpixel({0},{1},{2})", color, x, y);
@@ -74,6 +63,16 @@ namespace GHIElectronics.DUE {
             public bool DrawRectangle(uint color, int x, int y, int width, int height) {
 
                 var cmd = string.Format("lcdrect({0},{1},{2},{3},{4})", color, x, y, width, height);
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                return res.success;
+            }
+
+            public bool FillRectangle(uint color, int x, int y, int width, int height) {
+                var cmd = string.Format("lcdfill({0},{1},{2},{3},{4})", color, x, y, width, height);
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -165,6 +164,16 @@ namespace GHIElectronics.DUE {
 
                 return Stream(data);
 
+            }
+
+            public bool Config(int target, int slaveAddress) {
+                var cmd = string.Format("lcdconfig({0},{1})", target, slaveAddress);
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                return res.success;
             }
 
 
