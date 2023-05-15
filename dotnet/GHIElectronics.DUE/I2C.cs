@@ -65,16 +65,16 @@ namespace GHIElectronics.DUE {
             }
 
 
-            [Obsolete("This method is for testing I2C bytes purpose. Use i2cstream (WriteRead) instead. No need to implement when making driver.", false)]
+            [Obsolete("This method is for testing I2C bytes purpose. Use i2cstream (WriteRead) instead. No need to implement when making driver.", false)] 
             public bool I2cBytes(byte address, byte[]? dataWrite, int offsetWrite, int countWrite, byte[]? dataRead, int offsetRead, int countRead) {
 
                 if ((dataWrite == null && dataRead == null) || (countWrite == 0 && countRead == 0))
                     throw new Exception("At least one of dataWrite or dataRead must be specified");
 
-                if (dataWrite == null && countWrite != 0 )
+                if (dataWrite == null && countWrite != 0)
                     throw new ArgumentNullException();
 
-                if (dataRead == null  && countRead != 0)
+                if (dataRead == null && countRead != 0)
                     throw new ArgumentNullException();
 
                 if (dataWrite != null && offsetWrite + countWrite > dataWrite.Length)
@@ -83,42 +83,60 @@ namespace GHIElectronics.DUE {
                 if (dataRead != null && offsetRead + countRead > dataRead.Length)
                     throw new ArgumentOutOfRangeException();
 
-                if (countWrite > 4 || countRead > 4)
-                    throw new Exception("I2cBytes max read: 4. Max write: 4");
+                if (countWrite > 0) {
 
-                var cmd_var = new string[countWrite];               
+                    var cmd_dim = string.Format("dim a[{0}]", countWrite);
 
-                for (var i = 0; i < countWrite; i++) {
-                    var variable = (char)('a' + i);
+                    this.serialPort.WriteCommand(cmd_dim);
 
-                    cmd_var[i] = string.Format("{0}={1}", variable, dataWrite[offsetWrite + i]);
-                }
+                    CmdRespone res_dim = this.serialPort.ReadRespone();
 
-                CmdRespone res;
-                for (var i = 0; i < countWrite; i++) {
-                    this.serialPort.WriteCommand(cmd_var[i]);
-
-                    res = this.serialPort.ReadRespone();
-
-                    if (!res.success) {
+                    if (!res_dim.success) {
                         return false;
+                    }
+
+                    for (var i = 0; i < countWrite;i++) {
+
+                        cmd_dim = string.Format("a[{0}] = {1}", i, dataWrite[i]);
+
+                        this.serialPort.WriteCommand(cmd_dim);
+
+                        res_dim = this.serialPort.ReadRespone();
+
+                        if (!res_dim.success) {
+                            return false;
+                        }
+
                     }
                 }
 
-                var cmd = string.Format("i2cbytes({0},{1},{2})", address, countWrite, countRead);
+                if (countRead > 0) {
+
+                    var cmd_dim = string.Format("dim b[{0}]", countRead);
+
+                    this.serialPort.WriteCommand(cmd_dim);
+
+                    CmdRespone res_dim = this.serialPort.ReadRespone();
+
+                    if (!res_dim.success) {
+                        return false;
+                    }
+                }                
+
+                var cmd = string.Format("i2cbytes({0},a,{1},b,{2})", address, countWrite, countRead);
 
                 this.serialPort.WriteCommand(cmd);
 
-                res = this.serialPort.ReadRespone();
+                CmdRespone res = this.serialPort.ReadRespone();
 
                 if (!res.success) {
                     return false;
                 }
 
                 try {
-                    for (var i = 0;i < countRead; i++) {
-                        var variable = (char)('a' + i);
-                        cmd = string.Format("print({0})", variable);
+                    for (var i = 0; i < countRead; i++) {
+                        
+                        cmd = string.Format("print(b[{0}])", i);
                         this.serialPort.WriteCommand(cmd);
 
                         res = this.serialPort.ReadRespone();
