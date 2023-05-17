@@ -7,8 +7,8 @@ class NeoController:
         self.serialPort = serialPort
         self.SupportLedNumMax = self.MAX_LED_NUM
 
-    def Show(self, count):
-        cmd = "neoshow({0})".format(count)
+    def Show(self, pin: int, count: int):
+        cmd = "neoshow({0}, {1})".format(pin, count)
         self.serialPort.WriteCommand(cmd)
 
         # each led need 1.25us delay blocking mode
@@ -42,7 +42,7 @@ class NeoController:
 
         return res.success
 
-    def SetMultiple(self, color, offset: int, length: int):
+    def SetMultiple(self, pin: int, color, offset: int, length: int):
         if len(color) > self.MAX_LED_NUM:
             return False
 
@@ -53,7 +53,7 @@ class NeoController:
             data[(i - offset) * 3 + 1] = (color[i] >> 8) & 0xff
             data[(i - offset) * 3 + 2] = (color[i] >> 0) & 0xff
 
-        cmd = "neostream({0})".format(len(data))
+        cmd = "neostream({0}, {1})".format(pin, len(data))
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()

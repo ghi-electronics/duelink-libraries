@@ -16,8 +16,8 @@ namespace GHIElectronics.DUE {
 
             public NeoController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public bool Show(int count) {
-                var cmd = string.Format("neoshow({0})", count.ToString());
+            public bool Show(int pin, int count) {
+                var cmd = string.Format("neoshow({0}, {1})", pin.ToString(), count.ToString());
                 this.serialPort.WriteCommand(cmd);
 
                 // each led ned 1.25us delay blocking mode
@@ -96,7 +96,7 @@ namespace GHIElectronics.DUE {
                 return res.success;
             }
 
-            public bool SetMultiple(uint[] color, int offset, int length) {
+            public bool SetMultiple(int pin, uint[] color, int offset, int length) {
                 if (length > MAX_LED_NUM) {
                     return false;
                 }
@@ -109,7 +109,7 @@ namespace GHIElectronics.DUE {
                     data[(i - offset) * 3 + 2 ] = (byte)((color[i] >> 0) & 0xff);
                 }
 
-                var cmd = string.Format("neostream({0})", data.Length.ToString());
+                var cmd = string.Format("neostream({0}, {1})", pin.ToString(), data.Length.ToString());
 
                 this.serialPort.WriteCommand(cmd);
 
