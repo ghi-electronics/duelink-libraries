@@ -18,6 +18,8 @@ from DUE.Led import LedController
 from DUE.Script import ScriptController
 from DUE.DeviceConfiguration import DeviceConfiguration
 from DUE.Pin import PinController
+from DUE.Temperature import TemperatureController
+from DUE.Humidity import HudimityController
 from enum import Enum
 import platform
 class DUEController:
@@ -51,6 +53,8 @@ class DUEController:
         self.Led = LedController(self.serialPort)
         self.Script = ScriptController(self.serialPort)
         self.Pin = PinController()
+        self.Temperature = TemperatureController(self.serialPort)
+        self.Humidity = HudimityController(self.serialPort)
     
     def __Connect(self, comPort: str):
         self.serialPort = SerialInterface(comPort)

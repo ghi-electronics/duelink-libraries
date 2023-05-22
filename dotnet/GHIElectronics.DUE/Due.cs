@@ -58,6 +58,10 @@ namespace GHIElectronics.DUE {
 
         public PinController Pin { get; internal set; }
 
+        public TemperatureController Temperature { get; internal set; }
+
+        public HumidityController Humidity { get; internal set; }
+
         public string Version { get; internal set; } = string.Empty;
 
         public bool IsPulse { get; internal set; } = false;
@@ -102,6 +106,8 @@ namespace GHIElectronics.DUE {
             this.Led = new LedController(this.serialPort);
             this.Script = new ScriptController(this.serialPort);
             this.Pin = new PinController();
+            this.Temperature = new TemperatureController(this.serialPort);
+            this.Humidity = new HumidityController(this.serialPort);
             
         }
 
