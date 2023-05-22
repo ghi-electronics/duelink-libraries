@@ -19,7 +19,7 @@ namespace GHIElectronics.DUE {
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 if (pin > 2 ) {
-                    if (pin != 97 && pin != 98)
+                    if (pin != 97 && pin != 98 && pin != 65 && pin != 66)
                         throw new ArgumentOutOfRangeException("Invalid pin.");
                 }
                     
@@ -40,7 +40,7 @@ namespace GHIElectronics.DUE {
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 if (pin > 2) {
-                    if (pin != 97 && pin != 98)
+                    if (pin != 97 && pin != 98 && pin != 65 && pin != 66)
                         throw new ArgumentOutOfRangeException("Invalid pin.");
                 }
 
@@ -69,7 +69,7 @@ namespace GHIElectronics.DUE {
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 if (pin > 2) {
-                    if (pin != 97 && pin != 98)
+                    if (pin != 97 && pin != 98 && pin != 65 && pin != 66)
                         throw new ArgumentOutOfRangeException("Invalid pin.");
                 }
 
