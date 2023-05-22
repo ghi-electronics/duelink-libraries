@@ -36,6 +36,11 @@ namespace GHIElectronics.DUE {
                 return -1;
 
             }
+
+            public int Dht11 { get; } = 11;
+            public int Dht12 { get; } = 12;
+            public int Dht21 { get; } = 21;
+            public int Dht22 { get; } = 22;
         }
     }
 }

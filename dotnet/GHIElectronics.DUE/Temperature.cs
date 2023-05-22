@@ -10,8 +10,6 @@ namespace GHIElectronics.DUE {
         public class TemperatureController {
             SerialInterface serialPort;
 
-            public const int MAX_LED_NUM = 256;
-
             public TemperatureController(SerialInterface serialPort) => this.serialPort = serialPort;
 
             public double Read(int pin, int sensortype) {
@@ -39,6 +37,11 @@ namespace GHIElectronics.DUE {
                 return -1;
 
             }
+
+            public int Dht11 { get; } = 11;
+            public int Dht12 { get; } = 12;
+            public int Dht21 { get; } =21;
+            public int Dht22 { get; } = 22;
         }
     }
 }
