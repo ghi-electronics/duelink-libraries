@@ -8,11 +8,11 @@ using static GHIElectronics.DUE.DUEController.DigitalController;
 
 namespace GHIElectronics.DUE {
     public partial class DUEController {
-        public enum Input {
-            PullNone = 0,
-            PullUp = 1,
-            PullDown = 2,
-        }
+        //public enum Input {
+        //    PullNone = 0,
+        //    PullUp = 1,
+        //    PullDown = 2,
+        //}
         public class DigitalController {
 
            
@@ -23,14 +23,14 @@ namespace GHIElectronics.DUE {
 
           
 
-            public bool Read(int pin, Input input = Input.PullNone) {
-                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)DUEController.Pin.ButtonA && pin != (int)DUEController.Pin.ButtonB && pin != (int)DUEController.Pin.Led))
+            public bool Read(int pin, int input = 0) {
+                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)PinController.BUTTON_A && pin != (int)PinController.BUTTON_B && pin != (int)PinController.LED))
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 var pull = "0";
 
-                if (input == Input.PullUp) pull = "1";
-                if (input == Input.PullDown) pull = "2";
+                if (input == PinController.PULLUP) pull = "1";
+                if (input == PinController.PULLDOWN) pull = "2";
 
                 var cmd = string.Format("print(dread({0},{1}))", pin.ToString(), pull);
 
@@ -57,7 +57,7 @@ namespace GHIElectronics.DUE {
             }
 
             public bool Write(int pin, bool value) {
-                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)DUEController.Pin.Led))
+                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)PinController.LED))
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 var v = (value == true ? 1 : 0);

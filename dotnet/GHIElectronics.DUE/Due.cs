@@ -20,11 +20,11 @@ namespace GHIElectronics.DUE {
     }
     public partial class DUEController {
 
-        public enum Pin {
-            ButtonA = 97,
-            ButtonB = 98,
-            Led = 108,
-        }
+        //public enum Pin {
+        //    ButtonA = 97,
+        //    ButtonB = 98,
+        //    Led = 108,
+        //}
 
         SerialInterface serialPort = default!;
 
@@ -55,6 +55,8 @@ namespace GHIElectronics.DUE {
         public LedController Led { get; internal set; }
 
         public ScriptController Script { get; internal set; }
+
+        public PinController Pin { get; internal set; }
 
         public string Version { get; internal set; } = string.Empty;
 
@@ -99,6 +101,7 @@ namespace GHIElectronics.DUE {
             this.Touch = new TouchController(this.serialPort);
             this.Led = new LedController(this.serialPort);
             this.Script = new ScriptController(this.serialPort);
+            this.Pin = new PinController();
             
         }
 

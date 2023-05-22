@@ -17,6 +17,7 @@ from DUE.Uart import UartController
 from DUE.Led import LedController
 from DUE.Script import ScriptController
 from DUE.DeviceConfiguration import DeviceConfiguration
+from DUE.Pin import PinController
 from enum import Enum
 import platform
 class DUEController:
@@ -49,6 +50,7 @@ class DUEController:
         self.Touch = TouchController(self.serialPort)
         self.Led = LedController(self.serialPort)
         self.Script = ScriptController(self.serialPort)
+        self.Pin = PinController()
     
     def __Connect(self, comPort: str):
         self.serialPort = SerialInterface(comPort)
@@ -101,16 +103,7 @@ class DUEController:
                         return port.device
 
         return ""
-    
-    class Pin:
-        ButtonA = 97
-        ButtonB = 98 
-        Led = 108
 
-    class Input:
-        PullNone = 0
-        PullUp = 1
-        PullDown = 2
                     
                 
         
