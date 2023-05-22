@@ -25,7 +25,10 @@ class AnalogController:
         return -1
     
     def Write(self, pin, duty_cycle):
-        if pin < 0 or (pin >= self.serialPort.DeviceConfig.MaxPinIO): # Led
+        if pin == 'l' or pin == 'L':
+            pin = 108
+        
+        if pin < 0 or (pin >= self.serialPort.DeviceConfig.MaxPinIO and pin != 108): # Led
             raise ValueError('Invalid pin')
 
         if duty_cycle < 0 or duty_cycle > 1000:
