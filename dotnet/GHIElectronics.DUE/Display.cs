@@ -71,7 +71,7 @@ namespace GHIElectronics.DUE {
                 return res.success;
             }
 
-            public bool FillRectangle(uint color, int x, int y, int width, int height) {
+            public bool DrawFillRect(uint color, int x, int y, int width, int height) {
                 var cmd = string.Format("lcdfill({0},{1},{2},{3},{4})", color, x, y, width, height);
 
                 this.serialPort.WriteCommand(cmd);

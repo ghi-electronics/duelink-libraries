@@ -32,7 +32,7 @@ class DisplayController:
         res = self.serialPort.ReadRespone()
         return res.success
     
-    def FillRectangle(self, color, x, y, width, height):
+    def DrawFillRect(self, color, x, y, width, height):
         cmd = f"lcdfill({color},{x},{y},{width},{height})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
