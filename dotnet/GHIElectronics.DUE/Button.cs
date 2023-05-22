@@ -37,7 +37,7 @@ namespace GHIElectronics.DUE {
             public bool Enable(char pin, bool enable) => this.Enable((int)pin, enable);
 
 
-            public bool IsPressed(int pin) {
+            public bool WasPressed(int pin) {
                 if (pin < 0)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
@@ -66,7 +66,7 @@ namespace GHIElectronics.DUE {
                 return false;
             }
 
-            public bool IsPressed(char pin) => this.IsPressed((int)pin);
+            public bool WasPressed(char pin) => this.WasPressed((int)pin);
 
             public bool IsReleased(int pin) {
                 if (pin < 0)
