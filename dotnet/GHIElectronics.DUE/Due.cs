@@ -33,7 +33,7 @@ namespace GHIElectronics.DUE {
         public AnalogController Analog { get; internal set; }
         public DigitalController Digital { get; internal set; }
         public I2cController I2c { get; internal set; }
-        public ServoMotoController ServoMoto { get; internal set; }
+        public ServoController Servo { get; internal set; }
         public SpiController Spi { get; internal set; }
 
         public FrequencyController Frequency { get; internal set; }
@@ -85,7 +85,7 @@ namespace GHIElectronics.DUE {
             this.Analog = new AnalogController(this.serialPort);
             this.Digital = new DigitalController(this.serialPort);
             this.I2c = new I2cController(this.serialPort);
-            this.ServoMoto = new ServoMotoController(this.serialPort);
+            this.Servo = new ServoController(this.serialPort);
             this.Frequency = new FrequencyController(this.serialPort);
             this.Spi = new SpiController(this.serialPort);
             this.Infrared = new InfraredController(this.serialPort);

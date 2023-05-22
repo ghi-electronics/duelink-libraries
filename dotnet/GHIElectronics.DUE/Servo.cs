@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace GHIElectronics.DUE {
     public partial class DUEController {
         
-        public class ServoMotoController {
+        public class ServoController {
 
             SerialInterface serialPort;
 
-            public ServoMotoController(SerialInterface serialPort) => this.serialPort = serialPort;
+            public ServoController(SerialInterface serialPort) => this.serialPort = serialPort;
 
             public bool Set(int pin, int position) {
                 if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)

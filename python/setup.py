@@ -1,8 +1,8 @@
 import setuptools
 
 setuptools.setup(
-    name = "PYDUE",
-    version = "1.0.0",
+    name = "DUELink",
+    version = "1.0.1",
     author = "GHI Electronics",
     author_email = "support@ghielectronics.com",
     license='MIT', 

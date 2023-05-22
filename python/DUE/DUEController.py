@@ -9,7 +9,7 @@ from DUE.Infrared import InfraredController
 from DUE.Neo import NeoController
 from DUE.System import SystemController
 from DUE.SerialInterface import SerialInterface
-from DUE.ServoMoto import ServoMotoController
+from DUE.Servo import ServoController
 from DUE.Sound import SoundController
 from DUE.Spi import SpiController
 from DUE.Touch import TouchController
@@ -35,7 +35,7 @@ class DUEController:
         self.Analog = AnalogController(self.serialPort)
         self.Digital = DigitalController(self.serialPort)
         self.I2c = I2cController(self.serialPort)
-        self.ServoMoto = ServoMotoController(self.serialPort)
+        self.Servo = ServoController(self.serialPort)
         self.Frequency = FrequencyController(self.serialPort)
         self.Spi = SpiController(self.serialPort)
         self.Infrared = InfraredController(self.serialPort)

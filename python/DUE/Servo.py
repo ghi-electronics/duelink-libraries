@@ -1,6 +1,6 @@
 from DUE.SerialInterface import SerialInterface
 
-class ServoMotoController:
+class ServoController:
     def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
