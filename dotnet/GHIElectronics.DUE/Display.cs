@@ -164,7 +164,25 @@ namespace GHIElectronics.DUE {
                 }                
                 return Stream(data);
 
-            }            
+            }
+
+            public bool DrawBufferBytes(byte[] color, int offset, int length) {
+
+                if (length % 4 != 0) {
+
+                    throw new Exception("length must be multiple of 4");
+                }
+
+                var data32 = new uint[length/4];
+
+                for (var i = 0; i < data32.Length; i++) {
+                    data32[i] = BitConverter.ToUInt32(color, (i + offset) * 4);
+                }
+
+                return this.DrawBuffer(data32, 0, data32.Length);
+
+
+            }
             public bool Configuration(int slaveAddress) {
                 var cmd = string.Format("lcdconfig(0,{0})", slaveAddress);
 

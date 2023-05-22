@@ -95,6 +95,18 @@ class DisplayController:
 
         return self.__Stream(data)
     
+    def DrawBufferBytes(self, color, offset: int, length: int):
+        if length % 4 !=0:
+            raise Exception("length must be multiple of 4")
+        
+        data32 = [0] * int(length/4)
+
+        for i in range (0, len(data32), 4):
+            data32[i] = (color[(i + offset) * 4 + 0] << 0) | (color[(i + offset) * 4 + 1] << 8) | (color[(i + offset) * 4 + 2] << 16) | (color[(i + offset) * 4 + 3] << 24)
+
+        return self.DrawBuffer(data32, 0, len(data32))
+
+    
     def Configuration(self, target: int, slaveAddress: int)-> bool:
         cmd = f"lcdconfig({target},{slaveAddress})"
 
