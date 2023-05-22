@@ -96,10 +96,13 @@ namespace GHIElectronics.DUE {
                 return res.success;
             }
 
-            public bool SetMultiple(int pin, uint[] color, int offset, int length) {
-                if (length > MAX_LED_NUM) {
+            public bool SetMultiple(int pin, uint[] color) {
+                if (color == null || color.Length > MAX_LED_NUM) {
                     return false;
                 }
+
+                int length = color.Length;
+                int offset = 0;
 
                 var data = new byte[length *  3];
 

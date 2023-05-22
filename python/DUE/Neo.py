@@ -42,10 +42,13 @@ class NeoController:
 
         return res.success
 
-    def SetMultiple(self, pin: int, color, offset: int, length: int):
+    def SetMultiple(self, pin: int, color):
         if len(color) > self.MAX_LED_NUM:
             return False
-
+        
+        length = len(color) 
+        offset = 0
+        
         data = bytearray(length*3)
 
         for i in range(offset, length + offset):
