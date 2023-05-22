@@ -83,13 +83,15 @@ class DisplayController:
 
                 index = (y >> 3) * WIDTH + x
 
-                if ((color[i] & 0x00FFFFFF) != 0): # no alpha
-                    data[index] |= (1 << (y & 7)) & 0xFF
-                
-                else:
-                    data[index] &= (~(1 << (y & 7))) & 0xFF
-                
-                i += 1                
+                if (i < offset + length):
+
+                    if ((color[i] & 0x00FFFFFF) != 0): # no alpha
+                        data[index] |= (1 << (y & 7)) & 0xFF
+                    
+                    else:
+                        data[index] &= (~(1 << (y & 7))) & 0xFF
+                    
+                    i += 1                
 
         return self.__Stream(data)
     

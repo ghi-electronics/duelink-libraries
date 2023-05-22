@@ -140,11 +140,10 @@ namespace GHIElectronics.DUE {
                 const int HEIGHT = 64;
 
                 if (length > WIDTH * HEIGHT)
-                    throw new Exception("Only 64*128 supported.");
+                    throw new Exception("Only 64*128 supported.");                
 
-               
 
-                var data = new byte[WIDTH * HEIGHT / 8];
+                var data = new byte[WIDTH * HEIGHT / 8]; // always send all screen, less than sreen size, fill by zero
                 var i = offset;
 
                 for (int y = 0; y < HEIGHT; y++) {
@@ -152,20 +151,20 @@ namespace GHIElectronics.DUE {
 
                         var index = (y >> 3) * WIDTH + x;
 
-                        if ((color[i] & 0x00FFFFFF) != 0) { // no alpha
-                            data[index] |= (byte)(1 << (y & 7));
+                        if (i < offset + length) {
+                            if ((color[i] & 0x00FFFFFF) != 0) { // no alpha
+                                data[index] |= (byte)(1 << (y & 7));
+                            }
+                            else {
+                                data[index] &= (byte)(~(1 << (y & 7)));
+                            }
+                            i++;
                         }
-                        else {
-                            data[index] &= (byte)(~(1 << (y & 7)));
-                        }
-                        i++;
                     }
-                }
-
+                }                
                 return Stream(data);
 
-            }
-
+            }            
             public bool Config(int target, int slaveAddress) {
                 var cmd = string.Format("lcdconfig({0},{1})", target, slaveAddress);
 
