@@ -145,7 +145,7 @@ namespace GHIElectronics.DUE {
                
 
                 var data = new byte[WIDTH * HEIGHT / 8];
-                var i = 0;
+                var i = offset;
 
                 for (int y = 0; y < HEIGHT; y++) {
                     for (int x = 0; x < WIDTH; x++) {

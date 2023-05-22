@@ -76,7 +76,7 @@ class DisplayController:
             raise Exception("Only 64*128 supported.")
 
         data = bytearray(int(WIDTH*HEIGHT/8))
-        i = 0
+        i = offset
 
         for y in range(0, HEIGHT):
             for x in range(0, WIDTH):
