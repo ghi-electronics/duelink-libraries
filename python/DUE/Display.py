@@ -95,7 +95,7 @@ class DisplayController:
 
         return self.__Stream(data)
     
-    def Config(self, target: int, slaveAddress: int)-> bool:
+    def Configuration(self, target: int, slaveAddress: int)-> bool:
         cmd = f"lcdconfig({target},{slaveAddress})"
 
         self.serialPort.WriteCommand(cmd)

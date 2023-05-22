@@ -165,8 +165,8 @@ namespace GHIElectronics.DUE {
                 return Stream(data);
 
             }            
-            public bool Config(int target, int slaveAddress) {
-                var cmd = string.Format("lcdconfig({0},{1})", target, slaveAddress);
+            public bool Configuration(int slaveAddress) {
+                var cmd = string.Format("lcdconfig(0,{0})", slaveAddress);
 
                 this.serialPort.WriteCommand(cmd);
 
