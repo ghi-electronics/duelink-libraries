@@ -7,7 +7,7 @@ class ButtonController:
 
     def Enable(self, pin, enable: bool) -> bool:
         if pin != 97 and pin != 98 and pin !=65 and pin != 66 and pin != 0 and pin != 1 and pin != 2 and pin !='A' and pin !='B' and pin !='a' and pin !='b':            
-            raise ValueError("Accept pins: 0,1,2,97,98")
+            raise ValueError("Invalid pin.")
 
         cmd = f"btnenable({pin}, {int(enable)})"
 
@@ -18,7 +18,7 @@ class ButtonController:
     
     def IsPressed(self, pin) -> bool:
         if pin != 97 and pin != 98 and pin !=65 and pin != 66 and pin != 0 and pin != 1 and pin != 2 and pin !='A' and pin !='B' and pin !='a' and pin !='b':
-            raise ValueError("Accept pins: 0,1,2,97,98")
+            raise ValueError("Invalid pin.")
             
         cmd = f"print(btndown({pin}))"
 
@@ -35,7 +35,7 @@ class ButtonController:
     
     def IsReleased(self, pin) -> bool:
         if pin != 97 and pin != 98 and pin !=65 and pin != 66 and pin != 0 and pin != 1 and pin != 2 and pin !='A' and pin !='B' and pin !='a' and pin !='b': 
-            raise ValueError("Accept pins: 0,1,2,97,98")
+            raise ValueError("Invalid pin.")
             
         cmd = f"print(btnup({pin}))"
 

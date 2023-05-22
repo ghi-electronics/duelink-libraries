@@ -34,6 +34,8 @@ namespace GHIElectronics.DUE {
 
             }
 
+            public bool Enable(char pin, bool enable) => this.Enable((int)pin, enable);
+
 
             public bool IsPressed(int pin) {
                 if (pin < 0)
@@ -63,6 +65,8 @@ namespace GHIElectronics.DUE {
 
                 return false;
             }
+
+            public bool IsPressed(char pin) => this.IsPressed((int)pin);
 
             public bool IsReleased(int pin) {
                 if (pin < 0)
@@ -94,6 +98,8 @@ namespace GHIElectronics.DUE {
 
 
             }
+
+            public bool IsReleased(char pin) => this.IsReleased((int)pin);
 
         }
     }
