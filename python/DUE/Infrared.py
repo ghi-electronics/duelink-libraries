@@ -13,8 +13,13 @@ class InfraredController:
                 pass
         return -1
 
-    def Enable(self, enable):
-        cmd = "irenable({})".format(int(enable))
+    def Enable(self, enable: bool):
+        en = 0
+
+        if enable == True:
+            en = 1
+
+        cmd = "irenable({})".format(int(en))
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
