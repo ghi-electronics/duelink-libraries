@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,17 @@ namespace GHIElectronics.DUE {
 
             SerialInterface serialPort;
 
-            public SystemController(SerialInterface serialPort) => this.serialPort = serialPort;
+            const int DISPLAY_MAX_LINES = 8;
+            const int DISPLAY_MAX_CHARACTER_PER_LINE = 21;
+
+            public SystemController(SerialInterface serialPort) {
+                this.serialPort = serialPort;
+                this.displayText = new string[DISPLAY_MAX_LINES];
+
+                for (var i = 0; i < DISPLAY_MAX_LINES; i++) {
+                    displayText[i] = string.Empty;  
+                }
+            }
 
             public void Reset(ResetOption option) {
 
@@ -97,28 +108,71 @@ namespace GHIElectronics.DUE {
 
             }
 
+
+            string[] displayText;
+
+            int print_posx = 0;
+            private void PrnChar(char c) {
+                if (print_posx == DISPLAY_MAX_CHARACTER_PER_LINE && c != '\r' && c != '\n')
+                    return;
+
+
+                if (c == '\r' || c == '\n') {
+                    print_posx = 0;
+
+                    for (var i = 1; i < DISPLAY_MAX_LINES; i++) { // move up the last line
+                        displayText[i - 1] = displayText[i];
+                    }
+
+                    displayText[DISPLAY_MAX_LINES - 1] = string.Empty;                    
+                }
+                else {
+                    displayText[DISPLAY_MAX_LINES - 1] += c;
+                    print_posx++;
+                }
+
+            }
+
+            private void PrnText(string text, bool newline) {
+                for (var i = 0; i < text.Length; i++) {
+                    this.PrnChar(text[i]);
+                }
+
+                var display = new DisplayController(this.serialPort);
+
+                display.Clear(0);
+
+                for (var i = 0; i < displayText.Length; i++) {
+                    if (displayText[i] != string.Empty) {
+                        display.DrawText(displayText[i], 1, 0, i * 8);
+                    }
+
+                }
+
+                display.Show();
+
+                if (newline) {
+                    this.PrnChar('\r');
+                }                
+            }
             public bool Print(string text) {
+            
+                Debug.WriteLine(text);
 
-                var cmd = string.Format("print(\"{0}\")", text);
+                this.PrnText(text, false);
+
+                return true;
 
 
-                this.serialPort.WriteCommand(cmd);
-
-                var res = this.serialPort.ReadRespone();
-
-                return res.success;
             }
 
             public bool Println(string text) {
 
-                var cmd = string.Format("println(\"{0}\")", text);
+                Debug.WriteLine(text);
 
+                this.PrnText(text, true);
 
-                this.serialPort.WriteCommand(cmd);
-
-                var res = this.serialPort.ReadRespone();
-
-                return res.success;
+                return true;
             }
             public bool Wait(int millisecond) {
 

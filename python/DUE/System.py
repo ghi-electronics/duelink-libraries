@@ -1,3 +1,4 @@
+from DUE.Display import DisplayController
 from enum import Enum
 import time
 
@@ -6,8 +7,13 @@ class SystemController:
         SystemReset = 0
         Bootloader = 1
 
+    DISPLAY_MAX_LINES = 8
+    DISPLAY_MAX_CHARACTER_PER_LINE = 21
+
     def __init__(self, serialPort):
         self.serialPort = serialPort
+        self.print_posx = 0
+        self.displayText = ["", "", "", "", "", "", "", ""]
 
     def Reset(self, option : Enum):
         cmd = "reset({0})".format(1 if option.value == 1 else 0)
@@ -48,17 +54,54 @@ class SystemController:
         res = self.serialPort.ReadRespone()
         return res.success
     
+    def __PrnChar(self, c):
+        if self.print_posx == SystemController.DISPLAY_MAX_CHARACTER_PER_LINE and c != '\r' and c != '\n':
+            return
+        
+        if c ==  '\r'  or c == '\n':
+            self.print_posx = 0
+
+            for i in range (1, SystemController.DISPLAY_MAX_LINES):
+                self.displayText[i-1] = self.displayText[i]
+
+            self.displayText[SystemController.DISPLAY_MAX_LINES-1] = ""
+        else:
+            self.displayText[SystemController.DISPLAY_MAX_LINES-1] = self.displayText[SystemController.DISPLAY_MAX_LINES-1] + c
+            self.print_posx+=1
+        return
+    
+    def __PrnText(self, text:str, newline: bool):
+        for i in range (len(text)):
+            self.__PrnChar(text[i])
+
+        display = DisplayController(self.serialPort)
+        display.Clear(0)
+
+        for i in range (len(self.displayText)):
+            if self.displayText[i] != "":
+                display.DrawText(self.displayText[i], 1, 0, i * 8)
+        
+        display.Show()
+
+        if (newline):
+            self.__PrnChar('\r')
+
+
+
+
+
+    
     def Print(self, text: str)->bool:
-        cmd = f"print(\"{text}\")"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
-        return res.success
+        print(text)
+        self.__PrnText(text, False)
+
+        return True
     
     def Println(self, text: str)->bool:
-        cmd = f"println(\"{text}\")"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
-        return res.success
+        print(text)
+        self.__PrnText(text, True)
+
+        return True
     
     def Wait(self, millisecond: int)->bool:
         cmd = f"wait({millisecond})"       
