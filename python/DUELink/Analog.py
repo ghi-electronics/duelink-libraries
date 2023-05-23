@@ -1,4 +1,4 @@
-from DUE.SerialInterface import SerialInterface
+from DUELink.SerialInterface import SerialInterface
 
 class AnalogController:
     def __init__(self, serialPort:SerialInterface):

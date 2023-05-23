@@ -1,4 +1,4 @@
-from DUE.SerialInterface import SerialInterface
+from DUELink.SerialInterface import SerialInterface
 
 class DistanceSensorController:
     def __init__(self, serialPort:SerialInterface):

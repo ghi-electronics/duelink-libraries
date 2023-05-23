@@ -1,7 +1,7 @@
 from typing import Optional
 
 import time
-from DUE.SerialInterface import SerialInterface
+from DUELink.SerialInterface import SerialInterface
 
 class SpiController:
     def __init__(self, serialPort:SerialInterface):

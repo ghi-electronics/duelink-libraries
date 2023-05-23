@@ -1,5 +1,5 @@
 
-from DUE.SerialInterface import SerialInterface
+from DUELink.SerialInterface import SerialInterface
 
 class DigitalController:    
 

@@ -1,4 +1,4 @@
-from DUE.Display import DisplayController
+from DUELink.Display import DisplayController
 from enum import Enum
 import time
 

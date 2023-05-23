@@ -1,7 +1,7 @@
 import time
 import serial
 from datetime import datetime, timedelta
-from DUE.DeviceConfiguration import DeviceConfiguration
+from DUELink.DeviceConfiguration import DeviceConfiguration
 
 class SerialInterface:
     CommandCompleteText = ">"
