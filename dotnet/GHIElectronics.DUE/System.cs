@@ -166,11 +166,31 @@ namespace GHIElectronics.DUE {
 
             }
 
+            public bool Print(int text) {
+
+                Debug.WriteLine(text.ToString());
+
+                this.PrnText(text.ToString(), false);
+
+                return true;
+
+
+            }
+
             public bool Println(string text) {
 
                 Debug.WriteLine(text);
 
                 this.PrnText(text, true);
+
+                return true;
+            }
+
+            public bool Println(int text) {
+
+                Debug.WriteLine(text.ToString());
+
+                this.PrnText(text.ToString(), true);
 
                 return true;
             }

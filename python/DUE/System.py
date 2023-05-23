@@ -91,15 +91,22 @@ class SystemController:
 
 
     
-    def Print(self, text: str)->bool:
+    def Print(self, text)->bool:
         print(text)
-        self.__PrnText(text, False)
+
+        if isinstance(text, str):
+            self.__PrnText(text, False)
+        else:
+            self.__PrnText(str(text), False)
 
         return True
     
-    def Println(self, text: str)->bool:
+    def Println(self, text)->bool:
         print(text)
-        self.__PrnText(text, True)
+        if isinstance(text, str):
+            self.__PrnText(text, True)
+        else:
+            self.__PrnText(str(text), True)
 
         return True
     
