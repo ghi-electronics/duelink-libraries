@@ -2,21 +2,38 @@ import time
 
 class PinController:   
      
-    BUTTON_A = 97
-    BUTTON_B = 98
-    LED = 108
-    PIEZO = 112
-    PULLNONE = 0
-    PULLUP = 1
-    PULLDOWN = 2
-
     def __init__(self):
-        self.ButtonA = PinController.BUTTON_A
-        self.ButtonB = PinController.BUTTON_B
-        self.Led = PinController.LED
-        self.Piezo = PinController.PIEZO
+        pass
 
-        self.PullNone = PinController.PULLNONE
-        self.PullUp = PinController.PULLUP
 
-        self.PullDown = PinController.PULLDOWN
+    def get_button_a(self):
+        return 97
+
+    def get_button_b(self):
+        return 98
+    
+    def get_led(self):
+        return 108
+
+    def get_piezo(self):
+        return 112
+    
+    def get_pullnone(self):
+        return 0
+    
+    def get_pullup(self):
+        return 1
+    
+    def get_pulldown(self):
+        return 2
+
+    def set_empty(self, value: int):
+        return    
+    
+    ButtonA = property(get_button_a, set_empty)  
+    ButtonB = property(get_button_b, set_empty)   
+    Led = property(get_led, set_empty) 
+    Piezo = property(get_piezo, set_empty)
+    PullNone = property(get_pullnone, set_empty)
+    PullUp = property(get_pullup, set_empty)
+    PullDown = property(get_pulldown, set_empty)
