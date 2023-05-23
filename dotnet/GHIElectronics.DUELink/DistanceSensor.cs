@@ -17,7 +17,7 @@ namespace GHIElectronics.DUELink {
                 if (pulsePin < 0 || pulsePin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
-                if (echoPin < 0 || echoPin >= this.serialPort.DeviceConfig.MaxPinIO)
+                if (echoPin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 var cmd = string.Format("print(distance({0},{1}))", pulsePin, echoPin);

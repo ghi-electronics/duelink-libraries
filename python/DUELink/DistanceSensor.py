@@ -9,7 +9,7 @@ class DistanceSensorController:
         if pulsePin < 0 or pulsePin >= self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError('Invalid pin')
 
-        if echoPin < 0 or echoPin >= self.serialPort.DeviceConfig.MaxPinIO:
+        if echoPin >= self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError('Invalid pin')
 
         cmd = f'print(distance({pulsePin},{echoPin}))'
