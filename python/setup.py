@@ -6,7 +6,7 @@ setuptools.setup(
     author = "GHI Electronics",
     author_email = "support@ghielectronics.com",
     license='MIT', 
-    description = "GHI Electronics DUE Python library.",
+    description = "GHI Electronics DUELink Python library.",
     url = "https://www.duelink.com/",
     packages=setuptools.find_packages(),
     classifiers=[
