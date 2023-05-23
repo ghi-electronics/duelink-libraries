@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static GHIElectronics.DUE.DUEController;
+using static GHIElectronics.DUELink.DUELinkController;
 
-namespace GHIElectronics.DUE {
-    public partial class DUEController {
+namespace GHIElectronics.DUELink {
+    public partial class DUELinkController {
         public class DistanceSensorController {
 
 

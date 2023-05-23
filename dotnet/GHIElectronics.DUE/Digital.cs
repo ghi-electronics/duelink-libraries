@@ -4,10 +4,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static GHIElectronics.DUE.DUEController.DigitalController;
+using static GHIElectronics.DUELink.DUELinkController.DigitalController;
 
-namespace GHIElectronics.DUE {
-    public partial class DUEController {
+namespace GHIElectronics.DUELink {
+    public partial class DUELinkController {
         //public enum Input {
         //    PullNone = 0,
         //    PullUp = 1,

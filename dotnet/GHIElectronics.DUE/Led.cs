@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic.FileIO;
 
-namespace GHIElectronics.DUE {
-    public partial class DUEController {
+namespace GHIElectronics.DUELink {
+    public partial class DUELinkController {
         public class LedController {
 
             SerialInterface serialPort;

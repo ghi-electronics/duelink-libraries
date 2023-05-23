@@ -6,7 +6,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
-namespace GHIElectronics.DUE {
+namespace GHIElectronics.DUELink {
 
     public class DeviceConfiguration {
         public bool IsPulse { get; internal set; } = false;
@@ -18,7 +18,7 @@ namespace GHIElectronics.DUE {
 
 
     }
-    public partial class DUEController {
+    public partial class DUELinkController {
 
         //public enum Pin {
         //    ButtonA = 97,
@@ -73,7 +73,7 @@ namespace GHIElectronics.DUE {
         public int MaxIO { get; internal set; } 
         public int MaxAnalog { get; internal set; }
 
-        public DUEController(string comPort) {
+        public DUELinkController(string comPort) {
             if (comPort == null)
                 throw new Exception(string.Format("Invalid comport: {0}", comPort));
 

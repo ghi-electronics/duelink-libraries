@@ -5,11 +5,11 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using static GHIElectronics.DUE.DUEController;
-using static GHIElectronics.DUE.SerialInterface;
+using static GHIElectronics.DUELink.DUELinkController;
+using static GHIElectronics.DUELink.SerialInterface;
 
-namespace GHIElectronics.DUE {
-    public partial class DUEController {
+namespace GHIElectronics.DUELink {
+    public partial class DUELinkController {
 
         public class SpiController {
 

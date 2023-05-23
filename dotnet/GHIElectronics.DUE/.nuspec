@@ -2,14 +2,14 @@
 
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-	<id>GHIElectronics.DUE</id>
+	<id>GHIElectronics.DUELink</id>
 	<version>1.0.2</version>
 	<title />
 	<authors>GHI Electronics LLC</authors>
 	<owners>GHI Electronics LLC</owners>	
 	<description>The driver for DUE</description>
 	<icon>images\icon.png</icon>
-	<tags>DUE BrainPad TinyCLR TinyCLROS FEZ</tags>
+	<tags>DUELink BrainPad TinyCLR TinyCLROS FEZ</tags>
 	<licenseUrl>http://files.ghielectronics.com/downloads/TinyCLR/License.txt</licenseUrl>
 	<requireLicenseAcceptance>true</requireLicenseAcceptance>
 	<copyright>Copyright GHI Electronics, LLC 2023</copyright>
@@ -18,7 +18,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="$TargetDir$bin\release\net6.0\GHIElectronics.DUE.dll" target="lib\net6.0"/>
+    <file src="$TargetDir$bin\release\net6.0\GHIElectronics.DUELink.dll" target="lib\net6.0"/>
 	<file src="$TargetDir$images\icon.png" target="images\" />
   </files>
 </package>

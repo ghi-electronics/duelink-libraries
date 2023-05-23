@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace GHIElectronics.DUE {
+namespace GHIElectronics.DUELink {
 
-    public partial class DUEController {
+    public partial class DUELinkController {
 
         public enum ResetOption {
             SystemReset = 0,

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GHIElectronics.DUE {
-    public partial class DUEController {
+namespace GHIElectronics.DUELink {
+    public partial class DUELinkController {
 
 
         public class TouchController {

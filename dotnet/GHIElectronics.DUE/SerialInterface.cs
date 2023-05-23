@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Xml.Linq;
 
-namespace GHIElectronics.DUE {
+namespace GHIElectronics.DUELink {
     public class SerialInterface {
 
         
