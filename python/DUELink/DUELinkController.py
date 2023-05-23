@@ -10,7 +10,6 @@ from DUELink.Neo import NeoController
 from DUELink.System import SystemController
 from DUELink.SerialInterface import SerialInterface
 from DUELink.Servo import ServoController
-from DUELink.Sound import SoundController
 from DUELink.Spi import SpiController
 from DUELink.Touch import TouchController
 from DUELink.Uart import UartController
@@ -46,8 +45,7 @@ class DUELinkController:
         self.System = SystemController(self.serialPort)
         self.Uart = UartController(self.serialPort)
         self.Button = ButtonController(self.serialPort)
-        self.Distance = DistanceSensorController(self.serialPort)
-        self.Sound = SoundController(self.serialPort)
+        self.Distance = DistanceSensorController(self.serialPort)        
         self.Display = DisplayController(self.serialPort)
         self.Touch = TouchController(self.serialPort)
         self.Led = LedController(self.serialPort)

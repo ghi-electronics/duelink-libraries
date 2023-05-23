@@ -46,8 +46,7 @@ namespace GHIElectronics.DUELink {
 
         public UartController Uart { get; internal set; }
         public ButtonController Button { get; internal set; }
-        public DistanceSensorController Distance { get; internal set; }
-        public SoundController Sound { get; internal set; }
+        public DistanceSensorController Distance { get; internal set; }        
         public DisplayController Display { get; internal set; }
 
         public TouchController Touch { get; internal set; }
@@ -99,8 +98,7 @@ namespace GHIElectronics.DUELink {
             this.System = new SystemController(this.serialPort);
             this.Uart = new UartController(this.serialPort);
             this.Button = new ButtonController(this.serialPort);
-            this.Distance = new DistanceSensorController(this.serialPort);
-            this.Sound = new SoundController(this.serialPort);
+            this.Distance = new DistanceSensorController(this.serialPort);            
             this.Display = new DisplayController(this.serialPort);
             this.Touch = new TouchController(this.serialPort);
             this.Led = new LedController(this.serialPort);
