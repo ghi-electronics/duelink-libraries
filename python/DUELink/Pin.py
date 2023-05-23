@@ -6,34 +6,34 @@ class PinController:
         pass
 
 
-    def get_button_a(self):
+    def __get_button_a(self):
         return 97
 
-    def get_button_b(self):
+    def __get_button_b(self):
         return 98
     
-    def get_led(self):
+    def __get_led(self):
         return 108
 
-    def get_piezo(self):
+    def __get_piezo(self):
         return 112
     
-    def get_pullnone(self):
+    def __get_pullnone(self):
         return 0
     
-    def get_pullup(self):
+    def __get_pullup(self):
         return 1
     
-    def get_pulldown(self):
+    def __get_pulldown(self):
         return 2
 
-    def set_empty(self, value: int):
+    def __set_empty(self, value: int):
         return    
     
-    ButtonA = property(get_button_a, set_empty)  
-    ButtonB = property(get_button_b, set_empty)   
-    Led = property(get_led, set_empty) 
-    Piezo = property(get_piezo, set_empty)
-    PullNone = property(get_pullnone, set_empty)
-    PullUp = property(get_pullup, set_empty)
-    PullDown = property(get_pulldown, set_empty)
+    ButtonA = property(__get_button_a, __set_empty)  
+    ButtonB = property(__get_button_b, __set_empty)   
+    Led = property(__get_led, __set_empty) 
+    Piezo = property(__get_piezo, __set_empty)
+    PullNone = property(__get_pullnone, __set_empty)
+    PullUp = property(__get_pullup, __set_empty)
+    PullDown = property(__get_pulldown, __set_empty)

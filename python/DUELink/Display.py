@@ -114,3 +114,78 @@ class DisplayController:
         res = self.serialPort.ReadRespone()
         return res.success
 
+    def DrawImage(self, data, offset: int, length: int, x: int, y: int, width: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:
+        height = int(len(data) / width)
+
+        cmd = f"dim a[{len(data) + 2}]"
+
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+
+        if res.success:
+            cmd = f"a[0] = {width}"
+
+            self.serialPort.WriteCommand(cmd)
+            res = self.serialPort.ReadRespone()
+
+            if res.success:
+                cmd = f"a[1] = {height}"
+
+                self.serialPort.WriteCommand(cmd)
+                res = self.serialPort.ReadRespone()
+
+                if res.success:
+                    for i in range(offset, offset + length):
+                        cmd = f"a[{(i - offset + 2)}] = {data[i]}"
+                        self.serialPort.WriteCommand(cmd)
+                        res = self.serialPort.ReadRespone()
+
+                        if (res.success == False):
+                            break
+                    
+                    if (res.success == True):
+                        cmd = f"lcdimg(a, {x}, {y}, {scaleWidth}, {scaleHeight}, {transform})"
+
+                        self.serialPort.WriteCommand(cmd)
+                        res = self.serialPort.ReadRespone()
+        
+
+        cmd = "dim a[0]"
+
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+
+        return res.success
+
+    def DrawImageBytes(self, data, offset: int, length: int, x: int, y: int, width: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:
+        if length % 4 !=0:
+            raise Exception("length must be multiple of 4")
+        
+        data32 = [0] * int(length/4)
+
+        for i in range (0, len(data32), 4):
+            data32[i] = (data[(i + offset) * 4 + 0] << 0) | (data[(i + offset) * 4 + 1] << 8) | (data[(i + offset) * 4 + 2] << 16) | (data[(i + offset) * 4 + 3] << 24)
+
+        return self.DrawImage(data32, 0, len(data32),x, y, width, scaleWidth, scaleHeight, transform)
+    
+    def __get_transform_none(self):
+        return 0
+    def __get_transform_fliphorizontal(self):
+        return 1
+    def __get_transform_flipvertical(self):
+        return 2
+    def __get_transform_rotate90(self):
+        return 3
+    def __get_transform_rotate180(self):
+        return 4
+    def __get_transform_rotate270(self):
+        return 5
+    def __set_transform(self):
+        return 
+    
+    TransformNone = property(__get_transform_none, __set_transform)  
+    TransformFlipHorizontal = property(__get_transform_fliphorizontal, __set_transform) 
+    TransformFlipVertical = property(__get_transform_flipvertical, __set_transform) 
+    TransformRotate90 = property(__get_transform_rotate90, __set_transform) 
+    TransformRotate180 = property(__get_transform_rotate180, __set_transform) 
+    TransformRotate270 = property(__get_transform_rotate270, __set_transform) 

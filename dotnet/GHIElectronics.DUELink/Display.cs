@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace GHIElectronics.DUELink {
 
@@ -12,6 +13,12 @@ namespace GHIElectronics.DUELink {
 
             SerialInterface serialPort;
 
+            public int TransformNone { get; } = 0;
+            public int TransformFlipHorizontal { get; } = 1;
+            public int TransformFlipVertical { get; } = 2;
+            public int TransformRotate90 { get; } = 3;
+            public int TransformRotate180 { get; } = 4;
+            public int TransformRotate270 { get; } = 5;
 
 
             public DisplayController(SerialInterface serialPort) => this.serialPort = serialPort;
@@ -94,7 +101,7 @@ namespace GHIElectronics.DUELink {
 
             public bool DrawText(string text, uint color, int x, int y) {
                 var cmd = string.Format("lcdtext(\"{0}\",{1},{2},{3})", text, color, x, y);
-                
+
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -103,7 +110,7 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
-            public bool DrawTextScale (string text, uint color, int x, int y, int scalewidth, int scaleheight) {
+            public bool DrawTextScale(string text, uint color, int x, int y, int scalewidth, int scaleheight) {
                 var cmd = string.Format("lcdtexts(\"{0}\",{1},{2},{3},{4},{5})", text, color, x, y, scalewidth, scaleheight);
 
 
@@ -112,6 +119,86 @@ namespace GHIElectronics.DUELink {
                 var res = this.serialPort.ReadRespone();
 
                 return res.success;
+
+            }
+
+            public bool DrawImage(uint[] data, int offset, int length, int x, int y, int width, int scaleWidth, int scaleHeight, int transform) {
+
+                int height = data.Length / width;
+
+                var cmd = string.Format("dim a[{0}]", data.Length + 2);
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                if (res.success) {
+                    cmd = string.Format("a[0] = {0}", width);
+
+                    this.serialPort.WriteCommand(cmd);
+
+                    res = this.serialPort.ReadRespone();
+
+                    if (res.success) {
+                        cmd = string.Format("a[1] = {0}", height);
+
+                        this.serialPort.WriteCommand(cmd);
+
+                        res = this.serialPort.ReadRespone();
+
+                        if (res.success) {
+
+                            for (var i = offset; i < offset + length; i++) {
+                                cmd = string.Format("a[{0}] = {1}", (i - offset + 2) , data[i]);
+
+                                this.serialPort.WriteCommand(cmd);
+
+                                res = this.serialPort.ReadRespone();
+
+                                if (!res.success) {
+                                    break;
+                                }
+                            }
+
+                            if (res.success) {
+                                cmd = string.Format("lcdimg(a, {0}, {1}, {2}, {3}, {4})", x, y, scaleWidth, scaleHeight, transform);
+
+                                this.serialPort.WriteCommand(cmd);
+
+                                res = this.serialPort.ReadRespone();
+                            }
+                        }
+
+
+                    }
+
+
+
+                }
+
+                cmd = string.Format("dim a[0]"); // free array
+
+                this.serialPort.WriteCommand(cmd);
+
+                res = this.serialPort.ReadRespone();
+
+                return res.success;
+
+            }
+
+            public bool DrawImageBytes(byte[] data, int offset, int length, int x, int y, int width, int scaleWidth, int scaleHeight, int transform) {
+                if (length % 4 != 0) {
+
+                    throw new Exception("length must be multiple of 4");
+                }
+
+                var data32 = new uint[length / 4];
+
+                for (var i = 0; i < data32.Length; i++) {
+                    data32[i] = BitConverter.ToUInt32(data, (i + offset) * 4);
+                }
+
+                return this.DrawImage(data32, 0, data32.Length, x, y, width, scaleWidth, scaleHeight, transform);
 
             }
 
@@ -140,7 +227,7 @@ namespace GHIElectronics.DUELink {
                 const int HEIGHT = 64;
 
                 if (length > WIDTH * HEIGHT)
-                    throw new Exception("Only 64*128 supported.");                
+                    throw new Exception("Only 64*128 supported.");
 
 
                 var data = new byte[WIDTH * HEIGHT / 8]; // always send all screen, less than sreen size, fill by zero
@@ -161,7 +248,7 @@ namespace GHIElectronics.DUELink {
                             i++;
                         }
                     }
-                }                
+                }
                 return Stream(data);
 
             }
@@ -173,7 +260,7 @@ namespace GHIElectronics.DUELink {
                     throw new Exception("length must be multiple of 4");
                 }
 
-                var data32 = new uint[length/4];
+                var data32 = new uint[length / 4];
 
                 for (var i = 0; i < data32.Length; i++) {
                     data32[i] = BitConverter.ToUInt32(color, (i + offset) * 4);
