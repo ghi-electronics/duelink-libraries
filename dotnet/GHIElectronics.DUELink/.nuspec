@@ -9,7 +9,7 @@
 	<owners>GHI Electronics LLC</owners>	
 	<description>The driver for DUE</description>
 	<icon>images\icon.png</icon>
-	<tags>DUELink BrainPad TinyCLR TinyCLROS FEZ</tags>
+	<tags>DUE DUELink BrainPad TinyCLR TinyCLROS FEZ</tags>
 	<licenseUrl>http://files.ghielectronics.com/downloads/TinyCLR/License.txt</licenseUrl>
 	<requireLicenseAcceptance>true</requireLicenseAcceptance>
 	<copyright>Copyright GHI Electronics, LLC 2023</copyright>
