@@ -13,7 +13,7 @@ namespace GHIElectronics.DUELink {
             SerialInterface serialPort;
             public DistanceSensorController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public int Read(int pulsePin, int echoPin) {
+            public float Read(int pulsePin, int echoPin) {
                 if (pulsePin < 0 || pulsePin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
@@ -28,7 +28,7 @@ namespace GHIElectronics.DUELink {
 
                 if (res.success) {
                     try {
-                        var distance = int.Parse(res.respone);
+                        var distance = float.Parse(res.respone);
                         return distance;
                     }
                     catch {

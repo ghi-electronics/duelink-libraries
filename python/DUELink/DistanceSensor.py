@@ -4,7 +4,7 @@ class DistanceSensorController:
     def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
-    def Read(self, pulsePin, echoPin):
+    def Read(self, pulsePin, echoPin)->float:
 
         if pulsePin < 0 or pulsePin >= self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError('Invalid pin')
@@ -19,7 +19,7 @@ class DistanceSensorController:
 
         if res.success:
             try:
-                distance = int(res.respone)
+                distance = float(res.respone)
                 return distance
             except ValueError:
                 pass
