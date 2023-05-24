@@ -68,9 +68,12 @@ class DisplayController:
 
         return res.success
     
-    def DrawBuffer(self, color, offset: int, length: int):
+    def DrawBuffer(self, color):
         WIDTH = 128
         HEIGHT = 64
+
+        offset = 0
+        length = len(color)
 
         if (length > WIDTH * HEIGHT) :
             raise Exception("Only 64*128 supported.")
@@ -95,7 +98,10 @@ class DisplayController:
 
         return self.__Stream(data)
     
-    def DrawBufferBytes(self, color, offset: int, length: int):
+    def DrawBufferBytes(self, color):
+        offset = 0
+        length = len(color)
+        
         if length % 4 !=0:
             raise Exception("length must be multiple of 4")
         
@@ -114,7 +120,7 @@ class DisplayController:
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def DrawImages(self, img, x: int, y: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:        
+    def DrawImageS(self, img, x: int, y: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:        
         
         width = img[0]
         height = img[1]
@@ -151,7 +157,7 @@ class DisplayController:
         return res.success 
 
     def DrawImage(self, img, x: int, y: int, transform: int) -> bool:
-        return self.DrawImages(img, x, y, 1, 1, transform)
+        return self.DrawImageS(img, x, y, 1, 1, transform)
 
     #def DrawImageBytes(self, data, offset: int, length: int, x: int, y: int, width: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:
     #    if length % 4 !=0:

@@ -208,11 +208,18 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool DrawBuffer(uint[] color, int offset, int length) {
+            public bool DrawBuffer(uint[] color) {
                 const int WIDTH = 128;
                 const int HEIGHT = 64;
 
-                if (length > WIDTH * HEIGHT)
+                if (color == null) {
+                    throw new Exception("color can not be null.");
+                }
+
+                int offset = 0;
+                int length = color.Length;
+
+                if (length != WIDTH * HEIGHT)
                     throw new Exception("Only 64*128 supported.");
 
 
@@ -239,7 +246,14 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool DrawBufferBytes(byte[] color, int offset, int length) {
+            public bool DrawBufferBytes(byte[] color) {
+
+                if (color == null) {
+                    throw new Exception("color can not be null.");
+                }
+
+                int offset = 0;
+                int length = color.Length;
 
                 if (length % 4 != 0) {
 
@@ -252,7 +266,7 @@ namespace GHIElectronics.DUELink {
                     data32[i] = BitConverter.ToUInt32(color, (i + offset) * 4);
                 }
 
-                return this.DrawBuffer(data32, 0, data32.Length);
+                return this.DrawBuffer(data32);
 
 
             }
