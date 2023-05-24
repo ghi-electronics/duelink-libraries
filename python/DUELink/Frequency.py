@@ -4,7 +4,7 @@ class FrequencyController:
         self.MaxFrequency = 1000000
         self.MinFrequency = 16
 
-    def Write(self, frequency, duration_ms=0, dutycyle=500):
+    def Write(self, pin, frequency, duration_ms=0, dutycyle=500):
         if frequency < self.MinFrequency or frequency > self.MaxFrequency:
             raise ValueError("Frequency must be in range 16Hz..1000000Hz")
 
@@ -14,7 +14,10 @@ class FrequencyController:
         if dutycyle < 0 or dutycyle > 1000:
             raise ValueError("dutycyle must be in range 0..1000")
 
-        cmd = "freq({}, {}, {})".format(frequency, duration_ms, dutycyle)
+        if pin == 'p' or pin == 'P':
+            pin = 112
+
+        cmd = "freq({}, {}, {}, {})".format(pin, frequency, duration_ms, dutycyle)
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
