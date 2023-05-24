@@ -110,7 +110,7 @@ class DisplayController:
         for i in range (0, len(data32), 4):
             data32[i] = (color[(i + offset) * 4 + 0] << 0) | (color[(i + offset) * 4 + 1] << 8) | (color[(i + offset) * 4 + 2] << 16) | (color[(i + offset) * 4 + 3] << 24)
 
-        return self.DrawBuffer(data32, 0, len(data32))
+        return self.DrawBuffer(data32)
 
     
     def Configuration(self, target: int, slaveAddress: int)-> bool:
