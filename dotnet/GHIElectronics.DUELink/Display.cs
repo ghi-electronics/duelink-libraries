@@ -121,60 +121,39 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
+            public bool DrawImage(Image img, int x, int y, int transform) => this.DrawImages(img, x, y, 1, 1, transform);
+            public bool DrawImages(Image img, int x, int y, int scaleWidth, int scaleHeight, int transform) {
 
-            public bool DrawImage(uint[] data, int offset, int length, int x, int y, int width, int scaleWidth, int scaleHeight, int transform) {
+                var data = img.Data;
+                var width = img.Width;
+                var height = img.Height;                
 
-                int height = data.Length / width;
-
-                var cmd = string.Format("dim a[{0}]", data.Length + 2);
+                var cmd = string.Format("dim a[{0}]", data.Length);
 
                 this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
-                if (res.success) {
-                    cmd = string.Format("a[0] = {0}", width);
+                for (var i = 0; i < data.Length; i++) {
+                    cmd = string.Format("a[{0}] = {1}", (i) , data[i]);
 
                     this.serialPort.WriteCommand(cmd);
 
                     res = this.serialPort.ReadRespone();
 
-                    if (res.success) {
-                        cmd = string.Format("a[1] = {0}", height);
-
-                        this.serialPort.WriteCommand(cmd);
-
-                        res = this.serialPort.ReadRespone();
-
-                        if (res.success) {
-
-                            for (var i = offset; i < offset + length; i++) {
-                                cmd = string.Format("a[{0}] = {1}", (i - offset + 2) , data[i]);
-
-                                this.serialPort.WriteCommand(cmd);
-
-                                res = this.serialPort.ReadRespone();
-
-                                if (!res.success) {
-                                    break;
-                                }
-                            }
-
-                            if (res.success) {
-                                cmd = string.Format("lcdimg(a, {0}, {1}, {2}, {3}, {4})", x, y, scaleWidth, scaleHeight, transform);
-
-                                this.serialPort.WriteCommand(cmd);
-
-                                res = this.serialPort.ReadRespone();
-                            }
-                        }
-
-
+                    if (!res.success) {
+                        break;
                     }
-
-
-
                 }
+
+                if (res.success) {
+                    cmd = string.Format("lcdimgs(a, {0}, {1}, {2}, {3}, {4})", x, y, scaleWidth, scaleHeight, transform);
+
+                    this.serialPort.WriteCommand(cmd);
+
+                    res = this.serialPort.ReadRespone();
+                }
+                       
 
                 cmd = string.Format("dim a[0]"); // free array
 
@@ -186,21 +165,21 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool DrawImageBytes(byte[] data, int offset, int length, int x, int y, int width, int scaleWidth, int scaleHeight, int transform) {
-                if (length % 4 != 0) {
+            //public bool DrawImageBytes(byte[] data, int offset, int length, int x, int y, int width, int scaleWidth, int scaleHeight, int transform) {
+            //    if (length % 4 != 0) {
 
-                    throw new Exception("length must be multiple of 4");
-                }
+            //        throw new Exception("length must be multiple of 4");
+            //    }
 
-                var data32 = new uint[length / 4];
+            //    var data32 = new uint[length / 4];
 
-                for (var i = 0; i < data32.Length; i++) {
-                    data32[i] = BitConverter.ToUInt32(data, (i + offset) * 4);
-                }
+            //    for (var i = 0; i < data32.Length; i++) {
+            //        data32[i] = BitConverter.ToUInt32(data, (i + offset) * 4);
+            //    }
 
-                return this.DrawImage(data32, 0, data32.Length, x, y, width, scaleWidth, scaleHeight, transform);
+            //    return this.DrawImage(data32, 0, data32.Length, x, y, width, scaleWidth, scaleHeight, transform);
 
-            }
+            //}
 
             private bool Stream(byte[] data) {
                 var cmd = string.Format("lcdstream()");

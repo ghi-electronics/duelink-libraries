@@ -19,6 +19,7 @@ from DUELink.DeviceConfiguration import DeviceConfiguration
 from DUELink.Pin import PinController
 from DUELink.Temperature import TemperatureController
 from DUELink.Humidity import HudimityController
+from DUELink.Image import ImageController
 from enum import Enum
 import platform
 class DUELinkController:
@@ -104,7 +105,13 @@ class DUELinkController:
                     else:
                         return port.device
 
-        return ""
+        return "" 
+
+    def Image(self, width: int, height: int, data)->ImageController:
+        img = ImageController(width, height, data)
+
+        return img
+
 
                     
                 

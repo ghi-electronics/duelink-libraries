@@ -1,3 +1,5 @@
+from DUELink.Image import ImageController
+
 class DisplayController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
@@ -114,40 +116,30 @@ class DisplayController:
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def DrawImage(self, data, offset: int, length: int, x: int, y: int, width: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:
-        height = int(len(data) / width)
+    def DrawImages(self, img:ImageController, x: int, y: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:
+        width = img.Width
+        height = img.Height
 
-        cmd = f"dim a[{len(data) + 2}]"
+
+        cmd = f"dim a[{len(img.Data)}]"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
 
-        if res.success:
-            cmd = f"a[0] = {width}"
-
+        
+        for i in range(len(img.Data)):
+            cmd = f"a[{(i)}] = {img.Data[i]}"
             self.serialPort.WriteCommand(cmd)
             res = self.serialPort.ReadRespone()
 
-            if res.success:
-                cmd = f"a[1] = {height}"
+            if (res.success == False):
+                break
+        
+        if (res.success == True):
+            cmd = f"lcdimgs(a, {x}, {y}, {scaleWidth}, {scaleHeight}, {transform})"
 
-                self.serialPort.WriteCommand(cmd)
-                res = self.serialPort.ReadRespone()
-
-                if res.success:
-                    for i in range(offset, offset + length):
-                        cmd = f"a[{(i - offset + 2)}] = {data[i]}"
-                        self.serialPort.WriteCommand(cmd)
-                        res = self.serialPort.ReadRespone()
-
-                        if (res.success == False):
-                            break
-                    
-                    if (res.success == True):
-                        cmd = f"lcdimg(a, {x}, {y}, {scaleWidth}, {scaleHeight}, {transform})"
-
-                        self.serialPort.WriteCommand(cmd)
-                        res = self.serialPort.ReadRespone()
+            self.serialPort.WriteCommand(cmd)
+            res = self.serialPort.ReadRespone()
         
 
         cmd = "dim a[0]"
@@ -155,18 +147,21 @@ class DisplayController:
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
 
-        return res.success
+        return res.success 
 
-    def DrawImageBytes(self, data, offset: int, length: int, x: int, y: int, width: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:
-        if length % 4 !=0:
-            raise Exception("length must be multiple of 4")
+    def DrawImage(self, img:ImageController, x: int, y: int, transform: int) -> bool:
+        return self.DrawImages(img, x, y, 1, 1, transform)
+
+    #def DrawImageBytes(self, data, offset: int, length: int, x: int, y: int, width: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:
+    #    if length % 4 !=0:
+    #        raise Exception("length must be multiple of 4")
         
-        data32 = [0] * int(length/4)
+    #    data32 = [0] * int(length/4)
 
-        for i in range (0, len(data32), 4):
-            data32[i] = (data[(i + offset) * 4 + 0] << 0) | (data[(i + offset) * 4 + 1] << 8) | (data[(i + offset) * 4 + 2] << 16) | (data[(i + offset) * 4 + 3] << 24)
+    #    for i in range (0, len(data32), 4):
+    #        data32[i] = (data[(i + offset) * 4 + 0] << 0) | (data[(i + offset) * 4 + 1] << 8) | (data[(i + offset) * 4 + 2] << 16) | (data[(i + offset) * 4 + 3] << 24)
 
-        return self.DrawImage(data32, 0, len(data32),x, y, width, scaleWidth, scaleHeight, transform)
+    #    return self.DrawImage(data32, 0, len(data32),x, y, width, scaleWidth, scaleHeight, transform)
     
     def __get_transform_none(self):
         return 0
