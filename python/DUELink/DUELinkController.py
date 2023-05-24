@@ -19,7 +19,6 @@ from DUELink.DeviceConfiguration import DeviceConfiguration
 from DUELink.Pin import PinController
 from DUELink.Temperature import TemperatureController
 from DUELink.Humidity import HudimityController
-from DUELink.Image import ImageController
 from enum import Enum
 import platform
 class DUELinkController:
@@ -107,13 +106,19 @@ class DUELinkController:
 
         return "" 
 
-    def Image(self, width: int, height: int, data)->ImageController:
+    def Image(self, data, width: int, height: int):
         if width <=0 or height <=0 or len(data) < width*2:
             raise Exception("Invalid arguments")
         
-        img = ImageController(width, height, data)
+        self.DataImg = [0] * (width * height + 2)
 
-        return img
+        self.DataImg[0] = width
+        self.DataImg[1] = height
+
+        for i in range (width * height):
+            self.DataImg[2 + i] = data[i]
+
+        return self.DataImg
 
 
                     

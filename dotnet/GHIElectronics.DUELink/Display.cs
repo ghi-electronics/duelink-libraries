@@ -121,12 +121,19 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
-            public bool DrawImage(Image img, int x, int y, int transform) => this.DrawImages(img, x, y, 1, 1, transform);
-            public bool DrawImages(Image img, int x, int y, int scaleWidth, int scaleHeight, int transform) {
+            public bool DrawImage(uint[] data, int x, int y, int transform) => this.DrawImageS(data, x, y, 1, 1, transform);
+            public bool DrawImageS(uint[] data, int x, int y, int scaleWidth, int scaleHeight, int transform) {
 
-                var data = img.Data;
-                var width = img.Width;
-                var height = img.Height;                
+                if ( data == null) {
+                    throw new ArgumentNullException("Data null.");
+                }
+
+                var width = data[0];
+                var height = data[1];
+
+                if (width == 0 || height == 0 || data == null || data.Length < (width * height)) {
+                    throw new ArgumentException("Invalid argument.");
+                }
 
                 var cmd = string.Format("dim a[{0}]", data.Length);
 

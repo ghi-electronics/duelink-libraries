@@ -1,5 +1,3 @@
-from DUELink.Image import ImageController
-
 class DisplayController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
@@ -116,19 +114,22 @@ class DisplayController:
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def DrawImages(self, img:ImageController, x: int, y: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:
-        width = img.Width
-        height = img.Height
+    def DrawImages(self, img, x: int, y: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:        
+        
+        width = img[0]
+        height = img[1]
 
+        if width <=0 or height <=0 or len(img) < width*2:
+            raise Exception("Invalid arguments")
 
-        cmd = f"dim a[{len(img.Data)}]"
+        cmd = f"dim a[{len(img)}]"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
 
         
-        for i in range(len(img.Data)):
-            cmd = f"a[{(i)}] = {img.Data[i]}"
+        for i in range(len(img)):
+            cmd = f"a[{(i)}] = {img[i]}"
             self.serialPort.WriteCommand(cmd)
             res = self.serialPort.ReadRespone()
 
@@ -149,7 +150,7 @@ class DisplayController:
 
         return res.success 
 
-    def DrawImage(self, img:ImageController, x: int, y: int, transform: int) -> bool:
+    def DrawImage(self, img, x: int, y: int, transform: int) -> bool:
         return self.DrawImages(img, x, y, 1, 1, transform)
 
     #def DrawImageBytes(self, data, offset: int, length: int, x: int, y: int, width: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:

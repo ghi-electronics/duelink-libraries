@@ -46,7 +46,7 @@ namespace GHIElectronics.DUELink {
 
         public UartController Uart { get; internal set; }
         public ButtonController Button { get; internal set; }
-        public DistanceSensorController Distance { get; internal set; }        
+        public DistanceSensorController Distance { get; internal set; }
         public DisplayController Display { get; internal set; }
 
         public TouchController Touch { get; internal set; }
@@ -68,8 +68,8 @@ namespace GHIElectronics.DUELink {
         public bool IsFlea { get; internal set; } = false;
         public bool IsEdge { get; internal set; } = false;
 
-      
-        public int MaxIO { get; internal set; } 
+
+        public int MaxIO { get; internal set; }
         public int MaxAnalog { get; internal set; }
 
         public DUELinkController(string comPort) {
@@ -98,7 +98,7 @@ namespace GHIElectronics.DUELink {
             this.System = new SystemController(this.serialPort);
             this.Uart = new UartController(this.serialPort);
             this.Button = new ButtonController(this.serialPort);
-            this.Distance = new DistanceSensorController(this.serialPort);            
+            this.Distance = new DistanceSensorController(this.serialPort);
             this.Display = new DisplayController(this.serialPort);
             this.Touch = new TouchController(this.serialPort);
             this.Led = new LedController(this.serialPort);
@@ -106,7 +106,7 @@ namespace GHIElectronics.DUELink {
             this.Pin = new PinController();
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);
-            
+
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {
@@ -130,9 +130,9 @@ namespace GHIElectronics.DUELink {
                                     var portName = (string)devParamsKey?.GetValue("PortName");
                                     if (portName != null) {
 
-                                        if (devFnKey.Name.IndexOf(vid, StringComparison.InvariantCultureIgnoreCase) >=0) {
+                                        if (devFnKey.Name.IndexOf(vid, StringComparison.InvariantCultureIgnoreCase) >= 0) {
 
-                                            if (devFnKey.Name.IndexOf(pid, StringComparison.InvariantCultureIgnoreCase) >= 0)  {
+                                            if (devFnKey.Name.IndexOf(pid, StringComparison.InvariantCultureIgnoreCase) >= 0) {
                                                 serialports.Add(portName);
                                             }
 
@@ -190,11 +190,11 @@ namespace GHIElectronics.DUELink {
 
             this.Version = this.serialPort.GetVersion().Substring(0);
 
-            if (this.Version!= null && this.Version != string.Empty && this.Version.Length == 7 ) {
+            if (this.Version != null && this.Version != string.Empty && this.Version.Length == 7) {
 
                 this.DeviceConfig = new DeviceConfiguration();
 
-                if (this.Version[this.Version.Length -1] == 'P') {
+                if (this.Version[this.Version.Length - 1] == 'P') {
                     this.DeviceConfig.IsPulse = true;
                     this.DeviceConfig.MaxPinIO = 23;
                     this.DeviceConfig.MaxPinAnalog = 29;
@@ -229,6 +229,21 @@ namespace GHIElectronics.DUELink {
             }
         }
 
-        public void Disconnect() => this.serialPort.Disconnect();   
+        public void Disconnect() => this.serialPort.Disconnect();
+
+        public uint[] Image(uint[] data, uint width, uint height) {
+            if (width == 0 || height == 0 || data == null || data.Length < (width * height)) {
+                throw new ArgumentException("Invalid argument.");
+            }
+
+            var buffer = new uint[width * height + 2];
+
+            buffer[0] = width;
+            buffer[1] = height;
+
+            Array.Copy(data, 0, buffer, 2, width * height);
+
+            return buffer;
+        }
     }
 }
