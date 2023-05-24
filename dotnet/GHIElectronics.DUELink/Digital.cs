@@ -70,6 +70,13 @@ namespace GHIElectronics.DUELink {
 
                 return respone.success;
             }
+
+            public bool Write(char c, bool value) {
+                if (c == 'l' || c == 'L')
+                    return this.Write((int)PinController.LED, value);
+
+                return false;
+            }
         }
 
        

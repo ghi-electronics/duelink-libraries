@@ -30,7 +30,10 @@ class DigitalController:
 
         return False
 
-    def Write(self, pin: int, value: bool) -> bool:
+    def Write(self, pin, value: bool) -> bool:
+        if pin == 'l' or pin == 'L':
+            pin = 108
+
         if pin < 0 or (pin >= self.serialPort.DeviceConfig.MaxPinIO and pin != 108): # Led
             raise ValueError("Invalid pin")
 
