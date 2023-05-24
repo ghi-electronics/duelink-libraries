@@ -6,7 +6,13 @@ class DigitalController:
     def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
-    def Read(self, pin: int, inputType: 0) -> bool:
+    def Read(self, pin, inputType: 0) -> bool:
+        if pin == 'a' or pin == 'A':
+            pin = 97
+
+        if pin == 'b' or pin == 'B':
+            pin = 98
+
         if pin < 0 or (pin >= self.serialPort.DeviceConfig.MaxPinIO and pin != 97 and pin != 98 and pin != 108): #A, B, Led
             raise ValueError("Invalid pin")
 

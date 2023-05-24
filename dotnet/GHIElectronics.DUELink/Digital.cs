@@ -56,6 +56,22 @@ namespace GHIElectronics.DUELink {
                 return false;
             }
 
+            public bool Read(char c, int input = 0) {
+                int pin = -1;
+
+                if (c == 'a' || c == 'A')
+                    pin = PinController.BUTTON_A;
+
+                if (c == 'b' || c == 'B')
+                    pin = PinController.BUTTON_B;
+
+                if (pin != -1) {
+                    return this.Read(pin, input);   
+                }
+
+                return false;
+            }
+
             public bool Write(int pin, bool value) {
                 if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)PinController.LED))
                     throw new ArgumentOutOfRangeException("Invalid pin.");
