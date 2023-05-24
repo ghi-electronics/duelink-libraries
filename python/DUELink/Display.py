@@ -75,9 +75,6 @@ class DisplayController:
         offset = 0
         length = len(color)
 
-        if (length > WIDTH * HEIGHT) :
-            raise Exception("Only 64*128 supported.")
-
         data = bytearray(int(WIDTH*HEIGHT/8))
         i = offset
 
@@ -125,7 +122,7 @@ class DisplayController:
         width = img[0]
         height = img[1]
 
-        if width <=0 or height <=0 or len(img) < width*2:
+        if width <=0 or height <=0 or len(img) < width*height:
             raise Exception("Invalid arguments")
 
         cmd = f"dim a[{len(img)}]"

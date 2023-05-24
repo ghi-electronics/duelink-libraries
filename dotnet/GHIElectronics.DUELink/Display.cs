@@ -219,9 +219,6 @@ namespace GHIElectronics.DUELink {
                 int offset = 0;
                 int length = color.Length;
 
-                if (length != WIDTH * HEIGHT)
-                    throw new Exception("Only 64*128 supported.");
-
 
                 var data = new byte[WIDTH * HEIGHT / 8]; // always send all screen, less than sreen size, fill by zero
                 var i = offset;
