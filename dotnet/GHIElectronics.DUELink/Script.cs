@@ -14,6 +14,8 @@ namespace GHIElectronics.DUELink {
 
             public ScriptController(SerialInterface serialPort) => this.serialPort = serialPort;
 
+            private string loadscript = string.Empty;
+
             public void Run() {
                 var cmd = string.Format("run");
 
@@ -25,6 +27,7 @@ namespace GHIElectronics.DUELink {
             }
 
             public bool New() {
+                this.loadscript = string.Empty;
                 var cmd = string.Format("new");
 
                 this.serialPort.WriteCommand(cmd);
@@ -35,6 +38,21 @@ namespace GHIElectronics.DUELink {
             }
 
             public bool Load(string script) {
+                this.loadscript += script;
+
+                this.loadscript += "\n";
+
+                return true;
+
+            }
+            public bool Record() {
+
+                if (this.loadscript == string.Empty) {
+                    throw new Exception("No script for recording.");
+                }
+
+                var script = this.loadscript;
+
                 var cmd = "pgmstream()";
 
                 var raw = UTF8Encoding.UTF8.GetBytes(script);
@@ -56,6 +74,8 @@ namespace GHIElectronics.DUELink {
                 this.serialPort.WriteRawData(data, 0, data.Length);
 
                 res = this.serialPort.ReadRespone();
+
+                this.loadscript = string.Empty;
                 return res.success;
             }
 
@@ -134,7 +154,7 @@ namespace GHIElectronics.DUELink {
             public bool IsRunning() {
                 this.serialPort.DiscardInBuffer();
 
-               
+
                 this.serialPort.WriteRawData(new byte[] { 0xFF }, 0, 1);
 
                 Thread.Sleep(1);
@@ -152,7 +172,7 @@ namespace GHIElectronics.DUELink {
                     this.serialPort.ReadRespone();
                 }
 
-                
+
 
                 return data[0] == 0xFF;
 

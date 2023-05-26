@@ -4,6 +4,7 @@ from DUELink.SerialInterface import SerialInterface
 class ScriptController:
     def __init__(self, serialPort : SerialInterface):
         self.serialPort = serialPort
+        self.loadscript = ""
 
     def Run(self):
         cmd = "run"
@@ -11,6 +12,7 @@ class ScriptController:
         time.sleep(0.001)
 
     def New(self) -> bool:
+        self.loadscript = ""
         cmd = "new"
         self.serialPort.WriteCommand(cmd)
 
@@ -19,6 +21,15 @@ class ScriptController:
         return res.success
     
     def Load(self, script : str) -> bool:
+        self.loadscript += script
+        self.loadscript += "\n"
+    
+    def Record(self) -> bool:
+        if (self.loadscript == ""):
+            raise Exception("No script for recording.")
+
+        script = self.loadscript        
+
         cmd = "pgmstream()"
 
         raw = script.encode('ASCII')
@@ -39,6 +50,8 @@ class ScriptController:
         self.serialPort.WriteRawData(data, 0, len(data))
 
         res = self.serialPort.ReadRespone()
+
+        self.loadscript = ""
         return res.success
             
     
