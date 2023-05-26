@@ -231,7 +231,7 @@ namespace GHIElectronics.DUELink {
 
         public void Disconnect() => this.serialPort.Disconnect();
 
-        public uint[] Image(uint[] data, uint width, uint height) {
+        public uint[] CreateImage(uint[] data, uint width, uint height) {
             if (width == 0 || height == 0 || data == null || data.Length < (width * height)) {
                 throw new ArgumentException("Invalid argument.");
             }

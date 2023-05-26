@@ -121,28 +121,28 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
-            public bool DrawImage(uint[] data, int x, int y, int transform) => this.DrawImageS(data, x, y, 1, 1, transform);
-            public bool DrawImageS(uint[] data, int x, int y, int scaleWidth, int scaleHeight, int transform) {
+            public bool DrawImage(uint[] img, int x, int y, int transform) => this.DrawImageS(img, x, y, 1, 1, transform);
+            public bool DrawImageS(uint[] img, int x, int y, int scaleWidth, int scaleHeight, int transform) {
 
-                if ( data == null) {
+                if ( img == null) {
                     throw new ArgumentNullException("Data null.");
                 }
 
-                var width = data[0];
-                var height = data[1];
+                var width = img[0];
+                var height = img[1];
 
-                if (width == 0 || height == 0 || data == null || data.Length < (width * height)) {
+                if (width == 0 || height == 0 || img == null || img.Length < (width * height)) {
                     throw new ArgumentException("Invalid argument.");
                 }
 
-                var cmd = string.Format("dim a[{0}]", data.Length);
+                var cmd = string.Format("dim a[{0}]", img.Length);
 
                 this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
 
-                for (var i = 0; i < data.Length; i++) {
-                    cmd = string.Format("a[{0}] = {1}", (i) , data[i]);
+                for (var i = 0; i < img.Length; i++) {
+                    cmd = string.Format("a[{0}] = {1}", (i) , img[i]);
 
                     this.serialPort.WriteCommand(cmd);
 
