@@ -277,20 +277,20 @@ namespace GHIElectronics.DUELink {
                 return res.success;
             }
 
-            public uint[] CreateImage(uint[] data, uint width, uint height) {
-                if (width == 0 || height == 0 || data == null || data.Length < (width * height)) {
-                    throw new ArgumentException("Invalid argument.");
-                }
+            //public uint[] CreateImage(uint[] data, uint width, uint height) {
+            //    if (width == 0 || height == 0 || data == null || data.Length < (width * height)) {
+            //        throw new ArgumentException("Invalid argument.");
+            //    }
 
-                var buffer = new uint[width * height + 2];
+            //    var buffer = new uint[width * height + 2];
 
-                buffer[0] = width;
-                buffer[1] = height;
+            //    buffer[0] = width;
+            //    buffer[1] = height;
 
-                Array.Copy(data, 0, buffer, 2, width * height);
+            //    Array.Copy(data, 0, buffer, 2, width * height);
 
-                return buffer;
-            }
+            //    return buffer;
+            //}
         }
 
     }

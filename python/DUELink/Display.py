@@ -156,19 +156,19 @@ class DisplayController:
     def DrawImage(self, img, x: int, y: int, transform: int) -> bool:
         return self.DrawImageS(img, x, y, 1, 1, transform)
     
-    def CreateImage(self, data, width: int, height: int):
-        if width <=0 or height <=0 or len(data) < width*height:
-            raise Exception("Invalid arguments")
+    #def CreateImage(self, data, width: int, height: int):
+    #    if width <=0 or height <=0 or len(data) < width*height:
+    #        raise Exception("Invalid arguments")
         
-        self.DataImg = [0] * (width * height + 2)
+    #    self.DataImg = [0] * (width * height + 2)
 
-        self.DataImg[0] = width
-        self.DataImg[1] = height
+    #    self.DataImg[0] = width
+    #    self.DataImg[1] = height
 
-        for i in range (width * height):
-            self.DataImg[2 + i] = data[i]
+    #    for i in range (width * height):
+    #        self.DataImg[2 + i] = data[i]
 
-        return self.DataImg
+    #    return self.DataImg
 
     #def DrawImageBytes(self, data, offset: int, length: int, x: int, y: int, width: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:
     #    if length % 4 !=0:
