@@ -106,23 +106,6 @@ class DUELinkController:
 
         return "" 
 
-    def CreateImage(self, data, width: int, height: int):
-        if width <=0 or height <=0 or len(data) < width*height:
-            raise Exception("Invalid arguments")
-        
-        self.DataImg = [0] * (width * height + 2)
-
-        self.DataImg[0] = width
-        self.DataImg[1] = height
-
-        for i in range (width * height):
-            self.DataImg[2 + i] = data[i]
-
-        return self.DataImg
-
-
-                    
-                
         
         
 
