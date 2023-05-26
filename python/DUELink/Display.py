@@ -154,7 +154,7 @@ class DisplayController:
         return res.success 
 
     def DrawImage(self, img, x: int, y: int, transform: int) -> bool:
-        return self.DrawImageS(img, x, y, 1, 1, transform)
+        return self.DrawImageScale(img, x, y, 1, 1, transform)
     
     #def CreateImage(self, data, width: int, height: int):
     #    if width <=0 or height <=0 or len(data) < width*height:
