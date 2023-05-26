@@ -122,7 +122,7 @@ namespace GHIElectronics.DUELink {
 
             }
             public bool DrawImage(uint[] img, int x, int y, int transform) => this.DrawImageS(img, x, y, 1, 1, transform);
-            public bool DrawImageS(uint[] img, int x, int y, int scaleWidth, int scaleHeight, int transform) {
+            public bool DrawImageScale(uint[] img, int x, int y, int scaleWidth, int scaleHeight, int transform) {
 
                 if ( img == null) {
                     throw new ArgumentNullException("Data null.");

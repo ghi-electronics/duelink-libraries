@@ -117,7 +117,7 @@ class DisplayController:
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def DrawImageS(self, img, x: int, y: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:        
+    def DrawImageScale(self, img, x: int, y: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:        
         
         width = img[0]
         height = img[1]
