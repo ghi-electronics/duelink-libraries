@@ -138,6 +138,34 @@ namespace GHIElectronics.DUELink {
                 return res.success;
             }
 
+            public bool Write4bppScale(byte[] dataWrite, int chipselect = -1) => this.Write4bppScale(dataWrite, 0, dataWrite.Length, chipselect);
+            public bool Write4bppScale(byte[] dataWrite, int offset, int count, int chipselect = -1) {
+                if (chipselect >= this.serialPort.DeviceConfig.MaxPinIO)
+                    throw new ArgumentOutOfRangeException("Invalid pin.");
+
+                if (dataWrite == null)
+                    throw new ArgumentNullException();
+
+                if (dataWrite != null && offset + count > dataWrite.Length)
+                    throw new ArgumentOutOfRangeException();
+
+                var cmd = string.Format("spi4bppscale({0},{1})", count.ToString(), chipselect.ToString());
+
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                if (!res.success) {
+                    return false;
+                }
+
+                this.serialPort.WriteRawData(dataWrite, offset, count);
+
+                res = this.serialPort.ReadRespone();
+                return res.success;
+            }
+
             public bool Pallete(int id, uint color) {
                 if (id >= 16)
                     throw new ArgumentOutOfRangeException("Pallete supports 16 color index only.");
@@ -156,8 +184,8 @@ namespace GHIElectronics.DUELink {
                 if (mode > 3 )
                     throw new ArgumentOutOfRangeException("Mode must be in range 0...3.");
 
-                if (frequencyKHz < 200 || frequencyKHz > 20000)
-                    throw new ArgumentOutOfRangeException("FrequencyKHz must be in range 200KHz to 20MHz.");
+                if (frequencyKHz < 200 || frequencyKHz > 42000)
+                    throw new ArgumentOutOfRangeException("FrequencyKHz must be in range 200KHz to 42MHz.");
 
                 var cmd = string.Format("spicfg({0},{1})", mode.ToString(), frequencyKHz.ToString());
 
