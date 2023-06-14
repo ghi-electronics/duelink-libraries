@@ -28,6 +28,16 @@ namespace GHIElectronics.DUELink {
 
         SerialInterface serialPort = default!;
 
+        public int TransferBlockDelay {
+            get => this.serialPort.TransferBlockDelay;
+            set => this.serialPort.TransferBlockDelay = value;
+        }
+
+        public int TransferBlockSizeMax {
+            get => this.serialPort.TransferBlockSizeMax;
+            set => this.serialPort.TransferBlockSizeMax = value;
+        }
+
         public DeviceConfiguration DeviceConfig { get; set; }
 
         public AnalogController Analog { get; internal set; }

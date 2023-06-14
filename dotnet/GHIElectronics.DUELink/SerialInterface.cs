@@ -317,23 +317,38 @@ namespace GHIElectronics.DUELink {
         }
 
 
-
+        int transferBlockSizeMax1 = 1024;
+        int transferBlockSizeMax2 = 512;
         public int TransferBlockSizeMax {
             get {
                 if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
-                    return 1024;
-                else return 512;
+                    return transferBlockSizeMax1;
+                else return transferBlockSizeMax2;
 
             }
+            set {
+                if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
+                    transferBlockSizeMax1 = value;
+                else transferBlockSizeMax2 = value;
+            }
         }
+
+        int transferBlockDelay1 = 2;
+        int transferBlockDelay2 = 10;        
         public int TransferBlockDelay {
             get {
                 if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
-                    return 2;
-                else return 5;
+                    return transferBlockDelay1;
+                else return transferBlockDelay2;
 
             }
+            set {
+                if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
+                    transferBlockDelay1 = value;
+                else transferBlockDelay2 = value;
+            }
         }
+
         public void WriteRawData(byte[] buffer, int offset, int count) {
 
 
