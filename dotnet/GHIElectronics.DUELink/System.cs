@@ -108,6 +108,13 @@ namespace GHIElectronics.DUELink {
 
             }
 
+            public bool Beep(char pin, uint frequency, uint durationms) {
+                if (pin == 'p' || pin == 'P') {
+                    return this.Beep((int)PinController.PIEZO, frequency, durationms);
+                }
+
+                return false;
+            }
 
             string[] displayText;
 

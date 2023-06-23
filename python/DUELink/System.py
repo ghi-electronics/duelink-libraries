@@ -48,6 +48,8 @@ class SystemController:
             raise ValueError("Frequency is within range[0,10000] Hz")
         if duration < 0 or duration > 1000:
             raise ValueError("duration is within range[0,1000] millisecond")
+        if pin == 'p' or pin == 'P':
+            pin = 0x70
         
         cmd = "beep({0}, {1}, {2})".format(pin, frequency, duration)
         self.serialPort.WriteCommand(cmd)
