@@ -369,7 +369,7 @@ namespace GHIElectronics.DUELink {
                 if (remain > 0) {
                     this.port.Write(buffer, idx, remain);
 
-                    Thread.Sleep(this.TransferBlockDelay);
+                    //Thread.Sleep(this.TransferBlockDelay);
                 }
             }
 

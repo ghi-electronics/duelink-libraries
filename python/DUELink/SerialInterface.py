@@ -225,7 +225,7 @@ class SerialInterface:
         if remain > 0:
             self.portName.write(buffer[idx:idx + remain])
 
-            time.sleep(self.TransferBlockDelay)
+            #time.sleep(self.TransferBlockDelay)
 
     def ReadRawData(self, buffer, offset, count):
         end = datetime.utcnow() + timedelta(seconds=self.ReadTimeout)
