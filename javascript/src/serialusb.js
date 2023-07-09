@@ -74,12 +74,12 @@ class SerialUSB {
     }
 
     async write(bytedata) {
-        //return new Promise(resolve => {
+        return new Promise(resolve => {
             var buffer = Buffer.from(bytedata);
             this.port.write(buffer);
-            //this.port.drain();
-        //    resolve();
-       //});        
+            this.port.drain();
+            resolve();
+        });        
     }
 
     hasData() {
