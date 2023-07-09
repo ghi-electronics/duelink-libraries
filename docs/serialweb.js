@@ -201,22 +201,31 @@ class WebSerial {
         this.port = await navigator.serial.requestPort({ filters: deviceFilters });
         await this.port.open({ baudRate: 115200 });
         this.writer = this.port.writable.getWriter();
-        this.reader = this.port.readable.getReader();
-
+        
         this.__readDataLoop();
     }
 
     async __readDataLoop() {
         while(this.port.readable) {
-            let result = await this.reader.read();
-            if (result.value) {
-                for(let c of result.value) {
-                    this.ring.enqueue(c);
+            const reader = this.port.readable.getReader();
+            try {
+                while(true) {
+                    const result = await reader.read();
+                    if (result.done) {
+                        break;
+                    }
+                    if (result.value) {
+                        for(let c of result.value) {
+                            this.ring.enqueue(c);
+                        }
+                    }
+                    
+                    if (result.status === 'stall') {
+                        await this.device.clearHalt(2);
+                    }
                 }
-            }
-            
-            if (result.status === 'stall') {
-                await this.device.clearHalt(2);
+            } finally {
+                reader.releaseLock();
             }
         }
     }
@@ -255,8 +264,9 @@ class WebSerial {
         return this.ring.hasData();
     }
 
-    close() {
-
+    async close() {
+        await this.writer.close();
+        await this.port.close();       
     }
 
     setTimeout(timeout) {
