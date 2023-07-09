@@ -11,8 +11,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
+
     <link rel="stylesheet" href="styles.css">
-    <script src="duelink.js?1"></script>
+    <script type="module" src="./serialweb.js"></script>
+    <script type="module" src="./duelink.js"></script>
 
     <style>
         .center {
@@ -115,18 +117,20 @@
 </html>
 
 <script>
-  
+    import("./serialweb.js").then(mod => serial = mod);
+    import("./duelink.js").then(mod => due = mod);
     // A $( document ).ready() block.
    
     function Check() {
         if (!this.duedemo)
-            this.duedemo = new DUELinkController(this.comPort);
+            this.duedemo = new due.DUELinkController(new serial.WebSerial());
     }
-    function connect() {
+
+    async function connect() {
         try {
             hideError();
-            this.comPort = new SerialInterface();
-            comPort.Connect();
+            Check();
+            await duedemo.Connect();
             $("#id-connect").slideUp();
             $("#id-inputs").prop("disabled", false);
 
