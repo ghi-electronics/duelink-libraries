@@ -4,7 +4,8 @@ import { RingBuffer } from './util.js';
 export {SerialUSB}
 
 class SerialUSB {
-    constructor(baudRate=115200) {
+    constructor(portname, baudRate=115200) {
+        this.portname = portname;
         this.baudRate = baudRate;
         this.timeOut = 3;
         this.ring = new RingBuffer(1024);
@@ -12,10 +13,13 @@ class SerialUSB {
 
     async connect() {
         return new Promise(async resolve => {
-            var selectPort = await this.detectPort();
-            if(selectPort==='') throw new Error("Device not found.");
+            if (!this.portname) 
+            {
+                this.portname = await this.detectPort();
+            }
+            if(this.portname === '') throw new Error("Device not found.");
             
-            this.port = new SerialPort({ path: selectPort, baudRate: this.baudRate });
+            this.port = new SerialPort({ path: this.portname, baudRate: this.baudRate });
             
             this.port.on('open', () => {
                 resolve();
