@@ -10,7 +10,7 @@ node index.js
 
 ## Running the browser test locally
 Install the node.js http server. This only needs to be done once
-`npn install -g http-server`
+`npm install -g http-server`
 
 Run the server
 ```
