@@ -1,260 +1,33 @@
-class Util {
-    static async sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    static async pumpAsync() {
-        return new Promise(resolve => setImmediate(resolve));
-    }
-}
-
-class SerialUSB {
-    static RING_BUFFER_SIZE=128;
-
-    constructor(serialUsb) {
-        this.port = serialUsb;
-        this.timeOut = 3;
-        this.head = 0;
-        this.tail = 0;
-        this.bytesAvailable = 0;
-        this.buffer = new Uint8Array(SerialUSB.RING_BUFFER_SIZE);
-
-        this.port.on('readable', () => {
-            const data = this.port.read();
-            for (let c of data) {
-                this.enqueue(c);
-            }            
-        });
-    }
-
-    enqueue(b) {
-        this.bytesAvailable++;
-
-        if (this.bytesAvailable === SerialUSB.RING_BUFFER_SIZE) {
-            this.head = (this.head+1) % SerialUSB.RING_BUFFER_SIZE; 
-        }
-        this.buffer[this.tail] = b;
-        this.tail = (this.tail+1) % SerialUSB.RING_BUFFER_SIZE;
-    }
-
-    async dequeue() {
-        return new Promise(resolve => {
-            setImmediate(async () => {
-                if (this.bytesAvailable === 0) await Util.pumpAsync();
-                if (this.bytesAvailable === 0) 
-                {   
-                    resolve(null); 
-                } else {
-                    const b = this.buffer[this.head];
-                    this.head = (this.head+1) % SerialUSB.RING_BUFFER_SIZE;
-                    this.bytesAvailable--;
-                    resolve(b);
-                }
-            });
-        });
-    }
-
-    async dequeueN(count) {
-        if (this.bytesAvailable === 0) await Util.pumpAsync();
-        if (this.bytesAvailable === 0) return null;
-        if (this.bytesAvailable < count) count = this.bytesAvailable;
-        var bytes = new Uint8Array(count);
-        for (let i = 0; i < count; i++) {
-            bytes[i] = await this.dequeue();
-        }
-        return bytes;
-    }
-
-    async dequeueAll() {
-        if (this.bytesAvailable === 0) await Util.pumpAsync();
-        return await this.dequeueN(this.bytesAvailable);
-    }
-
-    async connect() {
-        this.x = 0;
-    }
-
-    async sendString(message) {
-       await this.port.write(message);
-    }
-
-    async readN(count) {
-        let buffer = new Uint8Array(count);
-        let offset = 0;
-        while (count > 0) {
-            let result = await this.dequeueN(count);
-            if (result) {
-                let readbuf = this.toArrayBuffer(result);
-                buffer.set(readbuf, offset);
-                offset += result.length;
-                count -= result.length;
-            }
-        }
-
-        return buffer;
-    }
-
-    async read() {
-        let result = await this.dequeueAll();
-        return result;
-    }
-
-    async write(bytedata) {
-        var buffer = Buffer.from(bytedata);
-        await this.port.write(buffer);
-    }
-
-    close() {
-
-    }
-
-    setTimeout(timeout) {
-        this.timeOut = timeout;
-    }
-
-    getTimeout() {
-        return this.timeOut;
-    }
-
-    resetInputBuffer() {
-        this.head = this.tail = this.bytesAvailable = 0;
-    }
-
-    resetOutputBuffer() {
-    }
-}
-
-class SerialWebUSB {
-    constructor(inEndpoint, outEndpoint) {
-        this.outEndpoint = outEndpoint;
-        this.inEndpoint = inEndpoint;
-    }
-
-    async connect(deviceFilters) {
-        this.x = 0;
-
-        this.port = await navigator.serial.requestPort({ filters: deviceFilters });
-        await this.port.open({ baudRate: 9600 });
-        this.writer = this.port.writable.getWriter();
-        this.reader = this.port.readable.getReader();
-    }
-
-    async sendString(message) {
-        let encoder = new TextEncoder();
-        let bytes = encoder.encode(message);
-        await this.writer.write(bytes);
-    }
-
-    async readString() {
-        //let messageLengthBuffer = await this.readBytes(1);
-        //let messageLength = messageLengthBuffer[0];
-
-        let messageBuffer = await this.readBytes();
-        let decoder = new TextDecoder();
-        return decoder.decode(messageBuffer);
-    }
-
-    async readBytes(count) {
-        let buffer = new Uint8Array(count);
-        let offset = 0;
-        while (count > 0) {
-            let result = await this.reader.read();
-            if (result.value) {
-                buffer.set(new Uint8Array(result.value), offset);
-                offset += result.data.byteLength;
-                count -= result.data.byteLength;
-            }
-
-            if (result.status === 'stall') {
-                await this.device.clearHalt(2);
-            }
-        }
-
-        return buffer;
-    }
-
-    async readBytes() {
-        var buffer = new Uint8Array();
-        let offset = 0;
-        let result = await this.reader.read();
-        if (result.value) {
-            buffer = result.value;
-        }
-
-        if (result.status === 'stall') {
-            await this.device.clearHalt(2);
-        }
-
-
-        return buffer;
-    }
-    async read(count) {
-        return await this.readBytes(count);
-    }
-    async read() {
-        return await this.readBytes();// this.readString(); 
-    }
-    async write(bytedata) {
-        await this.writer.write(bytedata);
-    }
-    close() {
-
-    }
-    timeOut;
-    setTimeout(timeout) {
-        this.timeOut = timeout;
-    }
-
-    getTimeout() {
-        return this.timeOut;
-    }
-
-    resetInputBuffer() {
-
-    }
-    resetOutputBuffer() {
-
-    }
-}
-
+export { SerialInterface, DUELinkController }
+import { Util } from "./util.js";
 
 class SerialInterface {
     isReady = false;
-    isWeb = false;
+    isBrowser = false;
     static CommandCompleteText = ">";
-    static DefaultBaudRate = 115200;
     static Decoder = new TextDecoder();
     version = "0.0";
  
-    constructor(serialPort) {
+    constructor(serial) {
         this.DeviceConfig = new DeviceConfiguration();
-        this.portName = new SerialUSB(serialPort);
+        this.portName = serial;
         this.leftOver = "";
         this.ReadTimeout = 3;
         this.echo = true;
-        this.isWeb = false;
+        this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";;
     }
 
     async Connect() {
-        try {
-            if (this.isWeb)
-                await this.portName.connect([{ usbVendorId: 0x1B9F }]);
-            else
-                this.portName.connect();
-
-        } catch (e) {
-            console.log("connect Error" + e);
+        if (this.isBrowser) {
+            await this.portName.connect([{ usbVendorId: 0x1B9F }]);
+        } else {
+            await this.portName.connect();
         }
+
         
         this.portName.setTimeout(this.ReadTimeout);
         this.leftOver = "";
-        if (this.isWeb) {
-            setTimeout(() => {
-                this.Synchronize();
-            }, 100);
-        } else {
-            await this.Synchronize();
-        }
+        await this.Synchronize();
     }
 
     Disconnect() {
@@ -359,10 +132,10 @@ class SerialInterface {
         const response = new Cmdresponse();
         const end = new Date(Date.now() + this.ReadTimeout * 1000);
 
-        while (this.portName.bytesAvailable === 0 && new Date() <= end) {
+        while (!this.portName.hasData() && new Date() <= end) {
              await Util.pumpAsync();
         }
-        if (this.portName.bytesAvailable === 0) {
+        if (!this.portName.hasData()) {
             console.log("No Response");
         }
         
@@ -469,8 +242,9 @@ class SerialInterface {
 
         return count;
     }
-}
 
+
+}
 
 class Cmdresponse {
     constructor() {
@@ -491,9 +265,6 @@ class DeviceConfiguration {
 }
 
 class AnalogController {
-
-    //serialPort = new SerialInterface();
-
     constructor(serialPort) {
         this.serialPort = serialPort;
         this.Fixed_Frequency = 50;
@@ -1788,20 +1559,15 @@ class UartController {
 }
 
 class DUELinkController {
-    constructor(serialinterface) {
-        try {
-            this.Connect(serialinterface);
-        } catch {
-            throw (`Could not connect to the comport`);
-        }
+    constructor(serial) {
+        this.serialPort = new SerialInterface(serial);        
     }
 
-    
-
     async InitDevice() {
-        if (this.serialPort === null) {
-            throw (`serialPort is null`);
+        if (!this.serialPort) {
+            throw (`Not connected to the device.`);
         }
+        
         this.Analog = new AnalogController(this.serialPort);
         this.Digital = new DigitalController(this.serialPort);
         this.I2c = new I2cController(this.serialPort);
@@ -1822,8 +1588,9 @@ class DUELinkController {
         this.Temperature = new TemperatureController(this.serialPort);
         this.Humidity = new HudimityController(this.serialPort);
     }
-    async Connect(serialinterface) {
-        this.serialPort = serialinterface;
+    
+    async Connect() {
+        await this.serialPort.Connect();
         
         this.Version = this.serialPort.version;
         this.Version = this.Version.split("\n")[0];
@@ -1853,12 +1620,10 @@ class DUELinkController {
         }
 
         this.serialPort.DeviceConfig = this.DeviceConfig;
-        await this.InitDevice();
+        this.InitDevice();
     }
 
     Disconnect() {
         this.serialPort.Disconnect();
     }
-
-
 }

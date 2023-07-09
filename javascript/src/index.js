@@ -1,88 +1,19 @@
+import {SerialUSB} from './serialusb.js';
+import * as due from './duelink.js';
 
-import * as fs from 'fs';
-import vm from 'node:vm';
+let duedemo = new due.DUELinkController(new SerialUSB());
+await duedemo.Connect();
 
-function include(path) {
-    var code = fs.readFileSync(path, 'utf-8');
-    vm.runInThisContext(code, path);
-}
-
-//add library here
-include('duelink.js');
-
-//serial port lib
-import { SerialPort } from 'serialport'
-
-//due port detection
-async function DetectPort(){
-    var selected = ''
-    var listPorts = SerialPort.list()
-    var items = await listPorts;
-    console.log(items)
-    items.forEach(item => {
-            if(item.serialNumber && item.serialNumber.startsWith('DUE')){
-                selected = item.path;                
-            }
-        });
-    return selected;
-}
-
-//find any due device
-var selectPort = await DetectPort();
-if(selectPort==='')
-{
-    console.log('cannot detect due compatible device, program exited.');
-    process.exit(1);
-}else{
-    console.log('Selected Port:' + selectPort)
-}
-
-//init serial port
-var serialport = new SerialPort({ path: selectPort, baudRate: 115200 })
-var isReady = false;
-serialport.on('open', () => {
-    isReady = true;
-    console.log('serial is ready');
-})
-
-//wait for serial com is ready
-while (!isReady) {
-    await sleep(100)
-}
-
-var comPort = new SerialInterface(serialport);
-comPort.Connect();
-
-var trycount = 30;
-//wait for the firmware version for 3 secs
-while (!comPort.isReady) {
-    await sleep(100);
-    trycount--;
-    if (trycount <= 0) 
-        throw Error("can't get the firmware version")
-}
-
-var duedemo = new DUELinkController(comPort);
-
-// add sleep function!
-async function sleep(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
-}
-
-// blink 10 times
 async function demo() {
-    await duedemo.Led.Set(100,100,100);
+    // for (let i = 0; i < 5; i++) {
+    //     await duedemo.Digital.Write(108, true);
+    //     await duedemo.System.Wait(200);
+    //     await duedemo.Digital.Write(108, false);
+    //     await duedemo.System.Wait(200);
+    // }
 
     for (let i = 0; i < 10; i++) {
-        //await duedemo.Digital.Write(108, true);
-        //console.log(`turn led on...`+i);
-        //await duedemo.System.Wait(20);
-        //await duedemo.Digital.Write(108, false);
-        //console.log(`turn led off...`+i);
-        //await duedemo.System.Wait(20);
-        await duedemo.System.Println("Flash-" + i);
+        await duedemo.System.Println("Line-" + i);
     }
 
     let x = 64;

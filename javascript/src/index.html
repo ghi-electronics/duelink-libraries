@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="module" src="serialweb.js"></script>
+        <script type="module" src="duelink.js"></script>
+    </head>
+    <body>
+        <input id="btnConnect" type="button" onclick="onConnect()" value="Connect" />
+        <div id="controls" style="display:none">
+            <label id="version"></label>
+            <input type="button" onclick="led(true)" value="LED ON"/>
+            <input type="button" onclick="led(false)" value="LED OFF"/>
+        </div>
+        <script>
+            import("./serialweb.js").then(mod => serial = mod);
+            import("./duelink.js").then(mod => due = mod);
+
+            async function onConnect() {
+                duedemo = new due.DUELinkController(new serial.WebSerial());
+                await duedemo.Connect();
+                
+                document.getElementById('btnConnect').style.display="none";
+                document.getElementById('controls').style.display="block";
+                document.getElementById('version').innerText=duedemo.Version;
+            }
+
+            async function led(status) {
+                await duedemo.Digital.Write(108, status);
+            }
+        </script>
+    </body>
+</html>
