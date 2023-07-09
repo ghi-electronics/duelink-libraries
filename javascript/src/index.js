@@ -5,12 +5,12 @@ let duedemo = new due.DUELinkController(new SerialUSB());
 await duedemo.Connect();
 
 async function demo() {
-    // for (let i = 0; i < 5; i++) {
-    //     await duedemo.Digital.Write(108, true);
-    //     await duedemo.System.Wait(200);
-    //     await duedemo.Digital.Write(108, false);
-    //     await duedemo.System.Wait(200);
-    // }
+    for (let i = 0; i < 5; i++) {
+        await duedemo.Digital.Write(duedemo.Pin.Led, true);
+        await duedemo.System.Wait(200);
+        await duedemo.Digital.Write(duedemo.Pin.Led, false);
+        await duedemo.System.Wait(200);
+    }
 
     for (let i = 0; i < 10; i++) {
         await duedemo.System.Println("Line-" + i);
@@ -38,6 +38,6 @@ async function demo() {
 await demo();
 
 //close serial com
-duedemo.Disconnect()
+await duedemo.Disconnect()
 
 console.log("The End!");

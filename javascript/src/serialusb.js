@@ -86,8 +86,11 @@ class SerialUSB {
         return this.ring.hasData();
     }
 
-    close() {
-        
+    async close() {
+        return new Promise(resolve => {
+            this.port.close();
+            resolve();
+        });
     }
 
     setTimeout(timeout) {
