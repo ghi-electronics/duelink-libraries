@@ -30,9 +30,9 @@ class SerialInterface {
         await this.Synchronize();
     }
 
-    Disconnect() {
+    async Disconnect() {
         try {
-            this.portName.close();
+            await this.portName.close();
         } catch { }
         this.port = null;
     }
@@ -1623,7 +1623,7 @@ class DUELinkController {
         this.InitDevice();
     }
 
-    Disconnect() {
-        this.serialPort.Disconnect();
+    async Disconnect() {
+        await this.serialPort.Disconnect();
     }
 }
