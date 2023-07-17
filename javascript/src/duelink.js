@@ -188,7 +188,7 @@ class SerialInterface {
     static TransferBlockDelay = 5;
 
     async WriteRawData(buffer, offset, count) {
-        const block = Math.floor(count / SerialInterface.TransferBlockSizeMax);
+        let block = Math.floor(count / SerialInterface.TransferBlockSizeMax);
         const remain = count % SerialInterface.TransferBlockSizeMax;
 
         let idx = offset;
@@ -196,7 +196,7 @@ class SerialInterface {
         while (block > 0) {
             await this.portName.write(buffer.slice(idx, idx + SerialInterface.TransferBlockSizeMax));
             idx += SerialInterface.TransferBlockSizeMax;
-            block -= 1;
+            block--;
             await Util.sleep(SerialInterface.TransferBlockDelay);
         }
 
@@ -520,28 +520,24 @@ class DisplayController {
     async DrawBuffer(color) {
         const WIDTH = 128;
         const HEIGHT = 64;
-
-        let offset = 0;
-        const length = color.length;
-
         const data = new Uint8Array(Math.floor(WIDTH * HEIGHT / 8));
-        let i = offset;
-
-        for (let y = 0; y < HEIGHT; y++) {
-            for (let x = 0; x < WIDTH; x++) {
-
+        let pixelOffset=0;
+        for (let y = 0; y < HEIGHT && pixelOffset < color.length; y++) {
+            for (let x = 0; x < WIDTH && pixelOffset < color.length; x++) {
                 const index = Math.floor(y >> 3) * WIDTH + x;
+                
+                const r = color[pixelOffset];
+                const g = color[pixelOffset+1];
+                const b = color[pixelOffset+2];
+                //const a = color[pixelOffset+3];
+                
 
-                if (i < offset + length) {
+                if ((r+g+b)/3 > 127) 
+                    data[index] |= (1 << (y&7));
+                else 
+                    data[index] &= ~(1 << (y&7));
 
-                    if ((color[i] & 0x00FFFFFF) !== 0) { // no alpha
-                        data[index] |= (1 << (y & 7)) & 0xFF;
-                    } else {
-                        data[index] &= (~(1 << (y & 7))) & 0xFF;
-                    }
-
-                    i += 1;
-                }
+                pixelOffset += 4;
             }
         }
 

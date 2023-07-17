@@ -19,3 +19,11 @@ http-server
 ```
 
 Use the *localhost* address to access the serial port
+
+## Running the node.js canvas example
+```
+cd src
+npm install
+npm install -g canvas
+node canvasFrameBuffer.js
+```

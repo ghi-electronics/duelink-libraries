@@ -59,6 +59,30 @@
                         <label>Input text:</label>
                         <input type="text" id="textsendid" name="textsendname" value="Hello world!" />
                         <button class="btn btn-primary" onclick="sendText()">Send (to Pulse only)</button>
+                        <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+                            <table>
+                                <tr>
+                                    <td>Font</td>
+                                    <td>
+                                        <select id="fontName">
+                                            <option value="Arial">Arial</option>
+                                            <option value="Verdana">Verdana</option>
+                                            <option value="Tahoma">Tahoma</option>
+                                            <option value="Trebuchet MS">Trebuchet MS</option>
+                                            <option value="Times New Roman">Times New Roman</option>
+                                            <option value="Georgia">Georgia</option>
+                                            <option value="Garamond">Garamond</option>
+                                            <option value="Courier New">Courier New</option>
+                                            <option value="Brush Script MT">Brush Script MT</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Font size</td><td><input id="fontSize" type="number" value="12"></td>
+                                </tr>
+                            </table>
+                            <button class="btn btn-primary" onclick="sentTextAsDrawing()">Send as image (Pulse only)</button>
+                        </div>
                     </div>
 
                     <div class="center">
@@ -74,11 +98,13 @@
                         <label>(The source code for this demo in JavaScript and other languages is <a
                                 href="https://github.com/ghi-electronics/due-samples/tree/main/Demo">here.</a>)</label>
                     </div>
-
+                    <div class="center">
+                        <canvas id="surface" width=128 height=64 style="width: 256px; height: 128px; background-color: black;">
+        
+                        </canvas>
+                    </div>
                 </div>
-
             </div>
-
         </fieldset>
 
     </div>
@@ -118,6 +144,10 @@
     import("./serialweb.js").then(mod => serial = mod);
     import("./duelink.js").then(mod => due = mod);
     // A $( document ).ready() block.
+
+    // Get canvas context
+    let canvas = document.getElementById("surface");
+    let ctx = canvas.getContext("2d",  { willReadFrequently: true });
    
     function Check() {
         if (!this.duedemo)
@@ -146,6 +176,23 @@
     async function sendLedOff() {
         Check();
         await duedemo.Digital.Write(108, false);
+    }
+
+    async function sentTextAsDrawing() {
+        Check();
+        ctx.fillStyle = "black";
+        ctx.fillRect(0,0,128,64);
+        ctx.fillStyle = "white";
+        
+        let fontName = document.getElementById("fontName").value;
+        let fontSize = document.getElementById("fontSize").value;
+        let text = document.getElementById("textsendid").value;
+
+        ctx.font=fontSize + "px " + fontName;
+        ctx.fillText(text, 0, 32+(parseInt(fontSize)/2));
+
+        let frameBuffer = ctx.getImageData(0,0,128,64);
+        await duedemo.Display.DrawBuffer(frameBuffer.data);
     }
 
     async function playSound() {
