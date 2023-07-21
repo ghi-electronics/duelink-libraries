@@ -228,6 +228,12 @@ namespace GHIElectronics.DUELink {
                     this.DeviceConfig.MaxPinAnalog = 11;
 
                 }
+                else if (this.Version[this.Version.Length - 1] == 'R') {
+                    this.DeviceConfig.IsPulse = true;
+                    this.DeviceConfig.MaxPinIO = 23;
+                    this.DeviceConfig.MaxPinAnalog = 29;
+
+                }
                 else {
                     throw new Exception("Not support the version " + this.Version);
                 }
