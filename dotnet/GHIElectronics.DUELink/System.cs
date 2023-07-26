@@ -14,7 +14,7 @@ namespace GHIElectronics.DUELink {
         public enum ResetOption {
             SystemReset = 0,
             Bootloader
-            
+
 
         }
         public class SystemController {
@@ -29,13 +29,13 @@ namespace GHIElectronics.DUELink {
                 this.displayText = new string[DISPLAY_MAX_LINES];
 
                 for (var i = 0; i < DISPLAY_MAX_LINES; i++) {
-                    displayText[i] = string.Empty;  
+                    displayText[i] = string.Empty;
                 }
             }
 
             public void Reset(ResetOption option) {
 
-                var cmd = string.Format("reset({0})", option == ResetOption.Bootloader ? 1 : 0 );
+                var cmd = string.Format("reset({0})", option == ResetOption.Bootloader ? 1 : 0);
                 this.serialPort.WriteCommand(cmd);
 
                 // The device will reset in bootloader or system reset
@@ -131,7 +131,7 @@ namespace GHIElectronics.DUELink {
                         displayText[i - 1] = displayText[i];
                     }
 
-                    displayText[DISPLAY_MAX_LINES - 1] = string.Empty;                    
+                    displayText[DISPLAY_MAX_LINES - 1] = string.Empty;
                 }
                 else {
                     displayText[DISPLAY_MAX_LINES - 1] += c;
@@ -160,10 +160,10 @@ namespace GHIElectronics.DUELink {
 
                 if (newline) {
                     this.PrnChar('\r');
-                }                
+                }
             }
             public bool Print(string text) {
-            
+
                 Debug.WriteLine(text);
 
                 this.PrnText(text, false);
@@ -173,15 +173,12 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool Print(int text) {
+            public bool Print(int value) {
+                return this.Print(value.ToString());
+            }
 
-                Debug.WriteLine(text.ToString());
-
-                this.PrnText(text.ToString(), false);
-
-                return true;
-
-
+            public bool Print(bool value) {
+                return this.Print(value ? 1 : 0);
             }
 
             public bool Println(string text) {
@@ -193,14 +190,14 @@ namespace GHIElectronics.DUELink {
                 return true;
             }
 
-            public bool Println(int text) {
-
-                Debug.WriteLine(text.ToString());
-
-                this.PrnText(text.ToString(), true);
-
-                return true;
+            public bool Println(int value) {
+                return this.Println(value.ToString());
             }
+
+            public bool Println(bool value) {
+                return this.Println(value ? 1 : 0);
+            }
+
             public bool Wait(int millisecond) {
 
                 var cmd = string.Format("wait({0})", millisecond);

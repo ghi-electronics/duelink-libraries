@@ -89,15 +89,13 @@ class SystemController:
             self.__PrnChar('\r')
 
 
-
-
-
-    
     def Print(self, text)->bool:
         print(text)
 
         if isinstance(text, str):
             self.__PrnText(text, False)
+        elif isinstance(text, bool):
+            self.__PrnText('1' if True else '0', False)
         else:
             self.__PrnText(str(text), False)
 
@@ -107,6 +105,8 @@ class SystemController:
         print(text)
         if isinstance(text, str):
             self.__PrnText(text, True)
+        elif isinstance(text, bool):
+            self.__PrnText('1' if text else '0', True)
         else:
             self.__PrnText(str(text), True)
 

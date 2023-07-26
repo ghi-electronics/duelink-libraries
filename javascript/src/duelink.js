@@ -1414,6 +1414,8 @@ class SystemController {
     async Print(text) {
         if (typeof text === "string") {
             await this.__PrnText(text, false);
+        } else if (typeof text === "boolean") {
+            await this.__PrnText(text ? "1" : "0", false);
         } else {
             await this.__PrnText(text.toString(), false);
         }
@@ -1424,6 +1426,8 @@ class SystemController {
     async Println(text) {
         if (typeof text === "string") {
            await this.__PrnText(text, true);
+        } else if (typeof text === "boolean") {
+           await this.__PrnText(text ? "1" : "0", true);
         } else {
            await this.__PrnText(text.toString(), true);
         }
