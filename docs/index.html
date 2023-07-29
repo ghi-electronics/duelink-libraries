@@ -58,7 +58,7 @@
                     <div class="center">
                         <label>Input text:</label>
                         <input type="text" id="textsendid" name="textsendname" value="Hello world!" />
-                        <button class="btn btn-primary" onclick="sendText()">Send (Pulse/Rave)</button>
+                        <button class="btn btn-primary" onclick="sendText()">Send (Pulse/Rave)*</button>
                         <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
                             <table>
                                 <tr>
@@ -81,7 +81,7 @@
                                     <td>Font size</td><td><input id="fontSize" type="number" value="12"></td>
                                 </tr>
                             </table>
-                            <button class="btn btn-primary" onclick="sentTextAsDrawing()">Send as image (Pulse/Rave)</button>
+                            <button class="btn btn-primary" onclick="sentTextAsDrawing()">Send as image (Pulse/Rave)*</button>
                         </div>
                     </div>
 
@@ -102,6 +102,11 @@
                         <canvas id="surface" width=128 height=64 style="width: 256px; height: 128px; background-color: black;">
         
                         </canvas>
+                    </div>
+                    <div class="center">
+                        <small>
+                            <strong>*&nbsp;</strong>Will also work with Tick, Flea and Edge with I2C display at address 0x78 (0x3c)
+                        </small>
                     </div>
                 </div>
             </div>
