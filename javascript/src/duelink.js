@@ -647,8 +647,7 @@ class DisplayController {
                     let green = bitmap[i+1];
                     let blue = bitmap[i+2];
 
-                    let pixel = ((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6);
-                    buffer[j] = pixel;
+                    buffer[j] = ((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6);
                 }
                 break;
             case 16:
@@ -661,9 +660,10 @@ class DisplayController {
                         let red = bitmap[i];
                         let green = bitmap[i+1];
                         let blue = bitmap[i+2];
-                        let pixel = ((red >> 3) << 11) | ((green >> 3) << 6) | (blue >> 2);
-                        buffer[index + 0] = pixel & 0xff;
-                        buffer[index + 1] = pixel >> 8;
+                        let clr = (red << 16) | (green << 8) |  blue
+                        
+                        buffer[index + 0] = (((clr & 0b0000_0000_0000_0000_0001_1100_0000_0000) >> 5) | ((clr & 0b0000_0000_0000_0000_0000_0000_1111_1000) >> 3)) & 0xff
+                        buffer[index + 1] = (((clr & 0b0000_0000_1111_1000_0000_0000_0000_0000) >> 16) | ((clr & 0b0000_0000_0000_0000_1110_0000_0000_0000) >> 13)) & 0xff
                         i += 4;
                     }
                 }

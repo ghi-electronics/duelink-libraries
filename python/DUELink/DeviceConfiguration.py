@@ -4,6 +4,7 @@ class DeviceConfiguration:
         self.IsFlea = False
         self.IsPico = False
         self.IsEdge = False
+        self.IsRave = False
         self.MaxPinIO = 0
         self.MaxPinAnalog = 0
 

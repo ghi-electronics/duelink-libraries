@@ -1,6 +1,12 @@
 class DisplayController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
+        self.__palette = [0]*16;
+        self.Width = 128
+        self.Height = 64
+        if (self.serialPort.DeviceConfig.IsRave):
+            self.Width = 160
+            self.Height = 120
 
     def Show(self):
         cmd = "lcdshow()"
@@ -13,6 +19,28 @@ class DisplayController:
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
+    
+    def Palette(self, id:int, color: int) -> bool:
+        if id > 16:
+            raise ValueError("Palette supports 16 color index only.")
+
+        self.__palette[id] = color
+        cmd = f"palette({id},{color})"
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+        return res.success
+    
+    def PaletteFromBuffer(self, pixels, bucketDepth: int = 8) -> bool:
+        paletteBuilder = PaletteBuilder(3)
+        palette = paletteBuilder.BuildPalette(pixels)
+        for i in range(0, len(palette)):
+            red = palette[i][0]
+            green = palette[i][1]
+            blue = palette[i][2]
+            color = (red << 16) | (green << 8) | blue
+            if not self.Palette(i, color):
+                return False
+        return True
 
     def SetPixel(self, color, x, y):
         cmd = f"lcdpixel({color},{x},{y})"
@@ -56,8 +84,8 @@ class DisplayController:
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def __Stream(self, data):
-        cmd = "lcdstream()"
+    def __Stream(self, data, color_depth:int):
+        cmd = f"lcdstream({color_depth})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
 
@@ -68,32 +96,113 @@ class DisplayController:
 
         return res.success
     
-    def DrawBuffer(self, color):
-        WIDTH = 128
-        HEIGHT = 64
+    def __ColorDistance(self, color1, color2):
+        r1 = (color1 >> 16) & 0xff
+        g1 = (color1 >> 8) & 0xff
+        b1 = (color1 >> 0) & 0xff
 
-        offset = 0
-        length = len(color)
+        r2 = (color2 >> 16) & 0xff
+        g2 = (color2 >> 8) & 0xff
+        b2 = (color2 >> 0) & 0xff
 
-        data = bytearray(int(WIDTH*HEIGHT/8))
-        i = offset
+        rd = (r1 - r2) * (r1 - r2)
+        gd = (g1 - g2) * (g1 - g2)
+        bd = (b1 - b2) * (b1 - b2)
+        return rd+gd+bd
+    
+    def __PaletteLookup(self, color):
+        bestDistance = self.__ColorDistance(self.__palette[0], color)
+        bestEntry = 0
+        
+        for i in range(0, len(self.__palette)):
+            distance = self.__ColorDistance(self.__palette[i], color)
+            if distance < bestDistance:
+                bestDistance = distance;
+                bestEntry = i;
+        
+        return bestEntry;
+    
+    def DrawBuffer(self, bitmap, color_depth) -> bool:
+        if bitmap is None:
+            raise ValueError("Bitmap array is null")
+        
+        width = self.Width
+        height = self.Height
 
-        for y in range(0, HEIGHT):
-            for x in range(0, WIDTH):
+        buffer_size = 0
+        i = 0
+        buffer = None
 
-                index = (y >> 3) * WIDTH + x
+        match color_depth:
+            case 1:
+                buffer_size = int(width * height/8);
+                buffer = bytearray(buffer_size)
 
-                if (i < offset + length):
+                for y in range(0, height):
+                    for x in range(0, width):
+                        index = (y >> 3) * width + x
+                        red = bitmap[i][0]
+                        green = bitmap[i][1]
+                        blue = bitmap[i][2]
+                        brightness = (red + green + blue) / 3;
 
-                    if ((color[i] & 0x00FFFFFF) != 0): # no alpha
-                        data[index] |= (1 << (y & 7)) & 0xFF
-                    
-                    else:
-                        data[index] &= (~(1 << (y & 7))) & 0xFF
-                    
-                    i += 1                
+                        if (brightness > 127):
+                            buffer[index] |= (1 << (y & 7)) & 0xFF
+                        else:
+                            buffer[index] &= (~(1 << (y & 7))) & 0xFF
+                            
+                        i += 1        
+            case 4:
+                buffer_size = int(width * height / 2);
+                buffer = bytearray(buffer_size)
 
-        return self.__Stream(data)
+                for j in range(0, buffer_size):
+                    red = bitmap[i][0]
+                    green = bitmap[i][1]
+                    blue = bitmap[i][2]
+                    pixel1 = (red << 16) | (green << 8) | blue
+
+                    red = bitmap[i+1][0]
+                    green = bitmap[i+1][1]
+                    blue = bitmap[i+1][2]
+                    pixel2 = (red << 16) | (green << 8) | blue
+
+                    buffer[j] = (self.__PaletteLookup(pixel1) << 4) | self.__PaletteLookup(pixel2)
+
+                    i += 2
+
+            case 8:
+                buffer_size = int(width * height);
+                buffer = bytearray(buffer_size)
+
+                for j in range(0, buffer_size):
+                    red = bitmap[i][0]
+                    green = bitmap[i][1]
+                    blue = bitmap[i][2]
+
+                    buffer[j] = ((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6)
+                    i += 1
+
+            case 16:
+                buffer_size = int(width * height * 2);
+                buffer = bytearray(buffer_size)
+
+                for y in range(0, height):
+                    for x in range(0, width):
+                        index = (y * width + x) * 2
+                        red = bitmap[i][0]
+                        green = bitmap[i][1]
+                        blue = bitmap[i][2]
+                        clr = (red << 16) | (green << 8) |  blue
+
+                        buffer[index + 0] = (((clr & 0b0000_0000_0000_0000_0001_1100_0000_0000) >> 5) | ((clr & 0b0000_0000_0000_0000_0000_0000_1111_1000) >> 3)) & 0xff
+                        buffer[index + 1] = (((clr & 0b0000_0000_1111_1000_0000_0000_0000_0000) >> 16) | ((clr & 0b0000_0000_0000_0000_1110_0000_0000_0000) >> 13)) & 0xff
+                        i += 1
+
+            case _:
+                raise ValueError("Invalid color depth")
+            
+        return self.__Stream(buffer, color_depth)
     
     def DrawBufferBytes(self, color):
         offset = 0
@@ -202,3 +311,44 @@ class DisplayController:
     TransformRotate90 = property(__get_transform_rotate90, __set_transform) 
     TransformRotate180 = property(__get_transform_rotate180, __set_transform) 
     TransformRotate270 = property(__get_transform_rotate270, __set_transform) 
+
+class PaletteBuilder:
+    def __init__(self, bucketsPerChannel: int):
+        ValuesPerChannel = 256
+        if bucketsPerChannel < 1 or bucketsPerChannel > ValuesPerChannel:
+            raise ValueError(f"Buckets per channel must be between 1 and {ValuesPerChannel}")
+        self.__bucketSize = ValuesPerChannel / bucketsPerChannel
+
+    def BuildPalette(self, pixels):
+        histogram = dict()
+        for color in pixels:
+            key = self.__CreateColorKey(color)
+            if key in histogram:
+                histogram[key].append(color)
+            else:
+                histogram[key] = [color]
+
+        sortedBuckets = list(histogram.values())
+        sortedBuckets.sort(reverse=True, key=lambda e : len(e))
+
+        palette = []
+        for i in range(0, 16):
+            palette.append(self.__AverageColor(sortedBuckets[i % len(sortedBuckets)]))
+        return palette
+    
+    def __AverageColor(self, colors):
+        r = 0
+        g = 0
+        b = 0
+        for color in colors:
+            r += color[0]
+            g += color[1]
+            b += color[2]
+        count = len(colors)
+        return [int(r/count), int(g/count), int(b/count), color[3]]
+
+    def __CreateColorKey(self, color):
+        redBucket = int(color[0] / self.__bucketSize)
+        greenBucket = int(color[1] / self.__bucketSize)
+        blueBucket = int(color[2] / self.__bucketSize)
+        return (redBucket << 16) | (greenBucket << 8) | blueBucket    

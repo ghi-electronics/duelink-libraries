@@ -53,6 +53,12 @@ class DUELinkController:
         self.Pin = PinController()
         self.Temperature = TemperatureController(self.serialPort)
         self.Humidity = HudimityController(self.serialPort)
+
+        self.IsPulse = False
+        self.IsFlea = False
+        self.IsPico = False
+        self.IsEdge = False
+        self.IsRave = False
     
     def __Connect(self, comPort: str):
         self.serialPort = SerialInterface(comPort)
@@ -78,12 +84,21 @@ class DUELinkController:
             self.DeviceConfig.MaxPinIO = 11
             self.DeviceConfig.MaxPinAnalog = 29    
         elif self.Version[len(self.Version) -1] == 'E':
-            self.DeviceConfig.IsFlea = True
+            self.DeviceConfig.IsEdge = True
             self.DeviceConfig.MaxPinIO = 22
             self.DeviceConfig.MaxPinAnalog = 11  
+        if self.Version[len(self.Version) -1] == 'R':
+            self.DeviceConfig.IsRave = True
+            self.DeviceConfig.MaxPinIO = 23
+            self.DeviceConfig.MaxPinAnalog = 29
 
         self.serialPort.DeviceConfig = self.DeviceConfig
-            
+
+        self.IsPulse = self.DeviceConfig.IsPulse
+        self.IsFlea = self.DeviceConfig.IsFlea
+        self.IsPico = self.DeviceConfig.IsPico
+        self.IsEdge = self.DeviceConfig.IsEdge
+        self.IsRave = self.DeviceConfig.IsRave
 
     def Disconnect(self):
         self.serialPort.Disconnect()

@@ -353,11 +353,7 @@ namespace GHIElectronics.DUELink {
                             var green = (clr >> 8) & 0xFF;
                             var blue = (clr >> 0) & 0xFF;
 
-                            red = red >> 5;
-                            green = green >> 5;
-                            blue = blue >> 6;
-
-                            buffer[i] = (byte)((red << 5) | green << 2 | blue);                           
+                            buffer[i] = (byte)(((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6));
                         }
 
                         break;
