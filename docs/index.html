@@ -26,7 +26,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="navbar-brand">
             <img class="d-inline align-top mr-2" src="https://duelink.com/images/logo.png" />
-            <div class="d-inline align-middle">Demo Application</div>
+            <table class="d-inline align-middle">
+                <tr><td>Demo Application</td></tr>
+                <tr"><td><small><span id="id-version"></span></small></td></tr>
+            </table>        
         </div>
     </nav>
 
@@ -174,6 +177,7 @@
             } else if (BrainPad.IsEdge) {
                 await BrainPad.Display.Configuration(0, 0x3c);
             }
+            $("#id-version").text(BrainPad.Version);
             $("#id-connect").slideUp();
             $("#id-inputs").prop("disabled", false);
 
