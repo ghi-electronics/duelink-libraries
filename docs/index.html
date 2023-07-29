@@ -148,6 +148,7 @@
     // Get canvas context
     let canvas = document.getElementById("surface");
     let ctx = canvas.getContext("2d",  { willReadFrequently: true });
+    let color_depth = 1;
    
     function Check() {
         if (!this.BrainPad)
@@ -160,10 +161,13 @@
             Check();
             await BrainPad.Connect();
             if (BrainPad.IsRave) {
+                color_depth = 16;
                 canvas.width = 160;
                 canvas.height = 120;
                 canvas.style.width = '320px';
                 canvas.style.height = '240px';    
+            } else if (BrainPad.IsEdge) {
+                await BrainPad.Display.Configuration(0, 0x3c);
             }
             $("#id-connect").slideUp();
             $("#id-inputs").prop("disabled", false);
@@ -195,10 +199,10 @@
         let text = document.getElementById("textsendid").value;
 
         ctx.font=fontSize + "px " + fontName;
-        ctx.fillText(text, 0, 32+(parseInt(fontSize)/2));
+        ctx.fillText(text, 0, (canvas.height+parseInt(fontSize))/2);
 
-        let frameBuffer = ctx.getImageData(0,0,canvas.width,canvas.height);
-        await BrainPad.Display.DrawBuffer(frameBuffer.data,16);
+        let frameBuffer = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        await BrainPad.Display.DrawBuffer(frameBuffer.data,  color_depth);
     }
 
     async function playSound() {

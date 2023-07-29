@@ -629,10 +629,10 @@ class DisplayController {
                         var brightness = (red + green + blue) / 3;
 
                         if (brightness > 127) {
-                            buffer[index] |= (byte)(1 << (y & 7));
+                            buffer[index] |= 1 << (y & 7);
                         }
                         else {
-                            buffer[index] &= (byte)(~(1 << (y & 7)));
+                            buffer[index] &= ~(1 << (y & 7));
                         }
 
                         i += 4; // Move to next pixel 
