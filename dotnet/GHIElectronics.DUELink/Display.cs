@@ -57,7 +57,7 @@ namespace GHIElectronics.DUELink {
 
             public bool Palette(int id, uint color) {
                 if (id >= 16)
-                    throw new ArgumentOutOfRangeException("Pallete supports 16 color index only.");
+                    throw new ArgumentOutOfRangeException("Palette supports 16 color index only.");
 
                 _palette[id] = color;
                 var cmd = string.Format("palette({0},{1})", id.ToString(), color.ToString());
@@ -227,7 +227,7 @@ namespace GHIElectronics.DUELink {
 
             private bool Stream(byte[] data, int color_depth) {
                 var cmd = string.Format("lcdstream({0})", color_depth);
-
+                
                 this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
@@ -270,11 +270,11 @@ namespace GHIElectronics.DUELink {
 
             private byte PaletteLookup(uint color)
             {
-                var bestDistance = ColorDistance(_palette[0], color);
+                var bestDistance = ColorDistance(this._palette[0], color);
                 byte bestEntry = 0;
-                for(byte i=1 ; i < _palette.Length; i++)
+                for(byte i=1 ; i < this._palette.Length; i++)
                 {
-                    var distance = ColorDistance(_palette[i], color);
+                    var distance = ColorDistance(this._palette[i], color);
                     if (distance < bestDistance)
                     {
                         bestDistance = distance;
@@ -307,16 +307,21 @@ namespace GHIElectronics.DUELink {
 
                         for (int y = 0; y < height; y++) {
                             for (int x = 0; x < width; x++) {
-
                                 var index = (y >> 3) * width + x;
 
-                                
-                                if ((bitmap[i] & 0x00FFFFFF) != 0) { // no alpha
+                                var clr = bitmap[i];
+                                var red = (clr >> 16) & 0xFF;
+                                var green = (clr >> 8) & 0xFF;
+                                var blue = (clr >> 0) & 0xFF;
+                                var brightness = (red + green + blue) / 3;
+
+                                if (brightness > 127) {
                                     buffer[index] |= (byte)(1 << (y & 7));
                                 }
                                 else {
                                     buffer[index] &= (byte)(~(1 << (y & 7)));
                                 }
+
                                 i++;
                                 
                             }
@@ -357,7 +362,7 @@ namespace GHIElectronics.DUELink {
 
                         break;
 
-                    default:
+                    case 16:
                         buffer_size = width * height * 2;
 
                         buffer = new byte[buffer_size];
@@ -378,6 +383,8 @@ namespace GHIElectronics.DUELink {
                         }
 
                         break;
+                    default:
+                        throw new ArgumentException("Invalid color depth", nameof(color_depth));
                 }
 
                 if (buffer != null) {
@@ -462,15 +469,14 @@ namespace GHIElectronics.DUELink {
 
     class PaletteBuilder {
         private const int ValuesPerChannel = 256;
-        private readonly int _bucketsPerChannel;
-        private int BucketSize => ValuesPerChannel / _bucketsPerChannel;
+        private int _bucketSize;
 
-        public PaletteBuilder(int bucketsPerChannel = 32) {
+        public PaletteBuilder(int bucketsPerChannel) {
             if (bucketsPerChannel < 1 || bucketsPerChannel > ValuesPerChannel) {
                 throw new ArgumentException($"Must be between 1 and {ValuesPerChannel}", nameof(bucketsPerChannel));
             }
 
-            _bucketsPerChannel = bucketsPerChannel;
+            _bucketSize = ValuesPerChannel / bucketsPerChannel;
         }
 
         public uint[] BuildPalette(uint[] pixels) {
@@ -512,9 +518,9 @@ namespace GHIElectronics.DUELink {
         }
 
         private uint CreateColorKey(uint color) {
-            var redBucket = ((color >> 16) & 0xff) / BucketSize;
-            var greenBucket = ((color >> 8) & 0xff) / BucketSize;
-            var blueBucket = ((color >> 0) & 0xff) / BucketSize;
+            var redBucket = ((color >> 16) & 0xff) / _bucketSize;
+            var greenBucket = ((color >> 8) & 0xff) / _bucketSize;
+            var blueBucket = ((color >> 0) & 0xff) / _bucketSize;
             return (uint)((redBucket << 16) | (greenBucket << 8) | blueBucket);
         }
     }
