@@ -12,7 +12,7 @@ async function demo() {
 
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     let pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    //await BrainPad.Display.PaletteFromBuffer(pixels,3);
+    await BrainPad.Display.PaletteFromBuffer(pixels, 3);
     await BrainPad.Display.DrawBuffer(pixels, 4);
 }
 
