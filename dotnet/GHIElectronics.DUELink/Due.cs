@@ -13,6 +13,7 @@ namespace GHIElectronics.DUELink {
         public bool IsPico { get; internal set; } = false;
         public bool IsFlea { get; internal set; } = false;
         public bool IsEdge { get; internal set; } = false;
+        public bool IsRave { get; internal set; } = false;
         public uint MaxPinIO { get; set; }
         public uint MaxPinAnalog { get; set; }
 
@@ -229,7 +230,7 @@ namespace GHIElectronics.DUELink {
 
                 }
                 else if (this.Version[this.Version.Length - 1] == 'R') {
-                    this.DeviceConfig.IsPulse = true;
+                    this.DeviceConfig.IsRave = true;
                     this.DeviceConfig.MaxPinIO = 23;
                     this.DeviceConfig.MaxPinAnalog = 29;
 

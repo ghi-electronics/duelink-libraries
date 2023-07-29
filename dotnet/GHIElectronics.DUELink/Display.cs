@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace GHIElectronics.DUELink {
 
     public partial class DUELinkController {
         public class DisplayController {
-
             SerialInterface serialPort;
 
             public int TransformNone { get; } = 0;
@@ -20,8 +20,19 @@ namespace GHIElectronics.DUELink {
             public int TransformRotate180 { get; } = 4;
             public int TransformRotate270 { get; } = 5;
 
+            public int Width { get; private set; } = 128;
+            public int Height { get; private set; } = 64;
 
-            public DisplayController(SerialInterface serialPort) => this.serialPort = serialPort;
+            private uint[] _palette = new uint[16];
+
+            public DisplayController(SerialInterface serialPort) {
+                this.serialPort = serialPort;
+
+                if (this.serialPort.DeviceConfig.IsRave) {
+                    Width = 160;
+                    Height = 120;
+                }
+            }
 
             public bool Show() {
                 var cmd = string.Format("lcdshow()");
@@ -42,6 +53,32 @@ namespace GHIElectronics.DUELink {
 
                 return res.success;
 
+            }
+
+            public bool Palette(int id, uint color) {
+                if (id >= 16)
+                    throw new ArgumentOutOfRangeException("Pallete supports 16 color index only.");
+
+                _palette[id] = color;
+                var cmd = string.Format("palette({0},{1})", id.ToString(), color.ToString());
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+                return res.success;
+
+            }
+
+            public bool PaletteFromBuffer(uint[] pixels, int bucketDepth = 8)
+            {
+                var builder = new PaletteBuilder(bucketDepth);
+                var palette = builder.BuildPalette(pixels);
+                for (int i = 0; i < palette.Length; i++) {
+                    if (!Palette(i, palette[i])) {
+                        return false;
+                    }
+                }
+                return true;
             }
 
             public bool SetPixel(uint color, int x, int y) {
@@ -215,14 +252,47 @@ namespace GHIElectronics.DUELink {
 
             }
 
+            private int ColorDistance(uint color1, uint color2)
+            {
+                int r1 = (int)((color1 >> 16) & 0xff);
+                int g1 = (int)((color1 >> 8) & 0xff);
+                int b1 = (int)((color1 >> 0) & 0xff);
+
+                int r2 = (int)((color2 >> 16) & 0xff);
+                int g2 = (int)((color2 >> 8) & 0xff);
+                int b2 = (int)((color2 >> 0) & 0xff);
+
+                int rd = (r1 - r2) * (r1 - r2);
+                int gd = (g1 - g2) * (g1 - g2);
+                int bd = (b1 - b2) * (b1 - b2);
+                return rd+gd+bd;
+            }
+
+            private byte PaletteLookup(uint color)
+            {
+                var bestDistance = ColorDistance(_palette[0], color);
+                byte bestEntry = 0;
+                for(byte i=1 ; i < _palette.Length; i++)
+                {
+                    var distance = ColorDistance(_palette[i], color);
+                    if (distance < bestDistance)
+                    {
+                        bestDistance = distance;
+                        bestEntry = i;
+                    }
+                }
+                return bestEntry;
+            }
+
+
             // This function for testing firmware that support 1,4,8,16bit
             public void DrawBuffer(uint[] bitmap, int color_depth) {
                 if (bitmap == null) {
                     throw new Exception("Bitmap array is null");
                 }
-                // todo: get width from config
-                var width = 128;
-                var height = 64;
+
+                var width = this.Width;
+                var height = this.Height;
 
                 var buffer_size = 0;
                 var i = 0;
@@ -260,7 +330,7 @@ namespace GHIElectronics.DUELink {
                         buffer = new byte[buffer_size];
 
                         for (i = 0; i < buffer.Length; i++) {
-                            buffer[i] = (byte)((bitmap[i * 2] << 4) | bitmap[i * 2 + 1]);
+                            buffer[i] = (byte)((PaletteLookup(bitmap[i*2]) << 4) | PaletteLookup(bitmap[i * 2 + 1]));
                         }
 
                         break;
@@ -282,7 +352,7 @@ namespace GHIElectronics.DUELink {
                             green = green >> 5;
                             blue = blue >> 6;
 
-                            buffer[i] = (byte)((red << 5) | green << 3 | blue);
+                            buffer[i] = (byte)((red << 5) | green << 2 | blue);                           
                         }
 
                         break;
@@ -307,8 +377,6 @@ namespace GHIElectronics.DUELink {
                             }
                         }
 
-                        
-
                         break;
                 }
 
@@ -317,7 +385,27 @@ namespace GHIElectronics.DUELink {
                     this.Stream(buffer, color_depth);
                 }
 
+            
+            }
 
+            public uint[] BufferFrom(Image image) {
+                var bmp = new Bitmap(this.Width, this.Height);
+                var g = Graphics.FromImage(bmp);
+                g.DrawImage(image, 0, 0, this.Width, this.Height);
+
+                uint[] pixels = new uint[this.Width * this.Height];
+
+                var bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                unsafe {
+                    var ptr = (uint*)bmpData.Scan0.ToPointer();
+                    for (int y = 0; y < bmpData.Height; y++) {
+                        for (int x = 0; x < bmpData.Width; x++) {
+                            pixels[y * bmpData.Width + x] = ptr[y * (bmpData.Stride >> 2) + x];
+                        }
+                    }
+                }
+                bmp.UnlockBits(bmpData);
+                return pixels;
             }
 
             public bool DrawBufferBytes(byte[] color) {
@@ -370,6 +458,64 @@ namespace GHIElectronics.DUELink {
             //    return buffer;
             //}
         }
+    }
 
+    class PaletteBuilder {
+        private const int ValuesPerChannel = 256;
+        private readonly int _bucketsPerChannel;
+        private int BucketSize => ValuesPerChannel / _bucketsPerChannel;
+
+        public PaletteBuilder(int bucketsPerChannel = 32) {
+            if (bucketsPerChannel < 1 || bucketsPerChannel > ValuesPerChannel) {
+                throw new ArgumentException($"Must be between 1 and {ValuesPerChannel}", nameof(bucketsPerChannel));
+            }
+
+            _bucketsPerChannel = bucketsPerChannel;
+        }
+
+        public uint[] BuildPalette(uint[] pixels) {
+            var histogram = new Dictionary<uint, List<uint>>();
+            foreach (var color in pixels) {
+                var key = CreateColorKey(color);
+                if (!histogram.TryGetValue(key, out var colors)) {
+                    colors = new List<uint>();
+                    histogram[key] = colors;
+                }
+                colors.Add(color);
+            }
+
+            var sortedBuckets = (from e in histogram
+                                 orderby e.Value.Count descending
+                                 select e).ToArray();
+
+            var palette = new uint[16];
+            for (int i = 0; i < 16; i++) {
+                palette[i] = AverageColor(sortedBuckets[i % sortedBuckets.Length].Value);
+            }
+            return palette;
+        }
+
+        private static uint AverageColor(IEnumerable<uint> colors) {
+            uint r = 0;
+            uint g = 0;
+            uint b = 0;
+            foreach (var color in colors) {
+                r += ((color >> 16) & 0xff);
+                g += ((color >> 8) & 0xff);
+                b += ((color >> 0) & 0xff);
+            }
+            var count = (uint)colors.Count();
+            r /= count;
+            g /= count;
+            b /= count;
+            return (r & 0xff) << 16 | (g & 0xff) << 8 | b & 0xff;
+        }
+
+        private uint CreateColorKey(uint color) {
+            var redBucket = ((color >> 16) & 0xff) / BucketSize;
+            var greenBucket = ((color >> 8) & 0xff) / BucketSize;
+            var blueBucket = ((color >> 0) & 0xff) / BucketSize;
+            return (uint)((redBucket << 16) | (greenBucket << 8) | blueBucket);
+        }
     }
 }
