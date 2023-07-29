@@ -23,7 +23,24 @@ namespace GHIElectronics.DUELink {
             public int Width { get; private set; } = 128;
             public int Height { get; private set; } = 64;
 
-            private uint[] _palette = new uint[16];
+            private uint[] _palette = new uint[]{
+                0x000000, // Black  
+                0xFFFFFF, // White  
+                0xFF0000, // Red    
+                0x32CD32, // Lime   
+                0x0000FF, // Blue   
+                0xFFFF00, // Yellow 
+                0x00FFFF, // Cyan   
+                0xFF00FF, // Magenta
+                0xC0C0C0, // Silver 
+                0x808080, // Gray   
+                0x800000, // Maroon 
+                0xBAB86C, // Oliver 
+                0x00FF00, // Green  
+                0xA020F0, // Purple 
+                0x008080, // Teal   
+                0x000080, // Navy   
+            };
 
             public DisplayController(SerialInterface serialPort) {
                 this.serialPort = serialPort;

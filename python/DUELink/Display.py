@@ -1,7 +1,25 @@
 class DisplayController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
-        self.__palette = [0]*16;
+        self.__palette = [
+            0x000000, # Black  
+            0xFFFFFF, # White  
+            0xFF0000, # Red    
+            0x32CD32, # Lime   
+            0x0000FF, # Blue   
+            0xFFFF00, # Yellow 
+            0x00FFFF, # Cyan   
+            0xFF00FF, # Magenta
+            0xC0C0C0, # Silver 
+            0x808080, # Gray   
+            0x800000, # Maroon 
+            0xBAB86C, # Oliver 
+            0x00FF00, # Green  
+            0xA020F0, # Purple 
+            0x008080, # Teal   
+            0x000080, # Navy
+        ]
+        
         self.Width = 128
         self.Height = 64
         if (self.serialPort.DeviceConfig.IsRave):
