@@ -9,7 +9,7 @@ class SerialInterface {
     version = "0.0";
  
     constructor(serial) {
-        this.DeviceConfig = new DeviceConfiguration();
+        this.DeviceConfig = null;
         this.portName = serial;
         this.leftOver = "";
         this.ReadTimeout = 3;
@@ -259,6 +259,7 @@ class DeviceConfiguration {
         this.IsFlea = false;
         this.IsPico = false;
         this.IsEdge = false;
+        this.IsRave = false;
         this.MaxPinIO = 0;
         this.MaxPinAnalog = 0;
     }
@@ -435,8 +436,34 @@ class DigitalController {
 }
 
 class DisplayController {
+    #_palette;
+
     constructor(serialPort) {
         this.serialPort = serialPort;
+        this.Width = 128;
+        this.Height = 64;
+        if (this.serialPort.DeviceConfig.IsRave) {
+            this.Width = 160;
+            this.Height = 120;
+        }
+        this.#_palette = [
+            0x000000, // Black  
+            0xFFFFFF, // White  
+            0xFF0000, // Red    
+            0x32CD32, // Lime   
+            0x0000FF, // Blue   
+            0xFFFF00, // Yellow 
+            0x00FFFF, // Cyan   
+            0xFF00FF, // Magenta
+            0xC0C0C0, // Silver 
+            0x808080, // Gray   
+            0x800000, // Maroon 
+            0xBAB86C, // Oliver 
+            0x00FF00, // Green  
+            0xA020F0, // Purple 
+            0x008080, // Teal   
+            0x000080, // Navy 
+        ];
     }
  
     async Show() {
@@ -451,6 +478,32 @@ class DisplayController {
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         return res.success;
+    }
+
+    async Palette(id, color) {
+        if (id > 16) {
+            throw new Error("Palette supports 16 color index only.");
+        }
+
+        this.#_palette[id] = color;
+
+        const cmd = `palette(${id},${color})`;
+
+        await this.serialPort.WriteCommand(cmd);
+
+        const res = await this.serialPort.ReadResponse();
+        return res.success;
+    }
+
+    async PaletteFromBuffer(pixels, bucketDepth = 8) {
+        let builder = new PaletteBuilder(bucketDepth);
+        let palette = builder.BuildPalette(pixels);
+        for (let i = 0; i < palette.length; i++) {
+            if (!await this.Palette(i, palette[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     async SetPixel(color, x, y) {
@@ -505,8 +558,8 @@ class DisplayController {
         return res.success;
     }
 
-    async __Stream(data) {
-        let cmd = "lcdstream()";
+    async __Stream(data, color_depth) {
+        let cmd = `lcdstream(${color_depth})`;
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
 
@@ -517,31 +570,126 @@ class DisplayController {
 
         return res.success;
     }
-    async DrawBuffer(color) {
-        const WIDTH = 128;
-        const HEIGHT = 64;
-        const data = new Uint8Array(Math.floor(WIDTH * HEIGHT / 8));
-        let pixelOffset=0;
-        for (let y = 0; y < HEIGHT && pixelOffset < color.length; y++) {
-            for (let x = 0; x < WIDTH && pixelOffset < color.length; x++) {
-                const index = Math.floor(y >> 3) * WIDTH + x;
-                
-                const r = color[pixelOffset];
-                const g = color[pixelOffset+1];
-                const b = color[pixelOffset+2];
-                //const a = color[pixelOffset+3];
-                
 
-                if ((r+g+b)/3 > 127) 
-                    data[index] |= (1 << (y&7));
-                else 
-                    data[index] &= ~(1 << (y&7));
+    #ColorDistance(color1, color2)
+    {
+        let r1 = (color1 >> 16) & 0xff;
+        let g1 = (color1 >> 8) & 0xff;
+        let b1 = (color1 >> 0) & 0xff;
 
-                pixelOffset += 4;
+        let r2 = (color2 >> 16) & 0xff;
+        let g2 = (color2 >> 8) & 0xff;
+        let b2 = (color2 >> 0) & 0xff;
+
+        let rd = (r1 - r2) * (r1 - r2);
+        let gd = (g1 - g2) * (g1 - g2);
+        let bd = (b1 - b2) * (b1 - b2);
+        return rd+gd+bd;
+    }
+    
+    #PaletteLookup(color)
+    {
+        let bestDistance = this.#ColorDistance(this.#_palette[0], color);
+        let bestEntry = 0;
+        for(let i = 1; i < this.#_palette.length; i++)
+        {
+            let distance = this.#ColorDistance(this.#_palette[i], color);
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestEntry = i;
             }
         }
+        return bestEntry;
+    }
 
-        return await this.__Stream(data);
+    async DrawBuffer(bitmap, color_depth) {
+        if (!bitmap) {
+            throw new Error("Bitmap array is null");
+        }
+
+        const width = this.Width;
+        const height = this.Height;
+
+        let buffer_size = 0;
+        let i=0;
+        let buffer = null;
+
+        switch(color_depth) {
+            case 1:
+                buffer_size = Math.floor(width * height / 8);
+                buffer = new Uint8Array(buffer_size);
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        let index = (y >> 3) * width + x;
+
+                        let red = bitmap[i];
+                        let green = bitmap[i+1];
+                        let blue = bitmap[i+2];
+                        var brightness = (red + green + blue) / 3;
+
+                        if (brightness > 127) {
+                            buffer[index] |= (byte)(1 << (y & 7));
+                        }
+                        else {
+                            buffer[index] &= (byte)(~(1 << (y & 7)));
+                        }
+
+                        i += 4; // Move to next pixel 
+                    }
+                }
+                break;
+            case 4:
+                buffer_size = width * height / 2;
+                buffer = new Uint8Array(buffer_size);
+                for(let j = 0; j < buffer_size; i += 8, j++) {
+                    let red = bitmap[i];
+                    let green = bitmap[i+1];
+                    let blue = bitmap[i+2];
+                    let pixel1 = (red << 16) | (green << 8) | blue;
+
+                    red = bitmap[i+4];
+                    green = bitmap[i+4+1];
+                    blue = bitmap[i+4+2];
+                    let pixel2 = (red << 16) | (green << 8) | blue;
+
+                    buffer[j] = (this.#PaletteLookup(pixel1) << 4) | this.#PaletteLookup(pixel2);
+                }
+                break;
+            case 8:
+                buffer_size = width * height;
+                buffer = new Uint8Array(buffer_size);
+                for(let j = 0; j < buffer_size; i += 4, j++) {
+                    let red = bitmap[i];
+                    let green = bitmap[i+1];
+                    let blue = bitmap[i+2];
+
+                    buffer[j] = ((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6);
+                }
+                break;
+            case 16:
+                buffer_size = width * height * 2;
+                buffer = new Uint8Array(buffer_size);
+                for (var y = 0; y < height; y++) {
+                    for (var x = 0; x < width; x++) {
+                        var index = (y * width + x) * 2;
+                        
+                        let red = bitmap[i];
+                        let green = bitmap[i+1];
+                        let blue = bitmap[i+2];
+                        let clr = (red << 16) | (green << 8) |  blue
+                        
+                        buffer[index + 0] = (((clr & 0b0000_0000_0000_0000_0001_1100_0000_0000) >> 5) | ((clr & 0b0000_0000_0000_0000_0000_0000_1111_1000) >> 3)) & 0xff
+                        buffer[index + 1] = (((clr & 0b0000_0000_1111_1000_0000_0000_0000_0000) >> 16) | ((clr & 0b0000_0000_0000_0000_1110_0000_0000_0000) >> 13)) & 0xff
+                        i += 4;
+                    }
+                }
+                break;
+            default:
+                throw new Error("Invalid color depth");
+        }
+
+        return await this.__Stream(buffer, color_depth);
     }
 
     async DrawBufferBytes(color) {
@@ -661,6 +809,69 @@ class DisplayController {
         return this.__get_transform_rotate270();
     }
 }
+
+class PaletteBuilder {
+    #_bucketSize;
+
+    constructor(bucketsPerChannel) {
+        const ValuesPerChannel = 256;
+        
+        if (bucketsPerChannel < 1 || bucketsPerChannel > ValuesPerChannel) {
+            throw new Error(`Buckets per channel must be between 1 and ${ValuesPerChannel}`);
+        }
+
+        this.#_bucketSize = ValuesPerChannel / bucketsPerChannel;
+    }
+
+    BuildPalette(pixels) {
+        let histogram = {};
+
+        for (let i = 0; i < pixels.length; i += 4) {
+            let pixel = (pixels[i+0] << 16) | (pixels[i+1] << 8) | (pixels[i+2] << 0);
+            
+            let key = this.#CreateColorKey(pixel);
+            if(key in histogram) {
+                histogram[key].push(pixel);
+            } else {
+                histogram[key] = [pixel];
+            }
+        }
+    
+        // sort buckets
+        let buckets = Object.values(histogram);
+        let sortedBuckets = buckets.sort((a, b) => a.length - b.length).reverse();
+    
+        let palette = new Uint32Array(16);
+        let i=0;
+        for (let i = 0; i < 16; i++) {
+            palette[i] = this.#AverageColor(sortedBuckets[i % sortedBuckets.length]);;
+        }
+        return palette;
+      }
+
+    #AverageColor(colors) {
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        for(let color of colors) {
+            r += ((color >> 16) & 0xff);
+            g += ((color >> 8) & 0xff);
+            b += ((color >> 0) & 0xff);
+        }
+        var count = colors.length;
+        r = Math.floor(r / count);
+        g = Math.floor(g / count);
+        b = Math.floor(b / count);
+        return (r & 0xff) << 16 | (g & 0xff) << 8 | b & 0xff;
+    }
+
+    #CreateColorKey(color) {
+        var redBucket = Math.floor(((color >> 16) & 0xff) / this.#_bucketSize);
+        var greenBucket = Math.floor(((color >> 8) & 0xff) / this.#_bucketSize);
+        var blueBucket = Math.floor(((color >> 0) & 0xff) / this.#_bucketSize);
+        return (redBucket << 16) | (greenBucket << 8) | blueBucket;
+    }
+  }
 
 class DistanceSensorController {
     constructor(serialPort) {
@@ -1368,7 +1579,7 @@ class SystemController {
         return res.success;
     }
 
-    __PrnChar(c) {
+    #PrnChar(c) {
         if (
             this.print_posx === SystemController.DISPLAY_MAX_CHARACTER_PER_LINE &&
             c !== "\r" &&
@@ -1393,9 +1604,9 @@ class SystemController {
         return;
     }
 
-    async __PrnText(text, newline) {
+    async #PrnText(text, newline) {
         for (let i = 0; i < text.length; i++) {
-            this.__PrnChar(text[i]);
+            this.#PrnChar(text[i]);
         }
  
         await this.display.Clear(0);
@@ -1407,15 +1618,17 @@ class SystemController {
         await this.display.Show();
 
         if (newline) {
-            this.__PrnChar("\r");
+            this.#PrnChar("\r");
         }
     }
 
     async Print(text) {
         if (typeof text === "string") {
-            await this.__PrnText(text, false);
+            await this.#PrnText(text, false);
+        } else if (typeof text === "boolean") {
+            await this.#PrnText(text ? "1" : "0", false);
         } else {
-            await this.__PrnText(text.toString(), false);
+            await this.#PrnText(text.toString(), false);
         }
 
         return true;
@@ -1423,9 +1636,11 @@ class SystemController {
 
     async Println(text) {
         if (typeof text === "string") {
-           await this.__PrnText(text, true);
+           await this.#PrnText(text, true);
+        } else if (typeof text === "boolean") {
+           await this.#PrnText(text ? "1" : "0", true);
         } else {
-           await this.__PrnText(text.toString(), true);
+           await this.#PrnText(text.toString(), true);
         }
 
         return true;
@@ -1556,7 +1771,13 @@ class UartController {
 
 class DUELinkController {
     constructor(serial) {
-        this.serialPort = new SerialInterface(serial);        
+        this.serialPort = new SerialInterface(serial);    
+        
+        this.IsPulse = false;
+        this.IsFlea = false;
+        this.IsPico = false;
+        this.IsEdge = false;
+        this.IsRave = false;
     }
 
     async InitDevice() {
@@ -1610,10 +1831,22 @@ class DUELinkController {
             this.DeviceConfig.MaxPinIO = 11;
             this.DeviceConfig.MaxPinAnalog = 29;
         } else if (this.Version[this.Version.length - 1] === "E") {
-            this.DeviceConfig.IsFlea = true;
+            this.DeviceConfig.IsEdge = true;
             this.DeviceConfig.MaxPinIO = 22;
             this.DeviceConfig.MaxPinAnalog = 11;
+        } else if (this.Version[this.Version.length - 1] === "R") {
+            this.DeviceConfig.IsRave = true;
+            this.DeviceConfig.MaxPinIO = 23;
+            this.DeviceConfig.MaxPinAnalog = 29;
+        } else {
+            throw new Error("The device is not supported.");    
         }
+
+        this.IsPulse = this.DeviceConfig.IsPulse;
+        this.IsFlea = this.DeviceConfig.IsFlea;
+        this.IsPico = this.DeviceConfig.IsPico;
+        this.IsEdge = this.DeviceConfig.IsEdge;
+        this.IsRave = this.DeviceConfig.IsRave;
 
         this.serialPort.DeviceConfig = this.DeviceConfig;
         this.InitDevice();
