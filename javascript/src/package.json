@@ -17,6 +17,6 @@
   "dependencies": {
     "canvas": "^2.11.2",
     "delay": "^6.0.0",
-    "serialport": "^11.0.0"
+    "serialport": "^11.0.1"
   }
 }
