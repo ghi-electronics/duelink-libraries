@@ -323,10 +323,10 @@ class ButtonController {
     }
 
     async Enable(pin, enable) {
-        if (pin < 0) throw new Error("Invalid pin.");
-        if (pin === 'A' || pin === 'a') pin = 65;
-        if (pin === 'B' || pin === 'b') pin = 66;
-        if (pin > 2 && pin != 65 && pin != 66) throw new Error("Invalid pin.");
+        pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
+        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+            throw new Error("Invalid pin");
+        }
         
         const cmd = `btnenable(${pin}, ${Number(enable)})`;
 
@@ -337,10 +337,10 @@ class ButtonController {
     }
 
     async WasPressed(pin) {
-        if (pin < 0) throw new Error("Invalid pin.");
-        if (pin === 'A' || pin === 'a') pin = 65;
-        if (pin === 'B' || pin === 'b') pin = 66;
-        if (pin > 2 && pin != 65 && pin != 66) throw new Error("Invalid pin.");
+        pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
+        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+            throw new Error("Invalid pin");
+        }
         
         const cmd = `print(btndown(${pin}))`;
 
@@ -360,8 +360,9 @@ class ButtonController {
     }
 
     async IsReleased(pin) {
-        if (pin !== 97 && pin !== 98 && pin !== 65 && pin !== 66 && pin !== 0 && pin !== 1 && pin !== 2 && pin !== 'A' && pin !== 'B' && pin !== 'a' && pin !== 'b') {
-            throw new Error("Invalid pin.");
+        pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
+        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+            throw new Error("Invalid pin");
         }
 
         const cmd = `print(btnup(${pin}))`;

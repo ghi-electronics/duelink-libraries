@@ -6,9 +6,10 @@ class ButtonController:
         self.serialPort = serialPort
 
     def Enable(self, pin, enable: bool) -> bool:
-        if pin != 97 and pin != 98 and pin !=65 and pin != 66 and pin != 0 and pin != 1 and pin != 2 and pin !='A' and pin !='B' and pin !='a' and pin !='b':            
-            raise ValueError("Invalid pin.")
-
+        pin = (ord(pin) if isinstance(pin, str) else pin) & 0xdf
+        if pin != 0 and pin != 1 and pin != 2 and pin != 65 and pin != 66:
+            raise ValueError("Invalid pin")
+    
         cmd = f"btnenable({pin}, {int(enable)})"
 
         self.serialPort.WriteCommand(cmd)
@@ -17,8 +18,9 @@ class ButtonController:
         return res.success
     
     def WasPressed(self, pin) -> bool:
-        if pin != 97 and pin != 98 and pin !=65 and pin != 66 and pin != 0 and pin != 1 and pin != 2 and pin !='A' and pin !='B' and pin !='a' and pin !='b':
-            raise ValueError("Invalid pin.")
+        pin = (ord(pin) if isinstance(pin, str) else pin) & 0xdf
+        if pin != 0 and pin != 1 and pin != 2 and pin != 65 and pin != 66:
+            raise ValueError("Invalid pin")
             
         cmd = f"print(btndown({pin}))"
 
@@ -34,8 +36,9 @@ class ButtonController:
         return False
     
     def IsReleased(self, pin) -> bool:
-        if pin != 97 and pin != 98 and pin !=65 and pin != 66 and pin != 0 and pin != 1 and pin != 2 and pin !='A' and pin !='B' and pin !='a' and pin !='b': 
-            raise ValueError("Invalid pin.")
+        pin = (ord(pin) if isinstance(pin, str) else pin) & 0xdf
+        if pin != 0 and pin != 1 and pin != 2 and pin != 65 and pin != 66:
+            raise ValueError("Invalid pin")
             
         cmd = f"print(btnup({pin}))"
 

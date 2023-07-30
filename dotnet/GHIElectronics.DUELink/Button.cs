@@ -15,14 +15,11 @@ namespace GHIElectronics.DUELink {
             SerialInterface serialPort;
             public ButtonController(SerialInterface serialPort) => this.serialPort = serialPort;
             public bool Enable(int pin, bool enable) {
-                if (pin < 0)
-                    throw new ArgumentOutOfRangeException("Invalid pin.");
-
-                if (pin > 2 ) {
-                    if (pin != 97 && pin != 98 && pin != 65 && pin != 66)
-                        throw new ArgumentOutOfRangeException("Invalid pin.");
+                pin &= 0xdf;
+                if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+                    throw new ArgumentException("Invalid pin", nameof(pin));
                 }
-                    
+
 
                 var cmd = string.Format("btnenable({0},{1})", pin, enable==true? 1:0);
 
@@ -38,12 +35,9 @@ namespace GHIElectronics.DUELink {
 
 
             public bool WasPressed(int pin) {
-                if (pin < 0)
-                    throw new ArgumentOutOfRangeException("Invalid pin.");
-
-                if (pin > 2) {
-                    if (pin != 97 && pin != 98 && pin != 65 && pin != 66)
-                        throw new ArgumentOutOfRangeException("Invalid pin.");
+                pin &= 0xdf;
+                if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+                    throw new ArgumentException("Invalid pin", nameof(pin));
                 }
 
                 var cmd = string.Format("print(btndown({0}))", pin);
@@ -69,12 +63,9 @@ namespace GHIElectronics.DUELink {
             public bool WasPressed(char pin) => this.WasPressed((int)pin);
 
             public bool IsReleased(int pin) {
-                if (pin < 0)
-                    throw new ArgumentOutOfRangeException("Invalid pin.");
-
-                if (pin > 2) {
-                    if (pin != 97 && pin != 98 && pin != 65 && pin != 66)
-                        throw new ArgumentOutOfRangeException("Invalid pin.");
+                pin &= 0xdf;
+                if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+                    throw new ArgumentException("Invalid pin", nameof(pin));
                 }
 
                 var cmd = string.Format("print(btnup({0}))", pin);
