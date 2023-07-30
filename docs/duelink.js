@@ -323,10 +323,10 @@ class ButtonController {
     }
 
     async Enable(pin, enable) {
-        if (pin < 0) throw new Error("Invalid pin.");
-        if (pin === 'A' || pin === 'a') pin = 65;
-        if (pin === 'B' || pin === 'b') pin = 66;
-        if (pin > 2 && pin != 65 && pin != 66) throw new Error("Invalid pin.");
+        pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
+        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+            throw new Error("Invalid pin");
+        }
         
         const cmd = `btnenable(${pin}, ${Number(enable)})`;
 
@@ -336,11 +336,11 @@ class ButtonController {
         return res.success;
     }
 
-    async WasPressed(pin) {
-        if (pin < 0) throw new Error("Invalid pin.");
-        if (pin === 'A' || pin === 'a') pin = 65;
-        if (pin === 'B' || pin === 'b') pin = 66;
-        if (pin > 2 && pin != 65 && pin != 66) throw new Error("Invalid pin.");
+    async JustPressed(pin) {
+        pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
+        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+            throw new Error("Invalid pin");
+        }
         
         const cmd = `print(btndown(${pin}))`;
 
@@ -359,9 +359,10 @@ class ButtonController {
         return false;
     }
 
-    async IsReleased(pin) {
-        if (pin !== 97 && pin !== 98 && pin !== 65 && pin !== 66 && pin !== 0 && pin !== 1 && pin !== 2 && pin !== 'A' && pin !== 'B' && pin !== 'a' && pin !== 'b') {
-            throw new Error("Invalid pin.");
+    async JustReleased(pin) {
+        pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
+        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+            throw new Error("Invalid pin");
         }
 
         const cmd = `print(btnup(${pin}))`;
@@ -626,9 +627,8 @@ class DisplayController {
                         let red = bitmap[i];
                         let green = bitmap[i+1];
                         let blue = bitmap[i+2];
-                        var brightness = (red + green + blue) / 3;
-
-                        if (brightness > 127) {
+                        
+                        if (red + green + blue > 0) {
                             buffer[index] |= 1 << (y & 7);
                         }
                         else {

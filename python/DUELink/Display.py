@@ -158,9 +158,8 @@ class DisplayController:
                         red = bitmap[i]
                         green = bitmap[i+1]
                         blue = bitmap[i+2]
-                        brightness = (red + green + blue) / 3;
-
-                        if (brightness > 127):
+                        
+                        if red + green + blue > 0:
                             buffer[index] |= (1 << (y & 7)) & 0xFF
                         else:
                             buffer[index] &= (~(1 << (y & 7))) & 0xFF

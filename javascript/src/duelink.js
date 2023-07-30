@@ -627,9 +627,8 @@ class DisplayController {
                         let red = bitmap[i];
                         let green = bitmap[i+1];
                         let blue = bitmap[i+2];
-                        var brightness = (red + green + blue) / 3;
-
-                        if (brightness > 127) {
+                        
+                        if (red + green + blue > 0) {
                             buffer[index] |= 1 << (y & 7);
                         }
                         else {
