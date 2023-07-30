@@ -105,9 +105,6 @@ class SerialInterface {
         return response;
     }
 
-    // def CheckResult(self, actual, expected):
-    //     if actual != expected:
-    //         raise Exception(f"Expected {expected}, got {actual}.")
     DiscardInBuffer() {
         this.portName.resetInputBuffer();
     }
@@ -1525,14 +1522,21 @@ class SpiController {
 }
 
 class SystemController {
-    static DISPLAY_MAX_LINES = 8;
-    static DISPLAY_MAX_CHARACTER_PER_LINE = 21;
+    #DISPLAY_MAX_LINES = 8;
+    #DISPLAY_MAX_CHARACTER_PER_LINE = 21;
     
-    constructor(serialPort) {
+    constructor(serialPort, display) {
         this.serialPort = serialPort;
+        this.display = display;
+
+        this.#DISPLAY_MAX_LINES = Math.floor(this.display.Height / 8)
+        this.#DISPLAY_MAX_CHARACTER_PER_LINE = Math.floor(this.display.Width / 6)
+
         this.print_posx = 0;
-        this.displayText = ["", "", "", "", "", "", "", ""];
-        this.display = new DisplayController(this.serialPort);
+        this.displayText = new Array(this.#DISPLAY_MAX_LINES);
+        for(let i = 0; i < this.displayText.length; i++) {
+            this.displayText[i] = '';
+        }
     }
 
     async Reset(option) {
@@ -1581,7 +1585,7 @@ class SystemController {
 
     #PrnChar(c) {
         if (
-            this.print_posx === SystemController.DISPLAY_MAX_CHARACTER_PER_LINE &&
+            this.print_posx === this.#DISPLAY_MAX_CHARACTER_PER_LINE &&
             c !== "\r" &&
             c !== "\n"
         ) {
@@ -1591,14 +1595,14 @@ class SystemController {
         if (c === "\r" || c === "\n") {
             this.print_posx = 0;
 
-            for (let i = 1; i < SystemController.DISPLAY_MAX_LINES; i++) {
+            for (let i = 1; i < this.#DISPLAY_MAX_LINES; i++) {
                 this.displayText[i - 1] = this.displayText[i];
             }
 
-            this.displayText[SystemController.DISPLAY_MAX_LINES - 1] = "";
+            this.displayText[this.#DISPLAY_MAX_LINES - 1] = "";
         } else {
-            this.displayText[SystemController.DISPLAY_MAX_LINES - 1] =
-                this.displayText[SystemController.DISPLAY_MAX_LINES - 1] + c;
+            this.displayText[this.#DISPLAY_MAX_LINES - 1] =
+                this.displayText[this.#DISPLAY_MAX_LINES - 1] + c;
             this.print_posx += 1;
         }
         return;
@@ -1793,7 +1797,6 @@ class DUELinkController {
         this.Spi = new SpiController(this.serialPort);
         this.Infrared = new InfraredController(this.serialPort);
         this.Neo = new NeoController(this.serialPort);
-        this.System = new SystemController(this.serialPort);
         this.Uart = new UartController(this.serialPort);
         this.Button = new ButtonController(this.serialPort);
         this.Distance = new DistanceSensorController(this.serialPort);
@@ -1804,6 +1807,7 @@ class DUELinkController {
         this.Pin = new PinController();
         this.Temperature = new TemperatureController(this.serialPort);
         this.Humidity = new HudimityController(this.serialPort);
+        this.System = new SystemController(this.serialPort, this.Display);
     }
     
     async Connect() {
