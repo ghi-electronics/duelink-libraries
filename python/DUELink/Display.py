@@ -52,11 +52,7 @@ class DisplayController:
         paletteBuilder = PaletteBuilder(3)
         palette = paletteBuilder.BuildPalette(pixels)
         for i in range(0, len(palette)):
-            red = palette[i][0]
-            green = palette[i][1]
-            blue = palette[i][2]
-            color = (red << 16) | (green << 8) | blue
-            if not self.Palette(i, color):
+            if not self.Palette(i, palette[i]):
                 return False
         return True
 
@@ -159,9 +155,9 @@ class DisplayController:
                 for y in range(0, height):
                     for x in range(0, width):
                         index = (y >> 3) * width + x
-                        red = bitmap[i][0]
-                        green = bitmap[i][1]
-                        blue = bitmap[i][2]
+                        red = bitmap[i]
+                        green = bitmap[i+1]
+                        blue = bitmap[i+2]
                         brightness = (red + green + blue) / 3;
 
                         if (brightness > 127):
@@ -169,37 +165,36 @@ class DisplayController:
                         else:
                             buffer[index] &= (~(1 << (y & 7))) & 0xFF
                             
-                        i += 1        
+                        i += 4        
             case 4:
                 buffer_size = int(width * height / 2);
                 buffer = bytearray(buffer_size)
 
                 for j in range(0, buffer_size):
-                    red = bitmap[i][0]
-                    green = bitmap[i][1]
-                    blue = bitmap[i][2]
+                    red = bitmap[i]
+                    green = bitmap[i+1]
+                    blue = bitmap[i+2]
                     pixel1 = (red << 16) | (green << 8) | blue
 
-                    red = bitmap[i+1][0]
-                    green = bitmap[i+1][1]
-                    blue = bitmap[i+1][2]
+                    red = bitmap[i+4]
+                    green = bitmap[i+4+1]
+                    blue = bitmap[i+4+2]
                     pixel2 = (red << 16) | (green << 8) | blue
 
                     buffer[j] = (self.__PaletteLookup(pixel1) << 4) | self.__PaletteLookup(pixel2)
 
-                    i += 2
+                    i += 8
 
             case 8:
                 buffer_size = int(width * height);
                 buffer = bytearray(buffer_size)
 
                 for j in range(0, buffer_size):
-                    red = bitmap[i][0]
-                    green = bitmap[i][1]
-                    blue = bitmap[i][2]
-
+                    red = bitmap[i]
+                    green = bitmap[i+1]
+                    blue = bitmap[i+2]
                     buffer[j] = ((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6)
-                    i += 1
+                    i += 4
 
             case 16:
                 buffer_size = int(width * height * 2);
@@ -208,14 +203,14 @@ class DisplayController:
                 for y in range(0, height):
                     for x in range(0, width):
                         index = (y * width + x) * 2
-                        red = bitmap[i][0]
-                        green = bitmap[i][1]
-                        blue = bitmap[i][2]
+                        red = bitmap[i+0]
+                        green = bitmap[i+1]
+                        blue = bitmap[i+2]
                         clr = (red << 16) | (green << 8) |  blue
 
                         buffer[index + 0] = (((clr & 0b0000_0000_0000_0000_0001_1100_0000_0000) >> 5) | ((clr & 0b0000_0000_0000_0000_0000_0000_1111_1000) >> 3)) & 0xff
                         buffer[index + 1] = (((clr & 0b0000_0000_1111_1000_0000_0000_0000_0000) >> 16) | ((clr & 0b0000_0000_0000_0000_1110_0000_0000_0000) >> 13)) & 0xff
-                        i += 1
+                        i += 4
 
             case _:
                 raise ValueError("Invalid color depth")
@@ -339,12 +334,14 @@ class PaletteBuilder:
 
     def BuildPalette(self, pixels):
         histogram = dict()
-        for color in pixels:
-            key = self.__CreateColorKey(color)
+
+        for i in range(0, len(pixels), 4):
+            pixel = ((pixels[i]) << 16) | (pixels[i+1] << 8) | pixels[i+2]
+            key = self.__CreateColorKey(pixels[i], pixels[i+1], pixels[i+2])
             if key in histogram:
-                histogram[key].append(color)
+                histogram[key].append(pixel)
             else:
-                histogram[key] = [color]
+                histogram[key] = [pixel]
 
         sortedBuckets = list(histogram.values())
         sortedBuckets.sort(reverse=True, key=lambda e : len(e))
@@ -359,14 +356,17 @@ class PaletteBuilder:
         g = 0
         b = 0
         for color in colors:
-            r += color[0]
-            g += color[1]
-            b += color[2]
+            r += ((color >> 16) & 0xff)
+            g += ((color >> 8) & 0xff)
+            b += ((color >> 0) & 0xff)
         count = len(colors)
-        return [int(r/count), int(g/count), int(b/count), color[3]]
+        r = int(r/count)
+        g = int(g/count)
+        b = int(b/count)
+        return (r<<16) | (g<<8) | b
 
-    def __CreateColorKey(self, color):
-        redBucket = int(color[0] / self.__bucketSize)
-        greenBucket = int(color[1] / self.__bucketSize)
-        blueBucket = int(color[2] / self.__bucketSize)
+    def __CreateColorKey(self, r, g, b):
+        redBucket = int(r / self.__bucketSize)
+        greenBucket = int(g / self.__bucketSize)
+        blueBucket = int(b / self.__bucketSize)
         return (redBucket << 16) | (greenBucket << 8) | blueBucket    
