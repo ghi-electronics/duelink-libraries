@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -86,7 +87,7 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool PaletteFromBuffer(uint[] pixels, int bucketDepth = 8)
+            public bool PaletteFromBuffer(byte[] pixels, int bucketDepth = 8)
             {
                 var builder = new PaletteBuilder(bucketDepth);
                 var palette = builder.BuildPalette(pixels);
@@ -303,7 +304,7 @@ namespace GHIElectronics.DUELink {
 
 
             // This function for testing firmware that support 1,4,8,16bit
-            public void DrawBuffer(uint[] bitmap, int color_depth) {
+            public void DrawBuffer(byte[] bitmap, int color_depth) {
                 if (bitmap == null) {
                     throw new Exception("Bitmap array is null");
                 }
@@ -319,17 +320,15 @@ namespace GHIElectronics.DUELink {
                 switch (color_depth) {
                     case 1:
                         buffer_size = width * height / 8;
-
                         buffer = new byte[buffer_size];
 
                         for (int y = 0; y < height; y++) {
                             for (int x = 0; x < width; x++) {
                                 var index = (y >> 3) * width + x;
 
-                                var clr = bitmap[i];
-                                var red = (clr >> 16) & 0xFF;
-                                var green = (clr >> 8) & 0xFF;
-                                var blue = (clr >> 0) & 0xFF;
+                                var red = bitmap[i];
+                                var green = bitmap[i + 1];
+                                var blue = bitmap[i + 2];
                                 var brightness = (red + green + blue) / 3;
 
                                 if (brightness > 127) {
@@ -339,40 +338,43 @@ namespace GHIElectronics.DUELink {
                                     buffer[index] &= (byte)(~(1 << (y & 7)));
                                 }
 
-                                i++;
-                                
+                                i += 4;                                
                             }
                         }
-
                         break;
 
                     case 4:
                         buffer_size = width * height / 2;
-
                         buffer = new byte[buffer_size];
 
-                        for (i = 0; i < buffer.Length; i++) {
-                            buffer[i] = (byte)((PaletteLookup(bitmap[i*2]) << 4) | PaletteLookup(bitmap[i * 2 + 1]));
-                        }
+                        for (var j = 0; j < buffer.Length; j++) {
+                            var red = bitmap[i];
+                            var green = bitmap[i + 1];
+                            var blue = bitmap[i + 2];
+                            var pixel1 = (uint)((red << 16) | (green << 8) | blue);
 
+                            red = bitmap[i + 4];
+                            green = bitmap[i + 4 + 1];
+                            blue = bitmap[i + 4 + 2];
+                            var pixel2 = (uint)((red << 16) | (green << 8) | blue);
+
+                            buffer[j] = (byte)((PaletteLookup(pixel1) << 4) | PaletteLookup(pixel2));
+                            i += 8;
+                        }
                         break;
 
                     case 8:
                         buffer_size = width * height;
-
                         buffer = new byte[buffer_size];
 
+                        for (var j = 0; j < buffer.Length; j++) {
+                            var red = bitmap[i];
+                            var green = bitmap[i + 1];
+                            var blue = bitmap[i + 2];
 
-                        for (i = 0; i < buffer.Length; i++) {
-                            var clr = bitmap[i];
-
-                            var red = (clr >> 16) & 0xFF;
-                            var green = (clr >> 8) & 0xFF;
-                            var blue = (clr >> 0) & 0xFF;
-
-                            buffer[i] = (byte)(((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6));
+                            buffer[j] = (byte)(((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6));
+                            i += 4;
                         }
-
                         break;
 
                     case 16:
@@ -384,14 +386,15 @@ namespace GHIElectronics.DUELink {
                         i = 0;
                         for (var y = 0; y < height; y++) {
                             for (var x = 0; x < width; x++) {
-
                                 var index = (y * width + x) * 2;
-                                var clr = bitmap[i];
+                                var red = bitmap[i];
+                                var green = bitmap[i + 1];
+                                var blue = bitmap[i + 2];
+                                var clr = (uint)((red << 16) | (green << 8) | blue);
 
                                 buffer[index + 0] = (byte)(((clr & 0b0000_0000_0000_0000_0001_1100_0000_0000) >> 5) | ((clr & 0b0000_0000_0000_0000_0000_0000_1111_1000) >> 3));
                                 buffer[index + 1] = (byte)(((clr & 0b0000_0000_1111_1000_0000_0000_0000_0000) >> 16) | ((clr & 0b0000_0000_0000_0000_1110_0000_0000_0000) >> 13));
-                                i++;
-
+                                i += 4;
                             }
                         }
 
@@ -408,19 +411,21 @@ namespace GHIElectronics.DUELink {
             
             }
 
-            public uint[] BufferFrom(Image image) {
+            public byte[] BufferFrom(Image image) {
                 var bmp = new Bitmap(this.Width, this.Height);
                 var g = Graphics.FromImage(bmp);
                 g.DrawImage(image, 0, 0, this.Width, this.Height);
 
-                uint[] pixels = new uint[this.Width * this.Height];
+                byte[] pixels = new byte[this.Width * this.Height * 4];
 
                 var bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                 unsafe {
-                    var ptr = (uint*)bmpData.Scan0.ToPointer();
+                    var ptr = (byte*)bmpData.Scan0.ToPointer();
                     for (int y = 0; y < bmpData.Height; y++) {
-                        for (int x = 0; x < bmpData.Width; x++) {
-                            pixels[y * bmpData.Width + x] = ptr[y * (bmpData.Stride >> 2) + x];
+                        for (int x = 0; x < bmpData.Width * 4; x += 4) {
+                            pixels[y * bmpData.Width * 4 + x] = ptr[y * bmpData.Stride + x + 2];        // Red
+                            pixels[y * bmpData.Width * 4 + x + 1] = ptr[y * bmpData.Stride + x + 1];    // Green
+                            pixels[y * bmpData.Width * 4 + x + 2] = ptr[y * bmpData.Stride + x];        // Blue
                         }
                     }
                 }
@@ -492,15 +497,16 @@ namespace GHIElectronics.DUELink {
             _bucketSize = ValuesPerChannel / bucketsPerChannel;
         }
 
-        public uint[] BuildPalette(uint[] pixels) {
+        public uint[] BuildPalette(byte[] pixels) {
             var histogram = new Dictionary<uint, List<uint>>();
-            foreach (var color in pixels) {
-                var key = CreateColorKey(color);
+            for(var i = 0; i < pixels.Length; i += 4) {
+                var pixel = (uint)(((pixels[i]) << 16) | (pixels[i + 1] << 8) | pixels[i + 2]);
+                var key = CreateColorKey(pixel);
                 if (!histogram.TryGetValue(key, out var colors)) {
                     colors = new List<uint>();
                     histogram[key] = colors;
                 }
-                colors.Add(color);
+                colors.Add(pixel);
             }
 
             var sortedBuckets = (from e in histogram
