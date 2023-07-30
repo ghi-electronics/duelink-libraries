@@ -20,14 +20,18 @@ namespace GHIElectronics.DUELink {
         public class SystemController {
 
             SerialInterface serialPort;
+            DisplayController display;
 
-            const int DISPLAY_MAX_LINES = 8;
-            const int DISPLAY_MAX_CHARACTER_PER_LINE = 21;
+            int DISPLAY_MAX_LINES = 8;
+            int DISPLAY_MAX_CHARACTER_PER_LINE = 21;
 
-            public SystemController(SerialInterface serialPort) {
+            public SystemController(SerialInterface serialPort, DisplayController display) {
                 this.serialPort = serialPort;
-                this.displayText = new string[DISPLAY_MAX_LINES];
+                this.display = display;
+                DISPLAY_MAX_LINES = this.display.Height / 8;
+                DISPLAY_MAX_CHARACTER_PER_LINE = this.display.Width / 6;
 
+                this.displayText = new string[DISPLAY_MAX_LINES];
                 for (var i = 0; i < DISPLAY_MAX_LINES; i++) {
                     displayText[i] = string.Empty;
                 }
@@ -145,10 +149,8 @@ namespace GHIElectronics.DUELink {
                     this.PrnChar(text[i]);
                 }
 
-                var display = new DisplayController(this.serialPort);
-
                 display.Clear(0);
-
+                
                 for (var i = 0; i < displayText.Length; i++) {
                     if (displayText[i] != string.Empty) {
                         display.DrawText(displayText[i], 1, 0, i * 8);

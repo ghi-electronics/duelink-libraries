@@ -42,7 +42,6 @@ class DUELinkController:
         self.Spi = SpiController(self.serialPort)
         self.Infrared = InfraredController(self.serialPort)
         self.Neo = NeoController(self.serialPort)
-        self.System = SystemController(self.serialPort)
         self.Uart = UartController(self.serialPort)
         self.Button = ButtonController(self.serialPort)
         self.Distance = DistanceSensorController(self.serialPort)        
@@ -53,6 +52,7 @@ class DUELinkController:
         self.Pin = PinController()
         self.Temperature = TemperatureController(self.serialPort)
         self.Humidity = HudimityController(self.serialPort)
+        self.System = SystemController(self.serialPort, self.Display)
 
         self.IsPulse = False
         self.IsFlea = False

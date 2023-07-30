@@ -10,10 +10,15 @@ class SystemController:
     DISPLAY_MAX_LINES = 8
     DISPLAY_MAX_CHARACTER_PER_LINE = 21
 
-    def __init__(self, serialPort):
+    def __init__(self, serialPort, display):
         self.serialPort = serialPort
+        self.display = display;
+
+        SystemController.DISPLAY_MAX_LINES = int(self.display.Height / 8)
+        SystemController.DISPLAY_MAX_CHARACTER_PER_LINE = int(self.display.Width / 6)
+        
         self.print_posx = 0
-        self.displayText = ["", "", "", "", "", "", "", ""]
+        self.displayText = [""] * SystemController.DISPLAY_MAX_LINES;
 
     def Reset(self, option : Enum):
         cmd = "reset({0})".format(1 if option.value == 1 else 0)

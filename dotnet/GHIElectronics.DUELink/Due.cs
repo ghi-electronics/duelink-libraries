@@ -106,7 +106,6 @@ namespace GHIElectronics.DUELink {
             this.Spi = new SpiController(this.serialPort);
             this.Infrared = new InfraredController(this.serialPort);
             this.Neo = new NeoController(this.serialPort);
-            this.System = new SystemController(this.serialPort);
             this.Uart = new UartController(this.serialPort);
             this.Button = new ButtonController(this.serialPort);
             this.Distance = new DistanceSensorController(this.serialPort);
@@ -117,7 +116,7 @@ namespace GHIElectronics.DUELink {
             this.Pin = new PinController();
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);
-
+            this.System = new SystemController(this.serialPort, this.Display);
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {
