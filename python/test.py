@@ -22,13 +22,9 @@ BrainPad = DUELinkController(availablePort)
 framebuffer = Image.open("C:\\Users\\chris\\OneDrive\\Pictures\\Cape Town 2009\\DSCN0082.JPG").convert("RGBA")
 framebuffer = framebuffer.resize((160, 120))
 
-#framebuffer =Image.new("RGBA", (BrainPad.Display.Width, BrainPad.Display.Height), "green")
-
-# Get the pixel data as a flat array of values
-#pixels = list(framebuffer.getdata())
 pixels = framebuffer.tobytes()
 
 BrainPad.Display.PaletteFromBuffer(pixels, 3)
 
 # Send to the BrainPad's display
-BrainPad.Display.DrawBuffer(pixels, 16)
+BrainPad.Display.DrawBuffer(pixels, 4)

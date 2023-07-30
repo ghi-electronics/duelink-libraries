@@ -186,7 +186,7 @@ class DisplayController:
                     i += 8
 
             case 8:
-                buffer_size = int(width * height);
+                buffer_size = int(width * height)
                 buffer = bytearray(buffer_size)
 
                 for j in range(0, buffer_size):
