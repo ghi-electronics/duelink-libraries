@@ -17,7 +17,7 @@ class ButtonController:
 
         return res.success
     
-    def WasPressed(self, pin) -> bool:
+    def JustPressed(self, pin) -> bool:
         pin = (ord(pin) if isinstance(pin, str) else pin) & 0xdf
         if pin != 0 and pin != 1 and pin != 2 and pin != 65 and pin != 66:
             raise ValueError("Invalid pin")
@@ -35,7 +35,7 @@ class ButtonController:
 
         return False
     
-    def IsReleased(self, pin) -> bool:
+    def JustReleased(self, pin) -> bool:
         pin = (ord(pin) if isinstance(pin, str) else pin) & 0xdf
         if pin != 0 and pin != 1 and pin != 2 and pin != 65 and pin != 66:
             raise ValueError("Invalid pin")

@@ -336,7 +336,7 @@ class ButtonController {
         return res.success;
     }
 
-    async WasPressed(pin) {
+    async JustPressed(pin) {
         pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
         if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
             throw new Error("Invalid pin");
@@ -359,7 +359,7 @@ class ButtonController {
         return false;
     }
 
-    async IsReleased(pin) {
+    async JustReleased(pin) {
         pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
         if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
             throw new Error("Invalid pin");

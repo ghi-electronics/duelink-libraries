@@ -60,7 +60,7 @@ namespace GHIElectronics.DUELink {
                 return false;
             }
 
-            public bool WasPressed(char pin) => this.WasPressed((int)pin);
+            public bool JustPressed(char pin) => this.WasPressed((int)pin);
 
             public bool IsReleased(int pin) {
                 pin &= 0xdf;
@@ -90,7 +90,7 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool IsReleased(char pin) => this.IsReleased((int)pin);
+            public bool JustReleased(char pin) => this.IsReleased((int)pin);
 
         }
     }
