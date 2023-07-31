@@ -2,6 +2,9 @@ from DUELink.Analog import AnalogController
 from DUELink.Button import ButtonController
 from DUELink.Digital import DigitalController
 from DUELink.Display import DisplayController
+from DUELink.Display import DisplayConfiguration
+from DUELink.DisplayType import DisplayTypeController
+from DUELink.DisplayColorDepth import DisplayColorDepthController
 from DUELink.DistanceSensor import DistanceSensorController
 from DUELink.Frequency import FrequencyController
 from DUELink.I2C import I2cController
@@ -53,12 +56,17 @@ class DUELinkController:
         self.Temperature = TemperatureController(self.serialPort)
         self.Humidity = HudimityController(self.serialPort)
         self.System = SystemController(self.serialPort, self.Display)
+        self.DisplayConfiguration = DisplayConfiguration()
+        self.DisplayType = DisplayTypeController()
+        self.DisplayColorDepth = DisplayColorDepthController()
+        
 
         self.IsPulse = False
         self.IsFlea = False
         self.IsPico = False
         self.IsEdge = False
         self.IsRave = False
+        self.IsTick = False
     
     def __Connect(self, comPort: str):
         self.serialPort = SerialInterface(comPort)
@@ -87,10 +95,14 @@ class DUELinkController:
             self.DeviceConfig.IsEdge = True
             self.DeviceConfig.MaxPinIO = 22
             self.DeviceConfig.MaxPinAnalog = 11  
-        if self.Version[len(self.Version) -1] == 'R':
+        elif self.Version[len(self.Version) -1] == 'R':
             self.DeviceConfig.IsRave = True
             self.DeviceConfig.MaxPinIO = 23
             self.DeviceConfig.MaxPinAnalog = 29
+        elif self.Version[len(self.Version) -1] == 'T':
+            self.DeviceConfig.IsTick = True
+            self.DeviceConfig.MaxPinIO = 23
+            self.DeviceConfig.MaxPinAnalog = 11
 
         self.serialPort.DeviceConfig = self.DeviceConfig
 
@@ -99,6 +111,7 @@ class DUELinkController:
         self.IsPico = self.DeviceConfig.IsPico
         self.IsEdge = self.DeviceConfig.IsEdge
         self.IsRave = self.DeviceConfig.IsRave
+        self.IsTick = self.DeviceConfig.IsTick
 
     def Disconnect(self):
         self.serialPort.Disconnect()
@@ -119,7 +132,9 @@ class DUELinkController:
                     else:
                         return port.device
 
-        return "" 
+        return ""
+   
+         
 
         
         

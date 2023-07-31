@@ -1,3 +1,35 @@
+
+from enum import IntEnum
+
+
+
+class DisplayType(IntEnum):  
+
+    ILI9342 = 0
+    ILI9341 = 1
+    ST7735 = 2
+    SSD1306 = 3
+    BuiltIn = 0xff
+
+class DisplayColorDepth(IntEnum):          
+    OneBit = 1
+    FourBit = 4
+    EightBit = 8
+    SixteenBit =16
+
+class DisplayConfiguration:        
+    def __init__(self):   
+        self.Type = DisplayType.BuiltIn  
+        self.I2cAddress = 0
+        self.SpiChipSelect = 0
+        self.SpiDataControl = 0
+        self.SpiPortrait = False
+        self.SpiMirror = False
+        self.SpiFlip = False
+        self.SpiSwapRedBlueColor = False
+        self.SpiSwapByteEndianness = False
+
+
 class DisplayController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
@@ -140,6 +172,11 @@ class DisplayController:
         if bitmap is None:
             raise ValueError("Bitmap array is null")
         
+        if (self.displayConfiguration.Type == DisplayType.ILI9341 or  self.displayConfiguration.Type == DisplayType.ILI9342 or self.displayConfiguration.Type == DisplayType.ST7735):
+            if(color_depth == DisplayColorDepth.OneBit):
+                raise Exception("Spi does not support one bit depth")
+                
+        
         width = self.Width
         height = self.Height
 
@@ -166,7 +203,7 @@ class DisplayController:
                             
                         i += 4        
             case 4:
-                buffer_size = int(width * height / 2);
+                buffer_size = int(width * height / 2)
                 buffer = bytearray(buffer_size)
 
                 for j in range(0, buffer_size):
@@ -231,8 +268,92 @@ class DisplayController:
         return self.DrawBuffer(data32)
 
     
-    def Configuration(self, target: int, slaveAddress: int)-> bool:
-        cmd = f"lcdconfig({target},{slaveAddress})"
+    def Configuration(self, displayConfig: DisplayConfiguration)-> bool:
+
+        self.displayConfiguration = displayConfig
+        param = 0
+ 
+        param |= (self.displayConfiguration.Type)
+        param |= (self.displayConfiguration.SpiChipSelect) << 8
+        param |= (self.displayConfiguration.SpiDataControl) << 14
+
+        portrait = 0
+
+        if (self.displayConfiguration.SpiPortrait == True):
+            portrait = 1
+
+        mirror = 0
+
+        if (self.displayConfiguration.SpiMirror == True):
+            mirror = 1
+
+        flip = 0
+
+        if (self.displayConfiguration.SpiFlip == True):
+            flip = 1
+
+        swapgrb = 0
+
+        if (self.displayConfiguration.SpiSwapRedBlueColor == True):
+            swapgrb = 1
+
+        swapbytes = 0
+
+        if (self.displayConfiguration.SpiSwapByteEndianness == True):
+            swapbytes = 1
+
+        
+        param |= portrait << 20
+        param |= mirror << 21
+        param |= flip << 22
+        param |= swapgrb << 23
+        param |= swapbytes << 24
+
+
+        if (self.displayConfiguration.Type == DisplayType.BuiltIn or param == 0) :
+            if (self.serialPort.DeviceConfig.IsTick == False and self.serialPort.DeviceConfig.IsPulse == False and self.serialPort.DeviceConfig.IsRave == False) :
+                raise Exception("The device does not support BuiltIn display")
+            
+            else:
+                param = 0
+            
+
+            if (self.serialPort.DeviceConfig.IsTick) :
+                self.Width = 5
+                self.Height = 5
+            
+            elif (self.serialPort.DeviceConfig.IsPulse) :
+                self.Width = 128
+                self.Height = 64                
+            
+            elif (self.serialPort.DeviceConfig.IsRave) :
+                self.Width = 160
+                self.Height = 120                
+            
+        
+        if ((self.serialPort.DeviceConfig.IsTick or self.serialPort.DeviceConfig.IsEdge) and (self.displayConfiguration.Type != DisplayType.SSD1306)):
+            raise Exception("The device does not support SPI display")
+        
+        
+        match (self.displayConfiguration.Type) :
+            case DisplayType.SSD1306:
+                self.Width = 128
+                self.Height = 64
+                param = self.displayConfiguration.I2cAddress
+            
+            case DisplayType.ILI9342 | DisplayType.ILI9341:            
+                self.Width = 160
+                self.Height = 120
+                param |= 1 << 7
+
+
+            case DisplayType.ST7735:
+                self.Width = 160
+                self.Height = 128
+                param |= 1 << 7
+
+        target = 0
+        cmd = f"lcdconfig({target},{param})"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
@@ -368,4 +489,12 @@ class PaletteBuilder:
         redBucket = int(r / self.__bucketSize)
         greenBucket = int(g / self.__bucketSize)
         blueBucket = int(b / self.__bucketSize)
-        return (redBucket << 16) | (greenBucket << 8) | blueBucket    
+        return (redBucket << 16) | (greenBucket << 8) | blueBucket
+
+
+        
+
+
+
+        
+    

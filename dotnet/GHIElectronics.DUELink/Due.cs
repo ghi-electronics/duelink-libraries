@@ -14,6 +14,8 @@ namespace GHIElectronics.DUELink {
         public bool IsFlea { get; internal set; } = false;
         public bool IsEdge { get; internal set; } = false;
         public bool IsRave { get; internal set; } = false;
+
+        public bool IsTick { get; internal set; } = false;
         public uint MaxPinIO { get; set; }
         public uint MaxPinAnalog { get; set; }
 
@@ -234,6 +236,12 @@ namespace GHIElectronics.DUELink {
                     this.DeviceConfig.MaxPinAnalog = 29;
 
                 }
+                else if (this.Version[this.Version.Length - 1] == 'T') {
+                    this.DeviceConfig.IsTick = true;
+                    this.DeviceConfig.MaxPinIO = 23;
+                    this.DeviceConfig.MaxPinAnalog = 11;
+
+                }
                 else {
                     throw new Exception("Not support the version " + this.Version);
                 }
@@ -247,6 +255,6 @@ namespace GHIElectronics.DUELink {
 
         public void Disconnect() => this.serialPort.Disconnect();
 
-        
+
     }
 }

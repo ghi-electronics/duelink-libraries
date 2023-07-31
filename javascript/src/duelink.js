@@ -257,6 +257,7 @@ class DeviceConfiguration {
         this.IsPico = false;
         this.IsEdge = false;
         this.IsRave = false;
+		this.IsTick = false;
         this.MaxPinIO = 0;
         this.MaxPinAnalog = 0;
     }
@@ -431,6 +432,63 @@ class DigitalController {
         const response = await this.serialPort.ReadResponse();
         return response.success;
     }
+}
+
+
+export class DisplayType {
+	
+	static get ILI9342() {
+		return 0;
+	}
+	
+	static get ILI9341() {
+		return 1;
+	}
+	
+	static get ST7735() {
+		return 2;
+	}
+	
+	static get SSD1306() {
+		return 3;
+	}
+	
+	static get BuiltIn() {
+		return 0xFF;
+	}
+}
+
+export class DisplayColorDepth {
+
+	static get OneBit() {
+		return 1;
+	}
+	
+	static get FourBit() {
+		return 4;
+	}
+	
+	static get EightBit() {
+		return 8;
+	}
+	
+	static get SixteenBit() {
+		return 16;
+	}
+}
+	
+class DisplayConfiguration {
+	
+	constructor() {
+		this.Type = DisplayType.BuiltIn;
+		this.SpiChipSelect = 0;
+		this.SpiDataControl = 0;
+		this.SpiPortrait = false;
+		this.SpiMirror = false;
+		this.SpiFlip = false;
+		this.SpiSwapRedBlueColor = false;
+		this.SpiSwapByteEndianness = false;
+	}
 }
 
 class DisplayController {
@@ -706,8 +764,72 @@ class DisplayController {
         return await this.DrawBuffer(data32);
     }
 
-    async Configuration(target, slaveAddress) {
-        const cmd = `lcdconfig(${target},${slaveAddress})`;
+    async Configuration(displayConfig) {
+		
+		this.displayConfiguration = displayConfig;
+		let param = 0;
+		
+		param |= (this.displayConfiguration.Type);
+		param |= (this.displayConfiguration.SpiChipSelect) << 8;
+		param |= (this.displayConfiguration.SpiDataControl) << 14;
+		param |= (this.displayConfiguration.SpiPortrait == true ? 1 : 0) << 20;
+		param |= (this.displayConfiguration.SpiMirror == true ? 1 : 0) << 21;
+		param |= (this.displayConfiguration.SpiFlip == true ? 1 : 0) << 22;
+		param |= (this.displayConfiguration.SpiSwapRedBlueColor == true ? 1 : 0) << 23;
+		param |= (this.displayConfiguration.SpiSwapByteEndianness == true ? 1 : 0) << 24;
+		
+		if (this.displayConfiguration.Type == DisplayType.BuiltIn || param == 0) {
+			if (this.serialPort.DeviceConfig.IsTick == false && this.serialPort.DeviceConfig.IsPulse == false && this.serialPort.DeviceConfig.IsRave == false) {
+				throw new Error("The device does not support BuiltIn display");
+			}
+			else {
+				param = 0;
+			}
+
+			if (this.serialPort.DeviceConfig.IsTick) {
+				this.Width = 5;
+				this.Height = 5;
+			}
+			else if (this.serialPort.DeviceConfig.IsPulse) {
+				this.Width = 128;
+				this.Height = 64;                        
+			}
+			else if (this.serialPort.DeviceConfig.IsRave) {
+				this.Width = 160;
+				this.Height = 120;                        
+			}
+		}
+		
+		if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.displayConfiguration.Type != DisplayType.SSD1306) {
+			throw new Error("The device does not support SPI display");
+		}
+		
+		switch (this.displayConfiguration.Type) {
+			case DisplayType.SSD1306:
+				this.Width = 128;
+				this.Height = 64;
+				param = this.displayConfiguration.I2cAddress;
+
+				break;
+
+			case DisplayType.ILI9342:
+			case DisplayType.ILI9341:
+				this.Width = 160;
+				this.Height = 120;
+				param |= 1 << 7;
+				break;
+
+			case DisplayType.ST7735:
+				this.Width = 160;
+				this.Height = 128;
+				param |= 1 << 7;
+				break;
+
+		}
+		
+		let target = 0;
+		
+        const cmd = `lcdconfig(${target},${param})`;
 
         await this.serialPort.WriteCommand(cmd);
         
@@ -1782,6 +1904,7 @@ class DUELinkController {
         this.IsPico = false;
         this.IsEdge = false;
         this.IsRave = false;
+		this.IsTick = false;
     }
 
     async InitDevice() {
@@ -1808,6 +1931,7 @@ class DUELinkController {
         this.Temperature = new TemperatureController(this.serialPort);
         this.Humidity = new HudimityController(this.serialPort);
         this.System = new SystemController(this.serialPort, this.Display);
+		this.DisplayConfiguration = new DisplayConfiguration();
     }
     
     async Connect() {
@@ -1842,6 +1966,10 @@ class DUELinkController {
             this.DeviceConfig.IsRave = true;
             this.DeviceConfig.MaxPinIO = 23;
             this.DeviceConfig.MaxPinAnalog = 29;
+        } else if (this.Version[this.Version.length - 1] === "T") {
+            this.DeviceConfig.IsTick = true;
+            this.DeviceConfig.MaxPinIO = 23;
+            this.DeviceConfig.MaxPinAnalog = 11;
         } else {
             throw new Error("The device is not supported.");    
         }
@@ -1851,6 +1979,7 @@ class DUELinkController {
         this.IsPico = this.DeviceConfig.IsPico;
         this.IsEdge = this.DeviceConfig.IsEdge;
         this.IsRave = this.DeviceConfig.IsRave;
+		this.IsTick = this.DeviceConfig.IsTick;
 
         this.serialPort.DeviceConfig = this.DeviceConfig;
         this.InitDevice();

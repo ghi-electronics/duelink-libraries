@@ -13,6 +13,7 @@ namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
         public class DisplayController {
             SerialInterface serialPort;
+            DisplayConfiguration displayConfiguration;
 
             public int TransformNone { get; } = 0;
             public int TransformFlipHorizontal { get; } = 1;
@@ -304,9 +305,13 @@ namespace GHIElectronics.DUELink {
 
 
             // This function for testing firmware that support 1,4,8,16bit
-            public void DrawBuffer(byte[] bitmap, int color_depth) {
+            public void DrawBuffer(byte[] bitmap, DisplayColorDepth color_depth) {
                 if (bitmap == null) {
                     throw new Exception("Bitmap array is null");
+                }
+
+                if ((this.displayConfiguration.Type == DisplayType.ST7735 || this.displayConfiguration.Type == DisplayType.ILI9341 || this.displayConfiguration.Type == DisplayType.ILI9342) && color_depth == DisplayColorDepth.OneBit) {
+                    throw new Exception("Spi does not support one bit depth");
                 }
 
                 var width = this.Width;
@@ -318,7 +323,7 @@ namespace GHIElectronics.DUELink {
             
 
                 switch (color_depth) {
-                    case 1:
+                    case DisplayColorDepth.OneBit:
                         buffer_size = width * height / 8;
                         buffer = new byte[buffer_size];
 
@@ -337,12 +342,12 @@ namespace GHIElectronics.DUELink {
                                     buffer[index] &= (byte)(~(1 << (y & 7)));
                                 }
 
-                                i += 4;                                
+                                i += 4;
                             }
                         }
                         break;
 
-                    case 4:
+                    case DisplayColorDepth.FourBit:
                         buffer_size = width * height / 2;
                         buffer = new byte[buffer_size];
 
@@ -362,7 +367,7 @@ namespace GHIElectronics.DUELink {
                         }
                         break;
 
-                    case 8:
+                    case DisplayColorDepth.EightBit:
                         buffer_size = width * height;
                         buffer = new byte[buffer_size];
 
@@ -376,7 +381,7 @@ namespace GHIElectronics.DUELink {
                         }
                         break;
 
-                    case 16:
+                    case DisplayColorDepth.SixteenBit:
                         buffer_size = width * height * 2;
 
                         buffer = new byte[buffer_size];
@@ -404,7 +409,7 @@ namespace GHIElectronics.DUELink {
 
                 if (buffer != null) {
 
-                    this.Stream(buffer, color_depth);
+                    this.Stream(buffer, (int)color_depth);
                 }
 
             
@@ -457,8 +462,75 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool Configuration(int target, uint param) {
-                var cmd = string.Format("lcdconfig({0},{1})", target, param);
+            public bool Configuration(DisplayConfiguration displayConfig) {
+
+                this.displayConfiguration = displayConfig;
+                var param = 0U;
+
+                
+                param |= (uint)(this.displayConfiguration.Type);
+                param |= (uint)(this.displayConfiguration.SpiChipSelect) << 8;
+                param |= (uint)(this.displayConfiguration.SpiDataControl) << 14;
+                param |= (uint)(this.displayConfiguration.SpiPortrait == true ? 1 : 0) << 20;
+                param |= (uint)(this.displayConfiguration.SpiMirror == true ? 1 : 0) << 21;
+                param |= (uint)(this.displayConfiguration.SpiFlip == true ? 1 : 0) << 22;
+                param |= (uint)(this.displayConfiguration.SpiSwapRedBlueColor == true ? 1 : 0) << 23;
+                param |= (uint)(this.displayConfiguration.SpiSwapByteEndianness == true ? 1 : 0) << 24;
+
+
+                if (this.displayConfiguration.Type == DisplayType.BuiltIn || param == 0) {
+                    if (this.serialPort.DeviceConfig.IsTick == false && this.serialPort.DeviceConfig.IsPulse == false && this.serialPort.DeviceConfig.IsRave == false) {
+                        throw new Exception("The device does not support BuiltIn display");
+                    }
+                    else {
+                        param = 0;
+                    }
+
+                    if (this.serialPort.DeviceConfig.IsTick) {
+                        this.Width = 5;
+                        this.Height = 5;
+                    }
+                    else if (this.serialPort.DeviceConfig.IsPulse) {
+                        this.Width = 128;
+                        this.Height = 64;                        
+                    }
+                    else if (this.serialPort.DeviceConfig.IsRave) {
+                        this.Width = 160;
+                        this.Height = 120;                        
+                    }
+
+                }
+
+                
+                if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.displayConfiguration.Type != DisplayType.SSD1306) {
+                    throw new Exception("The device does not support SPI display");
+                }
+                
+
+                switch (this.displayConfiguration.Type) {
+                    case DisplayType.SSD1306:
+                        this.Width = 128;
+                        this.Height = 64;
+                        param = this.displayConfiguration.I2cAddress;
+
+                        break;
+
+                    case DisplayType.ILI9342:
+                    case DisplayType.ILI9341:
+                        this.Width = 160;
+                        this.Height = 120;
+                        param |= 1 << 7;
+                        break;
+
+                    case DisplayType.ST7735:
+                        this.Width = 160;
+                        this.Height = 128;
+                        param |= 1 << 7;
+                        break;
+
+                }
+
+                var cmd = string.Format("lcdconfig(0,{0})", param);
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -481,7 +553,36 @@ namespace GHIElectronics.DUELink {
 
             //    return buffer;
             //}
+
         }
+    }
+
+    public enum DisplayType {
+        ILI9342 = 0,
+        ILI9341 = 1,
+        ST7735 = 2,
+        SSD1306 = 3,
+        BuiltIn = 0xFF,
+    }
+    public class DisplayConfiguration {
+        public DisplayType Type;
+
+        public int SpiChipSelect;
+        public int SpiDataControl;
+        public bool SpiPortrait;
+        public bool SpiMirror;
+        public bool SpiFlip;
+        public bool SpiSwapRedBlueColor;
+        public bool SpiSwapByteEndianness;
+
+        public byte I2cAddress;
+    }
+
+    public enum DisplayColorDepth {
+        OneBit = 1,
+        FourBit = 4,
+        EightBit = 8,
+        SixteenBit = 16,
     }
 
     class PaletteBuilder {
