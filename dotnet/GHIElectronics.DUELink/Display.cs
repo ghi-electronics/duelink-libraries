@@ -603,10 +603,13 @@ namespace GHIElectronics.DUELink {
             this.serialPort = serialPort;
             this.display = display;
             this.system = system;
-
             this.Type = DisplayType.BuiltIn;
 
-            this.Update();
+            if (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsRave) {
+                
+
+                this.Update();
+            }
         }
         public bool Update() {
             

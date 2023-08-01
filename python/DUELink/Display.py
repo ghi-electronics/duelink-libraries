@@ -35,6 +35,9 @@ class DisplayConfiguration:
         self.display = display
         self.system = system
 
+        if (self.serialPort.DeviceConfig.IsPulse or self.serialPort.DeviceConfig.IsRave ):
+            self.Update()
+
     def Update(self) -> bool:
         param = 0
  

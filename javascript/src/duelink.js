@@ -496,6 +496,10 @@ class DisplayConfiguration {
 		this.SpiFlipScreenVertical = false;
 		this.SpiSwapRedBlueColor = false;
 		this.SpiSwapByteEndianness = false;
+		
+		if (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsRave) {
+			this.Update();
+        }
 	}
 	
 	async Update() {
