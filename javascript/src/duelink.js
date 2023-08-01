@@ -746,9 +746,6 @@ class DisplayController {
 		if (this.Configuration.Type == DisplayType.BuiltIn) {
 			if (this.serialPort.DeviceConfig.IsPulse && color_depth != 1)
 				throw new Error("BuiltIn support one bit only");
-
-			else if (this.serialPort.DeviceConfig.IsRave && color_depth == 1)
-				throw new Error("BuiltIn does not support one bit");
 		}
 
         const width = this.Width;
@@ -760,26 +757,66 @@ class DisplayController {
 
         switch(color_depth) {
             case 1:
-                buffer_size = Math.floor(width * height / 8);
-                buffer = new Uint8Array(buffer_size);
-                for (let y = 0; y < height; y++) {
-                    for (let x = 0; x < width; x++) {
-                        let index = (y >> 3) * width + x;
+                if (this.Configuration.Type == DisplayType.SSD1306 || (this.Configuration.Type == DisplayType.BuiltIn && this.serialPort.DeviceConfig.IsPulse)) {
+					buffer_size = Math.floor(width * height / 8);
+					buffer = new Uint8Array(buffer_size);
+					for (let y = 0; y < height; y++) {
+						for (let x = 0; x < width; x++) {
+							let index = (y >> 3) * width + x;
 
-                        let red = bitmap[i];
-                        let green = bitmap[i+1];
-                        let blue = bitmap[i+2];
-                        
-                        if (red + green + blue > 0) {
-                            buffer[index] |= 1 << (y & 7);
-                        }
-                        else {
-                            buffer[index] &= ~(1 << (y & 7));
-                        }
+							let red = bitmap[i];
+							let green = bitmap[i+1];
+							let blue = bitmap[i+2];
+							
+							if (red + green + blue > 0) {
+								buffer[index] |= 1 << (y & 7);
+							}
+							else {
+								buffer[index] &= ~(1 << (y & 7));
+							}
 
-                        i += 4; // Move to next pixel 
-                    }
-                }
+							i += 4; // Move to next pixel 
+						}
+					}
+				}
+				else {
+					buffer_size = Math.floor(width * height / 8);
+					buffer = new Uint8Array(buffer_size);
+
+					let data = 0;
+					i = 0;
+					let bit = 0;
+					let j = 0;
+
+					for (let y = 0; y < height; y++) {
+						for (let x = 0; x < width; x++) {
+
+							let red = bitmap[i];
+							let green = bitmap[i + 1];
+							let blue = bitmap[i + 2];
+							let clr = ((red << 16) | (green << 8) | blue);
+
+							if (clr != 0) {
+								data |= (1 << bit);
+							}
+
+							bit +=1
+
+							if (bit == 8) {
+								buffer[j] = data;
+								j+=1
+
+								bit = 0;
+								data = 0;
+								
+							}
+
+							i += 4;
+							
+						}
+					}
+					
+				}
                 break;
             case 4:
                 buffer_size = width * height / 2;

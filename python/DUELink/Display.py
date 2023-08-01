@@ -279,9 +279,6 @@ class DisplayController:
         if (self.Configuration.Type == DisplayType.BuiltIn) :
             if (self.serialPort.DeviceConfig.IsPulse and color_depth != 1):
                 raise Exception("BuiltIn support one bit only")
-
-            elif (self.serialPort.DeviceConfig.IsRave and color_depth == 1):
-                raise Exception("BuiltIn does not support one bit")
             
                 
         
@@ -294,22 +291,55 @@ class DisplayController:
 
         match color_depth:
             case 1:
-                buffer_size = int(width * height/8);
-                buffer = bytearray(buffer_size)
+                if (self.Configuration.Type == DisplayType.SSD1306 or (self.Configuration.Type == DisplayType.BuiltIn and self.serialPort.DeviceConfig.IsPulse)):
+                    buffer_size = int(width * height/8)
+                    buffer = bytearray(buffer_size)
 
-                for y in range(0, height):
-                    for x in range(0, width):
-                        index = (y >> 3) * width + x
-                        red = bitmap[i]
-                        green = bitmap[i+1]
-                        blue = bitmap[i+2]
-                        
-                        if red + green + blue > 0:
-                            buffer[index] |= (1 << (y & 7)) & 0xFF
-                        else:
-                            buffer[index] &= (~(1 << (y & 7))) & 0xFF
+                    for y in range(0, height):
+                        for x in range(0, width):
+                            index = (y >> 3) * width + x
+                            red = bitmap[i]
+                            green = bitmap[i+1]
+                            blue = bitmap[i+2]
                             
-                        i += 4        
+                            if red + green + blue > 0:
+                                buffer[index] |= (1 << (y & 7)) & 0xFF
+                            else:
+                                buffer[index] &= (~(1 << (y & 7))) & 0xFF
+                                
+                            i += 4 
+                else:
+                    buffer_size = int(width * height/8)
+                    buffer = bytearray(buffer_size)
+                    data = 0
+                    i = 0
+                    bit = 0
+                    j = 0
+
+                    for y in range(0, height):
+                        for x in range(0, width):
+                            red = bitmap[i]
+                            green = bitmap[i + 1]
+                            blue = bitmap[i + 2]
+                            clr = ((red << 16) | (green << 8) | blue)
+
+                            if (clr != 0):
+                                data |= (1 << bit)
+                            
+                            bit +=1
+
+                            if (bit == 8):
+                                buffer[j] = data
+                                j +=1
+
+                                bit = 0
+                                data = 0
+                            
+                            i += 4
+                            
+                        
+                    
+
             case 4:
                 buffer_size = int(width * height / 2)
                 buffer = bytearray(buffer_size)

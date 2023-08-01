@@ -320,8 +320,8 @@ namespace GHIElectronics.DUELink {
                     if (this.serialPort.DeviceConfig.IsPulse && color_depth != 1)
                         throw new Exception("BuiltIn support one bit only");
 
-                    else if (this.serialPort.DeviceConfig.IsRave && color_depth == 1)
-                        throw new Exception("BuiltIn does not support one bit");
+                    //else if (this.serialPort.DeviceConfig.IsRave && color_depth == 1)
+                    //    throw new Exception("BuiltIn does not support one bit");
                 }
 
                 var width = this.Width;
@@ -334,25 +334,64 @@ namespace GHIElectronics.DUELink {
 
                 switch (color_depth) {
                     case 1:
-                        buffer_size = width * height / 8;
-                        buffer = new byte[buffer_size];
+                        if (this.Configuration.Type == DisplayType.SSD1306 || (this.Configuration.Type == DisplayType.BuiltIn && this.serialPort.DeviceConfig.IsPulse)) {
+                            buffer_size = width * height / 8;
+                            buffer = new byte[buffer_size];
 
-                        for (int y = 0; y < height; y++) {
-                            for (int x = 0; x < width; x++) {
-                                var index = (y >> 3) * width + x;
+                            for (int y = 0; y < height; y++) {
+                                for (int x = 0; x < width; x++) {
+                                    var index = (y >> 3) * width + x;
 
-                                var red = bitmap[i];
-                                var green = bitmap[i + 1];
-                                var blue = bitmap[i + 2];
-                                
-                                if (red + green + blue > 0) {
-                                    buffer[index] |= (byte)(1 << (y & 7));
+                                    var red = bitmap[i];
+                                    var green = bitmap[i + 1];
+                                    var blue = bitmap[i + 2];
+
+                                    if (red + green + blue > 0) {
+                                        buffer[index] |= (byte)(1 << (y & 7));
+                                    }
+                                    else {
+                                        buffer[index] &= (byte)(~(1 << (y & 7)));
+                                    }
+
+                                    i += 4;
                                 }
-                                else {
-                                    buffer[index] &= (byte)(~(1 << (y & 7)));
-                                }
+                            }
+                        }
+                        else {
+                            buffer_size = width * height / 8;
+                            buffer = new byte[buffer_size];
 
-                                i += 4;
+                            byte data = 0;
+                            i = 0;
+                            int bit = 0;
+                            int j = 0;
+
+                            for (int y = 0; y < height; y++) {
+                                for (int x = 0; x < width; x++) {
+
+                                    var red = bitmap[i];
+                                    var green = bitmap[i + 1];
+                                    var blue = bitmap[i + 2];
+                                    var clr = (uint)((red << 16) | (green << 8) | blue);
+
+                                    if (clr != 0) {
+                                        data |= (byte)(1 << bit);
+                                    }
+
+                                    bit++;
+
+                                    if (bit == 8) {
+                                        buffer[j] = data;
+                                        j++;
+
+                                        bit = 0;
+                                        data = 0;
+                                        
+                                    }
+
+                                    i += 4;
+                                    
+                                }
                             }
                         }
                         break;
