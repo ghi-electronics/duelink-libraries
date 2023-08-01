@@ -498,6 +498,7 @@ class DisplayController {
         this.serialPort = serialPort;
         this.Width = 128;
         this.Height = 64;
+		this.SystemControl = null;
         if (this.serialPort.DeviceConfig.IsRave) {
             this.Width = 160;
             this.Height = 120;
@@ -834,6 +835,13 @@ class DisplayController {
         await this.serialPort.WriteCommand(cmd);
         
         const res = await this.serialPort.ReadResponse();
+		
+		if (res.success === true) {
+			if (this.SystemControl != null) {
+				this.SystemControl.UpdateDisplay(this);
+			}
+		}
+		
         return res.success;
     }
 
@@ -1649,7 +1657,12 @@ class SystemController {
     
     constructor(serialPort, display) {
         this.serialPort = serialPort;
-        this.display = display;
+        this.UpdateDisplay(display);
+    }
+	
+	async UpdateDisplay(display) {
+		this.display = display;
+		this.display.SystemControl = this;
 
         this.#DISPLAY_MAX_LINES = Math.floor(this.display.Height / 8)
         this.#DISPLAY_MAX_CHARACTER_PER_LINE = Math.floor(this.display.Width / 6)
@@ -1659,7 +1672,7 @@ class SystemController {
         for(let i = 0; i < this.displayText.length; i++) {
             this.displayText[i] = '';
         }
-    }
+	}
 
     async Reset(option) {
         let cmd = `reset(${option.value === 1 ? 1 : 0})`;

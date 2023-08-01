@@ -33,6 +33,7 @@ class DisplayConfiguration:
 class DisplayController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
+        self.SystemControl = None
         self.__palette = [
             0x000000, # Black  
             0xFFFFFF, # White  
@@ -357,6 +358,11 @@ class DisplayController:
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
+
+        if (res.success == True):
+            if (self.SystemControl != None ):
+                self.SystemControl.UpdateDisplay(self)
+
         return res.success
 
     def DrawImageScale(self, img, x: int, y: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:        

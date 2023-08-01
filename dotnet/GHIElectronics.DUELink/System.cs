@@ -21,15 +21,25 @@ namespace GHIElectronics.DUELink {
 
             SerialInterface serialPort;
             DisplayController display;
+            
 
             int DISPLAY_MAX_LINES = 8;
             int DISPLAY_MAX_CHARACTER_PER_LINE = 21;
 
             public SystemController(SerialInterface serialPort, DisplayController display) {
                 this.serialPort = serialPort;
+
+                this.UpdateDisplay(display);
+            }
+
+            internal void UpdateDisplay(DisplayController display) {
                 this.display = display;
+                this.display.SystemControl = this;
+
                 DISPLAY_MAX_LINES = this.display.Height / 8;
                 DISPLAY_MAX_CHARACTER_PER_LINE = this.display.Width / 6;
+
+                print_posx = 0;
 
                 this.displayText = new string[DISPLAY_MAX_LINES];
                 for (var i = 0; i < DISPLAY_MAX_LINES; i++) {

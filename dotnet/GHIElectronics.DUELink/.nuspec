@@ -18,7 +18,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="$TargetDir$bin\release\net6.0\GHIElectronics.DUELink.dll" target="lib\net6.0"/>
+    <file src="$TargetDir$bin\release\net7.0\GHIElectronics.DUELink.dll" target="lib\net7.0"/>
 	<file src="$TargetDir$images\icon.png" target="images\" />
   </files>
 </package>

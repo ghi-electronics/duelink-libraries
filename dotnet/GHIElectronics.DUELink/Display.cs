@@ -14,6 +14,7 @@ namespace GHIElectronics.DUELink {
         public class DisplayController {
             SerialInterface serialPort;
             DisplayConfiguration displayConfiguration;
+            internal SystemController SystemControl { get; set; }
 
             public int TransformNone { get; } = 0;
             public int TransformFlipHorizontal { get; } = 1;
@@ -465,6 +466,7 @@ namespace GHIElectronics.DUELink {
             public bool Configuration(DisplayConfiguration displayConfig) {
 
                 this.displayConfiguration = displayConfig;
+                
                 var param = 0U;
 
                 
@@ -535,6 +537,12 @@ namespace GHIElectronics.DUELink {
                 this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();
+
+                if (res.success) {
+                    if (this.SystemControl != null) {
+                        this.SystemControl.UpdateDisplay(this);
+                    }
+                }
 
                 return res.success;
             }
