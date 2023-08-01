@@ -270,11 +270,7 @@ class DisplayController:
     
     def DrawBuffer(self, bitmap, color_depth) -> bool:
         if bitmap is None:
-            raise ValueError("Bitmap array is null")
-        
-        if (self.Configuration.Type == DisplayType.ILI9341 or  self.Configuration.Type == DisplayType.ILI9342 or self.Configuration.Type == DisplayType.ST7735):
-            if(color_depth == 1):
-                raise Exception("Spi does not support one bit depth")
+            raise ValueError("Bitmap array is null")        
             
         if (self.Configuration.Type == DisplayType.BuiltIn) :
             if (self.serialPort.DeviceConfig.IsPulse and color_depth != 1):

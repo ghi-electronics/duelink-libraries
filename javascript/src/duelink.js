@@ -739,10 +739,6 @@ class DisplayController {
             throw new Error("Bitmap array is null");
         }
 		
-		if ((this.Configuration.Type == DisplayType.ST7735 || this.Configuration.Type == DisplayType.ILI9341 || this.Configuration.Type == DisplayType.ILI9342) && color_depth == 1) {
-			throw new Error("Spi does not support one bit depth");
-		}
-		
 		if (this.Configuration.Type == DisplayType.BuiltIn) {
 			if (this.serialPort.DeviceConfig.IsPulse && color_depth != 1)
 				throw new Error("BuiltIn support one bit only");
