@@ -7,15 +7,14 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
+using static GHIElectronics.DUELink.DUELinkController;
 
 namespace GHIElectronics.DUELink {
 
     public partial class DUELinkController {
         public class DisplayController {
             SerialInterface serialPort;
-            DisplayConfiguration displayConfiguration;
-            internal SystemController SystemControl { get; set; }
-
+            public DisplayConfiguration Configuration { get; set; }
             public int TransformNone { get; } = 0;
             public int TransformFlipHorizontal { get; } = 1;
             public int TransformFlipVertical { get; } = 2;
@@ -23,8 +22,8 @@ namespace GHIElectronics.DUELink {
             public int TransformRotate180 { get; } = 4;
             public int TransformRotate270 { get; } = 5;
 
-            public int Width { get; private set; } = 128;
-            public int Height { get; private set; } = 64;
+            public int Width { get; internal set; } = 128;
+            public int Height { get; internal set; } = 64;
 
             private uint[] _palette = new uint[]{
                 0x000000, // Black  
@@ -47,11 +46,13 @@ namespace GHIElectronics.DUELink {
 
             public DisplayController(SerialInterface serialPort) {
                 this.serialPort = serialPort;
+                
 
                 if (this.serialPort.DeviceConfig.IsRave) {
                     Width = 160;
                     Height = 120;
-                }
+                }                
+
             }
 
             public bool Show() {
@@ -265,12 +266,12 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool DrawBuffer(uint[] color) {
-                //TODO: Need to be rewrite with SPI supported
+            //public bool DrawBuffer(uint[] color) {
+            //    //TODO: Need to be rewrite with SPI supported
 
-                return false;                
+            //    return false;                
 
-            }
+            //}
 
             private int ColorDistance(uint color1, uint color2)
             {
@@ -311,8 +312,16 @@ namespace GHIElectronics.DUELink {
                     throw new Exception("Bitmap array is null");
                 }
 
-                if ((this.displayConfiguration.Type == DisplayType.ST7735 || this.displayConfiguration.Type == DisplayType.ILI9341 || this.displayConfiguration.Type == DisplayType.ILI9342) && color_depth == DisplayColorDepth.OneBit) {
+                if ((this.Configuration.Type == DisplayType.ST7735 || this.Configuration.Type == DisplayType.ILI9341 || this.Configuration.Type == DisplayType.ILI9342) && color_depth == DisplayColorDepth.OneBit) {
                     throw new Exception("Spi does not support one bit depth");
+                }
+
+                if (this.Configuration.Type == DisplayType.BuiltIn) {
+                    if (this.serialPort.DeviceConfig.IsPulse && color_depth != DisplayColorDepth.OneBit)
+                        throw new Exception("BuiltIn support one bit only");
+
+                    else if (this.serialPort.DeviceConfig.IsRave && color_depth == DisplayColorDepth.OneBit)
+                        throw new Exception("BuiltIn does not support one bit");
                 }
 
                 var width = this.Width;
@@ -438,114 +447,114 @@ namespace GHIElectronics.DUELink {
                 return pixels;
             }
 
-            public bool DrawBufferBytes(byte[] color) {
+            //public bool DrawBufferBytes(byte[] color) {
 
-                if (color == null) {
-                    throw new Exception("color can not be null.");
-                }
+            //    if (color == null) {
+            //        throw new Exception("color can not be null.");
+            //    }
 
-                int offset = 0;
-                int length = color.Length;
+            //    int offset = 0;
+            //    int length = color.Length;
 
-                if (length % 4 != 0) {
+            //    if (length % 4 != 0) {
 
-                    throw new Exception("length must be multiple of 4");
-                }
+            //        throw new Exception("length must be multiple of 4");
+            //    }
 
-                var data32 = new uint[length / 4];
+            //    var data32 = new uint[length / 4];
 
-                for (var i = 0; i < data32.Length; i++) {
-                    data32[i] = BitConverter.ToUInt32(color, (i + offset) * 4);
-                }
+            //    for (var i = 0; i < data32.Length; i++) {
+            //        data32[i] = BitConverter.ToUInt32(color, (i + offset) * 4);
+            //    }
 
-                return this.DrawBuffer(data32);
+            //    return this.DrawBuffer(data32);
 
 
-            }
+            //}
 
-            public bool Configuration(DisplayConfiguration displayConfig) {
+            //public bool Configuration(DisplayConfiguration displayConfig) {
 
-                this.displayConfiguration = displayConfig;
+            //    this.Configuration = displayConfig;
                 
-                var param = 0U;
-
-                
-                param |= (uint)(this.displayConfiguration.Type);
-                param |= (uint)(this.displayConfiguration.SpiChipSelect) << 8;
-                param |= (uint)(this.displayConfiguration.SpiDataControl) << 14;
-                param |= (uint)(this.displayConfiguration.SpiPortrait == true ? 1 : 0) << 20;
-                param |= (uint)(this.displayConfiguration.SpiMirror == true ? 1 : 0) << 21;
-                param |= (uint)(this.displayConfiguration.SpiFlip == true ? 1 : 0) << 22;
-                param |= (uint)(this.displayConfiguration.SpiSwapRedBlueColor == true ? 1 : 0) << 23;
-                param |= (uint)(this.displayConfiguration.SpiSwapByteEndianness == true ? 1 : 0) << 24;
-
-
-                if (this.displayConfiguration.Type == DisplayType.BuiltIn || param == 0) {
-                    if (this.serialPort.DeviceConfig.IsTick == false && this.serialPort.DeviceConfig.IsPulse == false && this.serialPort.DeviceConfig.IsRave == false) {
-                        throw new Exception("The device does not support BuiltIn display");
-                    }
-                    else {
-                        param = 0;
-                    }
-
-                    if (this.serialPort.DeviceConfig.IsTick) {
-                        this.Width = 5;
-                        this.Height = 5;
-                    }
-                    else if (this.serialPort.DeviceConfig.IsPulse) {
-                        this.Width = 128;
-                        this.Height = 64;                        
-                    }
-                    else if (this.serialPort.DeviceConfig.IsRave) {
-                        this.Width = 160;
-                        this.Height = 120;                        
-                    }
-
-                }
+            //    var param = 0U;
 
                 
-                if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.displayConfiguration.Type != DisplayType.SSD1306) {
-                    throw new Exception("The device does not support SPI display");
-                }
+            //    param |= (uint)(this.Configuration.Type);
+            //    param |= (uint)(this.Configuration.SpiChipSelect) << 8;
+            //    param |= (uint)(this.Configuration.SpiDataControl) << 14;
+            //    param |= (uint)(this.Configuration.SpiPortrait == true ? 1 : 0) << 20;
+            //    param |= (uint)(this.Configuration.SpiMirror == true ? 1 : 0) << 21;
+            //    param |= (uint)(this.Configuration.SpiFlip == true ? 1 : 0) << 22;
+            //    param |= (uint)(this.Configuration.SpiSwapRedBlueColor == true ? 1 : 0) << 23;
+            //    param |= (uint)(this.Configuration.SpiSwapByteEndianness == true ? 1 : 0) << 24;
+
+
+            //    if (this.Configuration.Type == DisplayType.BuiltIn || param == 0) {
+            //        if (this.serialPort.DeviceConfig.IsTick == false && this.serialPort.DeviceConfig.IsPulse == false && this.serialPort.DeviceConfig.IsRave == false) {
+            //            throw new Exception("The device does not support BuiltIn display");
+            //        }
+            //        else {
+            //            param = 0;
+            //        }
+
+            //        if (this.serialPort.DeviceConfig.IsTick) {
+            //            this.Width = 5;
+            //            this.Height = 5;
+            //        }
+            //        else if (this.serialPort.DeviceConfig.IsPulse) {
+            //            this.Width = 128;
+            //            this.Height = 64;                        
+            //        }
+            //        else if (this.serialPort.DeviceConfig.IsRave) {
+            //            this.Width = 160;
+            //            this.Height = 120;                        
+            //        }
+
+            //    }
+
+                
+            //    if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.Configuration.Type != DisplayType.SSD1306) {
+            //        throw new Exception("The device does not support SPI display");
+            //    }
                 
 
-                switch (this.displayConfiguration.Type) {
-                    case DisplayType.SSD1306:
-                        this.Width = 128;
-                        this.Height = 64;
-                        param = this.displayConfiguration.I2cAddress;
+            //    switch (this.Configuration.Type) {
+            //        case DisplayType.SSD1306:
+            //            this.Width = 128;
+            //            this.Height = 64;
+            //            param = this.Configuration.I2cAddress;
 
-                        break;
+            //            break;
 
-                    case DisplayType.ILI9342:
-                    case DisplayType.ILI9341:
-                        this.Width = 160;
-                        this.Height = 120;
-                        param |= 1 << 7;
-                        break;
+            //        case DisplayType.ILI9342:
+            //        case DisplayType.ILI9341:
+            //            this.Width = 160;
+            //            this.Height = 120;
+            //            param |= 1 << 7;
+            //            break;
 
-                    case DisplayType.ST7735:
-                        this.Width = 160;
-                        this.Height = 128;
-                        param |= 1 << 7;
-                        break;
+            //        case DisplayType.ST7735:
+            //            this.Width = 160;
+            //            this.Height = 128;
+            //            param |= 1 << 7;
+            //            break;
 
-                }
+            //    }
 
-                var cmd = string.Format("lcdconfig(0,{0})", param);
+            //    var cmd = string.Format("lcdconfig(0,{0})", param);
 
-                this.serialPort.WriteCommand(cmd);
+            //    this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+            //    var res = this.serialPort.ReadRespone();
 
-                if (res.success) {
-                    if (this.SystemControl != null) {
-                        this.SystemControl.UpdateDisplay(this);
-                    }
-                }
+            //    if (res.success) {
+            //        if (this.SystemControl != null) {
+            //            this.SystemControl.UpdateDisplay(this);
+            //        }
+            //    }
 
-                return res.success;
-            }
+            //    return res.success;
+            //}
 
             //public uint[] CreateImage(uint[] data, uint width, uint height) {
             //    if (width == 0 || height == 0 || data == null || data.Length < (width * height)) {
@@ -575,15 +584,115 @@ namespace GHIElectronics.DUELink {
     public class DisplayConfiguration {
         public DisplayType Type;
 
+        public byte I2cAddress;
+
         public int SpiChipSelect;
         public int SpiDataControl;
         public bool SpiPortrait;
-        public bool SpiMirror;
-        public bool SpiFlip;
+        public bool SpiFlipScreenHorizontal;
+        public bool SpiFlipScreenVertical;
         public bool SpiSwapRedBlueColor;
         public bool SpiSwapByteEndianness;
 
-        public byte I2cAddress;
+        
+
+        SerialInterface serialPort;
+        DisplayController display;
+        SystemController system;
+        public DisplayConfiguration(SerialInterface serialPort, DisplayController display, SystemController system) {
+            this.serialPort = serialPort;
+            this.display = display;
+            this.system = system;
+
+            this.Type = DisplayType.BuiltIn;
+
+            this.Update();
+        }
+        public bool Update() {
+            
+
+            var param = 0U;
+
+
+            param |= (uint)(this.Type);
+            param |= (uint)(this.SpiChipSelect) << 8;
+            param |= (uint)(this.SpiDataControl) << 14;
+            param |= (uint)(this.SpiPortrait == true ? 1 : 0) << 20;
+            param |= (uint)(this.SpiFlipScreenHorizontal == true ? 1 : 0) << 21;
+            param |= (uint)(this.SpiFlipScreenVertical == true ? 1 : 0) << 22;
+            param |= (uint)(this.SpiSwapRedBlueColor == true ? 1 : 0) << 23;
+            param |= (uint)(this.SpiSwapByteEndianness == true ? 1 : 0) << 24;
+
+
+            if (this.Type == DisplayType.BuiltIn || param == 0) {
+                if (this.serialPort.DeviceConfig.IsTick == false && this.serialPort.DeviceConfig.IsPulse == false && this.serialPort.DeviceConfig.IsRave == false) {
+                    throw new Exception("The device does not support BuiltIn display");
+                }
+                else {
+                    param = 0;
+                }
+
+                if (this.serialPort.DeviceConfig.IsTick) {
+                    this.display.Width = 5;
+                    this.display.Height = 5;
+                }
+                else if (this.serialPort.DeviceConfig.IsPulse) {
+                    this.display.Width = 128;
+                    this.display.Height = 64;
+                }
+                else if (this.serialPort.DeviceConfig.IsRave) {
+                    this.display.Width = 160;
+                    this.display.Height = 120;
+                }
+
+            }
+
+
+            if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.Type != DisplayType.SSD1306) {
+                throw new Exception("The device does not support SPI display");
+            }
+
+
+            switch (this.Type) {
+                case DisplayType.SSD1306:
+                    this.display.Width = 128;
+                    this.display.Height = 64;
+                    param = this.I2cAddress;
+
+                    break;
+
+                case DisplayType.ILI9342:
+                case DisplayType.ILI9341:
+                    this.display.Width = 160;
+                    this.display.Height = 120;
+                    param |= 1 << 7;
+                    break;
+
+                case DisplayType.ST7735:
+                    this.display.Width = 160;
+                    this.display.Height = 128;
+                    param |= 1 << 7;
+                    break;
+
+            }
+
+            var cmd = string.Format("lcdconfig(0,{0})", param);
+
+            this.serialPort.WriteCommand(cmd);
+
+            var res = this.serialPort.ReadRespone();
+
+            if (res.success) {
+                if (this.system != null) {
+                    this.system.UpdateDisplay(this.display);
+                }
+            }
+
+            return res.success;
+        }
+        public void Default() {
+
+        }
     }
 
     public enum DisplayColorDepth {

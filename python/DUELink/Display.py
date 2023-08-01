@@ -18,22 +18,123 @@ class DisplayColorDepth(IntEnum):
     SixteenBit =16
 
 class DisplayConfiguration:        
-    def __init__(self):   
+    def __init__(self, serialPort, display, system):   
         self.Type = DisplayType.BuiltIn  
+
         self.I2cAddress = 0
+
         self.SpiChipSelect = 0
         self.SpiDataControl = 0
         self.SpiPortrait = False
-        self.SpiMirror = False
-        self.SpiFlip = False
+        self.SpiFlipScreenHorizontal = False
+        self.SpiFlipScreenVertical = False
         self.SpiSwapRedBlueColor = False
         self.SpiSwapByteEndianness = False
+
+        self.serialPort = serialPort
+        self.display = display
+        self.system = system
+
+    def Update(self) -> bool:
+        param = 0
+ 
+        param |= (self.Type)
+        param |= (self.SpiChipSelect) << 8
+        param |= (self.SpiDataControl) << 14
+
+        portrait = 0
+
+        if (self.SpiPortrait == True):
+            portrait = 1
+
+        mirror = 0
+
+        if (self.SpiFlipScreenHorizontal == True):
+            mirror = 1
+
+        flip = 0
+
+        if (self.SpiFlipScreenVertical == True):
+            flip = 1
+
+        swapgrb = 0
+
+        if (self.SpiSwapRedBlueColor == True):
+            swapgrb = 1
+
+        swapbytes = 0
+
+        if (self.SpiSwapByteEndianness == True):
+            swapbytes = 1
+
+        
+        param |= portrait << 20
+        param |= mirror << 21
+        param |= flip << 22
+        param |= swapgrb << 23
+        param |= swapbytes << 24
+
+
+        if (self.Type == DisplayType.BuiltIn or param == 0) :
+            if (self.serialPort.DeviceConfig.IsTick == False and self.serialPort.DeviceConfig.IsPulse == False and self.serialPort.DeviceConfig.IsRave == False) :
+                raise Exception("The device does not support BuiltIn display")
+            
+            else:
+                param = 0
+            
+
+            if (self.serialPort.DeviceConfig.IsTick) :
+                self.display.Width = 5
+                self.display.Height = 5
+            
+            elif (self.serialPort.DeviceConfig.IsPulse) :
+                self.display.Width = 128
+                self.display.Height = 64                
+            
+            elif (self.serialPort.DeviceConfig.IsRave) :
+                self.display.Width = 160
+                self.display.Height = 120                
+            
+        
+        if ((self.serialPort.DeviceConfig.IsTick or self.serialPort.DeviceConfig.IsEdge) and (self.Type != DisplayType.SSD1306)):
+            raise Exception("The device does not support SPI display")
+        
+        
+        match (self.Type) :
+            case DisplayType.SSD1306:
+                self.display.Width = 128
+                self.display.Height = 64
+                param = self.I2cAddress
+            
+            case DisplayType.ILI9342 | DisplayType.ILI9341:            
+                self.display.Width = 160
+                self.display.Height = 120
+                param |= 1 << 7
+
+
+            case DisplayType.ST7735:
+                self.display.Width = 160
+                self.display.Height = 128
+                param |= 1 << 7
+
+        target = 0
+        cmd = f"lcdconfig({target},{param})"
+
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+
+        if (res.success == True):
+            if (self.system != None ):
+                self.system.UpdateDisplay(self.display)
+
+        return res.success
+
 
 
 class DisplayController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
-        self.SystemControl = None
+        self.Configuration = None
         self.__palette = [
             0x000000, # Black  
             0xFFFFFF, # White  
@@ -173,9 +274,17 @@ class DisplayController:
         if bitmap is None:
             raise ValueError("Bitmap array is null")
         
-        if (self.displayConfiguration.Type == DisplayType.ILI9341 or  self.displayConfiguration.Type == DisplayType.ILI9342 or self.displayConfiguration.Type == DisplayType.ST7735):
+        if (self.Configuration.Type == DisplayType.ILI9341 or  self.Configuration.Type == DisplayType.ILI9342 or self.Configuration.Type == DisplayType.ST7735):
             if(color_depth == DisplayColorDepth.OneBit):
                 raise Exception("Spi does not support one bit depth")
+            
+        if (self.Configuration.Type == DisplayType.BuiltIn) :
+            if (self.serialPort.DeviceConfig.IsPulse and color_depth != DisplayColorDepth.OneBit):
+                raise Exception("BuiltIn support one bit only")
+
+            elif (self.serialPort.DeviceConfig.IsRave and color_depth == DisplayColorDepth.OneBit):
+                raise Exception("BuiltIn does not support one bit")
+            
                 
         
         width = self.Width
@@ -253,117 +362,7 @@ class DisplayController:
                 raise ValueError("Invalid color depth")
             
         return self.__Stream(buffer, color_depth)
-    
-    def DrawBufferBytes(self, color):
-        offset = 0
-        length = len(color)
         
-        if length % 4 !=0:
-            raise Exception("length must be multiple of 4")
-        
-        data32 = [0] * int(length/4)
-
-        for i in range (0, len(data32), 4):
-            data32[i] = (color[(i + offset) * 4 + 0] << 0) | (color[(i + offset) * 4 + 1] << 8) | (color[(i + offset) * 4 + 2] << 16) | (color[(i + offset) * 4 + 3] << 24)
-
-        return self.DrawBuffer(data32)
-
-    
-    def Configuration(self, displayConfig: DisplayConfiguration)-> bool:
-
-        self.displayConfiguration = displayConfig
-        param = 0
- 
-        param |= (self.displayConfiguration.Type)
-        param |= (self.displayConfiguration.SpiChipSelect) << 8
-        param |= (self.displayConfiguration.SpiDataControl) << 14
-
-        portrait = 0
-
-        if (self.displayConfiguration.SpiPortrait == True):
-            portrait = 1
-
-        mirror = 0
-
-        if (self.displayConfiguration.SpiMirror == True):
-            mirror = 1
-
-        flip = 0
-
-        if (self.displayConfiguration.SpiFlip == True):
-            flip = 1
-
-        swapgrb = 0
-
-        if (self.displayConfiguration.SpiSwapRedBlueColor == True):
-            swapgrb = 1
-
-        swapbytes = 0
-
-        if (self.displayConfiguration.SpiSwapByteEndianness == True):
-            swapbytes = 1
-
-        
-        param |= portrait << 20
-        param |= mirror << 21
-        param |= flip << 22
-        param |= swapgrb << 23
-        param |= swapbytes << 24
-
-
-        if (self.displayConfiguration.Type == DisplayType.BuiltIn or param == 0) :
-            if (self.serialPort.DeviceConfig.IsTick == False and self.serialPort.DeviceConfig.IsPulse == False and self.serialPort.DeviceConfig.IsRave == False) :
-                raise Exception("The device does not support BuiltIn display")
-            
-            else:
-                param = 0
-            
-
-            if (self.serialPort.DeviceConfig.IsTick) :
-                self.Width = 5
-                self.Height = 5
-            
-            elif (self.serialPort.DeviceConfig.IsPulse) :
-                self.Width = 128
-                self.Height = 64                
-            
-            elif (self.serialPort.DeviceConfig.IsRave) :
-                self.Width = 160
-                self.Height = 120                
-            
-        
-        if ((self.serialPort.DeviceConfig.IsTick or self.serialPort.DeviceConfig.IsEdge) and (self.displayConfiguration.Type != DisplayType.SSD1306)):
-            raise Exception("The device does not support SPI display")
-        
-        
-        match (self.displayConfiguration.Type) :
-            case DisplayType.SSD1306:
-                self.Width = 128
-                self.Height = 64
-                param = self.displayConfiguration.I2cAddress
-            
-            case DisplayType.ILI9342 | DisplayType.ILI9341:            
-                self.Width = 160
-                self.Height = 120
-                param |= 1 << 7
-
-
-            case DisplayType.ST7735:
-                self.Width = 160
-                self.Height = 128
-                param |= 1 << 7
-
-        target = 0
-        cmd = f"lcdconfig({target},{param})"
-
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
-
-        if (res.success == True):
-            if (self.SystemControl != None ):
-                self.SystemControl.UpdateDisplay(self)
-
-        return res.success
 
     def DrawImageScale(self, img, x: int, y: int, scaleWidth: int, scaleHeight: int,  transform: int) -> bool:        
         

@@ -479,15 +479,103 @@ export class DisplayColorDepth {
 	
 class DisplayConfiguration {
 	
-	constructor() {
+	constructor(serialPort, display, system) {
+		this.serialPort = serialPort;
+		this.display = display;
+		this.system = system;
+				
 		this.Type = DisplayType.BuiltIn;
+		
+		this.I2cAddress = 0;
+		
+		
 		this.SpiChipSelect = 0;
 		this.SpiDataControl = 0;
 		this.SpiPortrait = false;
-		this.SpiMirror = false;
-		this.SpiFlip = false;
+		this.SpiFlipScreenHorizontal = false;
+		this.SpiFlipScreenVertical = false;
 		this.SpiSwapRedBlueColor = false;
 		this.SpiSwapByteEndianness = false;
+	}
+	
+	async Update() {
+		let param = 0;
+		
+		param |= (this.Type);
+		param |= (this.SpiChipSelect) << 8;
+		param |= (this.SpiDataControl) << 14;
+		param |= (this.SpiPortrait == true ? 1 : 0) << 20;
+		param |= (this.SpiFlipScreenHorizontal == true ? 1 : 0) << 21;
+		param |= (this.SpiFlipScreenVertical == true ? 1 : 0) << 22;
+		param |= (this.SpiSwapRedBlueColor == true ? 1 : 0) << 23;
+		param |= (this.SpiSwapByteEndianness == true ? 1 : 0) << 24;
+		
+		if (this.Type === DisplayType.BuiltIn || param === 0) {
+			if (this.serialPort.DeviceConfig.IsTick === false && this.serialPort.DeviceConfig.IsPulse === false && this.serialPort.DeviceConfig.IsRave === false) {
+				throw new Error("The device does not support BuiltIn display");
+			}
+			else {
+				param = 0;				
+			}
+
+			if (this.serialPort.DeviceConfig.IsTick) {
+				this.display.Width = 5;
+				this.display.Height = 5;
+			}
+			else if (this.serialPort.DeviceConfig.IsPulse) {
+				this.display.Width = 128;
+				this.display.Height = 64;                        
+			}
+			else if (this.serialPort.DeviceConfig.IsRave) {
+				this.display.Width = 160;
+				this.display.Height = 120;                        
+			}
+
+		}
+		
+		if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.Type != DisplayType.SSD1306) {
+			throw new Error("The device does not support SPI display");
+		}
+		
+		switch (this.Type) {
+			case DisplayType.SSD1306:
+				this.display.Width = 128;
+				this.display.Height = 64;
+				param = this.I2cAddress;
+
+				break;
+
+			case DisplayType.ILI9342:
+			case DisplayType.ILI9341:
+				this.display.Width = 160;
+				this.display.Height = 120;
+				param |= 1 << 7;
+				break;
+
+			case DisplayType.ST7735:
+				this.display.Width = 160;
+				this.display.Height = 128;
+				param |= 1 << 7;
+				break;
+
+		}
+						
+			
+		let target = 0;
+		
+        const cmd = `lcdconfig(${target},${param})`;
+
+        await this.serialPort.WriteCommand(cmd);
+        
+        const res = await this.serialPort.ReadResponse();
+		
+		if (res.success === true) {
+			if (this.system != null) {
+				// this.system.UpdateDisplay(this.display);
+			}
+		}
+		
+        return res.success;
 	}
 }
 
@@ -498,7 +586,8 @@ class DisplayController {
         this.serialPort = serialPort;
         this.Width = 128;
         this.Height = 64;
-		this.SystemControl = null;
+		this.Configuration = null;
+		
         if (this.serialPort.DeviceConfig.IsRave) {
             this.Width = 160;
             this.Height = 120;
@@ -664,6 +753,18 @@ class DisplayController {
         if (!bitmap) {
             throw new Error("Bitmap array is null");
         }
+		
+		if ((this.Configuration.Type == DisplayType.ST7735 || this.Configuration.Type == DisplayType.ILI9341 || this.Configuration.Type == DisplayType.ILI9342) && color_depth == DisplayColorDepth.OneBit) {
+			throw new Error("Spi does not support one bit depth");
+		}
+		
+		if (this.Configuration.Type == DisplayType.BuiltIn) {
+			if (this.serialPort.DeviceConfig.IsPulse && color_depth != 1)
+				throw new Error("BuiltIn support one bit only");
+
+			else if (this.serialPort.DeviceConfig.IsRave && color_depth == 1)
+				throw new Error("BuiltIn does not support one bit");
+		}
 
         const width = this.Width;
         const height = this.Height;
@@ -747,103 +848,7 @@ class DisplayController {
 
         return await this.__Stream(buffer, color_depth);
     }
-
-    async DrawBufferBytes(color) {
-        let offset = 0;
-        const length = color.length;
-
-        if (length % 4 !== 0) {
-            throw new Error("length must be multiple of 4");
-        }
-
-        const data32 = new Uint32Array(length / 4);
-
-        for (let i = 0; i < data32.length; i++) {
-            data32[i] = (color[(i + offset) * 4 + 0] << 0) | (color[(i + offset) * 4 + 1] << 8) | (color[(i + offset) * 4 + 2] << 16) | (color[(i + offset) * 4 + 3] << 24);
-        }
-
-        return await this.DrawBuffer(data32);
-    }
-
-    async Configuration(displayConfig) {
-		
-		this.displayConfiguration = displayConfig;
-		let param = 0;
-		
-		param |= (this.displayConfiguration.Type);
-		param |= (this.displayConfiguration.SpiChipSelect) << 8;
-		param |= (this.displayConfiguration.SpiDataControl) << 14;
-		param |= (this.displayConfiguration.SpiPortrait == true ? 1 : 0) << 20;
-		param |= (this.displayConfiguration.SpiMirror == true ? 1 : 0) << 21;
-		param |= (this.displayConfiguration.SpiFlip == true ? 1 : 0) << 22;
-		param |= (this.displayConfiguration.SpiSwapRedBlueColor == true ? 1 : 0) << 23;
-		param |= (this.displayConfiguration.SpiSwapByteEndianness == true ? 1 : 0) << 24;
-		
-		if (this.displayConfiguration.Type == DisplayType.BuiltIn || param == 0) {
-			if (this.serialPort.DeviceConfig.IsTick == false && this.serialPort.DeviceConfig.IsPulse == false && this.serialPort.DeviceConfig.IsRave == false) {
-				throw new Error("The device does not support BuiltIn display");
-			}
-			else {
-				param = 0;
-			}
-
-			if (this.serialPort.DeviceConfig.IsTick) {
-				this.Width = 5;
-				this.Height = 5;
-			}
-			else if (this.serialPort.DeviceConfig.IsPulse) {
-				this.Width = 128;
-				this.Height = 64;                        
-			}
-			else if (this.serialPort.DeviceConfig.IsRave) {
-				this.Width = 160;
-				this.Height = 120;                        
-			}
-		}
-		
-		if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.displayConfiguration.Type != DisplayType.SSD1306) {
-			throw new Error("The device does not support SPI display");
-		}
-		
-		switch (this.displayConfiguration.Type) {
-			case DisplayType.SSD1306:
-				this.Width = 128;
-				this.Height = 64;
-				param = this.displayConfiguration.I2cAddress;
-
-				break;
-
-			case DisplayType.ILI9342:
-			case DisplayType.ILI9341:
-				this.Width = 160;
-				this.Height = 120;
-				param |= 1 << 7;
-				break;
-
-			case DisplayType.ST7735:
-				this.Width = 160;
-				this.Height = 128;
-				param |= 1 << 7;
-				break;
-
-		}
-		
-		let target = 0;
-		
-        const cmd = `lcdconfig(${target},${param})`;
-
-        await this.serialPort.WriteCommand(cmd);
-        
-        const res = await this.serialPort.ReadResponse();
-		
-		if (res.success === true) {
-			if (this.SystemControl != null) {
-				this.SystemControl.UpdateDisplay(this);
-			}
-		}
-		
-        return res.success;
-    }
+    
 
     async DrawImageScale(img, x, y, scaleWidth, scaleHeight, transform) {
         if (!img) throw new Error("Data null.");
@@ -1661,8 +1666,7 @@ class SystemController {
     }
 	
 	async UpdateDisplay(display) {
-		this.display = display;
-		this.display.SystemControl = this;
+		this.display = display;		
 
         this.#DISPLAY_MAX_LINES = Math.floor(this.display.Height / 8)
         this.#DISPLAY_MAX_CHARACTER_PER_LINE = Math.floor(this.display.Width / 6)
@@ -1944,7 +1948,8 @@ class DUELinkController {
         this.Temperature = new TemperatureController(this.serialPort);
         this.Humidity = new HudimityController(this.serialPort);
         this.System = new SystemController(this.serialPort, this.Display);
-		this.DisplayConfiguration = new DisplayConfiguration();
+		
+		this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display, this.System);
     }
     
     async Connect() {

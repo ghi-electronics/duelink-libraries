@@ -33,8 +33,7 @@ namespace GHIElectronics.DUELink {
             }
 
             internal void UpdateDisplay(DisplayController display) {
-                this.display = display;
-                this.display.SystemControl = this;
+                this.display = display; 
 
                 DISPLAY_MAX_LINES = this.display.Height / 8;
                 DISPLAY_MAX_CHARACTER_PER_LINE = this.display.Width / 6;

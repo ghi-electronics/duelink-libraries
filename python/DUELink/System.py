@@ -16,7 +16,6 @@ class SystemController:
     
     def UpdateDisplay(self, display):
         self.display = display
-        self.display.SystemControl = self
 
         SystemController.DISPLAY_MAX_LINES = int(self.display.Height / 8)
         SystemController.DISPLAY_MAX_CHARACTER_PER_LINE = int(self.display.Width / 6)

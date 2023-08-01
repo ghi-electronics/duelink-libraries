@@ -55,10 +55,10 @@ class DUELinkController:
         self.Pin = PinController()
         self.Temperature = TemperatureController(self.serialPort)
         self.Humidity = HudimityController(self.serialPort)
-        self.System = SystemController(self.serialPort, self.Display)
-        self.DisplayConfiguration = DisplayConfiguration()
+        self.System = SystemController(self.serialPort, self.Display)        
         self.DisplayType = DisplayTypeController()
         self.DisplayColorDepth = DisplayColorDepthController()
+        self.Display.Configuration = DisplayConfiguration(self.serialPort, self.Display, self.System)
         
 
         self.IsPulse = False

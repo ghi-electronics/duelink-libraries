@@ -119,6 +119,8 @@ namespace GHIElectronics.DUELink {
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);
             this.System = new SystemController(this.serialPort, this.Display);
+
+            this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display, this.System);
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {
