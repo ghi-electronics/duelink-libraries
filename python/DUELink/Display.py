@@ -11,11 +11,6 @@ class DisplayType(IntEnum):
     SSD1306 = 3
     BuiltIn = 0xff
 
-class DisplayColorDepth(IntEnum):          
-    OneBit = 1
-    FourBit = 4
-    EightBit = 8
-    SixteenBit =16
 
 class DisplayConfiguration:        
     def __init__(self, serialPort, display, system):   
@@ -278,14 +273,14 @@ class DisplayController:
             raise ValueError("Bitmap array is null")
         
         if (self.Configuration.Type == DisplayType.ILI9341 or  self.Configuration.Type == DisplayType.ILI9342 or self.Configuration.Type == DisplayType.ST7735):
-            if(color_depth == DisplayColorDepth.OneBit):
+            if(color_depth == 1):
                 raise Exception("Spi does not support one bit depth")
             
         if (self.Configuration.Type == DisplayType.BuiltIn) :
-            if (self.serialPort.DeviceConfig.IsPulse and color_depth != DisplayColorDepth.OneBit):
+            if (self.serialPort.DeviceConfig.IsPulse and color_depth != 1):
                 raise Exception("BuiltIn support one bit only")
 
-            elif (self.serialPort.DeviceConfig.IsRave and color_depth == DisplayColorDepth.OneBit):
+            elif (self.serialPort.DeviceConfig.IsRave and color_depth == 1):
                 raise Exception("BuiltIn does not support one bit")
             
                 

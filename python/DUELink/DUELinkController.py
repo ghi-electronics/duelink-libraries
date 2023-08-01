@@ -4,7 +4,6 @@ from DUELink.Digital import DigitalController
 from DUELink.Display import DisplayController
 from DUELink.Display import DisplayConfiguration
 from DUELink.DisplayType import DisplayTypeController
-from DUELink.DisplayColorDepth import DisplayColorDepthController
 from DUELink.DistanceSensor import DistanceSensorController
 from DUELink.Frequency import FrequencyController
 from DUELink.I2C import I2cController
@@ -56,8 +55,7 @@ class DUELinkController:
         self.Temperature = TemperatureController(self.serialPort)
         self.Humidity = HudimityController(self.serialPort)
         self.System = SystemController(self.serialPort, self.Display)        
-        self.DisplayType = DisplayTypeController()
-        self.DisplayColorDepth = DisplayColorDepthController()
+        self.DisplayType = DisplayTypeController()        
         self.Display.Configuration = DisplayConfiguration(self.serialPort, self.Display, self.System)
         
 

@@ -457,25 +457,6 @@ export class DisplayType {
 		return 0xFF;
 	}
 }
-
-export class DisplayColorDepth {
-
-	static get OneBit() {
-		return 1;
-	}
-	
-	static get FourBit() {
-		return 4;
-	}
-	
-	static get EightBit() {
-		return 8;
-	}
-	
-	static get SixteenBit() {
-		return 16;
-	}
-}
 	
 class DisplayConfiguration {
 	
@@ -758,7 +739,7 @@ class DisplayController {
             throw new Error("Bitmap array is null");
         }
 		
-		if ((this.Configuration.Type == DisplayType.ST7735 || this.Configuration.Type == DisplayType.ILI9341 || this.Configuration.Type == DisplayType.ILI9342) && color_depth == DisplayColorDepth.OneBit) {
+		if ((this.Configuration.Type == DisplayType.ST7735 || this.Configuration.Type == DisplayType.ILI9341 || this.Configuration.Type == DisplayType.ILI9342) && color_depth == 1) {
 			throw new Error("Spi does not support one bit depth");
 		}
 		

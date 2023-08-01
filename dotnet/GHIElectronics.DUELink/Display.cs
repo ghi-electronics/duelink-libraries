@@ -307,20 +307,20 @@ namespace GHIElectronics.DUELink {
 
 
             // This function for testing firmware that support 1,4,8,16bit
-            public void DrawBuffer(byte[] bitmap, DisplayColorDepth color_depth) {
+            public void DrawBuffer(byte[] bitmap, int color_depth) {
                 if (bitmap == null) {
                     throw new Exception("Bitmap array is null");
                 }
 
-                if ((this.Configuration.Type == DisplayType.ST7735 || this.Configuration.Type == DisplayType.ILI9341 || this.Configuration.Type == DisplayType.ILI9342) && color_depth == DisplayColorDepth.OneBit) {
+                if ((this.Configuration.Type == DisplayType.ST7735 || this.Configuration.Type == DisplayType.ILI9341 || this.Configuration.Type == DisplayType.ILI9342) && color_depth == 1) {
                     throw new Exception("Spi does not support one bit depth");
                 }
 
                 if (this.Configuration.Type == DisplayType.BuiltIn) {
-                    if (this.serialPort.DeviceConfig.IsPulse && color_depth != DisplayColorDepth.OneBit)
+                    if (this.serialPort.DeviceConfig.IsPulse && color_depth != 1)
                         throw new Exception("BuiltIn support one bit only");
 
-                    else if (this.serialPort.DeviceConfig.IsRave && color_depth == DisplayColorDepth.OneBit)
+                    else if (this.serialPort.DeviceConfig.IsRave && color_depth == 1)
                         throw new Exception("BuiltIn does not support one bit");
                 }
 
@@ -333,7 +333,7 @@ namespace GHIElectronics.DUELink {
             
 
                 switch (color_depth) {
-                    case DisplayColorDepth.OneBit:
+                    case 1:
                         buffer_size = width * height / 8;
                         buffer = new byte[buffer_size];
 
@@ -357,7 +357,7 @@ namespace GHIElectronics.DUELink {
                         }
                         break;
 
-                    case DisplayColorDepth.FourBit:
+                    case 4:
                         buffer_size = width * height / 2;
                         buffer = new byte[buffer_size];
 
@@ -377,7 +377,7 @@ namespace GHIElectronics.DUELink {
                         }
                         break;
 
-                    case DisplayColorDepth.EightBit:
+                    case 8:
                         buffer_size = width * height;
                         buffer = new byte[buffer_size];
 
@@ -391,7 +391,7 @@ namespace GHIElectronics.DUELink {
                         }
                         break;
 
-                    case DisplayColorDepth.SixteenBit:
+                    case 16:
                         buffer_size = width * height * 2;
 
                         buffer = new byte[buffer_size];
@@ -698,12 +698,7 @@ namespace GHIElectronics.DUELink {
         }
     }
 
-    public enum DisplayColorDepth {
-        OneBit = 1,
-        FourBit = 4,
-        EightBit = 8,
-        SixteenBit = 16,
-    }
+
 
     class PaletteBuilder {
         private const int ValuesPerChannel = 256;
