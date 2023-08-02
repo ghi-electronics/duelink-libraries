@@ -633,11 +633,11 @@ namespace GHIElectronics.DUELink {
 
         SerialInterface serialPort;
         DisplayController display;
-        SystemController system;
-        public DisplayConfiguration(SerialInterface serialPort, DisplayController display, SystemController system) {
+        //SystemController system;
+        public DisplayConfiguration(SerialInterface serialPort, DisplayController display/*, SystemController system*/) {
             this.serialPort = serialPort;
             this.display = display;
-            this.system = system;
+            //this.system = system;
             this.Type = DisplayType.BuiltIn;
 
             if (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsRave) {
@@ -720,11 +720,11 @@ namespace GHIElectronics.DUELink {
 
             var res = this.serialPort.ReadRespone();
 
-            if (res.success) {
-                if (this.system != null) {
-                    this.system.UpdateDisplay(this.display);
-                }
-            }
+            //if (res.success) {
+            //    if (this.system != null) {
+            //        this.system.UpdateDisplay(this.display);
+            //    }
+            //}
 
             return res.success;
         }

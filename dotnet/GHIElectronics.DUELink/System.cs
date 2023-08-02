@@ -20,31 +20,31 @@ namespace GHIElectronics.DUELink {
         public class SystemController {
 
             SerialInterface serialPort;
-            DisplayController display;
+            //DisplayController display;
             
 
-            int DISPLAY_MAX_LINES = 8;
-            int DISPLAY_MAX_CHARACTER_PER_LINE = 21;
+            //int DISPLAY_MAX_LINES = 8;
+            //int DISPLAY_MAX_CHARACTER_PER_LINE = 21;
 
-            public SystemController(SerialInterface serialPort, DisplayController display) {
+            public SystemController(SerialInterface serialPort) {
                 this.serialPort = serialPort;
 
-                this.UpdateDisplay(display);
+                //this.UpdateDisplay(display);
             }
 
-            internal void UpdateDisplay(DisplayController display) {
-                this.display = display; 
+            //internal void UpdateDisplay(DisplayController display) {
+            //    this.display = display; 
 
-                DISPLAY_MAX_LINES = this.display.Height / 8;
-                DISPLAY_MAX_CHARACTER_PER_LINE = this.display.Width / 6;
+            //    DISPLAY_MAX_LINES = this.display.Height / 8;
+            //    DISPLAY_MAX_CHARACTER_PER_LINE = this.display.Width / 6;
 
-                print_posx = 0;
+            //    print_posx = 0;
 
-                this.displayText = new string[DISPLAY_MAX_LINES];
-                for (var i = 0; i < DISPLAY_MAX_LINES; i++) {
-                    displayText[i] = string.Empty;
-                }
-            }
+            //    this.displayText = new string[DISPLAY_MAX_LINES];
+            //    for (var i = 0; i < DISPLAY_MAX_LINES; i++) {
+            //        displayText[i] = string.Empty;
+            //    }
+            //}
 
             public void Reset(ResetOption option) {
 
@@ -57,7 +57,7 @@ namespace GHIElectronics.DUELink {
             }
 
             public int GetTickMicroseconds() {
-                var cmd = string.Format("print(tickus())");
+                var cmd = string.Format("log(tickus())");
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -78,7 +78,7 @@ namespace GHIElectronics.DUELink {
             }
 
             public int GetTickMilliseconds() {
-                var cmd = string.Format("print(tickms())");
+                var cmd = string.Format("log(tickms())");
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -129,53 +129,60 @@ namespace GHIElectronics.DUELink {
                 return false;
             }
 
-            string[] displayText;
+            //string[] displayText;
 
-            int print_posx = 0;
-            private void PrnChar(char c) {
-                if (print_posx == DISPLAY_MAX_CHARACTER_PER_LINE && c != '\r' && c != '\n')
-                    return;
+            //int print_posx = 0;
+            //private void PrnChar(char c) {
+            //    if (print_posx == DISPLAY_MAX_CHARACTER_PER_LINE && c != '\r' && c != '\n')
+            //        return;
 
 
-                if (c == '\r' || c == '\n') {
-                    print_posx = 0;
+            //    if (c == '\r' || c == '\n') {
+            //        print_posx = 0;
 
-                    for (var i = 1; i < DISPLAY_MAX_LINES; i++) { // move up the last line
-                        displayText[i - 1] = displayText[i];
-                    }
+            //        for (var i = 1; i < DISPLAY_MAX_LINES; i++) { // move up the last line
+            //            displayText[i - 1] = displayText[i];
+            //        }
 
-                    displayText[DISPLAY_MAX_LINES - 1] = string.Empty;
-                }
-                else {
-                    displayText[DISPLAY_MAX_LINES - 1] += c;
-                    print_posx++;
-                }
+            //        displayText[DISPLAY_MAX_LINES - 1] = string.Empty;
+            //    }
+            //    else {
+            //        displayText[DISPLAY_MAX_LINES - 1] += c;
+            //        print_posx++;
+            //    }
 
-            }
+            //}
 
             private void PrnText(string text, bool newline) {
-                for (var i = 0; i < text.Length; i++) {
-                    this.PrnChar(text[i]);
-                }
+                //for (var i = 0; i < text.Length; i++) {
+                //    this.PrnChar(text[i]);
+                //}
 
-                display.Clear(0);
+                //display.Clear(0);
+
+                //for (var i = 0; i < displayText.Length; i++) {
+                //    if (displayText[i] != string.Empty) {
+                //        display.DrawText(displayText[i], 1, 0, i * 8);
+                //    }
+
+                //}
+
+                //display.Show();
+
+                //if (newline) {
+                //    this.PrnChar('\r');
+                //}
                 
-                for (var i = 0; i < displayText.Length; i++) {
-                    if (displayText[i] != string.Empty) {
-                        display.DrawText(displayText[i], 1, 0, i * 8);
-                    }
+                var cmd = string.Format(newline ? "println(\"{0}\")" : "print(\"{0}\")", text);
 
-                }
+                this.serialPort.WriteCommand(cmd);
 
-                display.Show();
-
-                if (newline) {
-                    this.PrnChar('\r');
-                }
+                var res = this.serialPort.ReadRespone();
+               
             }
             public bool Print(string text) {
 
-                Debug.WriteLine(text);
+                Debug.Write(text);
 
                 this.PrnText(text, false);
 

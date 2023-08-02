@@ -15,7 +15,7 @@ namespace GHIElectronics.DUELink {
             public TouchController(SerialInterface serialPort) => this.serialPort = serialPort;
 
             public bool Read(int pin) {
-                var cmd = string.Format("print(touchread({0}))", pin);
+                var cmd = string.Format("log(touchread({0}))", pin);
                 this.serialPort.WriteCommand(cmd);
 
                 var res = this.serialPort.ReadRespone();

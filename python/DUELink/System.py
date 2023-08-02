@@ -1,4 +1,3 @@
-from DUELink.Display import DisplayController
 from enum import Enum
 import time
 
@@ -7,22 +6,9 @@ class SystemController:
         SystemReset = 0
         Bootloader = 1
 
-    DISPLAY_MAX_LINES = 8
-    DISPLAY_MAX_CHARACTER_PER_LINE = 21
 
-    def __init__(self, serialPort, display):
-        self.serialPort = serialPort
-        self.UpdateDisplay(display)
-    
-    def UpdateDisplay(self, display):
-        self.display = display
-
-        SystemController.DISPLAY_MAX_LINES = int(self.display.Height / 8)
-        SystemController.DISPLAY_MAX_CHARACTER_PER_LINE = int(self.display.Width / 6)
-        
-        self.print_posx = 0
-        self.displayText = [""] * SystemController.DISPLAY_MAX_LINES;
-
+    def __init__(self, serialPort):
+        self.serialPort = serialPort           
 
     def Reset(self, option : Enum):
         cmd = "reset({0})".format(1 if option.value == 1 else 0)
@@ -31,7 +17,7 @@ class SystemController:
         self.serialPort.Disconnect()
 
     def GetTickMicroseconds(self):
-        cmd = "print(tickus())"
+        cmd = "log(tickus())"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         if res.success:
@@ -42,7 +28,7 @@ class SystemController:
         return -1
     
     def GetTickMilliseconds(self):
-        cmd = "print(tickms())"
+        cmd = "log(tickms())"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         if res.success:
@@ -63,39 +49,17 @@ class SystemController:
         cmd = "beep({0}, {1}, {2})".format(pin, frequency, duration)
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
-        return res.success
-    
-    def __PrnChar(self, c):
-        if self.print_posx == SystemController.DISPLAY_MAX_CHARACTER_PER_LINE and c != '\r' and c != '\n':
-            return
-        
-        if c ==  '\r'  or c == '\n':
-            self.print_posx = 0
-
-            for i in range (1, SystemController.DISPLAY_MAX_LINES):
-                self.displayText[i-1] = self.displayText[i]
-
-            self.displayText[SystemController.DISPLAY_MAX_LINES-1] = ""
-        else:
-            self.displayText[SystemController.DISPLAY_MAX_LINES-1] = self.displayText[SystemController.DISPLAY_MAX_LINES-1] + c
-            self.print_posx+=1
-        return
+        return res.success   
     
     def __PrnText(self, text:str, newline: bool):
-        for i in range (len(text)):
-            self.__PrnChar(text[i])
-
-        display = DisplayController(self.serialPort)
-        display.Clear(0)
-
-        for i in range (len(self.displayText)):
-            if self.displayText[i] != "":
-                display.DrawText(self.displayText[i], 1, 0, i * 8)
-        
-        display.Show()
+        cmd = f"print(\"{text}\")"
 
         if (newline):
-            self.__PrnChar('\r')
+            cmd = f"println(\"{text}\")"
+
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()        
+        
 
 
     def Print(self, text)->bool:

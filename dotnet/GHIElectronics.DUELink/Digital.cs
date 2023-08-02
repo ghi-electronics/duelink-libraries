@@ -32,7 +32,7 @@ namespace GHIElectronics.DUELink {
                 if (input == PinController.PULLUP) pull = "1";
                 if (input == PinController.PULLDOWN) pull = "2";
 
-                var cmd = string.Format("print(dread({0},{1}))", pin.ToString(), pull);
+                var cmd = string.Format("log(dread({0},{1}))", pin.ToString(), pull);
 
 
 

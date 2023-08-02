@@ -274,7 +274,7 @@ class AnalogController {
             throw new Error('Invalid pin');
         }
 
-        const cmd = `print(aread(${pin}))`;
+        const cmd = `log(aread(${pin}))`;
 
         await this.serialPort.WriteCommand(cmd);
 
@@ -340,7 +340,7 @@ class ButtonController {
             throw new Error("Invalid pin");
         }
         
-        const cmd = `print(btndown(${pin}))`;
+        const cmd = `log(btndown(${pin}))`;
 
         await this.serialPort.WriteCommand(cmd);
         const res = await this.serialPort.ReadResponse();
@@ -363,7 +363,7 @@ class ButtonController {
             throw new Error("Invalid pin");
         }
 
-        const cmd = `print(btnup(${pin}))`;
+        const cmd = `log(btnup(${pin}))`;
 
         await this.serialPort.WriteCommand(cmd);
         const res = await this.serialPort.ReadResponse();
@@ -403,7 +403,7 @@ class DigitalController {
             pull = '2';
         }
 
-        const cmd = `print(dread(${pin},${pull}))`;
+        const cmd = `log(dread(${pin},${pull}))`;
         await this.serialPort.WriteCommand(cmd);
 
         const response = await this.serialPort.ReadResponse();
@@ -460,10 +460,9 @@ export class DisplayType {
 	
 class DisplayConfiguration {
 	
-	constructor(serialPort, display, system) {
+	constructor(serialPort, display) {
 		this.serialPort = serialPort;
-		this.display = display;
-		this.system = system;
+		this.display = display;		
 				
 		this.Type = DisplayType.BuiltIn;
 		
@@ -552,13 +551,7 @@ class DisplayConfiguration {
 
         await this.serialPort.WriteCommand(cmd);
         
-        const res = await this.serialPort.ReadResponse();
-		
-		if (res.success === true) {
-			if (this.system != null) {
-				// this.system.UpdateDisplay(this.display);
-			}
-		}
+        const res = await this.serialPort.ReadResponse();		
 		
         return res.success;
 	}
@@ -1037,7 +1030,7 @@ class DistanceSensorController {
             throw new Error('Invalid pin');
         }
 
-        const cmd = `print(distance(${pulsePin},${echoPin}))`;
+        const cmd = `log(distance(${pulsePin},${echoPin}))`;
         await this.serialPort.WriteCommand(cmd);
 
         const res = await this.serialPort.ReadResponse();
@@ -1094,7 +1087,7 @@ class HudimityController {
     }
 
     async Read(pin, sensortype) {
-        let cmd = `print(humidity(${pin},${sensortype}))`;
+        let cmd = `log(humidity(${pin},${sensortype}))`;
         await this.serialPort.WriteCommand(cmd);
 
         let res = await this.serialPort.ReadResponse();
@@ -1182,7 +1175,7 @@ class InfraredController {
     }
 
     async Read() {
-        const cmd = "print(irread())";
+        const cmd = "log(irread())";
         await this.serialPort.WriteCommand(cmd);
         const res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -1674,27 +1667,11 @@ class SpiController {
     }
 }
 
-class SystemController {
-    #DISPLAY_MAX_LINES = 8;
-    #DISPLAY_MAX_CHARACTER_PER_LINE = 21;
+class SystemController {    
     
-    constructor(serialPort, display) {
-        this.serialPort = serialPort;
-        this.UpdateDisplay(display);
-    }
-	
-	async UpdateDisplay(display) {
-		this.display = display;		
-
-        this.#DISPLAY_MAX_LINES = Math.floor(this.display.Height / 8)
-        this.#DISPLAY_MAX_CHARACTER_PER_LINE = Math.floor(this.display.Width / 6)
-
-        this.print_posx = 0;
-        this.displayText = new Array(this.#DISPLAY_MAX_LINES);
-        for(let i = 0; i < this.displayText.length; i++) {
-            this.displayText[i] = '';
-        }
-	}
+    constructor(serialPort) {
+        this.serialPort = serialPort;        
+    }	
 
     async Reset(option) {
         let cmd = `reset(${option.value === 1 ? 1 : 0})`;
@@ -1703,7 +1680,7 @@ class SystemController {
     }
 
     async GetTickMicroseconds() {
-        let cmd = "print(tickus())";
+        let cmd = "log(tickus())";
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -1715,7 +1692,7 @@ class SystemController {
     }
 
     async GetTickMilliseconds() {
-        let cmd = "print(tickms())";
+        let cmd = "log(tickms())";
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -1740,47 +1717,14 @@ class SystemController {
         return res.success;
     }
 
-    #PrnChar(c) {
-        if (
-            this.print_posx === this.#DISPLAY_MAX_CHARACTER_PER_LINE &&
-            c !== "\r" &&
-            c !== "\n"
-        ) {
-            return;
-        }
-
-        if (c === "\r" || c === "\n") {
-            this.print_posx = 0;
-
-            for (let i = 1; i < this.#DISPLAY_MAX_LINES; i++) {
-                this.displayText[i - 1] = this.displayText[i];
-            }
-
-            this.displayText[this.#DISPLAY_MAX_LINES - 1] = "";
-        } else {
-            this.displayText[this.#DISPLAY_MAX_LINES - 1] =
-                this.displayText[this.#DISPLAY_MAX_LINES - 1] + c;
-            this.print_posx += 1;
-        }
-        return;
-    }
-
     async #PrnText(text, newline) {
-        for (let i = 0; i < text.length; i++) {
-            this.#PrnChar(text[i]);
-        }
- 
-        await this.display.Clear(0);
-        for (let i = 0; i < this.displayText.length; i++) {
-            if (this.displayText[i] !== "") {
-                await this.display.DrawText(this.displayText[i], 1, 0, i * 8);
-            }
-        }
-        await this.display.Show();
-
-        if (newline) {
-            this.#PrnChar("\r");
-        }
+        let cmd = `print("${text}")`;
+		
+		if (newline)
+			cmd = `println("${text}")`;
+		
+		await this.serialPort.WriteCommand(cmd);
+        let res = await this.serialPort.ReadResponse();
     }
 
     async Print(text) {
@@ -1819,7 +1763,7 @@ class TemperatureController {
     }
 
     async Read(pin, sensortype) {
-        let cmd = `print(temp(${pin},${sensortype}))`;
+        let cmd = `log(temp(${pin},${sensortype}))`;
         await this.serialPort.WriteCommand(cmd);
 
         let res = await this.serialPort.ReadResponse();
@@ -1869,7 +1813,7 @@ class TouchController {
     }
 
     async Read(pin) {
-        const cmd = `print(touchread(${pin}))`;
+        const cmd = `log(touchread(${pin}))`;
         await this.serialPort.WriteCommand(cmd);
 
         const res = await this.serialPort.ReadResponse();
@@ -1904,7 +1848,7 @@ class UartController {
     }
 
     async BytesToRead() {
-        let cmd = "x=uartcount():print(x)";
+        let cmd = "x=uartcount():log(x)";
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -1917,7 +1861,7 @@ class UartController {
     }
 
     async Read() {
-        let cmd = "x=uartread():print(x)";
+        let cmd = "x=uartread():log(x)";
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -1965,9 +1909,9 @@ class DUELinkController {
         this.Pin = new PinController();
         this.Temperature = new TemperatureController(this.serialPort);
         this.Humidity = new HudimityController(this.serialPort);
-        this.System = new SystemController(this.serialPort, this.Display);
+        this.System = new SystemController(this.serialPort);
 		
-		this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display, this.System);
+		this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display);
     }
     
     async Connect() {

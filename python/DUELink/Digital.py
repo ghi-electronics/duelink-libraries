@@ -22,7 +22,7 @@ class DigitalController:
         elif inputType == 2:
             pull = "2"
 
-        cmd = f"print(dread({pin},{pull}))"
+        cmd = f"log(dread({pin},{pull}))"
         self.serialPort.WriteCommand(cmd)
 
         respone = self.serialPort.ReadRespone()

@@ -40,7 +40,7 @@ namespace GHIElectronics.DUELink {
                     throw new ArgumentException("Invalid pin", nameof(pin));
                 }
 
-                var cmd = string.Format("print(btndown({0}))", pin);
+                var cmd = string.Format("log(btndown({0}))", pin);
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -68,7 +68,7 @@ namespace GHIElectronics.DUELink {
                     throw new ArgumentException("Invalid pin", nameof(pin));
                 }
 
-                var cmd = string.Format("print(btnup({0}))", pin);
+                var cmd = string.Format("log(btnup({0}))", pin);
 
                 this.serialPort.WriteCommand(cmd);
 

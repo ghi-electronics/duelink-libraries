@@ -88,7 +88,7 @@ namespace GHIElectronics.DUELink {
             public byte WriteByte(byte data) {
 
                 CmdRespone res;
-                var cmd = string.Format("print(spibyte({0}))", data.ToString());
+                var cmd = string.Format("log(spibyte({0}))", data.ToString());
 
                 this.serialPort.WriteCommand(cmd);
 

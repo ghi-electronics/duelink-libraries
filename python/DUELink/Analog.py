@@ -10,7 +10,7 @@ class AnalogController:
         if pin < 0 or pin >= self.serialPort.DeviceConfig.MaxPinAnalog:
             raise ValueError("Invalid pin")
 
-        cmd = "print(aread({0}))".format(str(pin))
+        cmd = "log(aread({0}))".format(str(pin))
 
         self.serialPort.WriteCommand(cmd)
 

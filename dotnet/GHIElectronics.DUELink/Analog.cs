@@ -18,7 +18,7 @@ namespace GHIElectronics.DUELink {
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
 
-                var cmd = string.Format("print(aread({0}))", pin.ToString());
+                var cmd = string.Format("log(aread({0}))", pin.ToString());
 
                 this.serialPort.WriteCommand(cmd);
 

@@ -13,7 +13,7 @@ class DisplayType(IntEnum):
 
 
 class DisplayConfiguration:        
-    def __init__(self, serialPort, display, system):   
+    def __init__(self, serialPort, display):   
         self.Type = DisplayType.BuiltIn  
 
         self.I2cAddress = 0
@@ -27,8 +27,7 @@ class DisplayConfiguration:
         self.SpiSwapByteEndianness = False
 
         self.serialPort = serialPort
-        self.display = display
-        self.system = system
+        self.display = display        
 
         if (self.serialPort.DeviceConfig.IsPulse or self.serialPort.DeviceConfig.IsRave ):
             self.Update()
@@ -120,11 +119,7 @@ class DisplayConfiguration:
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
-
-        if (res.success == True):
-            if (self.system != None ):
-                self.system.UpdateDisplay(self.display)
-
+        
         return res.success
 
 

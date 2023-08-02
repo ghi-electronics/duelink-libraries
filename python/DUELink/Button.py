@@ -22,7 +22,7 @@ class ButtonController:
         if pin != 0 and pin != 1 and pin != 2 and pin != 65 and pin != 66:
             raise ValueError("Invalid pin")
             
-        cmd = f"print(btndown({pin}))"
+        cmd = f"log(btndown({pin}))"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
@@ -40,7 +40,7 @@ class ButtonController:
         if pin != 0 and pin != 1 and pin != 2 and pin != 65 and pin != 66:
             raise ValueError("Invalid pin")
             
-        cmd = f"print(btnup({pin}))"
+        cmd = f"log(btnup({pin}))"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()

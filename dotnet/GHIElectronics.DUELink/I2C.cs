@@ -136,7 +136,7 @@ namespace GHIElectronics.DUELink {
                 try {
                     for (var i = 0; i < countRead; i++) {
                         
-                        cmd = string.Format("print(b[{0}])", i);
+                        cmd = string.Format("log(b[{0}])", i);
                         this.serialPort.WriteCommand(cmd);
 
                         res = this.serialPort.ReadRespone();

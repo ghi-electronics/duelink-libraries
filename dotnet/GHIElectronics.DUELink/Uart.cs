@@ -35,7 +35,7 @@ namespace GHIElectronics.DUELink {
             }
 
             public int BytesToRead() {
-                var cmd = string.Format("print(uartcount())");
+                var cmd = string.Format("log(uartcount())");
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -56,7 +56,7 @@ error:
             }
 
             public byte Read() {
-                var cmd = string.Format("print(uartread())");
+                var cmd = string.Format("log(uartread())");
 
                 this.serialPort.WriteCommand(cmd);
 

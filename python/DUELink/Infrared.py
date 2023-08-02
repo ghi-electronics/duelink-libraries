@@ -3,7 +3,7 @@ class InfraredController:
         self.serialPort = serialPort
 
     def Read(self):
-        cmd = "print(irread())"
+        cmd = "log(irread())"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         if res.success:
