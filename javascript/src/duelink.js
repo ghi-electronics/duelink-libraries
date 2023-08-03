@@ -544,10 +544,9 @@ class DisplayConfiguration {
 
 		}
 						
-			
-		let target = 0;
+					
 		
-        const cmd = `lcdconfig(${target},${param})`;
+        const cmd = `lcdconfig(${param})`;
 
         await this.serialPort.WriteCommand(cmd);
         

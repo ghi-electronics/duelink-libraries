@@ -113,9 +113,8 @@ class DisplayConfiguration:
                 self.display.Width = 160
                 self.display.Height = 128
                 param |= 1 << 7
-
-        target = 0
-        cmd = f"lcdconfig({target},{param})"
+        
+        cmd = f"lcdconfig({param})"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()

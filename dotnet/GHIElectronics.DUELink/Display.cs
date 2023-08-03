@@ -714,7 +714,7 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            var cmd = string.Format("lcdconfig(0,{0})", param);
+            var cmd = string.Format("lcdconfig({0})", param);
 
             this.serialPort.WriteCommand(cmd);
 
