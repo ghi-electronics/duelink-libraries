@@ -13,13 +13,15 @@ class InfraredController:
                 pass
         return -1
 
-    def Enable(self, enable: bool):
+    def Enable(self, pin:int, enable: bool):
         en = 0
 
         if enable == True:
             en = 1
-
-        cmd = "irenable({})".format(int(en))
+        if pin != 2 and pin != 8:
+            raise ValueError("IR is only available on pin 2 and 8")
+        
+        cmd = f"irenable({pin}, {int(enable)})"
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()

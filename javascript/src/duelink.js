@@ -544,8 +544,7 @@ class DisplayConfiguration {
 
 		}
 						
-					
-		
+						
         const cmd = `lcdconfig(${param})`;
 
         await this.serialPort.WriteCommand(cmd);
@@ -1187,14 +1186,17 @@ class InfraredController {
         return -1;
     }
 
-    async Enable(enable) {
+    async Enable(pin, enable) {
         let en = 0;
 
         if (enable === true) {
             en = 1;
         }
+		
+		if (pin != 2 && pin != 8)
+			throw new Error("IR is only available on pin 2 and 8"); 
 
-        const cmd = `irenable(${en})`;
+        const cmd = `irenable(${pin}, ${en})`;
         await this.serialPort.WriteCommand(cmd);
 
         const res = await this.serialPort.ReadResponse();
