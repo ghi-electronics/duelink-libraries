@@ -14,9 +14,17 @@ namespace GHIElectronics.DUELink {
 
             SerialInterface serialPort;
             public ButtonController(SerialInterface serialPort) => this.serialPort = serialPort;
+
+            private bool IsButtonValid(int pin) {
+                if (pin != 0 && pin != 1 && pin != 2 &&  pin != 13 && pin != 14 && pin != 15 && pin != 16 && pin != 65 && pin != 66 && pin != 68 && pin != 76 && pin != 82 && pin != 85) {
+                    return false;
+                }
+
+                return true;
+            }
             public bool Enable(int pin, bool enable) {
                 pin &= 0xdf;
-                if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+                if (IsButtonValid(pin) == false) {
                     throw new ArgumentException("Invalid pin", nameof(pin));
                 }
 
@@ -36,7 +44,7 @@ namespace GHIElectronics.DUELink {
 
             public bool WasPressed(int pin) {
                 pin &= 0xdf;
-                if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+                if (IsButtonValid(pin) == false) {
                     throw new ArgumentException("Invalid pin", nameof(pin));
                 }
 
@@ -64,7 +72,7 @@ namespace GHIElectronics.DUELink {
 
             public bool IsReleased(int pin) {
                 pin &= 0xdf;
-                if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+                if (IsButtonValid(pin) == false) {
                     throw new ArgumentException("Invalid pin", nameof(pin));
                 }
 

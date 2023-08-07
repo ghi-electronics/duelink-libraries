@@ -320,9 +320,17 @@ class ButtonController {
         this.serialPort = serialPort;
     }
 
-    async Enable(pin, enable) {
+    IsButtonValid(pin) {
+		if (pin != 0 && pin != 1 && pin != 2 &&  pin != 13 && pin != 14 && pin != 15 && pin != 16 && pin != 65 && pin != 66 && pin != 68 && pin != 76 && pin != 82 && pin != 85) {
+			return false;
+		}
+
+		return true;
+	}
+	
+	async Enable(pin, enable) {
         pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
-        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+        if (IsButtonValid(pin) == false) {
             throw new Error("Invalid pin");
         }
         
@@ -336,7 +344,7 @@ class ButtonController {
 
     async JustPressed(pin) {
         pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
-        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+        if (IsButtonValid(pin) == false) {
             throw new Error("Invalid pin");
         }
         
@@ -359,7 +367,7 @@ class ButtonController {
 
     async JustReleased(pin) {
         pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
-        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+        if (IsButtonValid(pin) == false) {
             throw new Error("Invalid pin");
         }
 
@@ -391,8 +399,24 @@ class DigitalController {
         if (pin === 'b' || pin === 'B') {
             pin = 98;
         }
+		
+		if (pin === 'u' || pin === 'U') {
+            pin = 85;
+        }
 
-        if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin !== 97 && pin !== 98 && pin !== 108)) {
+        if (pin === 'd' || pin === 'D') {
+            pin = 68;
+        }
+		
+		if (pin === 'l' || pin === 'L') {
+            pin = 76;
+        }
+
+        if (pin === 'r' || pin === 'R') {
+            pin = 82;
+        }
+
+        if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin !== 97 && pin !== 98 && pin !== 108 && pin !== 85 && pin !== 76 && pin !== 68 && pin !== 82)) {
             throw new Error('Invalid pin');
         }
 
@@ -1310,6 +1334,22 @@ class PinController {
     __get_button_b() {
         return 98;
     }
+	
+	__get_button_up() {
+        return 85;
+    }
+	
+	__get_button_down() {
+        return 68;
+    }
+	
+	__get_button_left() {
+        return 76;
+    }
+	
+	__get_button_right() {
+        return 82;
+    }
 
     __get_led() {
         return 108;
@@ -1342,7 +1382,23 @@ class PinController {
     get ButtonB() {
         return this.__get_button_b();
     }
-
+	
+	get ButtonUp() {
+        return this.__get_button_up();
+    }
+	
+	get ButtonDown() {
+        return this.__get_button_down();
+    }
+	
+	get ButtonLeft() {
+        return this.__get_button_left();
+    }
+	
+	get ButtonRight() {
+        return this.__get_button_right();
+    }
+	
     get Led() {
         return this.__get_led();
     }

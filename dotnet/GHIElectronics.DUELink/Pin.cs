@@ -16,8 +16,18 @@ namespace GHIElectronics.DUELink {
             internal static int PULLUP = 1;
             internal static int PULLDOWN = 2;
 
+            internal static int BUTTON_U = 85;
+            internal static int BUTTON_D = 68;
+            internal static int BUTTON_L = 76;
+            internal static int BUTTON_R = 82;
+
+
             public int ButtonA { get; } = BUTTON_A;
             public int ButtonB { get; } = BUTTON_B;
+            public int ButtonUp { get; } = BUTTON_U;
+            public int ButtonDown { get; } = BUTTON_D;
+            public int ButtonLeft { get; } = BUTTON_L;
+            public int ButtonRight { get; } = BUTTON_R;
             public int Led { get; } = LED;
             public int Piezo { get; } = PIEZO;
             public int PullNone { get; } = PULLNONE;

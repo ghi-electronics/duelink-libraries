@@ -24,7 +24,7 @@ namespace GHIElectronics.DUELink {
           
 
             public bool Read(int pin, int input = 0) {
-                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)PinController.BUTTON_A && pin != (int)PinController.BUTTON_B && pin != (int)PinController.LED))
+                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)PinController.BUTTON_A && pin != (int)PinController.BUTTON_B && pin != (int)PinController.BUTTON_U && pin != (int)PinController.BUTTON_D && pin != (int)PinController.BUTTON_L && pin != (int)PinController.BUTTON_R && pin != (int)PinController.LED))
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 var pull = "0";
