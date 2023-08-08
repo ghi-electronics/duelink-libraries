@@ -82,6 +82,8 @@ namespace GHIElectronics.DUELink {
         public bool IsEdge => DeviceConfig is null ? false : DeviceConfig.IsEdge;
         public bool IsRave => DeviceConfig is null ? false : DeviceConfig.IsRave;
 
+        public bool IsTick => DeviceConfig is null ? false : DeviceConfig.IsTick;
+
         public int MaxIO { get; internal set; }
         public int MaxAnalog { get; internal set; }
 
