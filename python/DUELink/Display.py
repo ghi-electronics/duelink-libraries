@@ -5,19 +5,17 @@ from enum import IntEnum
 
 class DisplayType(IntEnum):  
 
-    ILI9342 = 0
-    ILI9341 = 1
-    ST7735 = 2
-    SSD1306 = 3
-    BuiltIn = 0xff
+    BuiltIn = 0
+    ILI9342 = 0x80
+    ILI9341 = 0x81
+    ST7735 = 0x82
+    SSD1306 = 0x3C    
 
 
 class DisplayConfiguration:        
     def __init__(self, serialPort, display):   
         self.Type = DisplayType.BuiltIn  
-
-        self.I2cAddress = 0
-
+    
         self.SpiChipSelect = 0
         self.SpiDataControl = 0
         self.SpiPortrait = False
@@ -25,6 +23,8 @@ class DisplayConfiguration:
         self.SpiFlipScreenVertical = False
         self.SpiSwapRedBlueColor = False
         self.SpiSwapByteEndianness = False
+        self.WindowStartX = 0
+        self.WindowStartY = 0
 
         self.serialPort = serialPort
         self.display = display        
@@ -33,11 +33,15 @@ class DisplayConfiguration:
             self.Update()
 
     def Update(self) -> bool:
-        param = 0
+        address = 0
+        config = 0
+        chipselect = 0
+        datacontrol = 0
+        
  
-        param |= (self.Type)
-        param |= (self.SpiChipSelect) << 8
-        param |= (self.SpiDataControl) << 14
+        address = (self.Type)
+
+        
 
         portrait = 0
 
@@ -65,56 +69,59 @@ class DisplayConfiguration:
             swapbytes = 1
 
         
-        param |= portrait << 20
-        param |= mirror << 21
-        param |= flip << 22
-        param |= swapgrb << 23
-        param |= swapbytes << 24
+        config |= portrait << 0
+        config |= mirror << 1
+        config |= flip << 2
+        config |= swapgrb << 3
+        config |= swapbytes << 4
 
+        config |= (self.WindowStartX) << 8
+        config |= (self.WindowStartY) << 12
 
-        if (self.Type == DisplayType.BuiltIn or param == 0) :
-            if (self.serialPort.DeviceConfig.IsTick == False and self.serialPort.DeviceConfig.IsPulse == False and self.serialPort.DeviceConfig.IsRave == False) :
-                raise Exception("The device does not support BuiltIn display")
-            
-            else:
-                param = 0
-            
-
-            if (self.serialPort.DeviceConfig.IsTick) :
-                self.display.Width = 5
-                self.display.Height = 5
-            
-            elif (self.serialPort.DeviceConfig.IsPulse) :
-                self.display.Width = 128
-                self.display.Height = 64                
-            
-            elif (self.serialPort.DeviceConfig.IsRave) :
-                self.display.Width = 160
-                self.display.Height = 120                
+        chipselect = self.SpiChipSelect
+        datacontrol = self.SpiDataControl                       
             
         
-        if ((self.serialPort.DeviceConfig.IsTick or self.serialPort.DeviceConfig.IsEdge) and (self.Type != DisplayType.SSD1306)):
+        if ((self.serialPort.DeviceConfig.IsTick or self.serialPort.DeviceConfig.IsEdge) and (self.Type != DisplayType.BuiltIn and self.Type != DisplayType.SSD1306)):
             raise Exception("The device does not support SPI display")
         
         
         match (self.Type) :
             case DisplayType.SSD1306:
                 self.display.Width = 128
-                self.display.Height = 64
-                param = self.I2cAddress
+                self.display.Height = 64                
             
-            case DisplayType.ILI9342 | DisplayType.ILI9341:            
+            case DisplayType.ILI9342:            
                 self.display.Width = 160
-                self.display.Height = 120
-                param |= 1 << 7
+                self.display.Height = 120  
+
+            case DisplayType.ILI9341:            
+                self.display.Width = 160
+                self.display.Height = 120                   
 
 
             case DisplayType.ST7735:
                 self.display.Width = 160
-                self.display.Height = 128
-                param |= 1 << 7
+                self.display.Height = 128 
+
+            case DisplayType.BuiltIn:
+                if (self.serialPort.DeviceConfig.IsTick == False and self.serialPort.DeviceConfig.IsPulse == False and self.serialPort.DeviceConfig.IsRave == False) :
+                    raise Exception("The device does not support BuiltIn display")            
+
+                if (self.serialPort.DeviceConfig.IsTick) :
+                    self.display.Width = 5
+                    self.display.Height = 5
+                
+                elif (self.serialPort.DeviceConfig.IsPulse) :
+                    self.display.Width = 128
+                    self.display.Height = 64                
+                
+                elif (self.serialPort.DeviceConfig.IsRave) :
+                    self.display.Width = 160
+                    self.display.Height = 120     
+
         
-        cmd = f"lcdconfig({param})"
+        cmd = f"lcdconfig({address}, {config}, {chipselect}, {datacontrol})"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
@@ -151,6 +158,10 @@ class DisplayController:
         if (self.serialPort.DeviceConfig.IsRave):
             self.Width = 160
             self.Height = 120
+
+        if (self.serialPort.DeviceConfig.IsTick):
+            self.Width = 5
+            self.Height = 5
 
     def Show(self):
         cmd = "lcdshow()"

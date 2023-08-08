@@ -462,23 +462,23 @@ class DigitalController {
 export class DisplayType {
 	
 	static get ILI9342() {
-		return 0;
+		return 0x80;
 	}
 	
 	static get ILI9341() {
-		return 1;
+		return 0x81;
 	}
 	
 	static get ST7735() {
-		return 2;
+		return 0x82;
 	}
 	
 	static get SSD1306() {
-		return 3;
+		return 0x3C;
 	}
 	
 	static get BuiltIn() {
-		return 0xFF;
+		return 0;
 	}
 }
 	
@@ -500,6 +500,8 @@ class DisplayConfiguration {
 		this.SpiFlipScreenVertical = false;
 		this.SpiSwapRedBlueColor = false;
 		this.SpiSwapByteEndianness = false;
+        this.WindowStartX = 0;
+        this.WindowStartY = 0;
 		
 		if (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsRave) {
 			this.Update();
@@ -507,69 +509,69 @@ class DisplayConfiguration {
 	}
 	
 	async Update() {
-		let param = 0;
+        let address = 0
+        let config = 0
+        let chipselect = 0
+        let datacontrol= 0
 		
-		param |= (this.Type);
-		param |= (this.SpiChipSelect) << 8;
-		param |= (this.SpiDataControl) << 14;
-		param |= (this.SpiPortrait == true ? 1 : 0) << 20;
-		param |= (this.SpiFlipScreenHorizontal == true ? 1 : 0) << 21;
-		param |= (this.SpiFlipScreenVertical == true ? 1 : 0) << 22;
-		param |= (this.SpiSwapRedBlueColor == true ? 1 : 0) << 23;
-		param |= (this.SpiSwapByteEndianness == true ? 1 : 0) << 24;
-		
-		if (this.Type === DisplayType.BuiltIn || param === 0) {
-			if (this.serialPort.DeviceConfig.IsTick === false && this.serialPort.DeviceConfig.IsPulse === false && this.serialPort.DeviceConfig.IsRave === false) {
-				throw new Error("The device does not support BuiltIn display");
-			}
-			else {
-				param = 0;				
-			}
+		address |= (this.Type);
 
-			if (this.serialPort.DeviceConfig.IsTick) {
-				this.display.Width = 5;
-				this.display.Height = 5;
-			}
-			else if (this.serialPort.DeviceConfig.IsPulse) {
-				this.display.Width = 128;
-				this.display.Height = 64;                        
-			}
-			else if (this.serialPort.DeviceConfig.IsRave) {
-				this.display.Width = 160;
-				this.display.Height = 120;                        
-			}
 
-		}
+		config |= (this.SpiPortrait == true ? 1 : 0) << 0;
+		config |= (this.SpiFlipScreenHorizontal == true ? 1 : 0) << 1;
+		config |= (this.SpiFlipScreenVertical == true ? 1 : 0) << 2;
+		config |= (this.SpiSwapRedBlueColor == true ? 1 : 0) << 3;
+		config |= (this.SpiSwapByteEndianness == true ? 1 : 0) << 4;
+        config |= this.WindowStartX << 8;
+        config |= this.WindowStartY << 12;
+
+        chipselect = this.SpiChipSelect
+		datacontrol= this.SpiDataControl
 		
-		if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.Type != DisplayType.SSD1306) {
+		if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.Type != DisplayType.SSD1306 && this.Type != DisplayType.BuiltIn) {
 			throw new Error("The device does not support SPI display");
 		}
 		
 		switch (this.Type) {
 			case DisplayType.SSD1306:
 				this.display.Width = 128;
-				this.display.Height = 64;
-				param = this.I2cAddress;
+				this.display.Height = 64;				
 
 				break;
 
 			case DisplayType.ILI9342:
 			case DisplayType.ILI9341:
 				this.display.Width = 160;
-				this.display.Height = 120;
-				param |= 1 << 7;
+				this.display.Height = 120;				
 				break;
 
-			case DisplayType.ST7735:
+			case DisplayType.ST7735:			
 				this.display.Width = 160;
-				this.display.Height = 128;
-				param |= 1 << 7;
+				this.display.Height = 128;				
 				break;
+            case DisplayType.BuiltIn :
+                if (this.serialPort.DeviceConfig.IsTick === false && this.serialPort.DeviceConfig.IsPulse === false && this.serialPort.DeviceConfig.IsRave === false) {
+                    throw new Error("The device does not support BuiltIn display");
+                }			
+    
+                if (this.serialPort.DeviceConfig.IsTick) {
+                    this.display.Width = 5;
+                    this.display.Height = 5;
+                }
+                else if (this.serialPort.DeviceConfig.IsPulse) {
+                    this.display.Width = 128;
+                    this.display.Height = 64;                        
+                }
+                else if (this.serialPort.DeviceConfig.IsRave) {
+                    this.display.Width = 160;
+                    this.display.Height = 120;                        
+                }
+                break;
 
 		}
 						
 						
-        const cmd = `lcdconfig(${param})`;
+        const cmd = `lcdconfig(${address}, ${config}, ${chipselect}, ${datacontrol})`;
 
         await this.serialPort.WriteCommand(cmd);
         
@@ -592,6 +594,10 @@ class DisplayController {
             this.Width = 160;
             this.Height = 120;
         }
+        else if (this.serialPort.DeviceConfig.IsRave) {
+            this.Width = 5;
+            this.Height = 5;
+        } 
         this.#_palette = [
             0x000000, // Black  
             0xFFFFFF, // White  
