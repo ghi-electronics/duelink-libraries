@@ -7,7 +7,7 @@ class TemperatureController:
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
-        return res.success
+        return float(res.respone)
     
     def __get_dht11(self):
         return 11
