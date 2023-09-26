@@ -1119,7 +1119,7 @@ class HudimityController {
         await this.serialPort.WriteCommand(cmd);
 
         let res = await this.serialPort.ReadResponse();
-        return res.success;
+        return parseFloat(res.response);
     }
 
     get Dht11() {
@@ -1830,7 +1830,7 @@ class TemperatureController {
         await this.serialPort.WriteCommand(cmd);
 
         let res = await this.serialPort.ReadResponse();
-        return res.success;
+        return parseFloat(res.response);
     }
 
     __get_dht11() {

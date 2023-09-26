@@ -25,7 +25,7 @@ namespace GHIElectronics.DUELink {
 
                 if (respone.success) {
                     try {
-                        var value = int.Parse(respone.respone);
+                        var value = float.Parse(respone.respone);
 
                         return value;
                     }
