@@ -125,7 +125,7 @@ class SerialInterface {
     async ReadResponse() {
         let str = this.leftOver;
         const response = new Cmdresponse();
-        const end = new Date(Date.now() + this.ReadTimeout * 1000000);
+        const end = new Date(Date.now() + this.ReadTimeout * 1000);
 
         while (!this.portName.hasData() && new Date() <= end) {
             await Util.pumpAsync();
@@ -1818,10 +1818,13 @@ class SystemController {
 
     async Print(text) {
         if (typeof text === "string") {
+			console.log(text);
             await this.#PrnText(text, false);
         } else if (typeof text === "boolean") {
-            await this.#PrnText(text ? "1" : "0", false);
+            console.log(text ? "1" : "0");
+			await this.#PrnText(text ? "1" : "0", false);
         } else {
+			console.log(text.toString());
             await this.#PrnText(text.toString(), false);
         }
 
@@ -1830,10 +1833,13 @@ class SystemController {
 
     async Println(text) {
         if (typeof text === "string") {
+		   console.log(text);
            await this.#PrnText(text, true);
         } else if (typeof text === "boolean") {
+		   console.log(text ? "1" : "0");
            await this.#PrnText(text ? "1" : "0", true);
         } else {
+		   console.log(text.toString());
            await this.#PrnText(text.toString(), true);
         }
 
