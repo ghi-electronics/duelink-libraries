@@ -27,6 +27,7 @@ class SerialInterface {
         
         this.portName.setTimeout(this.ReadTimeout);
         this.leftOver = "";
+        await Util.sleep(100);
         await this.Synchronize();
     }
 
@@ -39,12 +40,10 @@ class SerialInterface {
 
     async Synchronize() {
         const cmd = new Uint8Array(1);
-        cmd[0] = 0x1b;
+        cmd[0] = 0x7F;
 
         await this.WriteRawData(cmd, 0, 1);
-        await this.ReadResponse();    
-       
-        await this.TurnEchoOff();
+
 
         const orig = this.portName.getTimeout();
         this.portName.setTimeout(1);
@@ -55,8 +54,7 @@ class SerialInterface {
             this.portName.resetOutputBuffer();
             try {
                 const version = await this.GetVersion();
-                if (version != "" && version[2] == "." && version[4] == ".") {
-                    console.log(version);
+                if (version != "" && version[2] == "." && version[4] == ".") {                   
                     this.isReady = true;
                     break;
                 }
@@ -85,7 +83,7 @@ class SerialInterface {
         if (version.success) {
             if (this.echo && version.response.includes(command)) {
                 // echo is on => need to turn off
-                this.TurnEchoOff();
+                await this.TurnEchoOff();
                 this.portName.resetInputBuffer();
                 this.portName.resetOutputBuffer();
                 version.response = version.response.slice(command.length);
@@ -127,19 +125,44 @@ class SerialInterface {
     async ReadResponse() {
         let str = this.leftOver;
         const response = new Cmdresponse();
-        const end = new Date(Date.now() + this.ReadTimeout * 1000);
+        const end = new Date(Date.now() + this.ReadTimeout * 1000000);
 
         while (!this.portName.hasData() && new Date() <= end) {
-             await Util.pumpAsync();
+            await Util.pumpAsync();
         }
         if (!this.portName.hasData()) {
             console.log("No Response");
         }
         
-        while (new Date() <= end) {
+        while (new Date() <= end) {           
             const data = await this.portName.read();
             if (data) {
-                str += SerialInterface.Decoder.decode(data);
+                
+                let size = 0;
+
+                for (let i = 0; i < data.length; i++) {                    
+                    if (data[i] != 10 && data[i] != 13)   {
+                        size = size + 1; 
+                    }
+                    
+                }
+
+                if (size == 0) {
+                    continue;
+                }
+
+                let newData = new Uint8Array(size);
+                let indexArray = 0;
+
+                for (let i = 0; i < data.length; i++) {                    
+                    if (data[i] != 10 && data[i] != 13)   {
+                        newData[indexArray] = data[i]
+                        indexArray++;
+                    }
+                    
+                }
+
+                str += SerialInterface.Decoder.decode(newData);
                 
                 if (str.length > 0) {
                     let idx1 = str.indexOf(">");
@@ -163,7 +186,7 @@ class SerialInterface {
                     
                     if (idx3 != -1) {
                         response.success = false;
-                    }
+                    }                  
 
                     return response;
                 }
@@ -503,9 +526,7 @@ class DisplayConfiguration {
         this.WindowStartX = 0;
         this.WindowStartY = 0;
 		
-		if (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsRave) {
-			this.Update();
-        }
+
 	}
 	
 	async Update() {
@@ -1774,7 +1795,12 @@ class SystemController {
             throw ("duration is within range[0,1000] millisecond");
         }
 
+        if (pin === 'p' || pin === 'P') {
+            pin = 112;
+        }
+
         let cmd = `beep(${pin}, ${frequency}, ${duration})`;
+        
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         return res.success;
@@ -1975,12 +2001,16 @@ class DUELinkController {
         this.System = new SystemController(this.serialPort);
 		
 		this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display);
+
+        if (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsRave) {
+			await this.Display.Configuration.Update();
+        }        
     }
     
     async Connect() {
         await this.serialPort.Connect();
         
-        this.Version = this.serialPort.version;
+        this.Version = (await this.serialPort.GetVersion());
         this.Version = this.Version.split("\n")[0];
         this.Version = this.Version.replace("\r", "");
         if (this.Version === "" || this.Version.length !== 7) {
@@ -2025,7 +2055,7 @@ class DUELinkController {
 		this.IsTick = this.DeviceConfig.IsTick;
 
         this.serialPort.DeviceConfig = this.DeviceConfig;
-        this.InitDevice();
+        await this.InitDevice();
     }
 
     async Disconnect() {
