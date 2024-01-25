@@ -23,6 +23,8 @@ from DUELink.Temperature import TemperatureController
 from DUELink.Humidity import HudimityController
 from enum import Enum
 import platform
+
+
 class DUELinkController:
 
     def __init__(self, comPort: str):
@@ -32,7 +34,7 @@ class DUELinkController:
             self.__Connect(comPort)
         except:
             raise Exception(f"Could not connect to the comport: {comPort}")
-        
+
         if self.serialPort is None:
             raise Exception(f"serialPort is null")
 
@@ -46,7 +48,7 @@ class DUELinkController:
         self.Neo = NeoController(self.serialPort)
         self.Uart = UartController(self.serialPort)
         self.Button = ButtonController(self.serialPort)
-        self.Distance = DistanceSensorController(self.serialPort)        
+        self.Distance = DistanceSensorController(self.serialPort)
         self.Display = DisplayController(self.serialPort)
         self.Touch = TouchController(self.serialPort)
         self.Led = LedController(self.serialPort)
@@ -54,18 +56,10 @@ class DUELinkController:
         self.Pin = PinController()
         self.Temperature = TemperatureController(self.serialPort)
         self.Humidity = HudimityController(self.serialPort)
-        self.System = SystemController(self.serialPort)        
-        self.DisplayType = DisplayTypeController()        
+        self.System = SystemController(self.serialPort)
+        self.DisplayType = DisplayTypeController()
         self.Display.Configuration = DisplayConfiguration(self.serialPort, self.Display)
-        
 
-        self.IsPulse = False
-        self.IsFlea = False
-        self.IsPico = False
-        self.IsEdge = False
-        self.IsRave = False
-        self.IsTick = False
-    
     def __Connect(self, comPort: str):
         self.serialPort = SerialInterface(comPort)
         self.serialPort.Connect()
@@ -74,30 +68,30 @@ class DUELinkController:
 
         if self.Version == "" or len(self.Version) != 7:
             raise Exception("The device is not supported.")
-        
+
         self.DeviceConfig = DeviceConfiguration()
 
-        if self.Version[len(self.Version) -1] == 'P':
+        if self.Version[len(self.Version) - 1] == 'P':
             self.DeviceConfig.IsPulse = True
             self.DeviceConfig.MaxPinIO = 23
             self.DeviceConfig.MaxPinAnalog = 29
-        elif self.Version[len(self.Version) -1] == 'I':
+        elif self.Version[len(self.Version) - 1] == 'I':
             self.DeviceConfig.IsPico = True
             self.DeviceConfig.MaxPinIO = 29
-            self.DeviceConfig.MaxPinAnalog = 29  
-        elif self.Version[len(self.Version) -1] == 'F':
+            self.DeviceConfig.MaxPinAnalog = 29
+        elif self.Version[len(self.Version) - 1] == 'F':
             self.DeviceConfig.IsFlea = True
             self.DeviceConfig.MaxPinIO = 11
-            self.DeviceConfig.MaxPinAnalog = 29    
-        elif self.Version[len(self.Version) -1] == 'E':
+            self.DeviceConfig.MaxPinAnalog = 29
+        elif self.Version[len(self.Version) - 1] == 'E':
             self.DeviceConfig.IsEdge = True
             self.DeviceConfig.MaxPinIO = 22
-            self.DeviceConfig.MaxPinAnalog = 11  
-        elif self.Version[len(self.Version) -1] == 'R':
+            self.DeviceConfig.MaxPinAnalog = 11
+        elif self.Version[len(self.Version) - 1] == 'R':
             self.DeviceConfig.IsRave = True
             self.DeviceConfig.MaxPinIO = 23
             self.DeviceConfig.MaxPinAnalog = 29
-        elif self.Version[len(self.Version) -1] == 'T':
+        elif self.Version[len(self.Version) - 1] == 'T':
             self.DeviceConfig.IsTick = True
             self.DeviceConfig.MaxPinIO = 23
             self.DeviceConfig.MaxPinAnalog = 11
@@ -119,22 +113,15 @@ class DUELinkController:
             from serial.tools.list_ports import comports
         except ImportError:
             return ""
-        
+
         if comports:
             com_ports_list = list(comports())
             ebb_ports_list = []
-            for port in com_ports_list:               
-                if port.vid ==0x1B9F and port.pid==0xF300:
+            for port in com_ports_list:
+                if port.vid == 0x1B9F and port.pid == 0xF300:
                     if (platform.system() == 'Windows'):
-                        return port.name                    
+                        return port.name
                     else:
                         return port.device
 
         return ""
-   
-         
-
-        
-        
-
-
