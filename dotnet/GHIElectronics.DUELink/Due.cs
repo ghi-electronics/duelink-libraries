@@ -16,6 +16,7 @@ namespace GHIElectronics.DUELink {
         public bool IsRave { get; internal set; } = false;
 
         public bool IsTick { get; internal set; } = false;
+        public bool IsDue { get; internal set; } = false;
         public uint MaxPinIO { get; set; }
         public uint MaxPinAnalog { get; set; }
 
@@ -242,8 +243,14 @@ namespace GHIElectronics.DUELink {
                 }
                 else if (this.Version[this.Version.Length - 1] == 'T') {
                     this.DeviceConfig.IsTick = true;
-                    this.DeviceConfig.MaxPinIO = 23;
+                    this.DeviceConfig.MaxPinIO = 13;
                     this.DeviceConfig.MaxPinAnalog = 11;
+
+                }
+                else if (this.Version[this.Version.Length - 1] == 'D') {
+                    this.DeviceConfig.IsDue = true;
+                    this.DeviceConfig.MaxPinIO = 15;
+                    this.DeviceConfig.MaxPinAnalog = 10;
 
                 }
                 else {
