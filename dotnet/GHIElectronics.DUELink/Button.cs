@@ -24,7 +24,7 @@ namespace GHIElectronics.DUELink {
             }
             public bool Enable(int pin, bool enable) {
                 pin &= 0xdf;
-                if (IsButtonValid(pin) == false) {
+                if (this.IsButtonValid(pin) == false) {
                     throw new ArgumentException("Invalid pin", nameof(pin));
                 }
 
@@ -44,7 +44,7 @@ namespace GHIElectronics.DUELink {
 
             public bool WasPressed(int pin) {
                 pin &= 0xdf;
-                if (IsButtonValid(pin) == false) {
+                if (this.IsButtonValid(pin) == false) {
                     throw new ArgumentException("Invalid pin", nameof(pin));
                 }
 
@@ -72,7 +72,7 @@ namespace GHIElectronics.DUELink {
 
             public bool IsReleased(int pin) {
                 pin &= 0xdf;
-                if (IsButtonValid(pin) == false) {
+                if (this.IsButtonValid(pin) == false) {
                     throw new ArgumentException("Invalid pin", nameof(pin));
                 }
 

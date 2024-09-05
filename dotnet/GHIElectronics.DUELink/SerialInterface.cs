@@ -324,14 +324,14 @@ namespace GHIElectronics.DUELink {
         public int TransferBlockSizeMax {
             get {
                 if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
-                    return transferBlockSizeMax1;
-                else return transferBlockSizeMax2;
+                    return this.transferBlockSizeMax1;
+                else return this.transferBlockSizeMax2;
 
             }
             set {
                 if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
-                    transferBlockSizeMax1 = value;
-                else transferBlockSizeMax2 = value;
+                    this.transferBlockSizeMax1 = value;
+                else this.transferBlockSizeMax2 = value;
             }
         }
 
@@ -340,14 +340,14 @@ namespace GHIElectronics.DUELink {
         public int TransferBlockDelay {
             get {
                 if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
-                    return transferBlockDelay1;
-                else return transferBlockDelay2;
+                    return this.transferBlockDelay1;
+                else return this.transferBlockDelay2;
 
             }
             set {
                 if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
-                    transferBlockDelay1 = value;
-                else transferBlockDelay2 = value;
+                    this.transferBlockDelay1 = value;
+                else this.transferBlockDelay2 = value;
             }
         }
 

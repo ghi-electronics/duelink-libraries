@@ -63,7 +63,7 @@ namespace GHIElectronics.DUELink {
 
             public bool Write(char pin, int dutycyle) {
                 if (pin == 'l' || pin == 'L')
-                    return Write((int)PinController.LED, dutycyle);
+                    return this.Write((int)PinController.LED, dutycyle);
 
                 throw new Exception("Invalid pin.");
             }

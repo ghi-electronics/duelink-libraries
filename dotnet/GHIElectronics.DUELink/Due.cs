@@ -77,13 +77,13 @@ namespace GHIElectronics.DUELink {
 
         public string Version { get; internal set; } = string.Empty;
 
-        public bool IsPulse => DeviceConfig is null ? false : DeviceConfig.IsPulse;
-        public bool IsPico => DeviceConfig is null ? false : DeviceConfig.IsPico;
-        public bool IsFlea => DeviceConfig is null ? false : DeviceConfig.IsFlea;
-        public bool IsEdge => DeviceConfig is null ? false : DeviceConfig.IsEdge;
-        public bool IsRave => DeviceConfig is null ? false : DeviceConfig.IsRave;
+        public bool IsPulse => this.DeviceConfig is null ? false : this.DeviceConfig.IsPulse;
+        public bool IsPico => this.DeviceConfig is null ? false : this.DeviceConfig.IsPico;
+        public bool IsFlea => this.DeviceConfig is null ? false : this.DeviceConfig.IsFlea;
+        public bool IsEdge => this.DeviceConfig is null ? false : this.DeviceConfig.IsEdge;
+        public bool IsRave => this.DeviceConfig is null ? false : this.DeviceConfig.IsRave;
 
-        public bool IsTick => DeviceConfig is null ? false : DeviceConfig.IsTick;
+        public bool IsTick => this.DeviceConfig is null ? false : this.DeviceConfig.IsTick;
 
         public int MaxIO { get; internal set; }
         public int MaxAnalog { get; internal set; }
