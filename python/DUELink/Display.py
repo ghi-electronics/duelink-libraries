@@ -123,7 +123,7 @@ class DisplayConfiguration:
 class DisplayController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
-        self.Configuration = None
+        self.Configuration = DisplayConfiguration(self.serialPort, self)
         self.__palette = [
             0x000000,  # Black
             0xFFFFFF,  # White

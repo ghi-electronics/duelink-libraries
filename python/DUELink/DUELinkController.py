@@ -56,7 +56,8 @@ class DUELinkController:
         self.Humidity = HudimityController(self.serialPort)
         self.System = SystemController(self.serialPort)        
         self.DisplayType = DisplayTypeController()        
-        self.Display.Configuration = DisplayConfiguration(self.serialPort, self.Display)
+  
+ 
         
 
         self.IsPulse = False
