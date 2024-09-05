@@ -76,6 +76,8 @@ namespace GHIElectronics.DUELink {
             // Send 127 code to exit running mode 
             this.WriteRawData(new byte[] { 127 }, 0, 1);
 
+            Thread.Sleep(300);
+
 
             var orig = this.ReadTimeout;
 
