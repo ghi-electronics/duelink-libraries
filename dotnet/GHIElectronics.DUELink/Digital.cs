@@ -57,7 +57,7 @@ namespace GHIElectronics.DUELink {
             }
 
             public bool Read(char c, int input = 0) {
-                int pin = -1;
+                var pin = -1;
 
                 if (c == 'a' || c == 'A')
                     pin = PinController.BUTTON_A;

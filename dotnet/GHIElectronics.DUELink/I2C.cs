@@ -89,7 +89,7 @@ namespace GHIElectronics.DUELink {
 
                     this.serialPort.WriteCommand(cmd_dim);
 
-                    CmdRespone res_dim = this.serialPort.ReadRespone();
+                    var res_dim = this.serialPort.ReadRespone();
 
                     if (!res_dim.success) {
                         return false;
@@ -116,7 +116,7 @@ namespace GHIElectronics.DUELink {
 
                     this.serialPort.WriteCommand(cmd_dim);
 
-                    CmdRespone res_dim = this.serialPort.ReadRespone();
+                    var res_dim = this.serialPort.ReadRespone();
 
                     if (!res_dim.success) {
                         return false;
@@ -127,7 +127,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                CmdRespone res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadRespone();
 
                 if (!res.success) {
                     return false;

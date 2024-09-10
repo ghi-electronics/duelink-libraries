@@ -102,7 +102,7 @@ namespace GHIElectronics.DUELink {
             {
                 var builder = new PaletteBuilder(bucketDepth);
                 var palette = builder.BuildPalette(pixels);
-                for (int i = 0; i < palette.Length; i++) {
+                for (var i = 0; i < palette.Length; i++) {
                     if (!this.Palette(i, palette[i])) {
                         return false;
                     }
@@ -283,17 +283,17 @@ namespace GHIElectronics.DUELink {
 
             private int ColorDistance(uint color1, uint color2)
             {
-                int r1 = (int)((color1 >> 16) & 0xff);
-                int g1 = (int)((color1 >> 8) & 0xff);
-                int b1 = (int)((color1 >> 0) & 0xff);
+                var r1 = (int)((color1 >> 16) & 0xff);
+                var g1 = (int)((color1 >> 8) & 0xff);
+                var b1 = (int)((color1 >> 0) & 0xff);
 
-                int r2 = (int)((color2 >> 16) & 0xff);
-                int g2 = (int)((color2 >> 8) & 0xff);
-                int b2 = (int)((color2 >> 0) & 0xff);
+                var r2 = (int)((color2 >> 16) & 0xff);
+                var g2 = (int)((color2 >> 8) & 0xff);
+                var b2 = (int)((color2 >> 0) & 0xff);
 
-                int rd = (r1 - r2) * (r1 - r2);
-                int gd = (g1 - g2) * (g1 - g2);
-                int bd = (b1 - b2) * (b1 - b2);
+                var rd = (r1 - r2) * (r1 - r2);
+                var gd = (g1 - g2) * (g1 - g2);
+                var bd = (b1 - b2) * (b1 - b2);
                 return rd+gd+bd;
             }
 
@@ -342,8 +342,8 @@ namespace GHIElectronics.DUELink {
                             buffer_size = width * height / 8;
                             buffer = new byte[buffer_size];
 
-                            for (int y = 0; y < height; y++) {
-                                for (int x = 0; x < width; x++) {
+                            for (var y = 0; y < height; y++) {
+                                for (var x = 0; x < width; x++) {
                                     var index = (y >> 3) * width + x;
 
                                     var red = bitmap[i];
@@ -367,11 +367,11 @@ namespace GHIElectronics.DUELink {
 
                             byte data = 0;
                             i = 0;
-                            int bit = 0;
-                            int j = 0;
+                            var bit = 0;
+                            var j = 0;
 
-                            for (int y = 0; y < height; y++) {
-                                for (int x = 0; x < width; x++) {
+                            for (var y = 0; y < height; y++) {
+                                for (var x = 0; x < width; x++) {
 
                                     var red = bitmap[i];
                                     var green = bitmap[i + 1];
@@ -473,13 +473,13 @@ namespace GHIElectronics.DUELink {
                 var g = Graphics.FromImage(bmp);
                 g.DrawImage(image, 0, 0, this.Width, this.Height);
 
-                byte[] pixels = new byte[this.Width * this.Height * 4];
+                var pixels = new byte[this.Width * this.Height * 4];
 
                 var bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                 unsafe {
                     var ptr = (byte*)bmpData.Scan0.ToPointer();
-                    for (int y = 0; y < bmpData.Height; y++) {
-                        for (int x = 0; x < bmpData.Width * 4; x += 4) {
+                    for (var y = 0; y < bmpData.Height; y++) {
+                        for (var x = 0; x < bmpData.Width * 4; x += 4) {
                             pixels[y * bmpData.Width * 4 + x] = ptr[y * bmpData.Stride + x + 2];        // Red
                             pixels[y * bmpData.Width * 4 + x + 1] = ptr[y * bmpData.Stride + x + 1];    // Green
                             pixels[y * bmpData.Width * 4 + x + 2] = ptr[y * bmpData.Stride + x];        // Blue
@@ -771,7 +771,7 @@ namespace GHIElectronics.DUELink {
                                  select e).ToArray();
 
             var palette = new uint[16];
-            for (int i = 0; i < 16; i++) {
+            for (var i = 0; i < 16; i++) {
                 palette[i] = AverageColor(sortedBuckets[i % sortedBuckets.Length].Value);
             }
             return palette;

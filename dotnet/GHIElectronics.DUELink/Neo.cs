@@ -101,12 +101,12 @@ namespace GHIElectronics.DUELink {
                     return false;
                 }
 
-                int length = color.Length;
-                int offset = 0;
+                var length = color.Length;
+                var offset = 0;
 
                 var data = new byte[length *  3];
 
-                for (int i = offset; i < length; i++) {
+                for (var i = offset; i < length; i++) {
                     data[(i - offset) * 3 + 0 ] = (byte)((color[i] >> 16) & 0xff);
                     data[(i - offset) * 3 + 1 ] = (byte)((color[i] >> 8) & 0xff);
                     data[(i - offset) * 3 + 2 ] = (byte)((color[i] >> 0) & 0xff);
