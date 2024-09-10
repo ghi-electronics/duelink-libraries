@@ -21,6 +21,8 @@ from DUELink.DeviceConfiguration import DeviceConfiguration
 from DUELink.Pin import PinController
 from DUELink.Temperature import TemperatureController
 from DUELink.Humidity import HudimityController
+from DUELink.Pulse import PulseController
+from DUELink.Can import CanController
 from enum import Enum
 import platform
 class DUELinkController:
@@ -57,7 +59,8 @@ class DUELinkController:
         self.System = SystemController(self.serialPort)        
         self.DisplayType = DisplayTypeController()        
   
- 
+        self.Pulse = PulseController(self.serialPort)
+        self.Can = CanController(self.serialPort)
         
 
         self.IsPulse = False
@@ -66,6 +69,7 @@ class DUELinkController:
         self.IsEdge = False
         self.IsRave = False
         self.IsTick = False
+        self.IsDue = False
     
     def __Connect(self, comPort: str):
         self.serialPort = SerialInterface(comPort)
@@ -102,6 +106,10 @@ class DUELinkController:
             self.DeviceConfig.IsTick = True
             self.DeviceConfig.MaxPinIO = 23
             self.DeviceConfig.MaxPinAnalog = 11
+        elif self.Version[len(self.Version) -1] == 'D':
+            self.DeviceConfig.IsDue = True
+            self.DeviceConfig.MaxPinIO = 15
+            self.DeviceConfig.MaxPinAnalog = 10
 
         self.serialPort.DeviceConfig = self.DeviceConfig
 

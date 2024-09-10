@@ -6,6 +6,7 @@ class DeviceConfiguration:
         self.IsEdge = False
         self.IsRave = False
         self.IsTick = False
+        self.IsDue = False
         self.MaxPinIO = 0
         self.MaxPinAnalog = 0
 

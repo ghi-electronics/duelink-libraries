@@ -211,7 +211,7 @@ class SerialInterface:
     TransferBlockDelay = 0.005
 
     def WriteRawData(self, buffer, offset, count):
-        block = count // self.TransferBlockSizeMax
+        block = count / self.TransferBlockSizeMax
         remain = count % self.TransferBlockSizeMax
 
         idx = offset
