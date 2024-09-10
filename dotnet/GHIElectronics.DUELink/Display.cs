@@ -61,6 +61,8 @@ namespace GHIElectronics.DUELink {
                     this.Height = 64;
                 }
 
+                this.Configuration = new DisplayConfiguration(this.serialPort, this);
+
             }
 
             public bool Show() {

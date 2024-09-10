@@ -88,6 +88,8 @@ namespace GHIElectronics.DUELink {
 
         public bool IsTick => this.DeviceConfig is null ? false : this.DeviceConfig.IsTick;
 
+        public bool IsDue => this.DeviceConfig is null ? false : this.DeviceConfig.IsDue;
+
         public int MaxIO { get; internal set; }
         public int MaxAnalog { get; internal set; }
 
@@ -125,8 +127,6 @@ namespace GHIElectronics.DUELink {
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);
             this.System = new SystemController(this.serialPort);
-
-            this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display);
 
             this.Pulse = new PulseController(this.serialPort);
             this.Can = new CanController(this.serialPort);

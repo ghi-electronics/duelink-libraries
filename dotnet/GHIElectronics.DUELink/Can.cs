@@ -17,7 +17,7 @@ namespace GHIElectronics.DUELink {
                 var baudrate_string = string.Empty;
 
                 switch (baudrate) {
-                    case 100_000:
+                    case 125_000:
                     case 250_000:
                     case 500_000:
                     case 1000_000:
@@ -28,7 +28,7 @@ namespace GHIElectronics.DUELink {
                 }
 
                 if (baudrate_string == string.Empty) {
-                    throw new ArgumentException("baudrate must be 100_000, 250_000, 500_000, 1000_000");
+                    throw new ArgumentException("baudrate must be 125_000, 250_000, 500_000, 1000_000");
                 }
 
                 var cmd = $"caninit({baudrate_string.ToString()})";
@@ -152,7 +152,7 @@ namespace GHIElectronics.DUELink {
             public byte[] Data { get; set; }
 
             public CanMessage(uint id, bool extended, bool remoteRequest, byte[] data, int offset, int length) {
-                if (length > 8)
+                if (length > 8 || length <=0)
                     throw new Exception($"Length {length} invalid");
 
                 this.Data = new byte[8];
