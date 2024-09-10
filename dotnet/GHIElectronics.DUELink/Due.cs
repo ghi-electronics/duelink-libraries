@@ -75,6 +75,9 @@ namespace GHIElectronics.DUELink {
 
         public HumidityController Humidity { get; internal set; }
 
+        public PulseController Pulse { get; internal set; }
+        public CanController Can { get; internal set; }
+
         public string Version { get; internal set; } = string.Empty;
 
         public bool IsPulse => this.DeviceConfig is null ? false : this.DeviceConfig.IsPulse;
@@ -123,7 +126,10 @@ namespace GHIElectronics.DUELink {
             this.Humidity = new HumidityController(this.serialPort);
             this.System = new SystemController(this.serialPort);
 
-            this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display/*, this.System*/);
+            this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display);
+
+            this.Pulse = new PulseController(this.serialPort);
+            this.Can = new CanController(this.serialPort);
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {
@@ -188,14 +194,31 @@ namespace GHIElectronics.DUELink {
             }
             else {
                 var ports = SerialPort.GetPortNames();
-
                 if (ports != null) {
+
+                    // MACOS
                     foreach (var port in ports) {
                         if (port.Contains("usbmodemDUE_SC131"))
                             return "/dev/tty.usbmodemDUE_SC131";
                         else if (port.Contains("usbmodemDUE_SC0071"))
                             return "/dev/tty.usbmodemDUE_SC0071";
                     }
+
+                    // Linux
+                    //var processInfo = new ProcessStartInfo("/usr/sbin/ghiusbports.sh") {
+                    //    RedirectStandardOutput = true,
+                    //};
+
+                    //var p = Process.Start(processInfo);
+
+                    //Thread.Sleep(300);
+
+                    //var outputs = p.StandardOutput.ReadToEnd().Split("\n");
+                    //foreach (var output in outputs) {
+                    //    if (output.Contains("GHI_Electronics"))
+                    //        return output.Split(" ")[0];
+                    //}
+
                 }
             }
 
