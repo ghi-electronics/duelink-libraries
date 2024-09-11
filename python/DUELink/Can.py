@@ -19,13 +19,13 @@ class CanController:
     def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
-    def Initialize(self, baudrate):
+    def Initialize(self, bitrate):
         baudrate_string = ""
 
-        if (baudrate == 100_000 or baudrate == 250_000 or baudrate == 500_000 or baudrate == 1000_000):
-            baudrate_string = str(baudrate)
+        if (bitrate == 125_000 or bitrate == 250_000 or bitrate == 500_000 or bitrate == 1000_000):
+            baudrate_string = str(bitrate)
         else:
-            raise ValueError('baudrate must be 100_000, 250_000, 500_000, 1000_000')
+            raise ValueError('Bit rate must be 125_000, 250_000, 500_000, 1000_000')
 
         cmd = 'caninit({})'.format(baudrate_string)
         
