@@ -58,7 +58,7 @@ class SerialUSB {
         while (count > 0) {
             let result = await this.ring.dequeueN(count);
             if (result) {
-                let readbuf = this.toArrayBuffer(result);
+                let readbuf = result;//this.toArrayBuffer(result);
                 buffer.set(readbuf, offset);
                 offset += result.length;
                 count -= result.length;
