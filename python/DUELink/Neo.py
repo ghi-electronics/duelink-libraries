@@ -27,7 +27,7 @@ class NeoController:
 
         return res.success
 
-    def SetColor(self, id: int, color: int):
+    def Set(self, id: int, color: int):
         red = (color >> 16) & 0xFF
         green = (color >> 8) & 0xFF
         blue = (color >> 0) & 0xFF

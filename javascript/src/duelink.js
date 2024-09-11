@@ -1440,7 +1440,7 @@ class NeoController {
         return res.success;
     }
 
-    async SetColor(id, color) {
+    async Set(id, color) {
         const red = (color >> 16) & 0xff;
         const green = (color >> 8) & 0xff;
         const blue = (color >> 0) & 0xff;
