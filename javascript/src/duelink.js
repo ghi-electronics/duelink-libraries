@@ -1,4 +1,4 @@
-export { SerialInterface, DUELinkController }
+export { SerialInterface, DUELinkController, CanMessage }
 import { Util } from "./util.js";
 
 class SerialInterface {
@@ -281,6 +281,7 @@ class DeviceConfiguration {
         this.IsEdge = false;
         this.IsRave = false;
 		this.IsTick = false;
+		this.IsDue = false;
         this.MaxPinIO = 0;
         this.MaxPinAnalog = 0;
     }
@@ -407,6 +408,132 @@ class ButtonController {
 
         return false;
     }
+}
+
+class CanMessage {
+	constructor(id, extended, remoteRequest, data, offset, length) {
+        this.Id = id
+        this.Extended = extended
+        this.RemoteRequest = remoteRequest
+        this.Length = length
+		this.Data = new Uint8Array(8);
+		
+		for (let i = offset; i < offset + length; i++) {
+            this.Data[i - offset] = data[i]
+        }
+    }
+}
+
+class CanController {
+	constructor(serialPort) {
+        this.serialPort = serialPort;
+    }
+	
+	async Initialize(bitrate) {
+		if (bitrate != 125000 && bitrate != 250000 && bitrate != 500000 && bitrate != 1000000)
+			throw new Error('Bit rate must be 125_000, 250_000, 500_000, 1000_000');
+		
+		const cmd = `caninit(${bitrate})`;
+        await this.serialPort.WriteCommand(cmd);
+
+        const response = await this.serialPort.ReadResponse(); 
+
+        return response.success;
+	}
+	
+	async InitializeExt(phase1,  phase2, prescaler, synchronizationJumpWidth) {			
+		const cmd = `caninitext(${phase1}, ${phase2}, ${prescaler}, ${synchronizationJumpWidth})`;
+        await this.serialPort.WriteCommand(cmd);
+
+        const response = await this.serialPort.ReadResponse(); 
+
+        return response.success;
+	}
+	
+	async Available() {
+		const cmd = `log(canavailable())`;
+
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+
+        if (res.success) {
+            try {
+                return parseInt(res.response);
+            } catch { }
+        }
+
+        return -1;
+	}
+	
+	async WriteMessage(message) {
+		let data = new Uint8Array(16);
+		
+		data[0] = ((message.Id >> 24) & 0xFF)
+        data[1] = ((message.Id >> 16) & 0xFF)
+        data[2] = ((message.Id >> 8) & 0xFF)
+        data[3] = ((message.Id >> 0) & 0xFF)
+
+        if (!message.Extended)
+            data[4] = 0
+        else
+            data[4] = 1
+
+        if (!message.RemoteRequest)
+            data[5] = 0
+        else
+            data[5] = 1
+		
+        data[6] = message.Length
+        data[7] = 0 
+		
+		for (let i = 0; i < 8; i++) {
+            data[i + 8] = message.Data[i]
+        }
+		
+		const cmd = `canwritestream()`;
+			
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+		
+		if (!res.success) {
+			throw new Exception("CAN write error: " + res.respone);
+		}
+		
+		await this.serialPort.WriteRawData(data, 0, data.length);
+
+		const res2 = await this.serialPort.ReadResponse();
+
+		return res2.success;
+	}
+
+    async ReadMessage () {
+        const cmd = `canreadstream()`;
+			
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+		
+		if (!res.success) {
+			throw new Exception("CAN read error: " + res.respone);
+		}
+
+        let data = new Uint8Array(16);
+
+        await this.serialPort.ReadRawData(data, 0, data.length);
+
+        let id = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]
+
+        let message = new CanMessage(id, data[4] > 0 ? true : false, data[5] > 0 ? true : false, data, 8, data[6]);
+
+        const res2 = await this.serialPort.ReadResponse();
+
+		if (res2.success)
+            return message
+
+        return null
+
+
+    }
+	
 }
 
 class DigitalController {
@@ -1973,6 +2100,28 @@ class UartController {
     }
 }
 
+class PulseController {
+    constructor(serialPort) {
+        this.serialPort = serialPort;
+    }
+
+    async Set(pin, stepCount,delay ) {
+        if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO) {
+            console.log('Invalid pin');
+            //throw new ValueError('Invalid pin');
+            return false;
+        }
+        
+
+        const cmd = `pulse(${pin}, ${stepCount}, ${delay})`;
+        await this.serialPort.WriteCommand(cmd);
+
+        const response = await this.serialPort.ReadResponse();
+
+        return response.success;
+    }
+}
+
 class DUELinkController {
     constructor(serial) {
         this.serialPort = new SerialInterface(serial);
@@ -2009,6 +2158,10 @@ class DUELinkController {
         this.Temperature = new TemperatureController(this.serialPort);
         this.Humidity = new HudimityController(this.serialPort);
         this.System = new SystemController(this.serialPort);
+		
+		this.Pulse = new PulseController(this.serialPort);
+		
+		this.Can = new CanController(this.serialPort);
 
 		this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display);
 
@@ -2053,6 +2206,11 @@ class DUELinkController {
             this.DeviceConfig.IsTick = true;
             this.DeviceConfig.MaxPinIO = 23;
             this.DeviceConfig.MaxPinAnalog = 11;
+		} else if (this.Version[this.Version.length - 1] === "D") {
+            this.DeviceConfig.IsDue = true;
+            this.DeviceConfig.MaxPinIO = 15;
+            this.DeviceConfig.MaxPinAnalog = 10;
+        
         } else {
             throw new Error("The device is not supported.");
         }
@@ -2063,6 +2221,7 @@ class DUELinkController {
         this.IsEdge = this.DeviceConfig.IsEdge;
         this.IsRave = this.DeviceConfig.IsRave;
 		this.IsTick = this.DeviceConfig.IsTick;
+		this.IsDue = this.DeviceConfig.IsDue;
 
         this.serialPort.DeviceConfig = this.DeviceConfig;
         await this.InitDevice();
