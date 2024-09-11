@@ -23,11 +23,20 @@ from DUELink.Temperature import TemperatureController
 from DUELink.Humidity import HudimityController
 from DUELink.Pulse import PulseController
 from DUELink.Can import CanController
+from DUELink.Sound import SoundController
 from enum import Enum
 import platform
 class DUELinkController:
 
     def __init__(self, comPort: str):
+        self.IsPulse = False
+        self.IsFlea = False
+        self.IsPico = False
+        self.IsEdge = False
+        self.IsRave = False
+        self.IsTick = False
+        self.IsDue = False
+
         if comPort is None:
             raise ValueError(f"Invalid comport: {comPort}")
         try:
@@ -61,15 +70,10 @@ class DUELinkController:
   
         self.Pulse = PulseController(self.serialPort)
         self.Can = CanController(self.serialPort)
+        self.Sound = SoundController(self.serialPort)
         
 
-        self.IsPulse = False
-        self.IsFlea = False
-        self.IsPico = False
-        self.IsEdge = False
-        self.IsRave = False
-        self.IsTick = False
-        self.IsDue = False
+        
     
     def __Connect(self, comPort: str):
         self.serialPort = SerialInterface(comPort)
@@ -119,6 +123,7 @@ class DUELinkController:
         self.IsEdge = self.DeviceConfig.IsEdge
         self.IsRave = self.DeviceConfig.IsRave
         self.IsTick = self.DeviceConfig.IsTick
+        self.IsDue = self.DeviceConfig.IsDue
 
     def Disconnect(self):
         self.serialPort.Disconnect()

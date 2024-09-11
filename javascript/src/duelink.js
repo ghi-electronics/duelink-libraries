@@ -1302,7 +1302,7 @@ class I2cController {
     async Read(address, data, offset = 0, length = -1) {
         if (length == -1)
             length = data.length
-        
+
         return await this.WriteRead(address, null, 0, 0, data, offset, length);
     }
 
@@ -1753,6 +1753,31 @@ class ServoController {
     }
 }
 
+class SoundController {
+    constructor(serialPort) {
+        this.serialPort = serialPort;
+    }
+
+    async Beep(pin, frequency, duration) {
+        if (frequency < 0 || frequency > 10000) {
+            throw ("Frequency is within range[0,10000] Hz");
+        }
+        if (duration < 0 || duration > 1000) {
+            throw ("duration is within range[0,1000] millisecond");
+        }
+
+        if (pin === 'p' || pin === 'P') {
+            pin = 112;
+        }
+
+        let cmd = `beep(${pin}, ${frequency}, ${duration})`;
+
+        await this.serialPort.WriteCommand(cmd);
+        let res = await this.serialPort.ReadResponse();
+        return res.success;
+    }
+}
+
 
 class SpiController {
     constructor(serialPort) {
@@ -1930,24 +1955,7 @@ class SystemController {
         return -1;
     }
 
-    async Beep(pin, frequency, duration) {
-        if (frequency < 0 || frequency > 10000) {
-            throw ("Frequency is within range[0,10000] Hz");
-        }
-        if (duration < 0 || duration > 1000) {
-            throw ("duration is within range[0,1000] millisecond");
-        }
-
-        if (pin === 'p' || pin === 'P') {
-            pin = 112;
-        }
-
-        let cmd = `beep(${pin}, ${frequency}, ${duration})`;
-
-        await this.serialPort.WriteCommand(cmd);
-        let res = await this.serialPort.ReadResponse();
-        return res.success;
-    }
+   
 
     async #PrnText(text, newline) {
         let cmd = `print("${text}")`;
@@ -2171,9 +2179,10 @@ class DUELinkController {
         this.Humidity = new HudimityController(this.serialPort);
         this.System = new SystemController(this.serialPort);
 		
-		this.Pulse = new PulseController(this.serialPort);
-		
+		this.Pulse = new PulseController(this.serialPort);		
 		this.Can = new CanController(this.serialPort);
+        this.Sound = new SoundController(this.serialPort);
+        
 
 		this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display);
 

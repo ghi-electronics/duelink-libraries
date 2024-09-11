@@ -77,6 +77,7 @@ namespace GHIElectronics.DUELink {
 
         public PulseController Pulse { get; internal set; }
         public CanController Can { get; internal set; }
+        public SoundController Sound { get; internal set; }
 
         public string Version { get; internal set; } = string.Empty;
 
@@ -130,6 +131,7 @@ namespace GHIElectronics.DUELink {
 
             this.Pulse = new PulseController(this.serialPort);
             this.Can = new CanController(this.serialPort);
+            this.Sound = new SoundController(this.serialPort);
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {

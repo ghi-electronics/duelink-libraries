@@ -98,36 +98,7 @@ namespace GHIElectronics.DUELink {
                 return -1;
             }
 
-            public bool Beep(int pin, uint frequency, uint durationms) {
-                if (durationms > 1000) {
-                    throw new Exception("Max duration is 1000 (one second)");
-                }
 
-                if (frequency > 10000) {
-                    throw new Exception("Frequency is within range[0,10000] Hz");
-                }
-
-                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)PinController.PIEZO))
-                    throw new Exception("Invalid pin.");
-
-                var cmd = string.Format("beep({0},{1},{2})", pin, frequency, durationms);
-
-                this.serialPort.WriteCommand(cmd);
-
-                var res = this.serialPort.ReadRespone();
-
-                return res.success;
-
-
-            }
-
-            public bool Beep(char pin, uint frequency, uint durationms) {
-                if (pin == 'p' || pin == 'P') {
-                    return this.Beep((int)PinController.PIEZO, frequency, durationms);
-                }
-
-                return false;
-            }
 
             //string[] displayText;
 
