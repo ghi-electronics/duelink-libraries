@@ -24,6 +24,8 @@ from DUELink.Humidity import HudimityController
 from DUELink.Pulse import PulseController
 from DUELink.Can import CanController
 from DUELink.Sound import SoundController
+from DUELink.Temperature import TemperatureSensorType
+from DUELink.Humidity import HumiditySensorType
 from enum import Enum
 import platform
 class DUELinkController:
@@ -71,6 +73,9 @@ class DUELinkController:
         self.Pulse = PulseController(self.serialPort)
         self.Can = CanController(self.serialPort)
         self.Sound = SoundController(self.serialPort)
+
+        self.TemperatureSensorType = TemperatureSensorType()
+        self.HumiditySensorType = HumiditySensorType()
         
 
         

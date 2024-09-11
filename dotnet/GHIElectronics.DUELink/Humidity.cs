@@ -6,12 +6,19 @@ using System.Threading.Tasks;
 
 namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
+        public enum HumiditySensorType : uint {
+            DHT11 = 11,
+            DHT12 = 12,
+            DHT21 = 21,
+            DHT22 = 22,
+
+        }
         public class HumidityController {
             SerialInterface serialPort;
 
             public HumidityController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public double Read(int pin, int sensortype) {
+            public double Read(int pin, HumiditySensorType sensortype) {
                 if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
