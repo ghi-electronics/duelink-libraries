@@ -13,22 +13,22 @@ namespace GHIElectronics.DUELink {
             public CanController(SerialInterface serialPort) => this.serialPort = serialPort;
 
 
-            public bool Initialize(int baudrate) {
+            public bool Initialize(int bitrate) {
                 var baudrate_string = string.Empty;
 
-                switch (baudrate) {
+                switch (bitrate) {
                     case 125_000:
                     case 250_000:
                     case 500_000:
                     case 1000_000:
-                        baudrate_string = baudrate.ToString();
+                        baudrate_string = bitrate.ToString();
 
                         break;
 
                 }
 
                 if (baudrate_string == string.Empty) {
-                    throw new ArgumentException("baudrate must be 125_000, 250_000, 500_000, 1000_000");
+                    throw new ArgumentException("Bit rate must be 125_000, 250_000, 500_000, 1000_000");
                 }
 
                 var cmd = $"caninit({baudrate_string.ToString()})";
