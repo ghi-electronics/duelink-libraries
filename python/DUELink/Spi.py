@@ -7,10 +7,16 @@ class SpiController:
     def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
-    def Write(self, dataWrite: bytes, offset: int, length: int, chipselect: int = -1) -> bool:
+    def Write(self, dataWrite: bytes, offset: int = 0, length: Optional[int] = None, chipselect: int = -1) -> bool:
+        if length is None:
+            length = len(dataWrite)
+
         return self.WriteRead(dataWrite, offset, length, None, 0, 0, chipselect)
 
-    def Read(self, dataRead: bytearray, offset: int, length: int, chipselect: int = -1) -> bool:
+    def Read(self, dataRead: bytearray, offset: int = 0, length: Optional[int] = None, chipselect: int = -1) -> bool:
+        if length is None:
+            length = len(dataRead)
+
         return self.WriteRead(None, 0, 0, dataRead, offset, length, chipselect)
 
     def WriteRead(self, dataWrite: Optional[bytes], offsetWrite: int, countWrite: int,

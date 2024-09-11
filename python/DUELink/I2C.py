@@ -4,10 +4,16 @@ class I2cController:
     def __init__(self, serialPort) -> None:
         self.serialPort = serialPort
 
-    def Write(self, address: int, data: bytes, offset: int, length: int) -> bool:
+    def Write(self, address: int, data: bytes, offset: Optional[int] = 0, length: int = None) -> bool:
+        if length is None:
+            length = len(data)
+        
         return self.WriteRead(address, data, offset, length, None, 0, 0)
 
-    def Read(self, address: int, data: bytearray, offset: int, length: int) -> bool:
+    def Read(self, address: int, data: bytearray, offset: Optional[int] = 0, length: int = None) -> bool:
+        if length is None:
+            length = len(data)
+
         return self.WriteRead(address, None, 0, 0, data, offset, length)
 
     def WriteRead(self, address: int, dataWrite: Optional[bytes], offsetWrite: int, countWrite: int, dataRead: Optional[bytearray], offsetRead: int, countRead: int) -> bool:

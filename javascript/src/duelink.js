@@ -1292,11 +1292,17 @@ class I2cController {
         this.serialPort = serialPort;
     }
 
-    async Write(address, data, offset, length) {
+    async Write(address, data, offset = 0, length = -1) {
+        if (length == -1)
+            length = data.length
+
         return await this.WriteRead(address, data, offset, length, null, 0, 0);
     }
 
-    async Read(address, data, offset, length) {
+    async Read(address, data, offset = 0, length = -1) {
+        if (length == -1)
+            length = data.length
+        
         return await this.WriteRead(address, null, 0, 0, data, offset, length);
     }
 
@@ -1753,11 +1759,17 @@ class SpiController {
         this.serialPort = serialPort;
     }
 
-    async Write(dataWrite, offset, length, chipselect = -1) {
+    async Write(dataWrite, offset = 0, length = -1, chipselect = -1) {
+        if (length === -1)
+            length = dataWrite.length
+
         return await this.WriteRead(dataWrite, offset, length, null, 0, 0, chipselect);
     }
 
-    async Read(dataRead, offset, length, chipselect = -1) {
+    async Read(dataRead, offset = 0, length = -1, chipselect = -1) {
+        if (length === -1)
+            length = dataRead.length
+
         return await this.WriteRead(null, 0, 0, dataRead, offset, length, chipselect);
     }
 
