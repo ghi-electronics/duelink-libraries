@@ -339,6 +339,51 @@ class AnalogController {
     }
 }
 
+class BluetoothController {
+    constructor(serialPort) {
+        this.serialPort = serialPort;
+    }
+
+    async SetName(name) {
+        if (typeof name != 'string') {
+            throw new Error("Invalid name");
+        }
+
+        const cmd = `wname("${name}", ${name.length})`; 
+
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+
+        return res.success;
+    }
+
+    async SetSpeed(speed) {
+        if (speed != 115200 && speed != 9600) {
+            throw new Error("Support speed 9600 or 115200 only");
+        }
+
+        const cmd = `wspeed(${speed})`; 
+
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+
+        return res.success;
+    }
+
+    async SetPinCode(pinCode) {
+        if (typeof pinCode != 'string' || pinCode.length != 4) {
+            throw new Error("Invalid pinCode");
+        }
+
+        const cmd = `wcode("${pinCode}")`; 
+
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+
+        return res.success;
+    }
+}
+
 class ButtonController {
     constructor(serialPort) {
         this.serialPort = serialPort;
@@ -2185,7 +2230,8 @@ class DUELinkController {
 		
 		this.Pulse = new PulseController(this.serialPort);		
 		this.Can = new CanController(this.serialPort);
-        this.Sound = new SoundController(this.serialPort);        
+        this.Sound = new SoundController(this.serialPort);
+        this.Bluetooth = new BluetoothController(this.serialPort);     
 
     }
 

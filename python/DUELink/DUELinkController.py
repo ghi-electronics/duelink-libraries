@@ -26,6 +26,7 @@ from DUELink.Can import CanController
 from DUELink.Sound import SoundController
 from DUELink.Temperature import TemperatureSensorType
 from DUELink.Humidity import HumiditySensorType
+from DUELink.Bluetooth import BluetoothController
 from enum import Enum
 import platform
 class DUELinkController:
@@ -73,6 +74,7 @@ class DUELinkController:
         self.Pulse = PulseController(self.serialPort)
         self.Can = CanController(self.serialPort)
         self.Sound = SoundController(self.serialPort)
+        self.Bluetooth = BluetoothController(self.serialPort)
 
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()
