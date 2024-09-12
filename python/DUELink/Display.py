@@ -263,7 +263,7 @@ class DisplayController:
 
         return bestEntry
 
-    def DrawBuffer(self, bitmap, color_depth) -> bool:
+    def ShowBuffer(self, bitmap, color_depth) -> bool:
         if bitmap is None:
             raise ValueError("Bitmap array is null")
 
@@ -280,7 +280,7 @@ class DisplayController:
 
         if color_depth == 1:
             if (self.Configuration.Type == DisplayType.SSD1306 or (
-                    self.Configuration.Type == DisplayType.BuiltIn and self.serialPort.DeviceConfig.IsPulse)):
+                    self.Configuration.Type == DisplayType.BuiltIn and (self.serialPort.DeviceConfig.IsPulse or self.serialPort.DeviceConfig.IsDue))):
                 buffer_size = int(width * height / 8)
                 buffer = bytearray(buffer_size)
 

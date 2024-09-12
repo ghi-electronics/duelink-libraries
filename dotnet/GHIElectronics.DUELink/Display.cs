@@ -317,7 +317,7 @@ namespace GHIElectronics.DUELink {
 
 
             // This function for testing firmware that support 1,4,8,16bit
-            public void DrawBuffer(byte[] bitmap, int color_depth) {
+            public void ShowBuffer(byte[] bitmap, int color_depth) {
                 if (bitmap == null) {
                     throw new Exception("Bitmap array is null");
                 }
@@ -340,7 +340,7 @@ namespace GHIElectronics.DUELink {
 
                 switch (color_depth) {
                     case 1:
-                        if (this.Configuration.Type == DisplayType.SSD1306 || (this.Configuration.Type == DisplayType.BuiltIn && this.serialPort.DeviceConfig.IsPulse)) {
+                        if (this.Configuration.Type == DisplayType.SSD1306 || (this.Configuration.Type == DisplayType.BuiltIn && (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsDue))) {
                             buffer_size = width * height / 8;
                             buffer = new byte[buffer_size];
 

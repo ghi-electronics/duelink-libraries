@@ -903,7 +903,7 @@ class DisplayController {
         return bestEntry;
     }
 
-    async DrawBuffer(bitmap, color_depth) {
+    async ShowBuffer(bitmap, color_depth) {
         if (!bitmap) {
             throw new Error("Bitmap array is null");
         }
@@ -922,7 +922,7 @@ class DisplayController {
 
         switch(color_depth) {
             case 1:
-                if (this.Configuration.Type == DisplayType.SSD1306 || (this.Configuration.Type == DisplayType.BuiltIn && this.serialPort.DeviceConfig.IsPulse)) {
+                if (this.Configuration.Type == DisplayType.SSD1306 || (this.Configuration.Type == DisplayType.BuiltIn && (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsDue))) {
 					buffer_size = Math.floor(width * height / 8);
 					buffer = new Uint8Array(buffer_size);
 					for (let y = 0; y < height; y++) {
