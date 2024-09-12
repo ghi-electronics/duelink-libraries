@@ -698,7 +698,7 @@ class DisplayConfiguration {
 				this.display.Height = 128;
 				break;
             case DisplayType.BuiltIn :
-                if (this.serialPort.DeviceConfig.IsTick === false && this.serialPort.DeviceConfig.IsPulse === false && this.serialPort.DeviceConfig.IsRave === false) {
+                if (this.serialPort.DeviceConfig.IsTick === false && this.serialPort.DeviceConfig.IsPulse === false && this.serialPort.DeviceConfig.IsRave === false && this.serialPort.DeviceConfig.IsDue === false) {
                     throw new Error("The device does not support BuiltIn display");
                 }
 
@@ -736,7 +736,6 @@ class DisplayController {
         this.serialPort = serialPort;
         this.Width = 128;
         this.Height = 64;
-		this.Configuration = null;
 
         if (this.serialPort.DeviceConfig.IsRave) {
             this.Width = 160;
@@ -746,6 +745,9 @@ class DisplayController {
             this.Width = 5;
             this.Height = 5;
         }
+
+        this.Configuration = new DisplayConfiguration(this.serialPort, this);
+
         this.#_palette = [
             0x000000, // Black
             0xFFFFFF, // White
@@ -920,9 +922,11 @@ class DisplayController {
         let i=0;
         let buffer = null;
 
+        let typeI2c = (this.Configuration.Type < 0x80) && (this.Configuration.Type > 0)
+
         switch(color_depth) {
             case 1:
-                if (this.Configuration.Type == DisplayType.SSD1306 || (this.Configuration.Type == DisplayType.BuiltIn && (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsDue))) {
+                if (typeI2c || (this.Configuration.Type == DisplayType.BuiltIn && (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsDue))) {
 					buffer_size = Math.floor(width * height / 8);
 					buffer = new Uint8Array(buffer_size);
 					for (let y = 0; y < height; y++) {
@@ -2181,14 +2185,8 @@ class DUELinkController {
 		
 		this.Pulse = new PulseController(this.serialPort);		
 		this.Can = new CanController(this.serialPort);
-        this.Sound = new SoundController(this.serialPort);
-        
+        this.Sound = new SoundController(this.serialPort);        
 
-		this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display);
-
-        if (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsRave) {
-			await this.Display.Configuration.Update();
-        }
     }
 
     async Connect() {

@@ -97,7 +97,7 @@ class DisplayConfiguration:
 
         elif self.Type == DisplayType.BuiltIn:
             if (
-                    self.serialPort.DeviceConfig.IsTick == False and self.serialPort.DeviceConfig.IsPulse == False and self.serialPort.DeviceConfig.IsRave == False):
+                    self.serialPort.DeviceConfig.IsTick == False and self.serialPort.DeviceConfig.IsPulse == False and self.serialPort.DeviceConfig.IsRave == False and self.serialPort.DeviceConfig.IsDue == False):
                 raise Exception("The device does not support BuiltIn display")
 
             if self.serialPort.DeviceConfig.IsTick:
@@ -278,9 +278,13 @@ class DisplayController:
         i = 0
         buffer = None
 
+        typeI2c = False
+
+        if self.Configuration.Type < 0x80 and self.Configuration.Type > 0:
+            typeI2c = True
+
         if color_depth == 1:
-            if (self.Configuration.Type == DisplayType.SSD1306 or (
-                    self.Configuration.Type == DisplayType.BuiltIn and (self.serialPort.DeviceConfig.IsPulse or self.serialPort.DeviceConfig.IsDue))):
+            if ((typeI2c == True) or (self.Configuration.Type == DisplayType.BuiltIn and (self.serialPort.DeviceConfig.IsPulse or self.serialPort.DeviceConfig.IsDue))):
                 buffer_size = int(width * height / 8)
                 buffer = bytearray(buffer_size)
 

@@ -337,10 +337,11 @@ namespace GHIElectronics.DUELink {
                 var i = 0;
                 var buffer = Array.Empty<byte>();
             
+                var typeI2c = ((uint)this.Configuration.Type < 0x80) && ((uint)this.Configuration.Type > 0);
 
                 switch (color_depth) {
                     case 1:
-                        if (this.Configuration.Type == DisplayType.SSD1306 || (this.Configuration.Type == DisplayType.BuiltIn && (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsDue))) {
+                        if (typeI2c || (this.Configuration.Type == DisplayType.BuiltIn && (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsDue))) {
                             buffer_size = width * height / 8;
                             buffer = new byte[buffer_size];
 
@@ -707,7 +708,7 @@ namespace GHIElectronics.DUELink {
                     break;
 
                 case DisplayType.BuiltIn:
-                    if (this.serialPort.DeviceConfig.IsTick == false && this.serialPort.DeviceConfig.IsPulse == false && this.serialPort.DeviceConfig.IsRave == false) {
+                    if (this.serialPort.DeviceConfig.IsTick == false && this.serialPort.DeviceConfig.IsPulse == false && this.serialPort.DeviceConfig.IsRave == false && this.serialPort.DeviceConfig.IsDue == false) {
                         throw new Exception("The device does not support BuiltIn display");
                     }
 
