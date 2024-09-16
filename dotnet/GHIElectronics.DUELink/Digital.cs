@@ -8,11 +8,11 @@ using static GHIElectronics.DUELink.DUELinkController.DigitalController;
 
 namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
-        //public enum Input {
-        //    PullNone = 0,
-        //    PullUp = 1,
-        //    PullDown = 2,
-        //}
+        public enum InputType {
+            None = 0,
+            PullUp = 1,
+            PullDown = 2,
+        }
         public class DigitalController {
 
            
@@ -23,7 +23,10 @@ namespace GHIElectronics.DUELink {
 
           
 
-            public bool Read(int pin, int input = 0) {
+            public bool Read(int pin, InputType inputType = InputType.None) {
+
+                var input = (int)inputType;
+
                 if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)PinController.BUTTON_A && pin != (int)PinController.BUTTON_B && pin != (int)PinController.BUTTON_U && pin != (int)PinController.BUTTON_D && pin != (int)PinController.BUTTON_L && pin != (int)PinController.BUTTON_R && pin != (int)PinController.LED))
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
@@ -56,7 +59,7 @@ namespace GHIElectronics.DUELink {
                 return false;
             }
 
-            public bool Read(char c, int input = 0) {
+            public bool Read(char c, InputType input = InputType.None) {
                 var pin = -1;
 
                 if (c == 'a' || c == 'A')

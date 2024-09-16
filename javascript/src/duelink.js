@@ -620,6 +620,14 @@ class DigitalController {
             pull = '1';
         } else if (inputType === 2) {
             pull = '2';
+        } else if (inputType === "none" || inputType === "None") {
+            pull = '0';
+        } else if (inputType === "pullup" || inputType === "PullUp") {
+            pull = '1';
+        } else if (inputType === "pulldown" || inputType === "PullDown") {
+            pull = '1';
+        } else {
+            throw new Error('Invalid PinType');
         }
 
         const cmd = `log(dread(${pin},${pull}))`;

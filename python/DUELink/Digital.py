@@ -21,6 +21,14 @@ class DigitalController:
             pull = "1"
         elif inputType == 2:
             pull = "2"
+        elif inputType == "pullup" or inputType == "PullUp":
+            pull = "1"
+        elif inputType == "pulldown" or inputType == "PullDown":
+            pull = "2"
+        elif inputType == "none" or inputType == "None":
+            pull = "0" 
+        else:
+            raise ValueError("Invalid inputType")    
 
         cmd = f"log(dread({pin},{pull}))"
         self.serialPort.WriteCommand(cmd)
