@@ -76,7 +76,7 @@ namespace GHIElectronics.DUELink {
             //    return res.success;
             //}
 
-            public bool Set(int id, uint color) {
+            public bool SetColor(int id, uint color) {
                 var red = (byte)((color >> 16) & 0xff);
                 var green = (byte)((color >> 8) & 0xff);
                 var blue = (byte)((color >> 0) & 0xff);
