@@ -12,7 +12,7 @@ namespace GHIElectronics.DUELink {
 
             SerialInterface serialPort;
 
-            public const int MAX_LED_NUM = 256;
+            public const int MAX_LED_NUM = 1024;
 
             public NeoController(SerialInterface serialPort) => this.serialPort = serialPort;
 
@@ -81,6 +81,22 @@ namespace GHIElectronics.DUELink {
                 var green = (byte)((color >> 8) & 0xff);
                 var blue = (byte)((color >> 0) & 0xff);
 
+                //return this.SetColor(id, red, green, blue);
+
+                if (id < 0 || id > MAX_LED_NUM) {
+                    return false;
+                }
+                var cmd = string.Format("neoset({0},{1},{2},{3})", id.ToString(), red.ToString(), green.ToString(), blue.ToString());
+
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                return res.success;
+            }
+
+            public bool SetRGB(int id, byte red, byte green, byte blue) {               
                 //return this.SetColor(id, red, green, blue);
 
                 if (id < 0 || id > MAX_LED_NUM) {

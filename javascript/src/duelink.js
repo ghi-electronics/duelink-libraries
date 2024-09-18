@@ -1465,7 +1465,7 @@ class LedController {
 }
 
 class NeoController {
-    MAX_LED_NUM = 256;
+    MAX_LED_NUM = 1024;
 
     constructor(serialPort) {
         this.serialPort = serialPort;
@@ -1502,6 +1502,19 @@ class NeoController {
         const green = (color >> 8) & 0xff;
         const blue = (color >> 0) & 0xff;
 
+        if (id < 0 || id > this.MAX_LED_NUM) {
+            return false;
+        }
+
+        const cmd = `neoset(${id},${red},${green},${blue})`;
+        await this.serialPort.WriteCommand(cmd);
+
+        const res = await this.serialPort.ReadResponse();
+
+        return res.success;
+    }
+	
+	async SetRGB(id, red, green, blue) {        
         if (id < 0 || id > this.MAX_LED_NUM) {
             return false;
         }

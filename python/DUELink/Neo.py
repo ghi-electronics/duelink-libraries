@@ -1,7 +1,7 @@
 import time
 
 class NeoController:
-    MAX_LED_NUM = 256
+    MAX_LED_NUM = 1024
 
     def __init__(self, serialPort):
         self.serialPort = serialPort
@@ -32,6 +32,17 @@ class NeoController:
         green = (color >> 8) & 0xFF
         blue = (color >> 0) & 0xFF
 
+        if id < 0 or id > self.MAX_LED_NUM:
+            return False
+
+        cmd = "neoset({0},{1},{2},{3})".format(id, red, green, blue)
+        self.serialPort.WriteCommand(cmd)
+
+        res = self.serialPort.ReadRespone()
+
+        return res.success
+    
+    def SetRGB(self, id: int, red: int, green: int, blue: int):      
         if id < 0 or id > self.MAX_LED_NUM:
             return False
 
