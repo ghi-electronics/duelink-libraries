@@ -2222,6 +2222,7 @@ class DUELinkController {
         this.IsEdge = false;
         this.IsRave = false;
 		this.IsTick = false;
+		this.IsDue = false;
     }
 
     async InitDevice() {
