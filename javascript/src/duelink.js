@@ -2264,7 +2264,7 @@ class DUELinkController {
         this.Version = this.Version.split("\n")[0];
         this.Version = this.Version.replace("\r", "");
         if (this.Version === "" || this.Version.length !== 7) {
-            throw ("The device is not supported.");
+            throw ("The device is not supported: ${this.Version}");
         }
 
         this.DeviceConfig = new DeviceConfiguration();
@@ -2299,7 +2299,7 @@ class DUELinkController {
             this.DeviceConfig.MaxPinAnalog = 10;
         
         } else {
-            throw new Error("The device is not supported.");
+            throw new Error("The device is not supported. ${this.Version}");
         }
 
         this.IsPulse = this.DeviceConfig.IsPulse;
