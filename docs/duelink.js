@@ -1,4 +1,4 @@
-export { SerialInterface, DUELinkController }
+export { SerialInterface, DUELinkController, CanMessage }
 import { Util } from "./util.js";
 
 class SerialInterface {
@@ -7,7 +7,7 @@ class SerialInterface {
     static CommandCompleteText = ">";
     static Decoder = new TextDecoder();
     version = "0.0";
- 
+
     constructor(serial) {
         this.DeviceConfig = null;
         this.portName = serial;
@@ -24,9 +24,10 @@ class SerialInterface {
             await this.portName.connect();
         }
 
-        
+
         this.portName.setTimeout(this.ReadTimeout);
         this.leftOver = "";
+        await Util.sleep(100);
         await this.Synchronize();
     }
 
@@ -39,12 +40,10 @@ class SerialInterface {
 
     async Synchronize() {
         const cmd = new Uint8Array(1);
-        cmd[0] = 0x1b;
+        cmd[0] = 0x7F;
 
         await this.WriteRawData(cmd, 0, 1);
-        await this.ReadResponse();    
-       
-        await this.TurnEchoOff();
+
 
         const orig = this.portName.getTimeout();
         this.portName.setTimeout(1);
@@ -56,7 +55,6 @@ class SerialInterface {
             try {
                 const version = await this.GetVersion();
                 if (version != "" && version[2] == "." && version[4] == ".") {
-                    console.log(version);
                     this.isReady = true;
                     break;
                 }
@@ -85,7 +83,7 @@ class SerialInterface {
         if (version.success) {
             if (this.echo && version.response.includes(command)) {
                 // echo is on => need to turn off
-                this.TurnEchoOff();
+                await this.TurnEchoOff();
                 this.portName.resetInputBuffer();
                 this.portName.resetOutputBuffer();
                 version.response = version.response.slice(command.length);
@@ -130,17 +128,42 @@ class SerialInterface {
         const end = new Date(Date.now() + this.ReadTimeout * 1000);
 
         while (!this.portName.hasData() && new Date() <= end) {
-             await Util.pumpAsync();
+            await Util.pumpAsync();
         }
         if (!this.portName.hasData()) {
             console.log("No Response");
         }
-        
+
         while (new Date() <= end) {
             const data = await this.portName.read();
             if (data) {
-                str += SerialInterface.Decoder.decode(data);
-                
+
+                let size = 0;
+
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i] != 10 && data[i] != 13)   {
+                        size = size + 1;
+                    }
+
+                }
+
+                if (size == 0) {
+                    continue;
+                }
+
+                let newData = new Uint8Array(size);
+                let indexArray = 0;
+
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i] != 10 && data[i] != 13)   {
+                        newData[indexArray] = data[i]
+                        indexArray++;
+                    }
+
+                }
+
+                str += SerialInterface.Decoder.decode(newData);
+
                 if (str.length > 0) {
                     let idx1 = str.indexOf(">");
                     let idx2 = str.indexOf("&");
@@ -158,9 +181,9 @@ class SerialInterface {
                     this.leftOver = str.slice(idx + 1);
                     response.success = true;
                     response.response = str.slice(0, idx);
-            
+
                     const idx3 = str.indexOf("!");
-                    
+
                     if (idx3 != -1) {
                         response.success = false;
                     }
@@ -257,6 +280,8 @@ class DeviceConfiguration {
         this.IsPico = false;
         this.IsEdge = false;
         this.IsRave = false;
+		this.IsTick = false;
+		this.IsDue = false;
         this.MaxPinIO = 0;
         this.MaxPinAnalog = 0;
     }
@@ -273,7 +298,7 @@ class AnalogController {
             throw new Error('Invalid pin');
         }
 
-        const cmd = `print(aread(${pin}))`;
+        const cmd = `log(aread(${pin}))`;
 
         await this.serialPort.WriteCommand(cmd);
 
@@ -305,7 +330,7 @@ class AnalogController {
         await this.serialPort.WriteCommand(cmd);
 
         const res = await this.serialPort.ReadResponse();
-    
+
         if (res.success) {
             return true;
         }
@@ -314,17 +339,70 @@ class AnalogController {
     }
 }
 
+class BluetoothController {
+    constructor(serialPort) {
+        this.serialPort = serialPort;
+    }
+
+    async SetName(name) {
+        if (typeof name != 'string') {
+            throw new Error("Invalid name");
+        }
+
+        const cmd = `wname("${name}", ${name.length})`; 
+
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+
+        return res.success;
+    }
+
+    async SetSpeed(speed) {
+        if (speed != 115200 && speed != 9600) {
+            throw new Error("Support speed 9600 or 115200 only");
+        }
+
+        const cmd = `wspeed(${speed})`; 
+
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+
+        return res.success;
+    }
+
+    async SetPinCode(pinCode) {
+        if (typeof pinCode != 'string' || pinCode.length != 4) {
+            throw new Error("Invalid pinCode");
+        }
+
+        const cmd = `wcode("${pinCode}")`; 
+
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+
+        return res.success;
+    }
+}
+
 class ButtonController {
     constructor(serialPort) {
         this.serialPort = serialPort;
     }
 
-    async Enable(pin, enable) {
+    IsButtonValid(pin) {
+		if (pin != 0 && pin != 1 && pin != 2 &&  pin != 13 && pin != 14 && pin != 15 && pin != 16 && pin != 65 && pin != 66 && pin != 68 && pin != 76 && pin != 82 && pin != 85) {
+			return false;
+		}
+
+		return true;
+	}
+
+	async Enable(pin, enable) {
         pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
-        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+        if (IsButtonValid(pin) == false) {
             throw new Error("Invalid pin");
         }
-        
+
         const cmd = `btnenable(${pin}, ${Number(enable)})`;
 
         await this.serialPort.WriteCommand(cmd);
@@ -335,11 +413,11 @@ class ButtonController {
 
     async JustPressed(pin) {
         pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
-        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+        if (IsButtonValid(pin) == false) {
             throw new Error("Invalid pin");
         }
-        
-        const cmd = `print(btndown(${pin}))`;
+
+        const cmd = `log(btndown(${pin}))`;
 
         await this.serialPort.WriteCommand(cmd);
         const res = await this.serialPort.ReadResponse();
@@ -347,8 +425,8 @@ class ButtonController {
         if (res.success) {
             try {
                 return parseInt(res.response) === 1;
-            } catch { 
-                console.log("Press EXCEPTION");        
+            } catch {
+                console.log("Press EXCEPTION");
             }
         }
 
@@ -358,11 +436,11 @@ class ButtonController {
 
     async JustReleased(pin) {
         pin = (typeof pin === 'string' ? pin.charCodeAt(0) : pin) & 0xdf;
-        if (pin != 0 && pin != 1 && pin != 2 && pin != 65 && pin != 66) {
+        if (IsButtonValid(pin) == false) {
             throw new Error("Invalid pin");
         }
 
-        const cmd = `print(btnup(${pin}))`;
+        const cmd = `log(btnup(${pin}))`;
 
         await this.serialPort.WriteCommand(cmd);
         const res = await this.serialPort.ReadResponse();
@@ -375,6 +453,132 @@ class ButtonController {
 
         return false;
     }
+}
+
+class CanMessage {
+	constructor(id, extended, remoteRequest, data, offset, length) {
+        this.Id = id
+        this.Extended = extended
+        this.RemoteRequest = remoteRequest
+        this.Length = length
+		this.Data = new Uint8Array(8);
+		
+		for (let i = offset; i < offset + length; i++) {
+            this.Data[i - offset] = data[i]
+        }
+    }
+}
+
+class CanController {
+	constructor(serialPort) {
+        this.serialPort = serialPort;
+    }
+	
+	async Initialize(bitrate) {
+		if (bitrate != 125000 && bitrate != 250000 && bitrate != 500000 && bitrate != 1000000)
+			throw new Error('Bit rate must be 125_000, 250_000, 500_000, 1000_000');
+		
+		const cmd = `caninit(${bitrate})`;
+        await this.serialPort.WriteCommand(cmd);
+
+        const response = await this.serialPort.ReadResponse(); 
+
+        return response.success;
+	}
+	
+	async InitializeExt(phase1,  phase2, prescaler, synchronizationJumpWidth) {			
+		const cmd = `caninitext(${phase1}, ${phase2}, ${prescaler}, ${synchronizationJumpWidth})`;
+        await this.serialPort.WriteCommand(cmd);
+
+        const response = await this.serialPort.ReadResponse(); 
+
+        return response.success;
+	}
+	
+	async Available() {
+		const cmd = `log(canavailable())`;
+
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+
+        if (res.success) {
+            try {
+                return parseInt(res.response);
+            } catch { }
+        }
+
+        return -1;
+	}
+	
+	async WriteMessage(message) {
+		let data = new Uint8Array(16);
+		
+		data[0] = ((message.Id >> 24) & 0xFF)
+        data[1] = ((message.Id >> 16) & 0xFF)
+        data[2] = ((message.Id >> 8) & 0xFF)
+        data[3] = ((message.Id >> 0) & 0xFF)
+
+        if (!message.Extended)
+            data[4] = 0
+        else
+            data[4] = 1
+
+        if (!message.RemoteRequest)
+            data[5] = 0
+        else
+            data[5] = 1
+		
+        data[6] = message.Length
+        data[7] = 0 
+		
+		for (let i = 0; i < 8; i++) {
+            data[i + 8] = message.Data[i]
+        }
+		
+		const cmd = `canwritestream()`;
+			
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+		
+		if (!res.success) {
+			throw new Exception("CAN write error: " + res.respone);
+		}
+		
+		await this.serialPort.WriteRawData(data, 0, data.length);
+
+		const res2 = await this.serialPort.ReadResponse();
+
+		return res2.success;
+	}
+
+    async ReadMessage () {
+        const cmd = `canreadstream()`;
+			
+        await this.serialPort.WriteCommand(cmd);
+        const res = await this.serialPort.ReadResponse();
+		
+		if (!res.success) {
+			throw new Exception("CAN read error: " + res.respone);
+		}
+
+        let data = new Uint8Array(16);
+
+        await this.serialPort.ReadRawData(data, 0, data.length);
+
+        let id = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]
+
+        let message = new CanMessage(id, data[4] > 0 ? true : false, data[5] > 0 ? true : false, data, 8, data[6]);
+
+        const res2 = await this.serialPort.ReadResponse();
+
+		if (res2.success)
+            return message
+
+        return null
+
+
+    }
+	
 }
 
 class DigitalController {
@@ -391,7 +595,23 @@ class DigitalController {
             pin = 98;
         }
 
-        if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin !== 97 && pin !== 98 && pin !== 108)) {
+		if (pin === 'u' || pin === 'U') {
+            pin = 85;
+        }
+
+        if (pin === 'd' || pin === 'D') {
+            pin = 68;
+        }
+
+		if (pin === 'l' || pin === 'L') {
+            pin = 76;
+        }
+
+        if (pin === 'r' || pin === 'R') {
+            pin = 82;
+        }
+
+        if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin !== 97 && pin !== 98 && pin !== 108 && pin !== 85 && pin !== 76 && pin !== 68 && pin !== 82)) {
             throw new Error('Invalid pin');
         }
 
@@ -400,9 +620,17 @@ class DigitalController {
             pull = '1';
         } else if (inputType === 2) {
             pull = '2';
+        } else if (inputType === "none" || inputType === "None") {
+            pull = '0';
+        } else if (inputType === "pullup" || inputType === "PullUp") {
+            pull = '1';
+        } else if (inputType === "pulldown" || inputType === "PullDown") {
+            pull = '1';
+        } else {
+            throw new Error('Invalid PinType');
         }
 
-        const cmd = `print(dread(${pin},${pull}))`;
+        const cmd = `log(dread(${pin},${pull}))`;
         await this.serialPort.WriteCommand(cmd);
 
         const response = await this.serialPort.ReadResponse();
@@ -433,6 +661,127 @@ class DigitalController {
     }
 }
 
+
+export class DisplayType {
+
+	static get ILI9342() {
+		return 0x80;
+	}
+
+	static get ILI9341() {
+		return 0x81;
+	}
+
+	static get ST7735() {
+		return 0x82;
+	}
+
+	static get SSD1306() {
+		return 0x3C;
+	}
+
+	static get BuiltIn() {
+		return 0;
+	}
+}
+
+class DisplayConfiguration {
+
+	constructor(serialPort, display) {
+		this.serialPort = serialPort;
+		this.display = display;
+
+		this.Type = DisplayType.BuiltIn;
+
+		this.I2cAddress = 0;
+
+
+		this.SpiChipSelect = 0;
+		this.SpiDataControl = 0;
+		this.SpiPortrait = false;
+		this.SpiFlipScreenHorizontal = false;
+		this.SpiFlipScreenVertical = false;
+		this.SpiSwapRedBlueColor = false;
+		this.SpiSwapByteEndianness = false;
+        this.WindowStartX = 0;
+        this.WindowStartY = 0;
+
+
+	}
+
+	async Update() {
+        let address = 0
+        let config = 0
+        let chipselect = 0
+        let datacontrol= 0
+
+		address |= (this.Type);
+
+
+		config |= (this.SpiPortrait == true ? 1 : 0) << 0;
+		config |= (this.SpiFlipScreenHorizontal == true ? 1 : 0) << 1;
+		config |= (this.SpiFlipScreenVertical == true ? 1 : 0) << 2;
+		config |= (this.SpiSwapRedBlueColor == true ? 1 : 0) << 3;
+		config |= (this.SpiSwapByteEndianness == true ? 1 : 0) << 4;
+        config |= this.WindowStartX << 8;
+        config |= this.WindowStartY << 12;
+
+        chipselect = this.SpiChipSelect
+		datacontrol= this.SpiDataControl
+
+		if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.Type != DisplayType.SSD1306 && this.Type != DisplayType.BuiltIn) {
+			throw new Error("The device does not support SPI display");
+		}
+
+		switch (this.Type) {
+			case DisplayType.SSD1306:
+				this.display.Width = 128;
+				this.display.Height = 64;
+
+				break;
+
+			case DisplayType.ILI9342:
+			case DisplayType.ILI9341:
+				this.display.Width = 160;
+				this.display.Height = 120;
+				break;
+
+			case DisplayType.ST7735:
+				this.display.Width = 160;
+				this.display.Height = 128;
+				break;
+            case DisplayType.BuiltIn :
+                if (this.serialPort.DeviceConfig.IsTick === false && this.serialPort.DeviceConfig.IsPulse === false && this.serialPort.DeviceConfig.IsRave === false && this.serialPort.DeviceConfig.IsDue === false) {
+                    throw new Error("The device does not support BuiltIn display");
+                }
+
+                if (this.serialPort.DeviceConfig.IsTick) {
+                    this.display.Width = 5;
+                    this.display.Height = 5;
+                }
+                else if (this.serialPort.DeviceConfig.IsPulse) {
+                    this.display.Width = 128;
+                    this.display.Height = 64;
+                }
+                else if (this.serialPort.DeviceConfig.IsRave) {
+                    this.display.Width = 160;
+                    this.display.Height = 120;
+                }
+                break;
+
+		}
+
+
+        const cmd = `lcdconfig(${address}, ${config}, ${chipselect}, ${datacontrol})`;
+
+        await this.serialPort.WriteCommand(cmd);
+
+        const res = await this.serialPort.ReadResponse();
+
+        return res.success;
+	}
+}
+
 class DisplayController {
     #_palette;
 
@@ -440,30 +789,38 @@ class DisplayController {
         this.serialPort = serialPort;
         this.Width = 128;
         this.Height = 64;
+
         if (this.serialPort.DeviceConfig.IsRave) {
             this.Width = 160;
             this.Height = 120;
         }
+        else if (this.serialPort.DeviceConfig.IsRave) {
+            this.Width = 5;
+            this.Height = 5;
+        }
+
+        this.Configuration = new DisplayConfiguration(this.serialPort, this);
+
         this.#_palette = [
-            0x000000, // Black  
-            0xFFFFFF, // White  
-            0xFF0000, // Red    
-            0x32CD32, // Lime   
-            0x0000FF, // Blue   
-            0xFFFF00, // Yellow 
-            0x00FFFF, // Cyan   
+            0x000000, // Black
+            0xFFFFFF, // White
+            0xFF0000, // Red
+            0x32CD32, // Lime
+            0x0000FF, // Blue
+            0xFFFF00, // Yellow
+            0x00FFFF, // Cyan
             0xFF00FF, // Magenta
-            0xC0C0C0, // Silver 
-            0x808080, // Gray   
-            0x800000, // Maroon 
-            0xBAB86C, // Oliver 
-            0x00FF00, // Green  
-            0xA020F0, // Purple 
-            0x008080, // Teal   
-            0x000080, // Navy 
+            0xC0C0C0, // Silver
+            0x808080, // Gray
+            0x800000, // Maroon
+            0xBAB86C, // Oliver
+            0x00FF00, // Green
+            0xA020F0, // Purple
+            0x008080, // Teal
+            0x000080, // Navy
         ];
     }
- 
+
     async Show() {
         let cmd = "lcdshow()";
         await this.serialPort.WriteCommand(cmd);
@@ -528,7 +885,7 @@ class DisplayController {
     async DrawFillRect(color, x, y, width, height) {
         let cmd = `lcdfill(${color},${x},${y},${width},${height})`;
         await this.serialPort.WriteCommand(cmd);
-        
+
         let res = await this.serialPort.ReadResponse();
         return res.success;
     }
@@ -536,7 +893,7 @@ class DisplayController {
     async DrawLine(color, x1, y1, x2, y2) {
         let cmd = `lcdline(${color},${x1},${y1},${x2},${y2})`;
         await this.serialPort.WriteCommand(cmd);
-        
+
         let res = await this.serialPort.ReadResponse();
         return res.success;
     }
@@ -551,7 +908,7 @@ class DisplayController {
     async DrawTextScale(text, color, x, y, scalewidth, scaleheight) {
         let cmd = `lcdtexts("${text}",${color},${x},${y},${scalewidth},${scaleheight})`;
         await this.serialPort.WriteCommand(cmd);
-        
+
         let res = await this.serialPort.ReadResponse();
         return res.success;
     }
@@ -584,7 +941,7 @@ class DisplayController {
         let bd = (b1 - b2) * (b1 - b2);
         return rd+gd+bd;
     }
-    
+
     #PaletteLookup(color)
     {
         let bestDistance = this.#ColorDistance(this.#_palette[0], color);
@@ -601,10 +958,15 @@ class DisplayController {
         return bestEntry;
     }
 
-    async DrawBuffer(bitmap, color_depth) {
+    async ShowBuffer(bitmap, color_depth) {
         if (!bitmap) {
             throw new Error("Bitmap array is null");
         }
+
+		if (this.Configuration.Type == DisplayType.BuiltIn) {
+			if (this.serialPort.DeviceConfig.IsPulse && color_depth != 1)
+				throw new Error("BuiltIn support one bit only");
+		}
 
         const width = this.Width;
         const height = this.Height;
@@ -613,28 +975,70 @@ class DisplayController {
         let i=0;
         let buffer = null;
 
+        let typeI2c = (this.Configuration.Type < 0x80) && (this.Configuration.Type > 0)
+
         switch(color_depth) {
             case 1:
-                buffer_size = Math.floor(width * height / 8);
-                buffer = new Uint8Array(buffer_size);
-                for (let y = 0; y < height; y++) {
-                    for (let x = 0; x < width; x++) {
-                        let index = (y >> 3) * width + x;
+                if (typeI2c || (this.Configuration.Type == DisplayType.BuiltIn && (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsDue))) {
+					buffer_size = Math.floor(width * height / 8);
+					buffer = new Uint8Array(buffer_size);
+					for (let y = 0; y < height; y++) {
+						for (let x = 0; x < width; x++) {
+							let index = (y >> 3) * width + x;
 
-                        let red = bitmap[i];
-                        let green = bitmap[i+1];
-                        let blue = bitmap[i+2];
-                        
-                        if (red + green + blue > 0) {
-                            buffer[index] |= 1 << (y & 7);
-                        }
-                        else {
-                            buffer[index] &= ~(1 << (y & 7));
-                        }
+							let red = bitmap[i];
+							let green = bitmap[i+1];
+							let blue = bitmap[i+2];
 
-                        i += 4; // Move to next pixel 
-                    }
-                }
+							if (red + green + blue > 0) {
+								buffer[index] |= 1 << (y & 7);
+							}
+							else {
+								buffer[index] &= ~(1 << (y & 7));
+							}
+
+							i += 4; // Move to next pixel
+						}
+					}
+				}
+				else {
+					buffer_size = Math.floor(width * height / 8);
+					buffer = new Uint8Array(buffer_size);
+
+					let data = 0;
+					i = 0;
+					let bit = 0;
+					let j = 0;
+
+					for (let y = 0; y < height; y++) {
+						for (let x = 0; x < width; x++) {
+
+							let red = bitmap[i];
+							let green = bitmap[i + 1];
+							let blue = bitmap[i + 2];
+							let clr = ((red << 16) | (green << 8) | blue);
+
+							if (clr != 0) {
+								data |= (1 << bit);
+							}
+
+							bit +=1
+
+							if (bit == 8) {
+								buffer[j] = data;
+								j+=1
+
+								bit = 0;
+								data = 0;
+
+							}
+
+							i += 4;
+
+						}
+					}
+
+				}
                 break;
             case 4:
                 buffer_size = width * height / 2;
@@ -670,12 +1074,12 @@ class DisplayController {
                 for (var y = 0; y < height; y++) {
                     for (var x = 0; x < width; x++) {
                         var index = (y * width + x) * 2;
-                        
+
                         let red = bitmap[i];
                         let green = bitmap[i+1];
                         let blue = bitmap[i+2];
                         let clr = (red << 16) | (green << 8) |  blue
-                        
+
                         buffer[index + 0] = (((clr & 0b0000_0000_0000_0000_0001_1100_0000_0000) >> 5) | ((clr & 0b0000_0000_0000_0000_0000_0000_1111_1000) >> 3)) & 0xff
                         buffer[index + 1] = (((clr & 0b0000_0000_1111_1000_0000_0000_0000_0000) >> 16) | ((clr & 0b0000_0000_0000_0000_1110_0000_0000_0000) >> 13)) & 0xff
                         i += 4;
@@ -689,31 +1093,6 @@ class DisplayController {
         return await this.__Stream(buffer, color_depth);
     }
 
-    async DrawBufferBytes(color) {
-        let offset = 0;
-        const length = color.length;
-
-        if (length % 4 !== 0) {
-            throw new Error("length must be multiple of 4");
-        }
-
-        const data32 = new Uint32Array(length / 4);
-
-        for (let i = 0; i < data32.length; i++) {
-            data32[i] = (color[(i + offset) * 4 + 0] << 0) | (color[(i + offset) * 4 + 1] << 8) | (color[(i + offset) * 4 + 2] << 16) | (color[(i + offset) * 4 + 3] << 24);
-        }
-
-        return await this.DrawBuffer(data32);
-    }
-
-    async Configuration(target, slaveAddress) {
-        const cmd = `lcdconfig(${target},${slaveAddress})`;
-
-        await this.serialPort.WriteCommand(cmd);
-        
-        const res = await this.serialPort.ReadResponse();
-        return res.success;
-    }
 
     async DrawImageScale(img, x, y, scaleWidth, scaleHeight, transform) {
         if (!img) throw new Error("Data null.");
@@ -728,14 +1107,14 @@ class DisplayController {
         let cmd = `dim a[${img.length}]`;
 
         await this.serialPort.WriteCommand(cmd);
-        
+
         let res = await this.serialPort.ReadResponse();
 
 
         for (let i = 0; i < img.length; i++) {
             cmd = `a[${i}] = ${img[i]}`;
             await this.serialPort.WriteCommand(cmd);
-            
+
             res = await this.serialPort.ReadResponse();
 
             if (res.success === false) {
@@ -747,7 +1126,7 @@ class DisplayController {
             cmd = `lcdimgs(a, ${x}, ${y}, ${scaleWidth}, ${scaleHeight}, ${transform})`;
 
             await this.serialPort.WriteCommand(cmd);
-            
+
             res = await this.serialPort.ReadResponse();
         }
 
@@ -755,7 +1134,7 @@ class DisplayController {
         cmd = "dim a[0]";
 
         await this.serialPort.WriteCommand(cmd);
-        
+
         res = await this.serialPort.ReadResponse();
 
         return res.success;
@@ -812,7 +1191,7 @@ class PaletteBuilder {
 
     constructor(bucketsPerChannel) {
         const ValuesPerChannel = 256;
-        
+
         if (bucketsPerChannel < 1 || bucketsPerChannel > ValuesPerChannel) {
             throw new Error(`Buckets per channel must be between 1 and ${ValuesPerChannel}`);
         }
@@ -825,7 +1204,7 @@ class PaletteBuilder {
 
         for (let i = 0; i < pixels.length; i += 4) {
             let pixel = (pixels[i+0] << 16) | (pixels[i+1] << 8) | (pixels[i+2] << 0);
-            
+
             let key = this.#CreateColorKey(pixel);
             if(key in histogram) {
                 histogram[key].push(pixel);
@@ -833,11 +1212,11 @@ class PaletteBuilder {
                 histogram[key] = [pixel];
             }
         }
-    
+
         // sort buckets
         let buckets = Object.values(histogram);
         let sortedBuckets = buckets.sort((a, b) => a.length - b.length).reverse();
-    
+
         let palette = new Uint32Array(16);
         let i=0;
         for (let i = 0; i < 16; i++) {
@@ -884,7 +1263,7 @@ class DistanceSensorController {
             throw new Error('Invalid pin');
         }
 
-        const cmd = `print(distance(${pulsePin},${echoPin}))`;
+        const cmd = `log(distance(${pulsePin},${echoPin}))`;
         await this.serialPort.WriteCommand(cmd);
 
         const res = await this.serialPort.ReadResponse();
@@ -941,11 +1320,11 @@ class HudimityController {
     }
 
     async Read(pin, sensortype) {
-        let cmd = `print(humidity(${pin},${sensortype}))`;
+        let cmd = `log(humidity(${pin},${sensortype}))`;
         await this.serialPort.WriteCommand(cmd);
 
         let res = await this.serialPort.ReadResponse();
-        return res.success;
+        return parseFloat(res.response);
     }
 
     get Dht11() {
@@ -970,11 +1349,17 @@ class I2cController {
         this.serialPort = serialPort;
     }
 
-    async Write(address, data, offset, length) {
+    async Write(address, data, offset = 0, length = -1) {
+        if (length == -1)
+            length = data.length
+
         return await this.WriteRead(address, data, offset, length, null, 0, 0);
     }
 
-    async Read(address, data, offset, length) {
+    async Read(address, data, offset = 0, length = -1) {
+        if (length == -1)
+            length = data.length
+
         return await this.WriteRead(address, null, 0, 0, data, offset, length);
     }
 
@@ -1029,7 +1414,7 @@ class InfraredController {
     }
 
     async Read() {
-        const cmd = "print(irread())";
+        const cmd = "log(irread())";
         await this.serialPort.WriteCommand(cmd);
         const res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -1042,14 +1427,17 @@ class InfraredController {
         return -1;
     }
 
-    async Enable(enable) {
+    async Enable(pin, enable) {
         let en = 0;
 
         if (enable === true) {
             en = 1;
         }
 
-        const cmd = `irenable(${en})`;
+		if (pin != 2 && pin != 8)
+			throw new Error("IR is only available on pin 2 and 8");
+
+        const cmd = `irenable(${pin}, ${en})`;
         await this.serialPort.WriteCommand(cmd);
 
         const res = await this.serialPort.ReadResponse();
@@ -1077,7 +1465,7 @@ class LedController {
 }
 
 class NeoController {
-    MAX_LED_NUM = 256;
+    MAX_LED_NUM = 1024;
 
     constructor(serialPort) {
         this.serialPort = serialPort;
@@ -1089,11 +1477,15 @@ class NeoController {
         await this.serialPort.WriteCommand(cmd);
 
         // each led need 1.25us delay blocking mode
-        const delay = (this.MAX_LED_NUM * 3 * 8 * 1.25);
-        setTimeout(async () => {
+        const delay = ((this.MAX_LED_NUM * 3 * 8 * 1.25) / 1000000);
+        /*setTimeout(async () => {
             const res = await this.serialPort.ReadResponse();
             return res.success;
-        }, delay);
+        }, delay);*/
+
+        await new Promise(resolve => setTimeout(resolve, delay));
+        const res = await this.serialPort.ReadResponse();
+        return res.success;
     }
 
     async Clear() {
@@ -1110,6 +1502,19 @@ class NeoController {
         const green = (color >> 8) & 0xff;
         const blue = (color >> 0) & 0xff;
 
+        if (id < 0 || id > this.MAX_LED_NUM) {
+            return false;
+        }
+
+        const cmd = `neoset(${id},${red},${green},${blue})`;
+        await this.serialPort.WriteCommand(cmd);
+
+        const res = await this.serialPort.ReadResponse();
+
+        return res.success;
+    }
+	
+	async SetRGB(id, red, green, blue) {        
         if (id < 0 || id > this.MAX_LED_NUM) {
             return false;
         }
@@ -1164,6 +1569,22 @@ class PinController {
         return 98;
     }
 
+	__get_button_up() {
+        return 85;
+    }
+
+	__get_button_down() {
+        return 68;
+    }
+
+	__get_button_left() {
+        return 76;
+    }
+
+	__get_button_right() {
+        return 82;
+    }
+
     __get_led() {
         return 108;
     }
@@ -1194,6 +1615,22 @@ class PinController {
 
     get ButtonB() {
         return this.__get_button_b();
+    }
+
+	get ButtonUp() {
+        return this.__get_button_up();
+    }
+
+	get ButtonDown() {
+        return this.__get_button_down();
+    }
+
+	get ButtonLeft() {
+        return this.__get_button_left();
+    }
+
+	get ButtonRight() {
+        return this.__get_button_right();
     }
 
     get Led() {
@@ -1342,7 +1779,7 @@ class ScriptController {
         dataRead[0] = 0x00;
 
         await this.serialPort.WriteRawData(dataWrite, 0, 1);
-        
+
         const count = await this.serialPort.ReadRawData(dataRead, 0, 1);
 
         if (count === 0) {
@@ -1386,17 +1823,48 @@ class ServoController {
     }
 }
 
+class SoundController {
+    constructor(serialPort) {
+        this.serialPort = serialPort;
+    }
+
+    async Beep(pin, frequency, duration) {
+        if (frequency < 0 || frequency > 10000) {
+            throw ("Frequency is within range[0,10000] Hz");
+        }
+        if (duration < 0 || duration > 1000) {
+            throw ("duration is within range[0,1000] millisecond");
+        }
+
+        if (pin === 'p' || pin === 'P') {
+            pin = 112;
+        }
+
+        let cmd = `beep(${pin}, ${frequency}, ${duration})`;
+
+        await this.serialPort.WriteCommand(cmd);
+        let res = await this.serialPort.ReadResponse();
+        return res.success;
+    }
+}
+
 
 class SpiController {
     constructor(serialPort) {
         this.serialPort = serialPort;
     }
 
-    async Write(dataWrite, offset, length, chipselect = -1) {
+    async Write(dataWrite, offset = 0, length = -1, chipselect = -1) {
+        if (length === -1)
+            length = dataWrite.length
+
         return await this.WriteRead(dataWrite, offset, length, null, 0, 0, chipselect);
     }
 
-    async Read(dataRead, offset, length, chipselect = -1) {
+    async Read(dataRead, offset = 0, length = -1, chipselect = -1) {
+        if (length === -1)
+            length = dataRead.length
+
         return await this.WriteRead(null, 0, 0, dataRead, offset, length, chipselect);
     }
 
@@ -1522,21 +1990,9 @@ class SpiController {
 }
 
 class SystemController {
-    #DISPLAY_MAX_LINES = 8;
-    #DISPLAY_MAX_CHARACTER_PER_LINE = 21;
-    
-    constructor(serialPort, display) {
+
+    constructor(serialPort) {
         this.serialPort = serialPort;
-        this.display = display;
-
-        this.#DISPLAY_MAX_LINES = Math.floor(this.display.Height / 8)
-        this.#DISPLAY_MAX_CHARACTER_PER_LINE = Math.floor(this.display.Width / 6)
-
-        this.print_posx = 0;
-        this.displayText = new Array(this.#DISPLAY_MAX_LINES);
-        for(let i = 0; i < this.displayText.length; i++) {
-            this.displayText[i] = '';
-        }
     }
 
     async Reset(option) {
@@ -1546,7 +2002,7 @@ class SystemController {
     }
 
     async GetTickMicroseconds() {
-        let cmd = "print(tickus())";
+        let cmd = "log(tickus())";
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -1558,7 +2014,7 @@ class SystemController {
     }
 
     async GetTickMilliseconds() {
-        let cmd = "print(tickms())";
+        let cmd = "log(tickms())";
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -1569,69 +2025,27 @@ class SystemController {
         return -1;
     }
 
-    async Beep(pin, frequency, duration) {
-        if (frequency < 0 || frequency > 10000) {
-            throw ("Frequency is within range[0,10000] Hz");
-        }
-        if (duration < 0 || duration > 1000) {
-            throw ("duration is within range[0,1000] millisecond");
-        }
-
-        let cmd = `beep(${pin}, ${frequency}, ${duration})`;
-        await this.serialPort.WriteCommand(cmd);
-        let res = await this.serialPort.ReadResponse();
-        return res.success;
-    }
-
-    #PrnChar(c) {
-        if (
-            this.print_posx === this.#DISPLAY_MAX_CHARACTER_PER_LINE &&
-            c !== "\r" &&
-            c !== "\n"
-        ) {
-            return;
-        }
-
-        if (c === "\r" || c === "\n") {
-            this.print_posx = 0;
-
-            for (let i = 1; i < this.#DISPLAY_MAX_LINES; i++) {
-                this.displayText[i - 1] = this.displayText[i];
-            }
-
-            this.displayText[this.#DISPLAY_MAX_LINES - 1] = "";
-        } else {
-            this.displayText[this.#DISPLAY_MAX_LINES - 1] =
-                this.displayText[this.#DISPLAY_MAX_LINES - 1] + c;
-            this.print_posx += 1;
-        }
-        return;
-    }
+   
 
     async #PrnText(text, newline) {
-        for (let i = 0; i < text.length; i++) {
-            this.#PrnChar(text[i]);
-        }
- 
-        await this.display.Clear(0);
-        for (let i = 0; i < this.displayText.length; i++) {
-            if (this.displayText[i] !== "") {
-                await this.display.DrawText(this.displayText[i], 1, 0, i * 8);
-            }
-        }
-        await this.display.Show();
+        let cmd = `print("${text}")`;
 
-        if (newline) {
-            this.#PrnChar("\r");
-        }
+		if (newline)
+			cmd = `println("${text}")`;
+
+		await this.serialPort.WriteCommand(cmd);
+        let res = await this.serialPort.ReadResponse();
     }
 
     async Print(text) {
         if (typeof text === "string") {
+			console.log(text);
             await this.#PrnText(text, false);
         } else if (typeof text === "boolean") {
-            await this.#PrnText(text ? "1" : "0", false);
+            console.log(text ? "1" : "0");
+			await this.#PrnText(text ? "1" : "0", false);
         } else {
+			console.log(text.toString());
             await this.#PrnText(text.toString(), false);
         }
 
@@ -1640,10 +2054,13 @@ class SystemController {
 
     async Println(text) {
         if (typeof text === "string") {
+		   console.log(text);
            await this.#PrnText(text, true);
         } else if (typeof text === "boolean") {
+		   console.log(text ? "1" : "0");
            await this.#PrnText(text ? "1" : "0", true);
         } else {
+		   console.log(text.toString());
            await this.#PrnText(text.toString(), true);
         }
 
@@ -1662,11 +2079,11 @@ class TemperatureController {
     }
 
     async Read(pin, sensortype) {
-        let cmd = `print(temp(${pin},${sensortype}))`;
+        let cmd = `log(temp(${pin},${sensortype}))`;
         await this.serialPort.WriteCommand(cmd);
 
         let res = await this.serialPort.ReadResponse();
-        return res.success;
+        return parseFloat(res.response);
     }
 
     __get_dht11() {
@@ -1712,7 +2129,7 @@ class TouchController {
     }
 
     async Read(pin) {
-        const cmd = `print(touchread(${pin}))`;
+        const cmd = `log(touchread(${pin}))`;
         await this.serialPort.WriteCommand(cmd);
 
         const res = await this.serialPort.ReadResponse();
@@ -1747,7 +2164,7 @@ class UartController {
     }
 
     async BytesToRead() {
-        let cmd = "x=uartcount():print(x)";
+        let cmd = "x=uartcount():log(x)";
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -1760,7 +2177,7 @@ class UartController {
     }
 
     async Read() {
-        let cmd = "x=uartread():print(x)";
+        let cmd = "x=uartread():log(x)";
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -1773,22 +2190,46 @@ class UartController {
     }
 }
 
+class PulseController {
+    constructor(serialPort) {
+        this.serialPort = serialPort;
+    }
+
+    async Set(pin, stepCount,delay ) {
+        if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO) {
+            console.log('Invalid pin');
+            //throw new ValueError('Invalid pin');
+            return false;
+        }
+        
+
+        const cmd = `pulse(${pin}, ${stepCount}, ${delay})`;
+        await this.serialPort.WriteCommand(cmd);
+
+        const response = await this.serialPort.ReadResponse();
+
+        return response.success;
+    }
+}
+
 class DUELinkController {
     constructor(serial) {
-        this.serialPort = new SerialInterface(serial);    
-        
+        this.serialPort = new SerialInterface(serial);
+
         this.IsPulse = false;
         this.IsFlea = false;
         this.IsPico = false;
         this.IsEdge = false;
         this.IsRave = false;
+		this.IsTick = false;
+		this.IsDue = false;
     }
 
     async InitDevice() {
         if (!this.serialPort) {
             throw (`Not connected to the device.`);
         }
-        
+
         this.Analog = new AnalogController(this.serialPort);
         this.Digital = new DigitalController(this.serialPort);
         this.I2c = new I2cController(this.serialPort);
@@ -1807,17 +2248,23 @@ class DUELinkController {
         this.Pin = new PinController();
         this.Temperature = new TemperatureController(this.serialPort);
         this.Humidity = new HudimityController(this.serialPort);
-        this.System = new SystemController(this.serialPort, this.Display);
+        this.System = new SystemController(this.serialPort);
+		
+		this.Pulse = new PulseController(this.serialPort);		
+		this.Can = new CanController(this.serialPort);
+        this.Sound = new SoundController(this.serialPort);
+        this.Bluetooth = new BluetoothController(this.serialPort);     
+
     }
-    
+
     async Connect() {
         await this.serialPort.Connect();
-        
-        this.Version = this.serialPort.version;
+
+        this.Version = (await this.serialPort.GetVersion());
         this.Version = this.Version.split("\n")[0];
         this.Version = this.Version.replace("\r", "");
         if (this.Version === "" || this.Version.length !== 7) {
-            throw ("The device is not supported.");
+            throw ("The device is not supported: ${this.Version}");
         }
 
         this.DeviceConfig = new DeviceConfiguration();
@@ -1842,8 +2289,17 @@ class DUELinkController {
             this.DeviceConfig.IsRave = true;
             this.DeviceConfig.MaxPinIO = 23;
             this.DeviceConfig.MaxPinAnalog = 29;
+        } else if (this.Version[this.Version.length - 1] === "T") {
+            this.DeviceConfig.IsTick = true;
+            this.DeviceConfig.MaxPinIO = 23;
+            this.DeviceConfig.MaxPinAnalog = 11;
+		} else if (this.Version[this.Version.length - 1] === "D") {
+            this.DeviceConfig.IsDue = true;
+            this.DeviceConfig.MaxPinIO = 15;
+            this.DeviceConfig.MaxPinAnalog = 10;
+        
         } else {
-            throw new Error("The device is not supported.");    
+            throw new Error("The device is not supported. ${this.Version}");
         }
 
         this.IsPulse = this.DeviceConfig.IsPulse;
@@ -1851,9 +2307,11 @@ class DUELinkController {
         this.IsPico = this.DeviceConfig.IsPico;
         this.IsEdge = this.DeviceConfig.IsEdge;
         this.IsRave = this.DeviceConfig.IsRave;
+		this.IsTick = this.DeviceConfig.IsTick;
+		this.IsDue = this.DeviceConfig.IsDue;
 
         this.serialPort.DeviceConfig = this.DeviceConfig;
-        this.InitDevice();
+        await this.InitDevice();
     }
 
     async Disconnect() {
