@@ -390,7 +390,7 @@ class ButtonController {
     }
 
     IsButtonValid(pin) {
-		if (pin != 0 && pin != 1 && pin != 2 &&  pin != 13 && pin != 14 && pin != 15 && pin != 16 && pin != 65 && pin != 66 && pin != 68 && pin != 76 && pin != 82 && pin != 85) {
+		if (pin != 0 && pin != 1 && pin != 2 &&  pin != 3 && pin != 4 && pin != 13 && pin != 14 && pin != 15 && pin != 16 && pin != 65 && pin != 66 && pin != 68 && pin != 76 && pin != 82 && pin != 85) {
 			return false;
 		}
 

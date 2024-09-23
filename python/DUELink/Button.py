@@ -6,7 +6,7 @@ class ButtonController:
         self.serialPort = serialPort
 
     def IsButtonValid(self, pin) ->bool:
-        if (pin != 0 and pin != 1 and pin != 2 and  pin != 13 and pin != 14 and pin != 15 and pin != 16 and pin != 65 and pin != 66 and pin != 68 and pin != 76 and pin != 82 and pin != 85):
+        if (pin != 0 and pin != 1 and pin != 2 and pin != 3 and pin != 4 and pin != 13 and pin != 14 and pin != 15 and pin != 16 and pin != 65 and pin != 66 and pin != 68 and pin != 76 and pin != 82 and pin != 85):
             return False
         return True
         
