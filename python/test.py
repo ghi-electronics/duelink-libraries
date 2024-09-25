@@ -3,8 +3,13 @@ from PIL import Image, ImageDraw, ImageFont
 
 # Connect to BrainPad
 availablePort = DUELinkController.GetConnectionPort()
-BrainPad = DUELinkController(availablePort)
+duelink = DUELinkController(availablePort)
 # BrainPad is ready
+x = 100
+duelink.Display.Clear(0)
+duelink.Display.DrawText(str(x), 1, 0, 0)
+duelink.Display.Show()
+
 
 # framebuffer =Image.new("RGBA", (BrainPad.Display.Width, BrainPad.Display.Height), "red")
 # draw = ImageDraw.Draw(framebuffer)

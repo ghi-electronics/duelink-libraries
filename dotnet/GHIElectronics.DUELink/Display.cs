@@ -189,6 +189,18 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
+
+            public bool DrawTextTiny(string text, uint color, int x, int y) {
+                var cmd = string.Format("lcdtextT(\"{0}\",{1},{2},{3})", text, color, x, y);
+
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                return res.success;
+
+            }
             public bool DrawImage(uint[] img, int x, int y, int transform) => this.DrawImageScale(img, x, y, 1, 1, transform);
             public bool DrawImageScale(uint[] img, int x, int y, int scaleWidth, int scaleHeight, int transform) {
 

@@ -13,8 +13,8 @@ namespace GHIElectronics.DUELink {
 
             public FrequencyController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public int MaxFrequency { get; } = 1000000;
-            public int MinFrequency { get; } = 16;
+            public int MaxFrequency { get; } = 10000000;
+            public int MinFrequency { get; } = 15;
 
             public bool Write(char c, int frequency, long duration_ms = 0, int dutycyle = 500) {
                 if (c == 'p' || c == 'P')
@@ -23,17 +23,17 @@ namespace GHIElectronics.DUELink {
                 return false;
              }
 
-            public bool Write(int pin, int frequency, long duration_ms = 0, int dutycyle = 500 ) {
+            public bool Write(int pin, int frequency, long duration_ms = 0, float dutycyle = 50 ) {
                 if (frequency < this.MinFrequency || frequency > this.MaxFrequency) {
-                    throw new Exception("Frequency must be in range 16Hz..1000000Hz");
+                    throw new Exception("Frequency must be in range 15Hz..10000000Hz");
                 }
 
                 if (duration_ms > 99999999) {
                     throw new Exception("duration_ms must be in range 0..99999999");
                 }
 
-                if (dutycyle < 0 || dutycyle > 1000) {
-                    throw new Exception("dutycyle must be in range 0..1000");
+                if (dutycyle < 0 || dutycyle > 100) {
+                    throw new Exception("dutycyle must be in range 0..100");
                 }
 
 

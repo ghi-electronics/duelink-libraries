@@ -905,6 +905,14 @@ class DisplayController {
         return res.success;
     }
 
+    async DrawTextTiny(text, color, x, y) {
+        let cmd = `lcdtextt("${text}",${color},${x},${y})`;
+        await this.serialPort.WriteCommand(cmd);
+
+        let res = await this.serialPort.ReadResponse();
+        return res.success;
+    }
+
     async DrawTextScale(text, color, x, y, scalewidth, scaleheight) {
         let cmd = `lcdtexts("${text}",${color},${x},${y},${scalewidth},${scaleheight})`;
         await this.serialPort.WriteCommand(cmd);
@@ -1284,21 +1292,21 @@ class DistanceSensorController {
 class FrequencyController {
     constructor(serialPort) {
         this.serialPort = serialPort;
-        this.MaxFrequency = 1000000;
-        this.MinFrequency = 16;
+        this.MaxFrequency = 10000000;
+        this.MinFrequency = 15;
     }
 
-    async Write(pin, frequency, duration_ms = 0, dutycyle = 500) {
+    async Write(pin, frequency, duration_ms = 0, dutycyle = 50) {
         if (frequency < this.MinFrequency || frequency > this.MaxFrequency) {
-            throw new Error("Frequency must be in range 16Hz..1000000Hz");
+            throw new Error("Frequency must be in range 15Hz..10000000Hz");
         }
 
         if (duration_ms > 99999999) {
             throw new Error("duration_ms must be in range 0..99999999");
         }
 
-        if (dutycyle < 0 || dutycyle > 1000) {
-            throw new Error("dutycyle must be in range 0..1000");
+        if (dutycyle < 0 || dutycyle > 100) {
+            throw new Error("dutycyle must be in range 0..100");
         }
 
         if (pin == 'p' || pin == 'P') {

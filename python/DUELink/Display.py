@@ -218,6 +218,12 @@ class DisplayController:
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
+    
+    def DrawTextTiny(self, text, color, x, y):
+        cmd = f"lcdtextt(\"{text}\",{color},{x},{y})"
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+        return res.success
 
     def DrawTextScale(self, text, color, x, y, scalewidth, scaleheight):
         cmd = f"lcdtexts(\"{text}\",{color},{x},{y},{scalewidth},{scaleheight})"
