@@ -1335,19 +1335,19 @@ class HudimityController {
         return parseFloat(res.response);
     }
 
-    get Dht11() {
+    get DHT11() {
         return 11;
     }
 
-    get Dht12() {
+    get DHT12() {
         return 12;
     }
 
-    get Dht21() {
+    get DHT21() {
         return 21;
     }
 
-    get Dht22() {
+    get DHT22() {
         return 22;
     }
 }
@@ -2077,19 +2077,19 @@ class TemperatureController {
         return;
     }
 
-    get Dht11() {
+    get DHT11() {
         return this.__get_dht11();
     }
 
-    get Dht12() {
+    get DHT12() {
         return this.__get_dht12();
     }
 
-    get Dht21() {
+    get DHT21() {
         return this.__get_dht21();
     }
 
-    get Dht22() {
+    get DHT22() {
         return this.__get_dht22();
     }
 }
@@ -2116,8 +2116,8 @@ class TouchController {
 }
 
 class UartController {
-    constructor(serialport) {
-        this.serialport = serialport;
+    constructor(serialPort) {
+        this.serialPort = serialPort;
     }
 
     async Enable(baudrate) {
@@ -2135,7 +2135,7 @@ class UartController {
     }
 
     async BytesToRead() {
-        let cmd = "x=uartcount():log(x)";
+        let cmd = "log(uartcount())";
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         if (res.success) {
@@ -2148,7 +2148,7 @@ class UartController {
     }
 
     async Read() {
-        let cmd = "x=uartread():log(x)";
+        let cmd = "log(uartread())";
         await this.serialPort.WriteCommand(cmd);
         let res = await this.serialPort.ReadResponse();
         if (res.success) {
