@@ -352,6 +352,9 @@ class BluetoothController {
         const cmd = `wname("${name}", ${name.length})`; 
 
         await this.serialPort.WriteCommand(cmd);
+
+        await Util.sleep(6000) // Bluetooth reset take ~6 seconds
+
         const res = await this.serialPort.ReadResponse();
 
         return res.success;
@@ -362,7 +365,7 @@ class BluetoothController {
             throw new Error("Support speed 9600 or 115200 only");
         }
 
-        const cmd = `wspeed(${speed})`; 
+        const cmd = `wspeed("${speed}")`; 
 
         await this.serialPort.WriteCommand(cmd);
         const res = await this.serialPort.ReadResponse();
@@ -378,6 +381,9 @@ class BluetoothController {
         const cmd = `wcode("${pinCode}")`; 
 
         await this.serialPort.WriteCommand(cmd);
+
+        await Util.sleep(6000) // Bluetooth reset take ~6 seconds
+
         const res = await this.serialPort.ReadResponse();
 
         return res.success;

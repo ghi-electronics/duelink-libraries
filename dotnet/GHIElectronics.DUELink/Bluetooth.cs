@@ -12,9 +12,11 @@ namespace GHIElectronics.DUELink {
             public BluetoothController(SerialInterface serialPort) => this.serialPort = serialPort;
 
             public bool SetName(string name) {
-                var cmd = $"wname({name},{name.Length})";
+                var cmd = $"wname(\"{name}\",{name.Length.ToString()})";
 
                 this.serialPort.WriteCommand(cmd);
+
+                Thread.Sleep(6000); // Bluetooth reset takes ~6 seconds
 
                 var res = this.serialPort.ReadRespone();
 
@@ -22,7 +24,7 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool SetSpeed(int speed) {
+            private bool SetSpeed(int speed) {
                 if (speed != 115200 && speed != 9600)
                     throw new Exception("Support speed 9600 or 115200 only");
 
@@ -48,10 +50,11 @@ namespace GHIElectronics.DUELink {
                     throw new Exception("PinCode invalid.");
                 }
 
-                var cmd = $"wcode({pinCode})";
+                var cmd = $"wcode(\"{pinCode}\")";
 
                 this.serialPort.WriteCommand(cmd);
 
+                Thread.Sleep(6000); // Bluetooth reset takes ~6 seconds
                 var res = this.serialPort.ReadRespone();
 
                 return res.success;

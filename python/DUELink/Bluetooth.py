@@ -1,3 +1,4 @@
+import time
 class BluetoothController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
@@ -6,6 +7,7 @@ class BluetoothController:
         cmd = f"wname(\"{name}\",{len(name)})"
         self.serialPort.WriteCommand(cmd)
 
+        time.sleep(6) # Bluetooth reset takes ~6 seconds
         res = self.serialPort.ReadRespone()
         return res.success
     
@@ -26,5 +28,6 @@ class BluetoothController:
         cmd = f"wcode(\"{pinCode}\")"
         self.serialPort.WriteCommand(cmd)
 
+        time.sleep(6) # Bluetooth reset takes ~6 seconds
         res = self.serialPort.ReadRespone()
         return res.success
