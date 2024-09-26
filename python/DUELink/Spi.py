@@ -73,36 +73,7 @@ class SpiController:
         res = self.serialPort.ReadRespone()
         return res.success
     
-    def Write4bpp(self, dataWrite: Optional[bytes], offsetWrite: int, countWrite: int,  chipselect: int = -1) -> bool:   
-        if chipselect >= self.serialPort.DeviceConfig.MaxPinIO:
-            raise ValueError("InvalidPin")
-        
-        if (dataWrite is None ) or (countWrite == 0):
-            raise ValueError("Invalid arguments")
-        
-        cmd = f"spi4bpp({countWrite},{chipselect})"
-        self.serialPort.WriteCommand(cmd)
-
-        res = self.serialPort.ReadRespone()
-
-        if not res.success:
-            return False
-
-        self.serialPort.WriteRawData(dataWrite, offsetWrite, countWrite)
-
-        res = self.serialPort.ReadRespone()
-        return res.success
     
-    def Pallete(self, id:int, color: int) -> bool:
-        if id > 16:
-            raise ValueError("Pallete supports 16 color index only.")
-        
-        cmd = f"palette({id},{color})"
-
-        self.serialPort.WriteCommand(cmd)
-
-        res = self.serialPort.ReadRespone()
-        return res.success
     
     def Configuration(self,mode: int,  frequencyKHz: int)-> bool:
         if mode > 3 or mode < 0:

@@ -1940,44 +1940,7 @@ class SpiController {
 
         const res2 = await this.serialPort.ReadResponse();
         return res2.success;
-    }
-
-    async Write4bpp(dataWrite, offsetWrite, countWrite, chipselect = -1) {
-        if (chipselect >= this.serialPort.DeviceConfig.MaxPinIO) {
-            throw new Error("InvalidPin");
-        }
-
-        if (dataWrite === null || countWrite === 0) {
-            throw new Error("Invalid arguments");
-        }
-
-        const cmd = `spi4bpp(${countWrite},${chipselect})`;
-        await this.serialPort.WriteCommand(cmd);
-
-        const res = await this.serialPort.ReadResponse();
-
-        if (!res.success) {
-            return false;
-        }
-
-        await this.serialPort.WriteRawData(dataWrite, offsetWrite, countWrite);
-
-        const res2 = await this.serialPort.ReadResponse();
-        return res2.success;
-    }
-
-    async Pallete(id, color) {
-        if (id > 16) {
-            throw new Error("Pallete supports 16 color index only.");
-        }
-
-        const cmd = `palette(${id},${color})`;
-
-        await this.serialPort.WriteCommand(cmd);
-
-        const res = await this.serialPort.ReadResponse();
-        return res.success;
-    }
+    }    
 
     async Configuration(mode, frequencyKHz) {
         if (mode > 3 || mode < 0) {

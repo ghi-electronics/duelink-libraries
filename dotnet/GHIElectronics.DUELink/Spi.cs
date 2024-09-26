@@ -110,75 +110,75 @@ namespace GHIElectronics.DUELink {
                 return value;
             }
 
-            public bool Write4bpp(byte[] dataWrite, int chipselect = -1) => this.Write4bpp(dataWrite, 0, dataWrite.Length, chipselect);
+            //public bool Write4bpp(byte[] dataWrite, int chipselect = -1) => this.Write4bpp(dataWrite, 0, dataWrite.Length, chipselect);
 
-            public bool Write4bpp(byte[] dataWrite, int offset, int count, int chipselect = -1) {
-                if (chipselect >= this.serialPort.DeviceConfig.MaxPinIO)
-                    throw new ArgumentOutOfRangeException("Invalid pin.");
+            //public bool Write4bpp(byte[] dataWrite, int offset, int count, int chipselect = -1) {
+            //    if (chipselect >= this.serialPort.DeviceConfig.MaxPinIO)
+            //        throw new ArgumentOutOfRangeException("Invalid pin.");
 
-                if (dataWrite == null)
-                    throw new ArgumentNullException();
+            //    if (dataWrite == null)
+            //        throw new ArgumentNullException();
 
-                if (dataWrite != null && offset + count > dataWrite.Length)
-                    throw new ArgumentOutOfRangeException();
+            //    if (dataWrite != null && offset + count > dataWrite.Length)
+            //        throw new ArgumentOutOfRangeException();
 
-                var cmd = string.Format("spi4bpp({0},{1})", count.ToString(), chipselect.ToString());
+            //    var cmd = string.Format("spi4bpp({0},{1})", count.ToString(), chipselect.ToString());
 
-                this.serialPort.WriteCommand(cmd);
+            //    this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+            //    var res = this.serialPort.ReadRespone();
 
-                if (!res.success) {
-                    return false;
-                }
+            //    if (!res.success) {
+            //        return false;
+            //    }
 
-                this.serialPort.WriteRawData(dataWrite, offset, count);
+            //    this.serialPort.WriteRawData(dataWrite, offset, count);
 
-                res = this.serialPort.ReadRespone();
-                return res.success;
-            }
+            //    res = this.serialPort.ReadRespone();
+            //    return res.success;
+            //}
 
-            public bool Write4bppScale(byte[] dataWrite, int chipselect = -1) => this.Write4bppScale(dataWrite, 0, dataWrite.Length, chipselect);
-            public bool Write4bppScale(byte[] dataWrite, int offset, int count, int chipselect = -1) {
-                if (chipselect >= this.serialPort.DeviceConfig.MaxPinIO)
-                    throw new ArgumentOutOfRangeException("Invalid pin.");
+            //public bool Write4bppScale(byte[] dataWrite, int chipselect = -1) => this.Write4bppScale(dataWrite, 0, dataWrite.Length, chipselect);
+            //public bool Write4bppScale(byte[] dataWrite, int offset, int count, int chipselect = -1) {
+            //    if (chipselect >= this.serialPort.DeviceConfig.MaxPinIO)
+            //        throw new ArgumentOutOfRangeException("Invalid pin.");
 
-                if (dataWrite == null)
-                    throw new ArgumentNullException();
+            //    if (dataWrite == null)
+            //        throw new ArgumentNullException();
 
-                if (dataWrite != null && offset + count > dataWrite.Length)
-                    throw new ArgumentOutOfRangeException();
+            //    if (dataWrite != null && offset + count > dataWrite.Length)
+            //        throw new ArgumentOutOfRangeException();
 
-                var cmd = string.Format("spi4bppscale({0},{1})", count.ToString(), chipselect.ToString());
-
-
-                this.serialPort.WriteCommand(cmd);
-
-                var res = this.serialPort.ReadRespone();
-
-                if (!res.success) {
-                    return false;
-                }
-
-                this.serialPort.WriteRawData(dataWrite, offset, count);
-
-                res = this.serialPort.ReadRespone();
-                return res.success;
-            }
-
-            public bool Pallete(int id, uint color) {
-                if (id >= 16)
-                    throw new ArgumentOutOfRangeException("Pallete supports 16 color index only.");
+            //    var cmd = string.Format("spi4bppscale({0},{1})", count.ToString(), chipselect.ToString());
 
 
-                var cmd = string.Format("palette({0},{1})", id.ToString(), color.ToString());
+            //    this.serialPort.WriteCommand(cmd);
 
-                this.serialPort.WriteCommand(cmd);
+            //    var res = this.serialPort.ReadRespone();
 
-                var res = this.serialPort.ReadRespone();
-                return res.success;
+            //    if (!res.success) {
+            //        return false;
+            //    }
 
-            }
+            //    this.serialPort.WriteRawData(dataWrite, offset, count);
+
+            //    res = this.serialPort.ReadRespone();
+            //    return res.success;
+            //}
+
+            //public bool Pallete(int id, uint color) {
+            //    if (id >= 16)
+            //        throw new ArgumentOutOfRangeException("Pallete supports 16 color index only.");
+
+
+            //    var cmd = string.Format("palette({0},{1})", id.ToString(), color.ToString());
+
+            //    this.serialPort.WriteCommand(cmd);
+
+            //    var res = this.serialPort.ReadRespone();
+            //    return res.success;
+
+            //}
 
             public bool Configuration(uint mode, uint frequencyKHz ) {
                 if (mode > 3 )
