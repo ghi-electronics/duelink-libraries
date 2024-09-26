@@ -57,7 +57,7 @@ class CanController:
 
         return -1
     
-    def WriteMessage(self, message:CanMessage)-> bool:
+    def Write(self, message:CanMessage)-> bool:
         data = [0]*16
 
         data[0] = ((message.Id >> 24) & 0xFF)
@@ -95,7 +95,7 @@ class CanController:
 
         return response.success
     
-    def ReadMessage(self) -> CanMessage:
+    def Read(self) -> CanMessage:
         cmd = 'canreadstream()'
 
         self.serialPort.WriteCommand(cmd)

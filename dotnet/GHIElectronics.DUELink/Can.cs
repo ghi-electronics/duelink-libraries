@@ -73,7 +73,7 @@ namespace GHIElectronics.DUELink {
                 return -1;
             }
 
-            public bool WriteMessage(CanMessage message) {
+            public bool Write(CanMessage message) {
 
                 var data = new byte[16];
 
@@ -111,7 +111,7 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public CanMessage ReadMessage() {
+            public CanMessage Read() {
 
                 var cmd = "canreadstream()";
 

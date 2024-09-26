@@ -510,7 +510,7 @@ class CanController {
         return -1;
 	}
 	
-	async WriteMessage(message) {
+	async Write(message) {
 		let data = new Uint8Array(16);
 		
 		data[0] = ((message.Id >> 24) & 0xFF)
@@ -551,7 +551,7 @@ class CanController {
 		return res2.success;
 	}
 
-    async ReadMessage () {
+    async Read () {
         const cmd = `canreadstream()`;
 			
         await this.serialPort.WriteCommand(cmd);
