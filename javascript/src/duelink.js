@@ -1335,21 +1335,7 @@ class HudimityController {
         return parseFloat(res.response);
     }
 
-    get DHT11() {
-        return 11;
-    }
-
-    get DHT12() {
-        return 12;
-    }
-
-    get DHT21() {
-        return 21;
-    }
-
-    get DHT22() {
-        return 22;
-    }
+    
 }
 
 class I2cController {
@@ -1964,6 +1950,7 @@ class SystemController {
 
     constructor(serialPort) {
         this.serialPort = serialPort;
+        this.Version = ""
     }
 
     async Reset(option) {
@@ -2057,41 +2044,7 @@ class TemperatureController {
         return parseFloat(res.response);
     }
 
-    __get_dht11() {
-        return 11;
-    }
-
-    __get_dht12() {
-        return 12;
-    }
-
-    __get_dht21() {
-        return 21;
-    }
-
-    __get_dht22() {
-        return 22;
-    }
-
-    __set_dht() {
-        return;
-    }
-
-    get DHT11() {
-        return this.__get_dht11();
-    }
-
-    get DHT12() {
-        return this.__get_dht12();
-    }
-
-    get DHT21() {
-        return this.__get_dht21();
-    }
-
-    get DHT22() {
-        return this.__get_dht22();
-    }
+    
 }
 
 class TouchController {
@@ -2225,6 +2178,8 @@ class DUELinkController {
 		this.Can = new CanController(this.serialPort);
         this.Sound = new SoundController(this.serialPort);
         this.Bluetooth = new BluetoothController(this.serialPort);     
+
+        this.System.Version = this.Version
 
     }
 

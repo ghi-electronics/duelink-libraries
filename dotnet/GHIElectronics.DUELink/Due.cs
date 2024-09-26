@@ -135,6 +135,8 @@ namespace GHIElectronics.DUELink {
             this.Can = new CanController(this.serialPort);
             this.Sound = new SoundController(this.serialPort);
             this.Bluetooth = new BluetoothController(this.serialPort);
+
+            this.System.Version = this.Version;
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {

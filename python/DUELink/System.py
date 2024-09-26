@@ -8,10 +8,11 @@ class SystemController:
 
 
     def __init__(self, serialPort):
-        self.serialPort = serialPort           
+        self.serialPort = serialPort
+        self.Version = ""         
 
-    def Reset(self, option : Enum):
-        cmd = "reset({0})".format(1 if option.value == 1 else 0)
+    def Reset(self, option : int):
+        cmd = "reset({0})".format(1 if option == 1 else 0)
         self.serialPort.WriteCommand(cmd)
         # The device will reset in bootloader or system reset
         self.serialPort.Disconnect()

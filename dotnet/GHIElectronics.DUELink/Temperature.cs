@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
 
-        public enum TemperatureSensorType: uint {
-            DHT11 = 11,
-            DHT12 = 12,
-            DHT21 = 21,
-            DHT22 = 22,
+        //public enum TemperatureSensorType: uint {
+        //    DHT11 = 11,
+        //    DHT12 = 12,
+        //    DHT21 = 21,
+        //    DHT22 = 22,
 
-        }
+        //}
         public class TemperatureController {
             SerialInterface serialPort;
 
             public TemperatureController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public double Read(int pin, TemperatureSensorType sensortype) {
+            public double Read(int pin, int sensortype) {
                 if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 

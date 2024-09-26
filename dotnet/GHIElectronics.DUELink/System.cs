@@ -46,9 +46,9 @@ namespace GHIElectronics.DUELink {
             //    }
             //}
 
-            public void Reset(ResetOption option) {
+            public void Reset(int option) {
 
-                var cmd = string.Format("reset({0})", option == ResetOption.Bootloader ? 1 : 0);
+                var cmd = string.Format("reset({0})", (option > 0) ? 1 : 0);
                 this.serialPort.WriteCommand(cmd);
 
                 // The device will reset in bootloader or system reset
@@ -200,7 +200,7 @@ namespace GHIElectronics.DUELink {
                 return res.success;
             }
 
-
+            public string Version { get; internal set; }
         }
     }
 }
