@@ -23,7 +23,7 @@ namespace GHIElectronics.DUELink {
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
 
-                var cmd = string.Format("log(humidity({0}, {1}))", pin.ToString(), sensortype.ToString());
+                var cmd = string.Format("log(humidity({0}, {1}))", pin.ToString(), ((int)(sensortype)).ToString());
 
                 this.serialPort.WriteCommand(cmd);
 

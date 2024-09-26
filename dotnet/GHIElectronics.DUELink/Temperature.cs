@@ -25,7 +25,7 @@ namespace GHIElectronics.DUELink {
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
 
-                var cmd = string.Format("log(temp({0}, {1}))", pin.ToString(), sensortype.ToString());
+                var cmd = string.Format("log(temp({0}, {1}))", pin.ToString(), ((int)(sensortype)).ToString());
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -46,10 +46,10 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public int Dht11 { get; } = 11;
-            public int Dht12 { get; } = 12;
-            public int Dht21 { get; } =21;
-            public int Dht22 { get; } = 22;
+            //public int Dht11 { get; } = 11;
+            //public int Dht12 { get; } = 12;
+            //public int Dht21 { get; } =21;
+            //public int Dht22 { get; } = 22;
         }
     }
 }
