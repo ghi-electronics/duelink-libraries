@@ -16,15 +16,15 @@ namespace GHIElectronics.DUELink {
 
             private string loadscript = string.Empty;
 
-            public void Run() {
-                var cmd = string.Format("run");
+            //public void Run() {
+            //    var cmd = string.Format("run");
 
-                this.serialPort.WriteCommand(cmd);
+            //    this.serialPort.WriteCommand(cmd);
 
-                // ensure the device enter to run mode.
-                Thread.Sleep(1);
+            //    // ensure the device enter to run mode.
+            //    Thread.Sleep(1);
 
-            }
+            //}
 
             public bool New() {
                 this.loadscript = string.Empty;

@@ -1661,10 +1661,6 @@ class ScriptController {
         this.loadscript = "";
     }
 
-    async Run() {
-        const cmd = "run";
-        await this.serialPort.WriteCommand(cmd);
-    }
 
     async New() {
         this.loadscript = "";

@@ -4,12 +4,7 @@ from DUELink.SerialInterface import SerialInterface
 class ScriptController:
     def __init__(self, serialPort : SerialInterface):
         self.serialPort = serialPort
-        self.loadscript = ""
-
-    def Run(self):
-        cmd = "run"
-        self.serialPort.WriteCommand(cmd)
-        time.sleep(0.001)
+        self.loadscript = ""    
 
     def New(self) -> bool:
         self.loadscript = ""
