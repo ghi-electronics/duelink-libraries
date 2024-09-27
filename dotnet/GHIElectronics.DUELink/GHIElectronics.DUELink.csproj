@@ -10,9 +10,9 @@
     <Copyright>Copyright GHI Electronics, LLC 2023</Copyright>
     <PackageProjectUrl>https://ghielectronics.com/</PackageProjectUrl>
     <PackageTags>BrainPad DUELink</PackageTags>
-    <AssemblyVersion>1.1.5.0</AssemblyVersion>
-    <FileVersion>1.1.5.0</FileVersion>
-    <Version>1.1.5.0</Version>
+    <AssemblyVersion>1.1.6.0</AssemblyVersion>
+    <FileVersion>1.1.6.0</FileVersion>
+    <Version>1.1.6.0</Version>
     <Authors>GHI Electronics, LLC</Authors>
 	<Owner>GHI Electronics, LLC</Owner>
     <Company>GHI Electronics, LLC</Company>
