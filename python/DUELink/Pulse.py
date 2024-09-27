@@ -4,11 +4,11 @@ class PulseController:
     def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
-    def Set(self, pin, stepCount, delay_us):
+    def Set(self, pin, pulseCount, pulseDuration):
         if pin < 0 or pin >= self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError('Invalid pin')    
 
-        cmd = 'pulse({}, {},{} )'.format(pin, stepCount, delay_us)
+        cmd = 'pulse({}, {},{} )'.format(pin, pulseCount, pulseDuration)
         
         self.serialPort.WriteCommand(cmd)
 

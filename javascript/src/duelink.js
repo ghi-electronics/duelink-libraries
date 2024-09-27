@@ -2097,7 +2097,7 @@ class PulseController {
         this.serialPort = serialPort;
     }
 
-    async Set(pin, stepCount,delay ) {
+    async Set(pin, pulseCount,pulseDuration ) {
         if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO) {
             console.log('Invalid pin');
             //throw new ValueError('Invalid pin');
@@ -2105,7 +2105,7 @@ class PulseController {
         }
         
 
-        const cmd = `pulse(${pin}, ${stepCount}, ${delay})`;
+        const cmd = `pulse(${pin}, ${pulseCount}, ${pulseDuration})`;
         await this.serialPort.WriteCommand(cmd);
 
         const response = await this.serialPort.ReadResponse();
