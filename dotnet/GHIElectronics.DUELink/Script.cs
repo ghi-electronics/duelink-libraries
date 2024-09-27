@@ -151,32 +151,32 @@ namespace GHIElectronics.DUELink {
                 return respone.success;
             }
 
-            public bool IsRunning() {
-                this.serialPort.DiscardInBuffer();
+            //public bool IsRunning() {
+            //    this.serialPort.DiscardInBuffer();
 
 
-                this.serialPort.WriteRawData(new byte[] { 0xFF }, 0, 1);
+            //    this.serialPort.WriteRawData(new byte[] { 0xFF }, 0, 1);
 
-                Thread.Sleep(1);
+            //    Thread.Sleep(1);
 
-                var data = new byte[1];
+            //    var data = new byte[1];
 
-                try {
-                    this.serialPort.ReadRawData(data, 0, data.Length);
-                }
-                catch {
-                    // if running, should received 0xff
-                    // it not, need to send '\n' to clear 0xff that was sent.
-                    this.serialPort.WriteRawData(new byte[] { (byte)'\n' }, 0, 1);
+            //    try {
+            //        this.serialPort.ReadRawData(data, 0, data.Length);
+            //    }
+            //    catch {
+            //        // if running, should received 0xff
+            //        // it not, need to send '\n' to clear 0xff that was sent.
+            //        this.serialPort.WriteRawData(new byte[] { (byte)'\n' }, 0, 1);
 
-                    this.serialPort.ReadRespone();
-                }
+            //        this.serialPort.ReadRespone();
+            //    }
 
 
 
-                return data[0] == 0xFF;
+            //    return data[0] == 0xFF;
 
-            }
+            //}
 
         }
     }

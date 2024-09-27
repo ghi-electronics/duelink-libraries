@@ -1768,31 +1768,7 @@ class ScriptController {
 
         return res.response;
     }
-
-    async IsRunning() {
-        this.serialPort.DiscardInBuffer();
-
-        const dataWrite = new Uint8Array(1);
-        const dataRead = new Uint8Array(1);
-
-        dataWrite[0] = 0xFF;
-        dataRead[0] = 0x00;
-
-        await this.serialPort.WriteRawData(dataWrite, 0, 1);
-
-        const count = await this.serialPort.ReadRawData(dataRead, 0, 1);
-
-        if (count === 0) {
-            // if running, should received 0xff
-            // it not, need to send '\n' to clear 0xff that was sent.
-            dataWrite[0] = 10;
-            this.serialPort.WriteRawData(dataWrite, 0, 1);
-
-            await this.serialPort.ReadResponse();
-        }
-
-        return dataRead[0] === 0xFF;
-    }
+    
 }
 
 // Assuming SerialInterface and ValueError classes are already imported

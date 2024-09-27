@@ -103,29 +103,6 @@ class ScriptController:
         res = self.serialPort.ReadRespone()
 
         return res.respone
-    
-    def IsRunning(self) -> bool:
-        self.serialPort.DiscardInBuffer()
-
-        dataWrite = bytearray(1)
-        dataRead = bytearray(1)
-
-        dataWrite[0] = 0xFF
-        dataRead[0] = 0x00
-
-        self.serialPort.WriteRawData(dataWrite, 0, 1)
-        time.sleep(0.001)
-      
-        count = self.serialPort.ReadRawData(dataRead, 0, 1)
-
-        if count == 0:
-            # if running, should received 0xff
-            # it not, need to send '\n' to clear 0xff that was sent.
-            dataWrite[0] = 10
-            self.serialPort.WriteRawData(dataWrite, 0, 1)
-
-            self.serialPort.ReadRespone()
-
-        return dataRead[0] == 0xFF
+        
 
        
