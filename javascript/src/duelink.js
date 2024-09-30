@@ -622,7 +622,9 @@ class DigitalController {
         }
 
         let pull = '0';
-        if (inputType === 1) {
+        if (inputType === 0) {
+            pull = '0';
+        } else if (inputType === 1) {
             pull = '1';
         } else if (inputType === 2) {
             pull = '2';
