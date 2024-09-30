@@ -610,7 +610,8 @@ class DigitalController {
         if (pin === 'r' || pin === 'R') {
             pin = 82;
         }
-
+		 
+		
         if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin !== 97 && pin !== 98 && pin !== 108 && pin !== 85 && pin !== 76 && pin !== 68 && pin !== 82)) {
             throw new Error('Invalid pin');
         }
@@ -626,6 +627,8 @@ class DigitalController {
             pull = '1';
         } else if (inputType === "pulldown" || inputType === "PullDown") {
             pull = '1';
+		} else if (inputType === 0) {
+            pull = '0';
         } else {
             throw new Error('Invalid PinType');
         }
@@ -1470,6 +1473,7 @@ class NeoController {
     constructor(serialPort) {
         this.serialPort = serialPort;
         this.SupportLedNumMax = this.MAX_LED_NUM;
+
     }
 
     async Show(pin, count) {
@@ -1815,6 +1819,7 @@ class ServoController {
         }
 
         const cmd = `servoset(${pin}, ${position})`;
+
         await this.serialPort.WriteCommand(cmd);
 
         const response = await this.serialPort.ReadResponse();
