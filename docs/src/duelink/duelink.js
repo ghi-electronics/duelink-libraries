@@ -1,5 +1,5 @@
-export { SerialInterface, DUELinkController, CanMessage }
-import { Util } from "./util.js";
+export { SerialInterface, DUELinkController, CanMessage, Util }
+import { Util } from "../util.js";
 
 class SerialInterface {
     isReady = false;

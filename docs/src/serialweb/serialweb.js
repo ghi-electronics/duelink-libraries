@@ -1,4 +1,4 @@
-import { Util, RingBuffer } from './util.js';
+import { Util, RingBuffer } from '../util.js';
 
 export {WebSerial}
 
