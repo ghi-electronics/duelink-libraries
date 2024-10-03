@@ -225,7 +225,7 @@
 			buttonPressCounter += 1		
 			if ((buttonPressCounter % 2) == 1) {
 				document.getElementById("buttonRead").innerHTML = "Stop Reading";
-				readJoystickCallback()
+				doActionCallback()
 				$("#myChart").show();
 								
 			}
@@ -239,7 +239,7 @@
 		}
 	}
 	
-	async function readJoystickCallback() {				
+	async function doActionCallback() {				
 		try 
 		{
 			if (reading == false) {
@@ -267,7 +267,7 @@
 
 			if (buttonPressCounter % 2 == 1) {
 				setTimeout(() => {
-				  readJoystickCallback();
+				  doActionCallback();
 				}, 200);	
 			}
 		}
