@@ -1396,11 +1396,11 @@ class I2cController {
                 throw new Error("I2c error:" + res.response);
             }
 
-            this.serialPort.WriteRawData(dataWrite, offsetWrite, countWrite);
+            await this.serialPort.WriteRawData(dataWrite, offsetWrite, countWrite);
         }
 
         if (countRead > 0) {
-            if (this.serialPort.ReadRawData(dataRead, offsetRead, countRead) !== countRead) {
+            if (await this.serialPort.ReadRawData(dataRead, offsetRead, countRead) !== countRead) {
                 throw new Error("I2C read raw data error.");
             }
         }
