@@ -148,8 +148,11 @@
 	import("./src/util.js").then(mod => util = mod);
 	
 	const ctx = document.getElementById('myChart');
-  
-    let connected = false
+	let isReading = false;
+	let isSerialConnected = false;
+	let buttonPressCounter = 0;    
+	const intervalCallBack = 200;
+	
 	function Check() {
         if (!this.duelink)
             this.duelink = new due.DUELinkController(new serial.WebSerial());
@@ -173,7 +176,7 @@
             $("#id-connect").slideUp();
             $("#id-inputs").prop("disabled", false);
 			
-			connected = true
+			isSerialConnected = true
 						
         } catch (e) {
             showError("connect Error" + e);
@@ -216,12 +219,11 @@
         $("#error-message").text(message);
     }
 	
-	let reading = false
-	let buttonPressCounter = 0;
+
 	
 	function startReading() {
 		hideError();
-		if (connected == true) {	
+		if (isSerialConnected == true) {	
 			buttonPressCounter += 1		
 			if ((buttonPressCounter % 2) == 1) {
 				document.getElementById("buttonRead").innerHTML = "Stop Reading";
@@ -239,12 +241,13 @@
 		}
 	}
 	
+	
 	async function doActionCallback() {				
 		try 
 		{
-			if (reading == false) {
+			if (isReading == false) {
 				Check();
-				reading = true
+				isReading = true
 				
 				let writeBuffer = new Uint8Array(1)
 				let readBuffer = [0,0,0,0,0]
@@ -260,7 +263,7 @@
 				document.getElementById("joyStickY").innerHTML = y;
 				document.getElementById("joyStickButton").innerHTML = readBuffer[4] == 0 ? "True" : "False"
 				
-				reading = false	
+				isReading = false	
 
 				showChart(x, y)
 			}
@@ -268,11 +271,11 @@
 			if (buttonPressCounter % 2 == 1) {
 				setTimeout(() => {
 				  doActionCallback();
-				}, 200);	
+				}, intervalCallBack);	
 			}
 		}
 		catch (err){
-			reading = false
+			isReading = false
 			showError("Error: " + err)
 			buttonPressCounter = 0
 			document.getElementById("buttonRead").innerHTML = "Start Reading";
