@@ -93,15 +93,15 @@
 				</div>
 				
 			</div>
-						
-			
+									
 		</div>
+	
 		<div class="row">				
 				<table >
 					<tr>
 							<td width="120"/>
 							<td width="200">
-							<button class="btn btn-primary" id="buttonRead" onclick="startReading()">Start Reading</button>
+							<button class="btn btn-primary" id="id-buttonRead" onclick="startReading()" disabled="true" >Start Reading</button>
 							</td>
 					</tr>
 				</table>
@@ -149,7 +149,6 @@
 	
 	const ctx = document.getElementById('myChart');
 	let isReading = false;
-	let isSerialConnected = false;
 	let buttonPressCounter = 0;    
 	const intervalCallBack = 200;
 	
@@ -174,10 +173,8 @@
             }
             $("#id-version").text(duelink.Version);
             $("#id-connect").slideUp();
-            $("#id-inputs").prop("disabled", false);
-			
-			isSerialConnected = true
-						
+            $("#id-buttonRead").prop("disabled", false);
+	
         } catch (e) {
             showError("connect Error" + e);
         }
@@ -204,44 +201,39 @@
     }
 
     function showStatus(message) {
-        $("#id-inputs").prop("disabled", true);
+        $("#id-buttonRead").prop("disabled", true);
         hideError();
         $("#id-status").show();
         $("#status-message").text(message);
         $.when($("#id-status").fadeOut(1000)).done(
-            function () { $("#id-inputs").prop("disabled", false); }
+            function () { $("#id-buttonRead").prop("disabled", false); }
         );
     }
 
     function showError(message) {
-        $("#id-inputs").prop("disabled", true);
+        $("#id-buttonRead").prop("disabled", true);
         $("#id-error").show();
         $("#error-message").text(message);
     }
 	
 
-	
 	function startReading() {
 		hideError();
-		if (isSerialConnected == true) {	
-			buttonPressCounter += 1		
-			if ((buttonPressCounter % 2) == 1) {
-				document.getElementById("buttonRead").innerHTML = "Stop Reading";
-				doActionCallback()
-				$("#myChart").show();
-								
-			}
-			else {	
-				document.getElementById("buttonRead").innerHTML = "Start Reading";
-				$("#myChart").hide();
-			}
+			
+		buttonPressCounter += 1		
+		if ((buttonPressCounter % 2) == 1) {
+			document.getElementById("id-buttonRead").innerHTML = "Stop Reading";
+			doActionCallback()
+			$("#myChart").show();
+							
 		}
-		else {
-			showError("DUELink is not connected")
+		else {	
+			document.getElementById("id-buttonRead").innerHTML = "Start Reading";
+			$("#myChart").hide();
 		}
+		
 	}
-	
-	
+		
 	async function doActionCallback() {				
 		try 
 		{
