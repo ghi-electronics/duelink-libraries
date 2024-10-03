@@ -31,7 +31,7 @@
 				l-13.3,14.1l-7.4,42.4h-35.1l32.9-191.9h35.1l-19.6,114.9h0.5c3.7-5.1,7.4-10.3,10.8-15.1l30.7-40h43.4l-51,54.3L1117.9,371.3z" />
                 </g>
             </svg>
-            <span class="navbar-brand-text">DUELink JavaScript I2C</span>
+            <span class="navbar-brand-text">DUELink I2C - QWIIC Joystick</span>
         </div>
     </nav>
 
@@ -60,8 +60,9 @@
 		
 		<div class="row">	
 			<div class="center">
-				<div class="center">
-					This demo requires Qwiic Joystic connected to DUELink
+				
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+					
 					<table >
 						<tr>
 							<td width="120">X value: </td>
@@ -80,23 +81,31 @@
 							<td width="200">
 								<span id="joyStickButton"></span>
 							</td>
-						</tr>
+						</tr>						
 						
-						<tr>
+					</table>		
+					<table>
+						<canvas id="myChart" > </canvas>
+						<script>
+							$("#myChart").hide();
+						</script>
+					</table>
+				</div>
+				
+			</div>
+						
+			
+		</div>
+		<div class="row">				
+				<table >
+					<tr>
 							<td width="120"/>
 							<td width="200">
 							<button class="btn btn-primary" id="buttonRead" onclick="startReading()">Start Reading</button>
 							</td>
-						</tr>
-						
-						
-					</table>
-					
-				</div>	
-				
-			</div>			
-			
-		</div>
+					</tr>
+				</table>
+			</div>
 				
 	
 	</div>
@@ -129,10 +138,16 @@
 
 </body>
 
-</html><script>
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
     import("./src/serialweb/serialweb.js").then(mod => serial = mod);
     import("./src/duelink/duelink.js").then(mod => due = mod);
 	import("./src/util.js").then(mod => util = mod);
+	
+	const ctx = document.getElementById('myChart');
   
     let connected = false
 	function Check() {
@@ -205,50 +220,101 @@
 	let buttonPressCounter = 0;
 	
 	function startReading() {
-		
-		if (connected == true) {
-			buttonPressCounter += 1
+		hideError();
+		if (connected == true) {	
+			buttonPressCounter += 1		
 			if ((buttonPressCounter % 2) == 1) {
 				document.getElementById("buttonRead").innerHTML = "Stop Reading";
-				
 				readJoystickCallback()
+				$("#myChart").show();
+								
 			}
 			else {	
 				document.getElementById("buttonRead").innerHTML = "Start Reading";
+				$("#myChart").hide();
 			}
 		}
 		else {
-			showError("Device is not connected")
+			showError("DUELink is not connected")
 		}
 	}
 	
-	async function readJoystickCallback() {		
-		if (reading == false) {
-			Check();
-			reading = true
-			
-			let writeBuffer = new Uint8Array(1)
-			let readBuffer = [0,0,0,0,0]
-			
-			writeBuffer[0] = 3
-			
-			await duelink.I2c.WriteRead(0x20,writeBuffer,0,1,readBuffer,0,5)
-			
-			let x = (readBuffer[0]<<8 | readBuffer[1])>>6
-			let y = (readBuffer[2]<<8 | readBuffer[3])>>6
+	async function readJoystickCallback() {				
+		try 
+		{
+			if (reading == false) {
+				Check();
+				reading = true
+				
+				let writeBuffer = new Uint8Array(1)
+				let readBuffer = [0,0,0,0,0]
+				
+				writeBuffer[0] = 3
+				
+				await duelink.I2c.WriteRead(0x20,writeBuffer,0,1,readBuffer,0,5)
+				
+				let x = (readBuffer[0]<<8 | readBuffer[1])>>6
+				let y = (readBuffer[2]<<8 | readBuffer[3])>>6
 
-			document.getElementById("joyStickX").innerHTML = x;
-			document.getElementById("joyStickY").innerHTML = y;
-			document.getElementById("joyStickButton").innerHTML = readBuffer[4] == 0 ? "True" : "False"
-			
+				document.getElementById("joyStickX").innerHTML = x;
+				document.getElementById("joyStickY").innerHTML = y;
+				document.getElementById("joyStickButton").innerHTML = readBuffer[4] == 0 ? "True" : "False"
+				
+				reading = false	
+
+				showChart(x, y)
+			}
+
+			if (buttonPressCounter % 2 == 1) {
+				setTimeout(() => {
+				  readJoystickCallback();
+				}, 200);	
+			}
+		}
+		catch (err){
 			reading = false
+			showError("Error: " + err)
+			buttonPressCounter = 0
+			document.getElementById("buttonRead").innerHTML = "Start Reading";
 		}
-
-		if (buttonPressCounter % 2 == 1) {
-			setTimeout(() => {
-			  readJoystickCallback();
-			}, 200);	
-		}
-
     }
+	
+	let lastX = -1
+	let lastY = -1
+	
+	async function showChart(x, y) {
+				
+		if (lastX != x || lastY != y) {
+			lastX = x
+			lastY = y
+			if(Chart.getChart("myChart")) {
+			  Chart.getChart("myChart")?.destroy()
+			}
+
+			if (this.chart) {			
+				this.chart = null
+			}
+			
+			if (!this.chart ) {
+				this.chart = new Chart(ctx, {
+					type: 'bar',
+					data: {
+					  labels: ['X', 'Y'],
+					  datasets: [{
+						label: 'QWIIC Joytick values',
+						data: [x, y, ],
+						borderWidth: 1
+					  }]
+					},
+					options: {
+					  scales: {
+						y: {
+						  beginAtZero: true
+						}
+					  }
+					}
+				  });
+			}
+		}
+	}
 </script>
