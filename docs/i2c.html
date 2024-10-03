@@ -134,7 +134,8 @@
     import("./src/duelink/duelink.js").then(mod => due = mod);
 	import("./src/util.js").then(mod => util = mod);
   
-    function Check() {
+    let connected = false
+	function Check() {
         if (!this.duelink)
             this.duelink = new due.DUELinkController(new serial.WebSerial());
     }
@@ -156,6 +157,8 @@
             $("#id-version").text(duelink.Version);
             $("#id-connect").slideUp();
             $("#id-inputs").prop("disabled", false);
+			
+			connected = true
 						
         } catch (e) {
             showError("connect Error" + e);
@@ -203,14 +206,19 @@
 	
 	function startReading() {
 		
-		buttonPressCounter += 1
-		if ((buttonPressCounter % 2) == 1) {
-			document.getElementById("buttonRead").innerHTML = "Stop Reading";
-			
-			readJoystickCallback()
+		if (connected == true) {
+			buttonPressCounter += 1
+			if ((buttonPressCounter % 2) == 1) {
+				document.getElementById("buttonRead").innerHTML = "Stop Reading";
+				
+				readJoystickCallback()
+			}
+			else {	
+				document.getElementById("buttonRead").innerHTML = "Start Reading";
+			}
 		}
-		else {	
-			document.getElementById("buttonRead").innerHTML = "Start Reading";
+		else {
+			showError("Device is not connected")
 		}
 	}
 	
