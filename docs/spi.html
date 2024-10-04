@@ -31,7 +31,7 @@
 				l-13.3,14.1l-7.4,42.4h-35.1l32.9-191.9h35.1l-19.6,114.9h0.5c3.7-5.1,7.4-10.3,10.8-15.1l30.7-40h43.4l-51,54.3L1117.9,371.3z" />
                 </g>
             </svg>
-            <span class="navbar-brand-text">DUELink UART</span>
+            <span class="navbar-brand-text">DUELink SPI</span>
         </div>
     </nav>
 
@@ -56,44 +56,95 @@
 
     <div id="id-selections" class="container">
 		<div class="row">	
-			<div class="center">				
-				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >							
-								
-					<tr>
-						<td width="109">Enable Baudrate:</td><br>
-						<td width="97">
-							<select id="id-baudrate" onchange="doUartInit()" disabled="true">
-								<option value="9600">9600</option>
-								<option value="19200">19200</option>
-								<option value="38400">38400</option>
-								<option value="57600">57600</option>
-								<option value="115200">115200</option>
-								<option value="230400">230400</option>
-								<option value="460800">460800</option>
-								<option value="921600">921600</option>
-							</select>
-						</td>
-					</tr>
-					<br>
-					<tr>						
-						<label for="dataSend">Byte(s) to send: (0,1,2... 255)</label><br>
-						<input type="text" id="dataSend" /><br>
-						<label text="text2">(Use comma between each byte if sending multiple bytes)</label><br>
-						<button class="btn btn-primary" onclick="doUartSend()"id="id-btSend" disabled="true" >Send </button>	<br><br>
+			<div class="center">	
 
-						<label for="id-dataReceived">Received data:</label><br>
-						<textarea rows="5" cols="50" id="id-dataReceived" disabled>
-							
-						</textarea>					
-					<tr>
-				</div>
-				
-			</div>
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >
+					SPI configuration
+					<table >
+						<tr>
+							<td width="200">Speed:</td>
+							<td width="200">
+								<select id="id-speed" onchange="doSpiInit()">
+									<option value="1000">1MHz</option>
+									<option value="2000">2MHz</option>
+									<option value="3000">4MHz</option>
+									<option value="4000">8MHz</option>
+									<option value="16000">16MHz</option>
+									<option value="20000">20MHz</option>
 						
-			
-		</div>
-					
-	
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td width="200">Mode:</td>
+							<td width="200">
+								<select id="id-mode" onchange="doSpiInit()">
+									<option value="0">Mode 0</option>
+									<option value="1">Mode 1</option>
+									<option value="2">Mode 2</option>
+									<option value="3">Mode 3</option>
+
+						
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td width="200">Chip Select</td>
+							<td width="200">
+								<select id="pinNumberCs">
+									<option value="0">P0</option>
+									<option value="1">P1</option>
+									<option value="2">P2</option>
+									<option value="3">P3</option>
+									<option value="4">P4</option>
+									<option value="5">P5</option>
+									<option value="6">P6</option>
+									<option value="7">P7</option>
+									<option value="8">P8</option>
+									<option value="9">P9</option>
+									<option value="10">P10</option>
+									<option value="11">P11</option>
+								</select>
+							</td>
+						</tr>
+						
+					</table>
+				</div>			
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >										
+					SPI Write
+					<table>
+						<tr>
+							<td width="200">Byte(s) to write: (0,1,2... 255)</td>
+							<td width="200">
+								<input type="text" id="dataSend" /><br>
+							</td>
+						</tr>						
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doSpiSend()"id="id-btSend" disabled="true" >Send </button>	<br><br>
+							</td>
+										
+						<tr>
+					</table >
+
+				</div>
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >	
+					SPI Read
+					<table>
+						<tr>
+							<td width="200">Received data:</td>							
+						</tr>
+						<tr>
+							<td width="200">
+								<textarea rows="5" cols="50" id="id-dataReceived" disabled>
+								
+								</textarea>	
+							</td>							
+						</tr>											
+					</table >
+				</div>
+			</div>
+		</div>		
 	</div>
 
     <div id="id-status" style="display:none">
@@ -162,35 +213,21 @@
             $("#id-version").text(duelink.Version);
             $("#id-connect").slideUp();
             $("#id-btSend").prop("disabled", false);	
-            $("#id-baudrate").prop("disabled", false);	
+            $("#id-speed").prop("disabled", false);	
 			
 			document.getElementById("id-dataReceived").focus(); 
 			document.getElementById("id-dataReceived").setSelectionRange(0, 0);
 
-			await duelink.Uart.Enable(9600);	
+			await duelink.Spi.Configuration(0, 1000);;	
 
-			doActionCallback();
+			
 						
         } catch (e) {
             showError("connect Error" + e);
         }
     }
 	
-    async function ledOn() {
-        Check();
-        await duelink.Digital.Write('l', true);
-    }
-
-	async function ledOff() {
-        Check();
-        await duelink.Digital.Write('l', false);
-    }
    
-    async function buzzer() {
-        Check();
-        await duelink.Frequency.Write('p', 230, 1000);
-    }
-
     
     function hideError() {
         $("#id-error").hide();
@@ -198,50 +235,67 @@
 
     function showStatus(message) {
         $("#id-btSend").prop("disabled", true);
-        $("#id-baudrate").prop("disabled", true);
+        $("#id-speed").prop("disabled", true);
         hideError();
         $("#id-status").show();
         $("#status-message").text(message);
         $.when($("#id-status").fadeOut(1000)).done(
-            function () { $("#id-btSend").prop("disabled", false); $("#id-baudrate").prop("disabled", false);}
+            function () { $("#id-btSend").prop("disabled", false); $("#id-speed").prop("disabled", false);}
             
         );
     }
 
     function showError(message) {
         //$("#id-btSend").prop("disabled", true);
-        //$("#id-baudrate").prop("disabled", true);
+        //$("#id-speed").prop("disabled", true);
         $("#id-error").show();
         $("#error-message").text(message);
     }
 	
 	let isWriting = false;
-	async function doUartSend() {
+	async function doSpiSend() {
 		hideError();
 
-		const data = $("#dataSend").val().trim().split(",");			
+		const data = $("#dataSend").val().trim().split(",");
+		var writeArray = new Uint8Array(data.length);		
 		
 		isWriting = true;
+		var canWrite = true;
 		for (let i = 0; i < data.length; i++) {
 			
 			var x = parseInt(data[i], 10);
 			
-			if (isNaN(x) == false) 
+			if (isNaN(x) == true) 
 			{				
-				await duelink.Uart.Write(x);
-			}
-			else  {				
+				//await duelink.Spi.Write(x);
+				canWrite = false;
 				showError(`Error at index: ${i}, value: ${data[i]}` );
-				
 				break;
 			}
+			writeArray[i] = x;
+		}
+		
+		if (canWrite) {
+			var readArray = new Uint8Array(writeArray.length);
+			await duelink.Spi.WriteRead(writeArray, 0, writeArray.length, readArray, 0, readArray.length);
+			
+			document.getElementById("id-dataReceived").innerHTML = "";
+			
+			for (var i = 0; i < readArray.length; i++)  {
+				document.getElementById("id-dataReceived").innerHTML += readArray[i];
+				
+				if (i < readArray.length - 1)
+					document.getElementById("id-dataReceived").innerHTML += ","
+			}
+			
+			
 			
 		}
 		isWriting =  false;
 	}
 	
-	async function doUartInit() {
-		await duelink.Uart.Enable($("#id-baudrate").val()/1);			
+	async function doSpiInit() {
+		await duelink.Spi.Configuration($("#id-mode").val()/1, $("#id-speed").val()/1);		
 	}
 		
 	let receivedData = ""
@@ -252,11 +306,11 @@
 				Check();
 				isReading = true
 				
-				let available = await duelink.Uart.BytesToRead();
+				let available = await duelink.Spi.BytesToRead();
 				
 				for (let i = 0; i < available; i++) 
 				{
-					let data = await duelink.Uart.Read();
+					let data = await duelink.Spi.Read();
 					
 					if (receivedData.length != 0)
 						receivedData +=","					
