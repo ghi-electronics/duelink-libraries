@@ -82,7 +82,7 @@
 						<tr>
 							<td width="200">CAN Id</td>	
 							<td width="200">					
-								<input type="text" id="id-canId" />
+								<input type="text" id="id-canId" value="111"/>
 							</td>
 						
 						<tr>
@@ -109,7 +109,7 @@
 						<tr>
 							<td width="200">Data to send (max 8 bytes): (0,1,2... 255)</td>	
 							<td width="200">												
-								<input type="text" id="id-dataSend" /><br>
+								<input type="text" id="id-dataSend" value="1,2,3"/><br>
 							</td>
 						
 						</tr>
@@ -299,19 +299,19 @@
 				Check();
 				isReading = true
 				
-				let available = await duelink.Can.Available();
+				var available = await duelink.Can.Available();
 				
-				for (let i = 0; i < available; i++) 
+				for (var i = 0; i < available; i++) {
 				
-					let msg = await duelink.Can.Read();
+					var msg = await duelink.Can.Read();
 					
 					totalMsgReceivedCount++;
 					
-					let id_hex = (msg.Id/1).toString(16);
+					var id_hex = (msg.Id/1).toString(16);
 					
-					let s = `Count: ${totalMsgReceivedCount}\nId: 0x${id_hex}\nExtended: ${msg.Extended}\nRemoteRequest: ${msg.RemoteRequest}\nLength: ${msg.Length}\nData:`;
+					var s = `Count: ${totalMsgReceivedCount}\nId: 0x${id_hex}\nExtended: ${msg.Extended}\nRemoteRequest: ${msg.RemoteRequest}\nLength: ${msg.Length}\nData:`;
 					
-					for (let i = 0; i < msg.Length; i++) {
+					for (var i = 0; i < msg.Length; i++) {
 						s += `${msg.Data[i]}`
 						
 						if (i < msg.Length - 1)
