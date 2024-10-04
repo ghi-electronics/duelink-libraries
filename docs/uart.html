@@ -77,8 +77,9 @@
 					</tr>
 					<br>
 					<tr>						
-						<label for="dataSend">Byte(s) to send (0,1,2... 255):</label><br>
+						<label for="dataSend">Byte(s) to send: (0,1,2... 255)</label><br>
 						<input type="text" id="dataSend" /><br>
+						<label text="text2">(Use comma between each byte if sending multiple bytes)</label><br>
 						<button class="btn btn-primary" onclick="doUartSend()"id="id-btSend" disabled="true" >Send </button>	<br><br>
 
 						<label for="id-dataReceived">Received data:</label><br>
@@ -210,8 +211,8 @@
     }
 
     function showError(message) {
-        $("#id-btSend").prop("disabled", true);
-        $("#id-baudrate").prop("disabled", true);
+        //$("#id-btSend").prop("disabled", true);
+        //$("#id-baudrate").prop("disabled", true);
         $("#id-error").show();
         $("#error-message").text(message);
     }
