@@ -136,7 +136,7 @@
 	
 	
 	let isReading = false;		
-	const intervalCallBack = 50;
+	const intervalCallBack = 100;
 	const textareaMaxCharacterPerLine = 55;
 	const textareMaxLines = 5; //textarea rows="5" above
 
@@ -253,7 +253,9 @@
 				Check();
 				isReading = true
 				
-				if (await duelink.Uart.BytesToRead() > 0)
+				let available = await duelink.Uart.BytesToRead();
+				
+				for (let i = 0; i < available; i++) 
 				{
 					let data = await duelink.Uart.Read();
 					
