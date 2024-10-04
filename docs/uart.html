@@ -135,8 +135,7 @@
 	import("./src/util.js").then(mod => util = mod);
 	
 	
-	let isReading = false;	
-	let buttonPressCounter = 0;    
+	let isReading = false;		
 	const intervalCallBack = 50;
 	const textareaMaxCharacterPerLine = 55;
 	const textareMaxLines = 5; //textarea rows="5" above
@@ -217,17 +216,19 @@
         $("#error-message").text(message);
     }
 	
+	let isWriting = false;
 	async function doUartSend() {
 		hideError();
 
 		const data = $("#dataSend").val().trim().split(",");			
 		
+		isWriting = true;
 		for (let i = 0; i < data.length; i++) {
 			
 			var x = parseInt(data[i], 10);
 			
 			if (isNaN(x) == false) 
-			{
+			{				
 				await duelink.Uart.Write(x);
 			}
 			else  {				
@@ -237,6 +238,7 @@
 			}
 			
 		}
+		isWriting =  false;
 	}
 	
 	async function doUartInit() {
@@ -247,7 +249,7 @@
 	async function doActionCallback() {				
 		try 
 		{
-			if (isReading == false) {
+			if (isReading == false && isWriting == false) {
 				Check();
 				isReading = true
 				
@@ -276,9 +278,7 @@
 		}
 		catch (err){
 			isReading = false
-			showError("Error: " + err)
-			buttonPressCounter = 0
-			document.getElementById("buttonRead").innerHTML = "Start Reading";
+			showError("Error: " + err)			
 		}
     }
 		
