@@ -369,16 +369,17 @@
                                                     <input type="range" min="0" max="180"
                                                            value="90" class="mysliderServo"
                                                            id="sliderRangeServo">
-                                                    <p>Value: <span id="demoServo"></span></p>
+                                                    <p>Position: <span id="demoServo"></span></p>
                                                 </div>
                                                 <script>
                                                     let rangesliderServo = document.getElementById("sliderRangeServo");
                                                     let output2 = document.getElementById("demoServo");
-                                                    output2.innerHTML = rangesliderServo.value;
+                                                    output2.innerHTML = rangesliderServo.value +' degrees';
 
                                                     rangesliderServo.oninput = function () {
-                                                        output2.innerHTML = this.value;
+                                                        output2.innerHTML = this.value+' degrees';
                                                     }
+													
                                                 </script>
                                             </td>
                                         	</tr>
