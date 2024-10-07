@@ -709,14 +709,14 @@
 		var countNeoPixel = neoPixelCount.value/1;
 		
 		
-		for(let a=0; a<3; a++){
+		for(let a=0; a<2; a++){
 		for(let i=0; i<countNeoPixel;i++){
 			await duelink.Neo.Clear();
 			await duelink.Neo.Show(pinNeoPixel, countNeoPixel);
-			await duelink.System.Wait(100);
+			await duelink.System.Wait(10);
 			await duelink.Neo.SetRGB(i, red, green, blue);
 			await duelink.Neo.Show(pinNeoPixel, countNeoPixel);
-			await duelink.System.Wait(100);
+			await duelink.System.Wait(10);
 		}
 			await duelink.Neo.Clear();
 			await duelink.Neo.Show(pinNeoPixel, countNeoPixel);
