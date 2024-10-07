@@ -135,35 +135,15 @@ class SerialInterface {
         }
 
         while (new Date() <= end) {
-            const data = await this.portName.read();
-            if (data) {
+            const data = await this.portName.readbyte();
+			
+            if (data) 
+			{
 
-                let size = 0;
+                
 
-                for (let i = 0; i < data.length; i++) {
-                    if (data[i] != 10 && data[i] != 13)   {
-                        size = size + 1;
-                    }
-
-                }
-
-                if (size == 0) {
-                    continue;
-                }
-
-                let newData = new Uint8Array(size);
-                let indexArray = 0;
-
-                for (let i = 0; i < data.length; i++) {
-                    if (data[i] != 10 && data[i] != 13)   {
-                        newData[indexArray] = data[i]
-                        indexArray++;
-                    }
-
-                }
-
-                str += SerialInterface.Decoder.decode(newData);
-
+                str += SerialInterface.Decoder.decode(data);
+				
                 if (str.length > 0) {
                     let idx1 = str.indexOf(">");
                     let idx2 = str.indexOf("&");
@@ -192,11 +172,14 @@ class SerialInterface {
                 }
             }
 
-            this.leftOver = "";
-
-            this.portName.resetInputBuffer();
-            this.portName.resetOutputBuffer();
+            
         }
+		
+		this.leftOver = "";
+
+		this.portName.resetInputBuffer();
+		this.portName.resetOutputBuffer();
+			
         //debugger;
         response.success = false;
         response.response = "";
