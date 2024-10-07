@@ -91,7 +91,7 @@
 						<tr>
 							<td width="200">Chip Select</td>
 							<td width="200">
-								<select id="pinNumberCs">
+								<select id="id-chipselect">
 									<option value="0">P0</option>
 									<option value="1">P1</option>
 									<option value="2">P2</option>
@@ -257,7 +257,8 @@
 		hideError();
 
 		const data = $("#dataSend").val().trim().split(",");
-		var writeArray = new Uint8Array(data.length);		
+		var writeArray = new Uint8Array(data.length);	
+		var chipselectPin = $("#id-chipselect").val()/1;
 		
 		isWriting = true;
 		var canWrite = true;
@@ -277,7 +278,7 @@
 		
 		if (canWrite) {
 			var readArray = new Uint8Array(writeArray.length);
-			await duelink.Spi.WriteRead(writeArray, 0, writeArray.length, readArray, 0, readArray.length);
+			await duelink.Spi.WriteRead(writeArray, 0, writeArray.length, readArray, 0, readArray.length, chipselectPin);
 			
 			document.getElementById("id-dataReceived").innerHTML = "";
 			
