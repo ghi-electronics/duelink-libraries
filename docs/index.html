@@ -11,6 +11,19 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	
+	<style>
+  	#colorSection {
+    width: 400px;
+    height: 60px;
+    background-color: black;
+    border: 1px solid black;
+  	}
+	</style>
+	
+	
+	
+	
 </head>
 
 <body>
@@ -422,6 +435,7 @@
                                                     outputRED.innerHTML = rangesliderNeoPixelRED.value;
 
                                                     rangesliderNeoPixelRED.oninput = function () {
+														setColorSwatch();
                                                         outputRED.innerHTML = this.value;
                                                     }
                                                 </script>
@@ -443,6 +457,7 @@
                                                     outputGREEN.innerHTML = rangesliderNeoPixelGREEN.value;
 
                                                     rangesliderNeoPixelGREEN.oninput = function () {
+														setColorSwatch();
                                                         outputGREEN.innerHTML = this.value;
                                                     }
                                                 </script>
@@ -464,17 +479,27 @@
                                                     outputBLUE.innerHTML = rangesliderNeoPixelBLUE.value;
 
                                                     rangesliderNeoPixelBLUE.oninput = function () {
+														setColorSwatch();
                                                         outputBLUE.innerHTML = this.value;
                                                     }
                                                 </script>
                                             </td>
+										<div id="colorSection"></div>
+										<br>
+										
 						            </table>
 								
 								<label>LED Index: </label>
                                 <input type="text" id="neoPixelIndex" name="neoPixelIndexName" value="0" />
 								<br>
+									<label>LED Count: </label>
+                                <input type="text" id="neoPixelCount" name="neoPixelCountName" value="4" />
+								<br>
                                     <button class="btn btn-primary" onclick="neoPixelSet()">Set Index</button>
+									<button class="btn btn-primary" onclick="neoPixelCycle()">Cycle</button>
                                     <button class="btn btn-primary" onclick="neoPixelClearAll()">Clear All</button>
+	
+									
                                 </div>
 								<br>
 							<a href="https://duelink.com/software/api/neopixel.html">NeoPixel API Documentation</a>
@@ -656,9 +681,57 @@
     async function neoPixelClearAll() {
         Check();
 		var pinNeoPixel = $("#pinNumberNeoPixel").val()/1;
-        await duelink.Neo.Clear();
-		await duelink.Neo.Show(pinNeoPixel, 1024);
+		var countNeoPixel = neoPixelCount.value/1;
+       	await duelink.Neo.Clear();
+		await duelink.Neo.Show(pinNeoPixel, countNeoPixel);
+       
     }
+	
+	async function neoPixelCycle(){
+		
+		var pinNeoPixel = $("#pinNumberNeoPixel").val()/1;
+
+		//RED Slider Value
+		let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
+        var red = rangesliderNeoPixelRED.value/1;
+		
+		//GREEN Slider Value
+		let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
+        var green = rangesliderNeoPixelGREEN.value/1;
+
+		
+		//GREEN Slider
+		let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
+		var blue = rangesliderNeoPixelBLUE.value/1;
+
+		
+		var index = neoPixelIndex.value/1;	
+		var countNeoPixel = neoPixelCount.value/1;
+		
+		
+		for(let a=0; a<3; a++){
+		for(let i=0; i<countNeoPixel;i++){
+			await duelink.Neo.Clear();
+			await duelink.Neo.Show(pinNeoPixel, countNeoPixel);
+			await duelink.System.Wait(100);
+			await duelink.Neo.SetRGB(i, red, green, blue);
+			await duelink.Neo.Show(pinNeoPixel, countNeoPixel);
+			await duelink.System.Wait(100);
+		}
+			await duelink.Neo.Clear();
+			await duelink.Neo.Show(pinNeoPixel, countNeoPixel);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
 	
 	async function neoPixelSet() {
         Check();
@@ -672,8 +745,7 @@
         rangesliderNeoPixelRED.oninput = function () {
             outputRED.innerHTML = this.value;
         }
-        var valueRangeNeoPixelRED = rangesliderNeoPixelRED.value;
-        var red = valueRangeNeoPixelRED / 1;
+        var red = rangesliderNeoPixelRED.value/1;
 		
 		//GREEN Slider
 		let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
@@ -683,26 +755,49 @@
         rangesliderNeoPixelGREEN.oninput = function () {
             outputGREEN.innerHTML = this.value;
         }
-        var valueRangeNeoPixelGREEN = rangesliderNeoPixelGREEN.value;
-        var green = valueRangeNeoPixelGREEN / 1;
+        var green = rangesliderNeoPixelGREEN.value/1;
+
 		
 		//GREEN Slider
 		let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
         let outputBLUE = document.getElementById("demoNeoPixelBLUE");
         outputBLUE.innerHTML = rangesliderNeoPixelBLUE.value;
+        var blue = rangesliderNeoPixelBLUE.value/1;
 
-        rangesliderNeoPixelBLUE.oninput = function () {
-            outputBLUE.innerHTML = this.value;
-        }
-        var valueRangeNeoPixelBLUE = rangesliderNeoPixelBLUE.value;
-        var blue = valueRangeNeoPixelBLUE / 1;	
 		
-		var neoPixelIndexEntered = neoPixelIndex.value;
-        var index = neoPixelIndexEntered / 1;
-
+		var index = neoPixelIndex.value/1;
+		
+		var countNeoPixel = neoPixelCount.value/1;
+		
+	
 		await duelink.Neo.SetRGB(index, red, green, blue);
-		await duelink.Neo.Show(pinNeoPixel, 1024);
+		
+
+		await duelink.Neo.Show(pinNeoPixel, countNeoPixel);
+		
+
+		
+		
+		
     }
+	async function setColorSwatch(){
+		
+		//RED Slider
+		let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
+        var red = rangesliderNeoPixelRED.value/1;
+		
+		//GREEN Slider
+		let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
+        var green = rangesliderNeoPixelGREEN.value/1;
+		
+		//GREEN Slider
+		let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
+        var blue = rangesliderNeoPixelBLUE.value/1;	
+			
+		
+		const color = `rgb(${red}, ${green}, ${blue})`;
+    document.getElementById('colorSection').style.backgroundColor = color;
+	}	
 
     async function playSound() {
         Check();
