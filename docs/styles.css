@@ -94,10 +94,19 @@ html, body {
 
 
 
+#id-selections {
+  position: relative;
+}
+
+#id-connect {
+  position: relative;
+}
 
 /* tab content */
 #id-selections .tab-content {
   color : black;
   background-color: white;
 }
+
+
 
