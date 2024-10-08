@@ -56,499 +56,479 @@ $(document).ready(function(){
 				
 	</div>
 
-    <div id="id-selections" class="container" onclick="closeNav()" >
-        <table>
-			<div class="row">
-				<div class="center">
-					<tr>
-						<br>
-					</tr>
-					<tr>
-						
-						
-						<td>
-							<fieldset id="id-inputs" class="border p-3" disabled="true">
-								<ul class="nav nav-tabs" role="tablist">
-									<li class="nav-item">
-										<a class="nav-link active" id="tab1" data-toggle="tab" href="#tab1Content" role="tab" aria-controls="tab1Content" aria-selected="true">Digital</a>
-									</li>
-									<li class="nav-item">
-										<a class="nav-link" id="tab2" data-toggle="tab" href="#tab2Content" role="tab" aria-controls="tab2Content" aria-selected="false">Analog</a>
-									</li>
-									<li class="nav-item">
-										<a class="nav-link" id="tab3" data-toggle="tab" href="#tab3Content" role="tab" aria-controls="tab3Content" aria-selected="false">Sound</a>
-									</li>
-									<li class="nav-item">
-										<a class="nav-link" id="tab4" data-toggle="tab" href="#tab4Content" role="tab" aria-controls="tab4Content" aria-selected="false">Servo</a>
-									</li>
-									<li class="nav-item">
-										<a class="nav-link" id="tab5" data-toggle="tab" href="#tab5Content" role="tab" aria-controls="tab5Content" aria-selected="false">NeoPixel</a>
-									</li>
-									<li class="nav-item">
-										<a class="nav-link" id="tab6" data-toggle="tab" href="#tab6Content" role="tab" aria-controls="tab6Content" aria-selected="false">Display</a>
-									</li>
-								</ul>
-								<div class="tab-content mt-3">
-									
+    <div id="id-selections" class="container">
+        <fieldset id="id-inputs" class="border p-3" disabled="true">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="tab1" data-toggle="tab" href="#tab1Content" role="tab" aria-controls="tab1Content" aria-selected="true">Digital</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tab2" data-toggle="tab" href="#tab2Content" role="tab" aria-controls="tab2Content" aria-selected="false">Analog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tab3" data-toggle="tab" href="#tab3Content" role="tab" aria-controls="tab3Content" aria-selected="false">Sound</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tab4" data-toggle="tab" href="#tab4Content" role="tab" aria-controls="tab4Content" aria-selected="false">Servo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tab5" data-toggle="tab" href="#tab5Content" role="tab" aria-controls="tab5Content" aria-selected="false">NeoPixel</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tab6" data-toggle="tab" href="#tab6Content" role="tab" aria-controls="tab6Content" aria-selected="false">Display</a>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3">
+                <div class="tab-pane fade show active" id="tab1Content" role="tabpanel" aria-labelledby="tab1">
+                    <!-- Digital Tab -->
+                    <div class="row">
+                        <div class="center">
+                            <div class="center">
+                                Digital Write					
+                                <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+                                    <table width="300">
+                                        <tr>
+                                            <td width="109">Pin</td>
+                                            <td width="97">
+                                                <select id="pinNumberDigitalWrite">
+                                                    <option value="108">LED</option>
+                                                    <option value="0">P0</option>
+                                                    <option value="1">P1</option>
+                                                    <option value="2">P2</option>
+                                                    <option value="3">P3</option>
+                                                    <option value="4">P4</option>
+                                                    <option value="5">P5</option>
+                                                    <option value="6">P6</option>
+                                                    <option value="7">P7</option>
+                                                    <option value="8">P8</option>
+                                                    <option value="9">P9</option>
+                                                    <option value="10">P10</option>
+                                                    <option value="11">P11</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="109">Value</td>
+                                            <td width="97">
+                                                <select id="valueDigitalWrite">
+                                                    <option value="1">true</option>
+                                                    <option value="0">false</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <button class="btn btn-primary" onclick="digitalWrite()">Set</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+				<br>
+                    <!-- Digital Read -->
+                    <div class="row">
+                        <div class="center">
+                            <div class="center">		
+                              Digital Read
+                                <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+                                    <table width="300">
+                                        <tr>
+                                            <td width="125">Pin</td>
+                                            <td width="113">
+                                                <select id="pinNumberDigitalRead">
+                                                    <option value="0">P0</option>
+                                                    <option value="1">P1</option>
+                                                    <option value="2">P2</option>
+                                                    <option value="3">P3</option>
+                                                    <option value="4">P4</option>
+                                                    <option value="5">P5</option>
+                                                    <option value="6">P6</option>
+                                                    <option value="7">P7</option>
+                                                    <option value="8">P8</option>
+                                                    <option value="9">P9</option>
+                                                    <option value="10">P10</option>
+                                                    <option value="11">P11</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="125">Pull</td>
+                                            <td width="113">
+                                                <select id="pullDigitalRead">
+                                                    <option value="0">None</option>
+                                                    <option value="1">Up</option>
+                                                    <option value="2">Down</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                        <tr>
+                                            <td width="125">Return: <span id="digitalReadReturn"></span></td>
+                                            <td width="113">
+                                            </td>
+                                        </tr>
+                                        </tr>
+                                    </table>
+                                    <button class="btn btn-primary" onclick="digitalRead()">Read</button>
+                                </div>
+							<br>
+							<a href="https://duelink.com/software/api/digital.html">Digital API Documentation</a>
+							
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab2Content" role="tabpanel" aria-labelledby="tab2">
+                    <!-- Analog Tab -->
+                    <div class="row">
+                        <div class="center">
+                            <div class="center">
+                               Analog Write
+                                <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+                                    <table width="300">
+                                        <tr>
+                                            <td width="176">Pin</td>
+                                            <td width="62">
+                                                <select id="pinNumberAnalogWrite">
+                                                    <option value="108">LED</option>
+                                                    <option value="0">P0</option>
+                                                    <option value="1">P1</option>
+                                                    <option value="2">P2</option>
+                                                    <option value="3">P3</option>
+                                                    <option value="4">P4</option>
+                                                    <option value="5">P5</option>
+                                                    <option value="6">P6</option>
+                                                    <option value="7">P7</option>
+                                                    <option value="8">P8</option>
+                                                    <option value="9">P9</option>
+                                                    <option value="10">P10</option>
+                                                    <option value="11">P11</option>
+                                                </select>
+                                            </td>
+                                        <tr>
+                                            <td>
+
+                                                <div class="rangeslider">
+                                                    <input type="range" min="0" max="100"
+                                                           value="50" class="myslider"
+                                                           id="sliderRange">
+                                                    <p>Value: <span id="demo"></span></p>
+                                                </div>
+
+                                                <script>
+                                                    let rangeslider = document.getElementById("sliderRange");
+                                                    let output = document.getElementById("demo");
+                                                    output.innerHTML = rangeslider.value;
+
+                                                    rangeslider.oninput = function () {
+                                                        output.innerHTML = this.value;
+                                                    }
+                                                </script>
+                                            </td>
+                                        </tr>
+                                        </tr>
+                                    </table>
+
+                                    <button class="btn btn-primary" onclick="analoglWrite()">Set</button>
+                                </div>
+							
+                            </div>
+                        </div>
+                    </div>
+					<br>
+                    <!-- Analog Read -->
+                    <div class="row">
+                        <div class="center">
+                            <div class="center">
+                                Analog Read
+                                <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+                                    <table width="300">
+                                        <tr>
+                                            <td width="109">Pin</td>
+                                            <td width="129">
+                                                <select id="pinNumber">
+                                                    <option value="0">P0</option>
+                                                    <option value="1">P1</option>
+                                                    <option value="2">P2</option>
+                                                    <option value="3">P3</option>
+                                                    <option value="4">P4</option>
+                                                    <option value="5">P5</option>
+                                                    <option value="6">P6</option>
+                                                    <option value="7">P7</option>
+                                                    <option value="8">P8</option>
+                                                    <option value="9">P9</option>
+                                                    <option value="10">P10</option>
+                                                    <option value="11">P11</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="109">Return: <span id="analogReadReturn"></span></td>
+                                            <td width="129">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <button class="btn btn-primary" onclick="analoglRead()">Read</button>
+                                </div>
+								<br>
+							<a href="https://duelink.com/software/api/analog.html">Analog API Documentation</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+				<!-- Sound Tab -->
+                <div class="tab-pane fade" id="tab3Content" role="tabpanel" aria-labelledby="tab3">
+                    <div class="row">
+                        <div class="center">
+                                Sound
+                                <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+                                    <table width="300">
+                                        <tr>
+                                            <td width="125">Pin</td>
+                                            <td width="144">
+                                                <select id="pinNumberSound">
+                                                    <option value="112">Piezo</option>
+                                                    <option value="0">P0</option>
+                                                    <option value="1">P1</option>
+                                                    <option value="2">P2</option>
+                                                    <option value="3">P3</option>
+                                                    <option value="4">P4</option>
+                                                    <option value="5">P5</option>
+                                                    <option value="6">P6</option>
+                                                    <option value="7">P7</option>
+                                                    <option value="8">P8</option>
+                                                    <option value="9">P9</option>
+                                                    <option value="10">P10</option>
+                                                    <option value="11">P11</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="125">Duration</td>
+                                            <td width="144">
+                                                <select id="playNote">
+                                                    <option value="130">C - 130Hz</option>
+                                                    <option value="146">D - 146Hz</option>
+                                                    <option value="164">E - 164Hz</option>
+                                                    <option value="174">F - 174Hz</option>
+                                                    <option value="196">G - 196Hz</option>
+                                                    <option value="220">A - 220Hz</option>
+                                                    <option value="246">B - 246Hz</option>
+                                                    <option value="261">C - 261Hz</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <button class="btn btn-primary" onclick="playSound()">Beep</button>
+                                </div>
+							<br>
+							<a href="https://duelink.com/software/api/sound.html">Sound API Documentation</a>
+                            </div>
+                        </div>               
+                </div>
+				<!-- Servo Tab -->
+                <div class="tab-pane fade" id="tab4Content" role="tabpanel" aria-labelledby="tab4">
+                    <div class="row">
+                        <div class="center">
+                            <div class="center">
+                                Servo Motor
+                                <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+                                    <table width="300">
+                                        <tr>
+                                            <td width="176">Pin</td>
+                                            <td width="62">
+                                                <select id="pinNumberServo">
+                                                    <option value="0">P0</option>
+                                                    <option value="1">P1</option>
+                                                    <option value="2">P2</option>
+                                                    <option value="3">P3</option>
+                                                    <option value="4">P4</option>
+                                                    <option value="5">P5</option>
+                                                    <option value="6">P6</option>
+                                                    <option value="7">P7</option>
+                                                    <option value="8">P8</option>
+                                                    <option value="9">P9</option>
+                                                    <option value="10">P10</option>
+                                                    <option value="11">P11</option>
+                                                </select>
+                                            </td>
+                                        	<tr>
+											<!---Servo Slider-->
+                                            <td>                                    
+                                                <div class="rangesliderServo">
+                                                    <input type="range" min="0" max="180"
+                                                           value="90" class="mysliderServo"
+                                                           id="sliderRangeServo">
+                                                    <p>Position: <span id="demoServo"></span></p>
+                                                </div>
+                                                <script>
+                                                    let rangesliderServo = document.getElementById("sliderRangeServo");
+                                                    let output2 = document.getElementById("demoServo");
+                                                    output2.innerHTML = rangesliderServo.value +' degrees';
+
+                                                    rangesliderServo.oninput = function () {
+                                                        output2.innerHTML = this.value+' degrees';
+                                                    }
+													
+                                                </script>
+                                            </td>
+                                        	</tr>
+                                        </tr>
+                                    </table>
+                                    <button class="btn btn-primary" onclick="setServo()">Set</button>
+                                </div>
+							<br>
+							<a href="https://duelink.com/software/api/servo.html">Servo API Documentation</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab5Content" role="tabpanel" aria-labelledby="tab5">
+                    <div class="row">
+                        <div class="center">
+                            <div class="center">
+                                NeoPixel
+                                <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+                                    <table width="300">										
+                                        <tr>
+                                            <td width="136">Pin</td>
+                                            <td width="152">
+                                                <select id="pinNumberNeoPixel">
+                                                    <option value="0">P0</option>
+                                                    <option value="1">P1</option>
+                                                    <option value="2">P2</option>
+                                                    <option value="3">P3</option>
+                                                    <option value="4">P4</option>
+                                                    <option value="5">P5</option>
+                                                    <option value="6">P6</option>
+                                                    <option value="7">P7</option>
+                                                    <option value="8">P8</option>
+                                                    <option value="9">P9</option>
+                                                    <option value="10">P10</option>
+                                                    <option value="11">P11</option>
+                                                </select>											
+                                            </td>									
+                                        </tr>
 								
-									<div class="tab-pane fade show active" id="tab1Content" role="tabpanel" aria-labelledby="tab1" >
-										<!-- Digital Tab -->
-										<div class="row">
-											<div class="center">
-												<div class="center">
-													Digital Write					
-													<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
-														<table width="300" background="FFFFFF">
-															<tr>
-																<td width="109">Pin</td>
-																<td width="97">
-																	<select id="pinNumberDigitalWrite">
-																		<option value="108">LED</option>
-																		<option value="0">P0</option>
-																		<option value="1">P1</option>
-																		<option value="2">P2</option>
-																		<option value="3">P3</option>
-																		<option value="4">P4</option>
-																		<option value="5">P5</option>
-																		<option value="6">P6</option>
-																		<option value="7">P7</option>
-																		<option value="8">P8</option>
-																		<option value="9">P9</option>
-																		<option value="10">P10</option>
-																		<option value="11">P11</option>
-																	</select>
-																</td>
-															</tr>
-															<tr>
-																<td width="109">Value</td>
-																<td width="97">
-																	<select id="valueDigitalWrite">
-																		<option value="1">true</option>
-																		<option value="0">false</option>
-																	</select>
-																</td>
-															</tr>
-														</table>
-														<button class="btn btn-primary" onclick="digitalWrite()">Set</button>
-													</div>
-												</div>
-											</div>
-										</div>
-									<br>
-										<!-- Digital Read -->
-										<div class="row">
-											<div class="center">
-												<div class="center">		
-												  Digital Read
-													<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
-														<table width="300">
-															<tr>
-																<td width="125">Pin</td>
-																<td width="113">
-																	<select id="pinNumberDigitalRead">
-																		<option value="0">P0</option>
-																		<option value="1">P1</option>
-																		<option value="2">P2</option>
-																		<option value="3">P3</option>
-																		<option value="4">P4</option>
-																		<option value="5">P5</option>
-																		<option value="6">P6</option>
-																		<option value="7">P7</option>
-																		<option value="8">P8</option>
-																		<option value="9">P9</option>
-																		<option value="10">P10</option>
-																		<option value="11">P11</option>
-																	</select>
-																</td>
-															</tr>
-															<tr>
-																<td width="125">Pull</td>
-																<td width="113">
-																	<select id="pullDigitalRead">
-																		<option value="0">None</option>
-																		<option value="1">Up</option>
-																		<option value="2">Down</option>
-																	</select>
-																</td>
-															</tr>
-															<tr>
-															<tr>
-																<td width="125">Return: <span id="digitalReadReturn"></span></td>
-																<td width="113">
-																</td>
-															</tr>
-															</tr>
-														</table>
-														<button class="btn btn-primary" onclick="digitalRead()">Read</button>
-													</div>
-												<br>
-												<a href="https://duelink.com/software/api/digital.html">Digital API Documentation</a>
-												
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="tab-pane fade" id="tab2Content" role="tabpanel" aria-labelledby="tab2">
-										<!-- Analog Tab -->
-										<div class="row">
-											<div class="center">
-												<div class="center">
-												   Analog Write
-													<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
-														<table width="300">
-															<tr>
-																<td width="176">Pin</td>
-																<td width="62">
-																	<select id="pinNumberAnalogWrite">
-																		<option value="108">LED</option>
-																		<option value="0">P0</option>
-																		<option value="1">P1</option>
-																		<option value="2">P2</option>
-																		<option value="3">P3</option>
-																		<option value="4">P4</option>
-																		<option value="5">P5</option>
-																		<option value="6">P6</option>
-																		<option value="7">P7</option>
-																		<option value="8">P8</option>
-																		<option value="9">P9</option>
-																		<option value="10">P10</option>
-																		<option value="11">P11</option>
-																	</select>
-																</td>
-															<tr>
-																<td>
+										<!---NeoPixel RED Slider-->
+                                            <td>
+                                                
+                                                <div class="rangesliderNeoPixelRED">
+                                                    <input type="range" min="0" max="255"
+                                                           value="128" class="mysliderNeoPixelRED"
+                                                           id="sliderRangeNeoPixelRED">
+                                                    <p>Red: <span id="demoNeoPixelRED"></span></p>
+                                                </div>
 
-																	<div class="rangeslider">
-																		<input type="range" min="0" max="100"
-																			   value="50" class="myslider"
-																			   id="sliderRange">
-																		<p>Value: <span id="demo"></span></p>
-																	</div>
+                                                <script>
+                                                    let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
+                                                    let outputRED = document.getElementById("demoNeoPixelRED");
+                                                    outputRED.innerHTML = rangesliderNeoPixelRED.value;
 
-																	<script>
-																		let rangeslider = document.getElementById("sliderRange");
-																		let output = document.getElementById("demo");
-																		output.innerHTML = rangeslider.value;
+                                                    rangesliderNeoPixelRED.oninput = function () {
+														setColorSwatch();
+                                                        outputRED.innerHTML = this.value;
+                                                    }
+                                                </script>
+                                            </td>
+										
+										<!---NeoPixel GREEN Slider-->
+                                            <td>
+                                                
+                                                <div class="rangesliderNeoPixelGREEN">
+                                                    <input type="range" min="0" max="255"
+                                                           value="128" class="mysliderNeoPixelGREEN"
+                                                           id="sliderRangeNeoPixelGREEN">
+                                                    <p>Green: <span id="demoNeoPixelGREEN"></span></p>
+                                                </div>
 
-																		rangeslider.oninput = function () {
-																			output.innerHTML = this.value;
-																		}
-																	</script>
-																</td>
-															</tr>
-															</tr>
-														</table>
+                                                <script>
+                                                    let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
+                                                    let outputGREEN = document.getElementById("demoNeoPixelGREEN");
+                                                    outputGREEN.innerHTML = rangesliderNeoPixelGREEN.value;
 
-														<button class="btn btn-primary" onclick="analoglWrite()">Set</button>
-													</div>
-												
-												</div>
-											</div>
-										</div>
+                                                    rangesliderNeoPixelGREEN.oninput = function () {
+														setColorSwatch();
+                                                        outputGREEN.innerHTML = this.value;
+                                                    }
+                                                </script>
+                                            </td>
+										
+										<!---NeoPixel BLUE Slider-->
+                                            <td>
+                                                
+                                                <div class="rangesliderNeoPixelBLUE">
+                                                    <input type="range" min="0" max="255"
+                                                           value="128" class="mysliderNeoPixelBLUE"
+                                                           id="sliderRangeNeoPixelBLUE">
+                                                    <p>Blue: <span id="demoNeoPixelBLUE"></span></p>
+                                                </div>
+
+                                                <script>
+                                                    let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
+                                                    let outputBLUE = document.getElementById("demoNeoPixelBLUE");
+                                                    outputBLUE.innerHTML = rangesliderNeoPixelBLUE.value;
+
+                                                    rangesliderNeoPixelBLUE.oninput = function () {
+														setColorSwatch();
+                                                        outputBLUE.innerHTML = this.value;
+                                                    }
+                                                </script>
+                                            </td>
+										<div id="colorSection"></div>
 										<br>
-										<!-- Analog Read -->
-										<div class="row">
-											<div class="center">
-												<div class="center">
-													Analog Read
-													<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
-														<table width="300">
-															<tr>
-																<td width="109">Pin</td>
-																<td width="129">
-																	<select id="pinNumber">
-																		<option value="0">P0</option>
-																		<option value="1">P1</option>
-																		<option value="2">P2</option>
-																		<option value="3">P3</option>
-																		<option value="4">P4</option>
-																		<option value="5">P5</option>
-																		<option value="6">P6</option>
-																		<option value="7">P7</option>
-																		<option value="8">P8</option>
-																		<option value="9">P9</option>
-																		<option value="10">P10</option>
-																		<option value="11">P11</option>
-																	</select>
-																</td>
-															</tr>
-															<tr>
-																<td width="109">Return: <span id="analogReadReturn"></span></td>
-																<td width="129">
-																</td>
-															</tr>
-														</table>
-														<button class="btn btn-primary" onclick="analoglRead()">Read</button>
-													</div>
-													<br>
-												<a href="https://duelink.com/software/api/analog.html">Analog API Documentation</a>
-												</div>
-											</div>
-										</div>
-									</div>
-									<!-- Sound Tab -->
-									<div class="tab-pane fade" id="tab3Content" role="tabpanel" aria-labelledby="tab3">
-										<div class="row">
-											<div class="center">
-													Sound
-													<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
-														<table width="300">
-															<tr>
-																<td width="125">Pin</td>
-																<td width="144">
-																	<select id="pinNumberSound">
-																		<option value="112">Piezo</option>
-																		<option value="0">P0</option>
-																		<option value="1">P1</option>
-																		<option value="2">P2</option>
-																		<option value="3">P3</option>
-																		<option value="4">P4</option>
-																		<option value="5">P5</option>
-																		<option value="6">P6</option>
-																		<option value="7">P7</option>
-																		<option value="8">P8</option>
-																		<option value="9">P9</option>
-																		<option value="10">P10</option>
-																		<option value="11">P11</option>
-																	</select>
-																</td>
-															</tr>
-															<tr>
-																<td width="125">Duration</td>
-																<td width="144">
-																	<select id="playNote">
-																		<option value="130">C - 130Hz</option>
-																		<option value="146">D - 146Hz</option>
-																		<option value="164">E - 164Hz</option>
-																		<option value="174">F - 174Hz</option>
-																		<option value="196">G - 196Hz</option>
-																		<option value="220">A - 220Hz</option>
-																		<option value="246">B - 246Hz</option>
-																		<option value="261">C - 261Hz</option>
-																	</select>
-																</td>
-															</tr>
-														</table>
-														<button class="btn btn-primary" onclick="playSound()">Beep</button>
-													</div>
-												<br>
-												<a href="https://duelink.com/software/api/sound.html">Sound API Documentation</a>
-												</div>
-											</div>               
-									</div>
-									<!-- Servo Tab -->
-									<div class="tab-pane fade" id="tab4Content" role="tabpanel" aria-labelledby="tab4">
-										<div class="row">
-											<div class="center">
-												<div class="center">
-													Servo Motor
-													<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
-														<table width="300">
-															<tr>
-																<td width="176">Pin</td>
-																<td width="62">
-																	<select id="pinNumberServo">
-																		<option value="0">P0</option>
-																		<option value="1">P1</option>
-																		<option value="2">P2</option>
-																		<option value="3">P3</option>
-																		<option value="4">P4</option>
-																		<option value="5">P5</option>
-																		<option value="6">P6</option>
-																		<option value="7">P7</option>
-																		<option value="8">P8</option>
-																		<option value="9">P9</option>
-																		<option value="10">P10</option>
-																		<option value="11">P11</option>
-																	</select>
-																</td>
-																<tr>
-																<!---Servo Slider-->
-																<td>                                    
-																	<div class="rangesliderServo">
-																		<input type="range" min="0" max="180"
-																			   value="90" class="mysliderServo"
-																			   id="sliderRangeServo">
-																		<p>Value: <span id="demoServo"></span></p>
-																	</div>
-																	<script>
-																		let rangesliderServo = document.getElementById("sliderRangeServo");
-																		let output2 = document.getElementById("demoServo");
-																		output2.innerHTML = rangesliderServo.value;
-
-																		rangesliderServo.oninput = function () {
-																			output2.innerHTML = this.value;
-																		}
-																	</script>
-																</td>
-																</tr>
-															</tr>
-														</table>
-														<button class="btn btn-primary" onclick="setServo()">Set</button>
-													</div>
-												<br>
-												<a href="https://duelink.com/software/api/servo.html">Servo API Documentation</a>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="tab-pane fade" id="tab5Content" role="tabpanel" aria-labelledby="tab5">
-										<div class="row">
-											<div class="center">
-												<div class="center">
-													NeoPixel
-													<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
-														<table width="300">										
-															<tr>
-																<td width="136">Pin</td>
-																<td width="152">
-																	<select id="pinNumberNeoPixel">
-																		<option value="0">P0</option>
-																		<option value="1">P1</option>
-																		<option value="2">P2</option>
-																		<option value="3">P3</option>
-																		<option value="4">P4</option>
-																		<option value="5">P5</option>
-																		<option value="6">P6</option>
-																		<option value="7">P7</option>
-																		<option value="8">P8</option>
-																		<option value="9">P9</option>
-																		<option value="10">P10</option>
-																		<option value="11">P11</option>
-																	</select>											
-																</td>									
-															</tr>
-													
-															<!---NeoPixel RED Slider-->
-																<td>
-																	
-																	<div class="rangesliderNeoPixelRED">
-																		<input type="range" min="0" max="255"
-																			   value="128" class="mysliderNeoPixelRED"
-																			   id="sliderRangeNeoPixelRED">
-																		<p>Red: <span id="demoNeoPixelRED"></span></p>
-																	</div>
-
-																	<script>
-																		let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
-																		let outputRED = document.getElementById("demoNeoPixelRED");
-																		outputRED.innerHTML = rangesliderNeoPixelRED.value;
-
-																		rangesliderNeoPixelRED.oninput = function () {
-																			setColorSwatch();
-																			outputRED.innerHTML = this.value;
-																		}
-																	</script>
-																</td>
-															
-															<!---NeoPixel GREEN Slider-->
-																<td>
-																	
-																	<div class="rangesliderNeoPixelGREEN">
-																		<input type="range" min="0" max="255"
-																			   value="128" class="mysliderNeoPixelGREEN"
-																			   id="sliderRangeNeoPixelGREEN">
-																		<p>Green: <span id="demoNeoPixelGREEN"></span></p>
-																	</div>
-
-																	<script>
-																		let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
-																		let outputGREEN = document.getElementById("demoNeoPixelGREEN");
-																		outputGREEN.innerHTML = rangesliderNeoPixelGREEN.value;
-
-																		rangesliderNeoPixelGREEN.oninput = function () {
-																			setColorSwatch();
-																			outputGREEN.innerHTML = this.value;
-																		}
-																	</script>
-																</td>
-															
-															<!---NeoPixel BLUE Slider-->
-																<td>
-																	
-																	<div class="rangesliderNeoPixelBLUE">
-																		<input type="range" min="0" max="255"
-																			   value="128" class="mysliderNeoPixelBLUE"
-																			   id="sliderRangeNeoPixelBLUE">
-																		<p>Blue: <span id="demoNeoPixelBLUE"></span></p>
-																	</div>
-
-																	<script>
-																		let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
-																		let outputBLUE = document.getElementById("demoNeoPixelBLUE");
-																		outputBLUE.innerHTML = rangesliderNeoPixelBLUE.value;
-
-																		rangesliderNeoPixelBLUE.oninput = function () {
-																			setColorSwatch();
-																			outputBLUE.innerHTML = this.value;
-																		}
-																	</script>
-																</td>
-															<div id="colorSection"></div>
-															<br>
-															
-														</table>
-													
-													<label>LED Index: </label>
-													<input type="text" id="neoPixelIndex" name="neoPixelIndexName" value="0" />
-													<br>
-														<label>LED Count: </label>
-													<input type="text" id="neoPixelCount" name="neoPixelCountName" value="4" />
-													<br>
-														<button class="btn btn-primary" onclick="neoPixelSet()">Set Index</button>
-														<button class="btn btn-primary" onclick="neoPixelCycle()">Cycle</button>
-														<button class="btn btn-primary" onclick="neoPixelClearAll()">Clear All</button>
-						
-														
-													</div>
-													<br>
-												<a href="https://duelink.com/software/api/neopixel.html">NeoPixel API Documentation</a>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="tab-pane fade" id="tab6Content" role="tabpanel" aria-labelledby="tab6">
-										<div class="row">
-											<div class="center">
-												Display                   
-												<div class="center">
-													<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">								
-														<div style = "text-align:center;">
-														<p>
-															<canvas id="surface" width="128" height="64" style="width: 200px; height: 100px; background-color: black;">
-															</canvas>
-														</p>
-															</div>                    
-															<button class="btn btn-primary" onclick="sendImage()">Show Image</button>			
-														<p>
-															<br>	
-															<label>Input text:</label>
-															<input type="text" id="textsendid" name="textsendname" value="Hello DUELink!" />
-															<button class="btn btn-primary" onclick="sendText()">Show Text </button>
-														</p>
-													</div>
-													<br>
-												<a href="https://duelink.com/software/api/lcd.html">Display API Documentation</a>
-												</div>
-											</div> 
-										</div>
-									</div>
-								</div>
+										
+						            </table>
 								
-							</fieldset>
-							<div id="id-bottom">
-								
-							</div>	
-							
-							
-						</td>
-					</tr>
-					
-					
-				</div>
-			</div>
-		</table>
+								<label>LED Index: </label>
+                                <input type="text" id="neoPixelIndex" name="neoPixelIndexName" value="0" />
+								<br>
+									<label>LED Count: </label>
+                                <input type="text" id="neoPixelCount" name="neoPixelCountName" value="4" />
+								<br>
+                                    <button class="btn btn-primary" onclick="neoPixelSet()">Set Index</button>
+									<button class="btn btn-primary" onclick="neoPixelCycle()">Cycle</button>
+                                    <button class="btn btn-primary" onclick="neoPixelClearAll()">Clear All</button>
+	
+									
+                                </div>
+								<br>
+							<a href="https://duelink.com/software/api/neopixel.html">NeoPixel API Documentation</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab6Content" role="tabpanel" aria-labelledby="tab6">
+                    <div class="row">
+                        <div class="center">
+                            Display                   
+                            <div class="center">
+                                <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">								
+									<div style = "text-align:center;">
+                                	<p>
+                                    	<canvas id="surface" width="128" height="64" style="width: 200px; height: 100px; background-color: black;">
+                                    	</canvas>
+                                	</p>
+                            			</div>                    
+                                    	<button class="btn btn-primary" onclick="sendImage()">Show Image</button>			
+									<p>
+										<br>	
+										<label>Input text:</label>
+                                		<input type="text" id="textsendid" name="textsendname" value="Hello DUELink!" />
+                                		<button class="btn btn-primary" onclick="sendText()">Show Text </button>
+                                	</p>
+                                </div>
+								<br>
+							<a href="https://duelink.com/software/api/lcd.html">Display API Documentation</a>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+	   
+        </fieldset>
+ 	    <div id="id-bottom">
 		
+		</div>
 	</div>
 
 	
@@ -600,7 +580,7 @@ $(document).ready(function(){
 
     async function connect() {
         try {
-			hideError();
+            hideError();
             Check();
             await duelink.Connect();
             if (duelink.IsRave) {
@@ -658,10 +638,10 @@ $(document).ready(function(){
         var valueSelectedServo = $("#valueServo").val();
         let rangesliderServo = document.getElementById("sliderRangeServo");
         let output2 = document.getElementById("demoServo");
-        output2.innerHTML = rangesliderServo.value;
+        output2.innerHTML = rangesliderServo.value + ' degrees';
 
         rangesliderServo.oninput = function () {
-            output2.innerHTML = this.value;
+            output2.innerHTML = this.value  + ' degrees';
         }
         var valueRangeServo = rangesliderServo.value;
         var servoValue = valueRangeServo / 1;
@@ -822,7 +802,4 @@ $(document).ready(function(){
         $("#id-error").show();
         $("#error-message").text(message);
     }
-	
-	
-	
 </script>
