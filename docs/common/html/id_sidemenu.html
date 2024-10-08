@@ -1,0 +1,48 @@
+
+
+<html>
+<head>  
+  
+</head>
+
+<body>
+	<a href="#">Basic</a>
+	<a href="#">CAN</a>
+	<a href="http://localhost:8080/i2c.html">I2c</a>
+	<a href="#">Spi</a>
+	<a href="#">Uart</a>
+	<button class="dropdown-btn" id="id-demoBtn">Samples
+		<i class="fa fa-caret-down"></i>
+	</button>
+
+	<div class="dropdown-container">
+		<a href="#">Led matrix</a>
+		<a href="#">Servo moto</a>
+		<a href="#">Stepper moto</a>
+		<a href="#">Piano</a>
+		<a href="#">Temperture</a>
+		<a href="#">Humidity</a>
+		<a href="#">Distance sensor</a>			
+	</div>
+			
+	<a href="https://www.ghielectronics.com/company/">About</a>		
+	<script>	
+		var dropdown = document.getElementsByClassName("dropdown-btn");
+
+		var i;
+
+		for (i = 0; i < dropdown.length; i++) {
+			dropdown[i].addEventListener("click", function() {
+				this.classList.toggle("active");
+				var dropdownContent = this.nextElementSibling;
+				
+				if (dropdownContent.style.display === "block") {
+					dropdownContent.style.display = "none";
+				} else {
+					dropdownContent.style.display = "block";
+				}
+			});
+		}
+	</script>
+</body>
+</html>

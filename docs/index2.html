@@ -31,75 +31,29 @@
 	</style>
 </head>
 
-<body>	
-	<div class="topnav" id="id-top">
-		<div class="row">
-			<div class="center">
-				<table >
-					<tr>					
-						<td width="64" >						
-							<a href="javascript:void(0);" class="icon" onclick="toggleMenu()"> 
-								
-								<i class="fa fa-bars"></i>
-								
-							</a>
-						</td>
-													
-						<td>
-							<img src="./due.png" style="width:200px;" >
-						</td>
-						
-					
-					</tr>
-					
-				</table>
-			</div>	
-		</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){   
+	$('#id-topbar').load("./common/html/id_topbar.html");
+	$('#id-connect').load("./common/html/id_connect.html");
+	$('#id-sidemenu').load("./common/html/id_sidemenu.html");
+	$('#id-status').load("./common/html/id_status.html");
+	$('#id-error').load("./common/html/id_error.html");
+	$('#id-bottom').load("./common/html/id_bottom.html");
+});
+</script>
 
+<body>	
+	<div class="topnav" id="id-topbar">
+				
 	</div>
 	
-    <div id="id-connect" class="alert alert-primary" role="alert">
-        <span>
-            <svg class="align-middle mr-2" focusable="false" width="24" height="24" aria-hidden="true">
-                <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20, 12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10, 10 0 0,0 22,12A10, 10 0 0,0 12,2M11,17H13V11H11V17Z">
-                </path>
-            </svg>
-        </span>
-        Press
-        <button class="btn btn-outline-primary ml-1 mr-1" onclick="connect()">
-            <span>
-                <svg class="align-middle" focusable="false" width="24" height="24" aria-hidden="true">
-                    <path d="M15 7v4h1v2h-3V5h2l-3-4-3 4h2v8H8v-2.07c.7-.37 1.2-1.08 1.2-1.93 0-1.21-.99-2.2-2.2-2.2-1.21 0-2.2.99-2.2 2.2 0 .85.5 1.56 1.2 1.93V13c0 1.11.89 2 2 2h3v3.05c-.71.37-1.2 1.1-1.2 1.95 0 1.22.99 2.2 2.2 2.2 1.21 0 2.2-.98 2.2-2.2 0-.85-.49-1.58-1.2-1.95V15h3c1.11 0 2-.89 2-2v-2h1V7h-4z">
-                    </path>
-                </svg>
-            </span>
-        </button>
-        to connect to your device
-    </div>
-	
-	<div id="id-sideMenu" class="sidenav">
-		<!-- <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a> -->
-		<a href="#">Basic</a>
-		<a href="#">CAN</a>
-		<a href="http://localhost:8080/i2c.html">I2c</a>
-		<a href="#">Spi</a>
-		<a href="#">Uart</a>
-		<button class="dropdown-btn" id="id-demoBtn">Samples
-			<i class="fa fa-caret-down"></i>
-		</button>
+	<div class="alert alert-primary" id="id-connect">		
 		
-		<div class="dropdown-container">
-			<a href="#">Led matrix</a>
-			<a href="#">Servo moto</a>
-			<a href="#">Stepper moto</a>
-			<a href="#">Piano</a>
-			<a href="#">Temperture</a>
-			<a href="#">Humidity</a>
-			<a href="#">Distance sensor</a>			
-		</div>
+	</div>
+	
+	<div class="sidenav" id="id-sidemenu" >		
 				
-		<a href="https://www.ghielectronics.com/company/">About</a>		
-		<script type="text/javascript" src="./js/dropdown_menu.js"></script>
 	</div>
 
     <div id="id-selections" class="container" onclick="closeNav()" >
@@ -582,30 +536,14 @@
 								</div>
 								
 							</fieldset>
-							<p>&nbsp;</p>
-							<h3> <a href="https://github.com/ghi-electronics/due-libraries/tree/main/docs">Fork this repo</a> and make it your own!</h3>
-							
-							<hr>
-							<!-- <br> -->
-							<img src="https://www.ghielectronics.com/wp-content/uploads/2019/11/GHI_LOGO_MASTER-1.png" alt="GHI Electronics" style="width:120px;">
-							
-							
-							
-							
-							<p style="text-align: center">www.ghielectronics.com</p>
+							<div id="id-bottom">
+								
+							</div>	
 							
 							
 						</td>
 					</tr>
-					<!-- <tr> -->
-						<!-- <div class="row"> -->
-							<!-- <div class="center"> -->
-								<!-- <td> -->
-									<!-- <img src="https://www.ghielectronics.com/wp-content/uploads/2019/11/GHI_LOGO_MASTER-1.png" alt="GHI Electronics" style="width:120px;"> -->
-								<!-- </td> -->
-							<!-- </div> -->
-						<!-- </div>								 -->
-					<!-- </tr> -->
+					
 					
 				</div>
 			</div>
@@ -616,39 +554,21 @@
 	
 
     <div id="id-status" style="display:none">
-        <div class="alert alert-success" role="alert">
-            <span>
-                <svg class="align-middle mr-2" style="fill:Green" focusable="false" width="24" height="24"
-                     aria-hidden="true">
-                    <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20, 12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10, 10 0 0,0 22,12A10, 10 0 0,0 12,2M11,17H13V11H11V17Z">
-                    </path>
-                </svg>
-            </span>
-            <span id="status-message"></span>
-        </div>
+        
     </div>
 
     <div id="id-error" style="display: none;">
-        <div class="alert alert-danger" role="alert">
-            <span>
-                <svg class="align-middle mr-2" style="fill:red" focusable="false" width="24" height="24"
-                     aria-hidden="true">
-                    <path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z">
-                    </path>
-                </svg>
-            </span>
-            <span id="error-message"></span>
-        </div>
+        
     </div>
 	
 
 
 </body>
 
+<script type="text/javascript" src="./js/dropdown_menu.js"></script>
 </html><script>
     import("./src/serialweb/serialweb.js").then(mod => serial = mod);
     import("./src/duelink/duelink.js").then(mod => due = mod);
-    // A $( document ).ready() block.
 
     // Get canvas context
     let canvas = document.getElementById("surface");
@@ -903,88 +823,6 @@
         $("#error-message").text(message);
     }
 	
-
-
 	
-
-
 	
-	function toggleMenu() {
-		var x = document.getElementById("id-sideMenu");
-		if (x.style.width === "250px") {
-			closeNav()
-		} else {
-			openNav();
-		}
-	}
-
-
-	function openNav() {
-		document.getElementById("id-sideMenu").style.width = "250px";
-		
-		//document.getElementById("id-connect").style.left = "250px";
-		
-
-		document.getElementById("id-top").animate(
-			[
-				{ transform: "translateX(0)" }, 
-				{ transform: "translateX(250px)" } 
-			],
-			{
-				duration: 350, // Animation duration in milliseconds
-				easing: "ease-in-out", // Easing function
-				fill: "forwards" // Keep the final state after animation
-			}
-		);
-		
-		document.getElementById("id-connect").animate(
-			[
-				{ transform: "translateX(0)" }, 
-				{ transform: "translateX(250px)" } 
-			],
-			{
-				duration: 350, // Animation duration in milliseconds
-				easing: "ease-in-out", // Easing function
-				fill: "forwards" // Keep the final state after animation
-			}
-		);
-		
-	
-	}
-
-	function closeNav() {
-		if (document.getElementById("id-sideMenu").style.width === "250px") {
-			document.getElementById("id-sideMenu").style.width = "0";
-			
-			
-
-			document.getElementById("id-top").animate(
-				[
-					{ transform: "translateX(250px)" }, 
-					{ transform: "translateX(0)" } 
-				],
-				{
-					duration: 350, // Animation duration in milliseconds
-					easing: "ease-in-out", // Easing function
-					fill: "forwards" // Keep the final state after animation
-				}
-			);
-			
-			document.getElementById("id-connect").animate(
-				[
-					{ transform: "translateX(250px)" }, 
-					{ transform: "translateX(0)" } 
-				],
-				{
-					duration: 350, // Animation duration in milliseconds
-					easing: "ease-in-out", // Easing function
-					fill: "forwards" // Keep the final state after animation
-				}
-			);
-			
-			
-		}
-	  
-	 
-	}
 </script>
