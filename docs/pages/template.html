@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DUELink Template</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../sidenav_styles.css">	
+	<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	
+	<style>
+		#colorSection {
+			width: 400px;
+			height: 60px;
+			background-color: black;
+			border: 1px solid black;
+		}
+
+	</style>
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){   
+	$('#id-topbar').load("../common/html/id_topbar.html");
+	$('#id-connect').load("../common/html/id_connect.html");
+	$('#id-sidemenu').load("../common/html/id_sidemenu.html");
+	$('#id-status').load("../common/html/id_status.html");
+	$('#id-error').load("../common/html/id_error.html");
+	$('#id-bottom').load("../common/html/id_bottom.html");
+});
+</script>	
+
+<body>
+    <div class="topnav" id="id-topbar">
+				
+	</div>
+	
+	<div class="alert alert-primary" id="id-connect">		
+		
+	</div>
+	
+	<div class="sidenav" id="id-sidemenu" >		
+				
+	</div>
+
+    <div id="id-selections" class="container">
+        <fieldset id="id-inputs" class="border p-3" disabled="true">            
+			<button class="btn btn-primary" onclick="ledOn()">LED ON</button>
+			<button class="btn btn-primary" onclick="ledOff()">LED OFF</button>
+			<button class="btn btn-primary" onclick="buzzer()">BUZZER</button>                          
+        </fieldset>	
+ 	    <p>&nbsp;</p>
+	</div>
+
+    <div id="id-status" style="display:none">
+        
+    </div>
+
+    <div id="id-error" style="display: none;">
+        
+    </div>
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="../common/js/dropdown_menu.js"></script>
+
+</html><script>
+    import("./src/serialweb/serialweb.js").then(mod => serial = mod);
+    import("./src/duelink/duelink.js").then(mod => due = mod);
+  
+    function Check() {
+        if (!this.duelink)
+            this.duelink = new due.DUELinkController(new serial.WebSerial());
+    }
+
+    async function connect() {
+        try {
+            hideError();
+            Check();
+            await duelink.Connect();
+            if (duelink.IsRave) {
+                color_depth = 16;
+                canvas.width = 160;
+                canvas.height = 120;
+                canvas.style.width = '320px';
+                canvas.style.height = '240px';
+            } else if (duelink.IsEdge) {
+                await duelink.Display.Configuration(0, 0x3c);
+            }
+            $("#id-version").text(duelink.Version);
+            $("#id-connect").slideUp();
+            $("#id-inputs").prop("disabled", false);
+
+        } catch (e) {
+            showError("connect Error" + e);
+        }
+    }
+	
+    async function ledOn() {
+        Check();
+        await duelink.Digital.Write('l', true);
+    }
+
+	async function ledOff() {
+        Check();
+        await duelink.Digital.Write('l', false);
+    }
+   
+    async function buzzer() {
+        Check();
+        await duelink.Frequency.Write('p', 230, 1000);
+    }
+
+    
+    function hideError() {
+        $("#id-error").hide();
+    }
+
+    function showStatus(message) {
+        $("#id-inputs").prop("disabled", true);
+        hideError();
+        $("#id-status").show();
+        $("#status-message").text(message);
+        $.when($("#id-status").fadeOut(1000)).done(
+            function () { $("#id-inputs").prop("disabled", false); }
+        );
+    }
+
+    function showError(message) {
+        $("#id-inputs").prop("disabled", true);
+        $("#id-error").show();
+        $("#error-message").text(message);
+    }
+</script>
