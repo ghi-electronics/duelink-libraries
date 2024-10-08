@@ -90,3 +90,14 @@ html, body {
 .mt-3 {
     margin-top: 1rem;
 }
+
+
+
+
+
+/* tab content */
+#id-selections .tab-content {
+  color : black;
+  background-color: white;
+}
+
