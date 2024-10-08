@@ -7,8 +7,8 @@
 
     <title>DUELink Template</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
-	<link rel="stylesheet" href="sidenav_styles.css">	
+    <link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../sidenav_styles.css">	
 	<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -35,12 +35,12 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 $(document).ready(function(){   
-	$('#id-topbar').load("./common/html/id_topbar.html");
-	$('#id-connect').load("./common/html/id_connect.html");
-	$('#id-sidemenu').load("./common/html/id_sidemenu.html");
-	$('#id-status').load("./common/html/id_status.html");
-	$('#id-error').load("./common/html/id_error.html");
-	$('#id-bottom').load("./common/html/id_bottom.html");
+	$('#id-topbar').load("../common/html/id_topbar.html");
+	$('#id-connect').load("../common/html/id_connect.html");
+	$('#id-sidemenu').load("../common/html/id_sidemenu.html");
+	$('#id-status').load("../common/html/id_status.html");
+	$('#id-error').load("../common/html/id_error.html");
+	$('#id-bottom').load("../common/html/id_bottom.html");
 });
 </script>	
 
@@ -126,12 +126,12 @@ $(document).ready(function(){
 </html>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script type="text/javascript" src="./common/js/dropdown_menu.js"></script>
+<script type="text/javascript" src="../common/js/dropdown_menu.js"></script>
 
 <script>
-    import("./src/serialweb/serialweb.js").then(mod => serial = mod);
-    import("./src/duelink/duelink.js").then(mod => due = mod);
-	import("./src/util.js").then(mod => util = mod);
+    import("../src/serialweb/serialweb.js").then(mod => serial = mod);
+    import("../src/duelink/duelink.js").then(mod => due = mod);
+	import("../src/util.js").then(mod => util = mod);
 	
 	const ctx = document.getElementById('myChart');
 	let isReading = false;
