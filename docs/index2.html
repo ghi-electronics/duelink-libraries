@@ -21,7 +21,13 @@
 			height: 60px;
 			background-color: black;
 			border: 1px solid black;
-		}		
+		}
+
+		img {
+		  display: block;
+		  margin-left: auto;
+		  margin-right: auto;		  
+		}
 	</style>
 </head>
 
@@ -30,23 +36,17 @@
 		<div class="row">
 			<div class="center">
 				<table >
-					<tr>
-					
-						<td width="64" >
-						<!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
+					<tr>					
+						<td width="64" >						
 							<a href="javascript:void(0);" class="icon" onclick="toggleMenu()"> 
 								
 								<i class="fa fa-bars"></i>
 								
 							</a>
 						</td>
-								
-						<td>	
-							<img src="https://www.ghielectronics.com/wp-content/uploads/2019/11/GHI_LOGO_MASTER-1.png" alt="GHI Electronics" class="center" style="width:120px;">
-						</td>
-						
+													
 						<td>
-							<img src="./due.png" style="width:140px;" >
+							<img src="./due.png" style="width:200px;" >
 						</td>
 						
 					
@@ -81,36 +81,25 @@
 		<!-- <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a> -->
 		<a href="#">Basic</a>
 		<a href="#">CAN</a>
-		<a href="#">I2c</a>
+		<a href="http://localhost:8080/i2c.html">I2c</a>
 		<a href="#">Spi</a>
 		<a href="#">Uart</a>
-		<button class="dropdown-btn">Demo
+		<button class="dropdown-btn" id="id-demoBtn">Samples
 			<i class="fa fa-caret-down"></i>
 		</button>
+		
 		<div class="dropdown-container">
-		<a href="#">NeoPixel</a>
-		<a href="#">Servo moto</a>
-		<a href="#">Stepper moto</a>
+			<a href="#">Led matrix</a>
+			<a href="#">Servo moto</a>
+			<a href="#">Stepper moto</a>
+			<a href="#">Piano</a>
+			<a href="#">Temperture</a>
+			<a href="#">Humidity</a>
+			<a href="#">Distance sensor</a>			
 		</div>
-
-		<script>
-			/* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
-			var dropdown = document.getElementsByClassName("dropdown-btn");
-			var i;
-
-			for (i = 0; i < dropdown.length; i++) {
-				dropdown[i].addEventListener("click", function() {
-					this.classList.toggle("active");
-					var dropdownContent = this.nextElementSibling;
-					
-					if (dropdownContent.style.display === "block") {
-						dropdownContent.style.display = "none";
-					} else {
-						dropdownContent.style.display = "block";
-					}
-				});
-			}
-		</script>
+				
+		<a href="https://www.ghielectronics.com/company/">About</a>		
+		<script type="text/javascript" src="./js/dropdown_menu.js"></script>
 	</div>
 
     <div id="id-selections" class="container" onclick="closeNav()" >
@@ -119,7 +108,7 @@
 				<div class="center">
 					<tr>
 						<br>
-					<tr>
+					</tr>
 					<tr>
 						
 						
@@ -591,15 +580,32 @@
 										</div>
 									</div>
 								</div>
-						   
+								
 							</fieldset>
 							<p>&nbsp;</p>
 							<h3> <a href="https://github.com/ghi-electronics/due-libraries/tree/main/docs">Fork this repo</a> and make it your own!</h3>
 							
+							<hr>
+							<!-- <br> -->
+							<img src="https://www.ghielectronics.com/wp-content/uploads/2019/11/GHI_LOGO_MASTER-1.png" alt="GHI Electronics" style="width:120px;">
+							
+							
+							
+							
+							<p style="text-align: center">www.ghielectronics.com</p>
+							
 							
 						</td>
 					</tr>
-					
+					<!-- <tr> -->
+						<!-- <div class="row"> -->
+							<!-- <div class="center"> -->
+								<!-- <td> -->
+									<!-- <img src="https://www.ghielectronics.com/wp-content/uploads/2019/11/GHI_LOGO_MASTER-1.png" alt="GHI Electronics" style="width:120px;"> -->
+								<!-- </td> -->
+							<!-- </div> -->
+						<!-- </div>								 -->
+					<!-- </tr> -->
 					
 				</div>
 			</div>

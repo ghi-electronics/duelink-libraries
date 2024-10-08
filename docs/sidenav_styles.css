@@ -3,14 +3,6 @@ html, body {
 }
 
 
-#id-selections {
-  position: relative;
-}
-
-#id-connect {
-  position: relative;
-}
-
 
 .mobile-container {
   max-width: 480px;
