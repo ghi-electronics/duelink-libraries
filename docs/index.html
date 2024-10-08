@@ -663,10 +663,10 @@
         var valueSelectedServo = $("#valueServo").val();
         let rangesliderServo = document.getElementById("sliderRangeServo");
         let output2 = document.getElementById("demoServo");
-        output2.innerHTML = rangesliderServo.value;
+        output2.innerHTML = rangesliderServo.value + ' degrees';
 
         rangesliderServo.oninput = function () {
-            output2.innerHTML = this.value;
+            output2.innerHTML = this.value  + ' degrees';
         }
         var valueRangeServo = rangesliderServo.value;
         var servoValue = valueRangeServo / 1;
