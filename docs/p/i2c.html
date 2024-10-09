@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DUELink I2C</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../sidenav_styles.css">	
+	<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	
+	<style>
+		#colorSection {
+			width: 400px;
+			height: 60px;
+			background-color: black;
+			border: 1px solid black;
+		}
+
+	</style>
+	
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){   
+	$('#id-topbar').load("../common/html/id_topbar.html");
+	$('#id-connect').load("../common/html/id_connect.html");
+	$('#id-sidemenu').load("../common/html/id_sidemenu.html");
+	$('#id-status').load("../common/html/id_status.html");
+	$('#id-error').load("../common/html/id_error.html");
+	$('#id-bottom').load("../common/html/id_bottom.html");
+});
+</script>	
+
+<body>
+	
+	<div class="topnav" id="id-topbar">
+				
+	</div>
+	
+	<div class="alert alert-primary" id="id-connect">		
+		
+	</div>
+	
+	<div class="sidenav" id="id-sidemenu" >		
+				
+	</div>
+		
+
+    <div id="id-selections" class="container">
+        
+		<div class="row">	
+			<div class="center">
+				
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+					<table >
+						<tr>
+							<td width="200">Slave address (7 bits)</td>	
+							<td width="200">												
+								<input type="text" id="id-address" value=""/><br>
+							</td>
+						
+						</tr>
+					
+						
+						<tr>
+							<td width="200">Data to write: (0,1,2... 255)</td>	
+							<td width="200">												
+								<input type="text" id="id-dataWrite" value="1,2,3"/><br>
+							</td>
+						
+						</tr>
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doWrite()" id="id-btWrite" disabled="true" >Write</button>	<br><br>
+							</td>
+						
+						</tr>						
+						
+											
+						<tr>
+							<td width="200">Read byte count:</td>	
+							<td width="200">												
+								<input type="text" id="id-readCount" value="1"/><br>
+							</td>
+						
+						</tr>
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doRead()" id="id-btRead" disabled="true" >Read</button>	<br><br>
+							</td>
+						
+						</tr>	
+
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doWriteRead()" id="id-btWriteRead" disabled="true" >WriteRead</button>	<br><br>
+							</td>
+						
+						</tr>						
+						
+					</table>		
+				</div>
+				
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >	
+					Received data
+					<table >												
+						
+						<tr>	
+							<td width="200">
+								<textarea rows="6" cols="50" id="id-dataReceived" disabled>
+									
+								</textarea>	
+							</td>
+						</tr>
+						
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doClear()" id="id-btClear" disabled="true" >Clear</button>	<br><br>
+							</td>
+						
+						</tr>	
+					
+					</table>
+					
+				</div>
+				
+			</div>
+									
+		</div>
+				
+	</div>
+
+    <div id="id-status" style="display:none">
+        
+    </div>
+
+    <div id="id-error" style="display: none;">
+        
+    </div>
+
+</body>
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="../common/js/dropdown_menu.js"></script>
+
+<script>
+    import("../src/serialweb/serialweb.js").then(mod => serial = mod);
+    import("../src/duelink/duelink.js").then(mod => due = mod);
+	import("../src/util.js").then(mod => util = mod);
+	
+	const ctx = document.getElementById('myChart');
+	let isReading = false;
+	let buttonPressCounter = 0;    
+	const intervalCallBack = 200;
+	
+	function Check() {
+        if (!this.duelink)
+            this.duelink = new due.DUELinkController(new serial.WebSerial());
+    }
+
+    async function connect() {
+        try {
+            hideError();
+            Check();
+            await duelink.Connect();
+            if (duelink.IsRave) {
+                color_depth = 16;
+                canvas.width = 160;
+                canvas.height = 120;
+                canvas.style.width = '320px';
+                canvas.style.height = '240px';
+            } else if (duelink.IsEdge) {
+                await duelink.Display.Configuration(0, 0x3c);
+            }
+            $("#id-version").text(duelink.Version);
+            $("#id-connect").slideUp();
+            $("#id-btWrite").prop("disabled", false);
+            $("#id-btRead").prop("disabled", false);
+            $("#id-btWriteRead").prop("disabled", false);
+            $("#id-btClear").prop("disabled", false);
+	
+        } catch (e) {
+            showError("connect Error" + e);
+        }
+    }
+	    
+
+    
+    function hideError() {
+        $("#id-error").hide();
+    }
+	
+	function hideStatus() {
+        $("#id-status").hide();
+    }
+
+    function showStatus(message) {
+        $("#id-buttonRead").prop("disabled", true);
+        hideError();
+        $("#id-status").show();
+        $("#status-message").text(message);
+        $.when($("#id-status").fadeOut(1000)).done(
+            function () { $("#id-buttonRead").prop("disabled", false); }
+        );
+    }
+
+    function showError(message) {
+        $("#id-buttonRead").prop("disabled", true);
+        $("#id-error").show();
+        $("#error-message").text(message);
+    }
+	
+
+	async function doWrite() {
+		hideError();
+		hideStatus();
+		
+		const id = $("#id-address").val().trim();
+		const data = $("#id-dataWrite").val().trim().split(",");
+		
+		
+		var canWrite = true;
+		
+		var dataWrite = new Uint8Array(data.length)
+		
+		for (let i = 0; i < data.length; i++) {
+			
+			var x = parseInt(data[i], 10);
+			
+			if (isNaN(x) == true)  {
+				showError(`Error at index: ${i}, value: ${data[i]}` );
+				canWrite = false;
+	
+				break;
+			}
+
+			dataWrite[i] = x
+		}
+		
+		if (canWrite) {
+			await duelink.I2c.Write(id,dataWrite,0,dataWrite.length)
+			
+			showStatus("Data sent");
+		}				
+	}
+	
+	async function doRead() {
+		hideError();
+		hideStatus();
+		
+		const id = $("#id-address").val().trim();
+		const count = $("#id-readCount").val().trim();
+				
+		var canRead = true;
+		
+					
+		var x = parseInt(count, 10);
+		
+		if (isNaN(x) == true)  {
+			showError("Error count" );
+			canRead = false;
+		}			
+		
+		
+		if (canRead) {
+			let data = new Uint8Array(x)
+			await duelink.I2c.Read(id,data,0,data.length)
+			
+			let s="";
+			
+			for (let i = 0; i < data.length; i++) {
+				s += `${data[i]}`
+				
+				if (i < data.length - 1)
+					s += ","
+			}
+
+			document.getElementById("id-dataReceived").innerHTML += s
+		}
+		
+	}
+	
+	async function doWriteRead() {
+		hideError();
+		hideStatus();
+		
+		const id = $("#id-address").val().trim();
+		const count = $("#id-readCount").val().trim();
+		const dataWrite = $("#id-dataWrite").val().trim().split(",");
+		
+		var canWriteRead = true;
+
+		var c = parseInt(count, 10);
+		
+		if (isNaN(c) == true)  {
+			showError("Error count" );
+			canWriteRead = false;
+		}
+		
+		var dataWrite2 = new Uint8Array(dataWrite.length)
+
+		for (let i = 0; i < dataWrite.length; i++) {
+			
+			let x = parseInt(dataWrite[i], 10);
+			
+			if (isNaN(x) == true)  {
+				showError(`Error at index: ${i}, value: ${dataWrite[i]}` );
+				canWriteRead = false;
+	
+				break;
+			}
+
+			dataWrite2[i] = x
+		}	
+
+		if (canWriteRead) {
+			let dataRead = new Uint8Array(c)
+			await duelink.I2c.WriteRead(id,dataWrite2,0,dataWrite2.length, dataRead, 0, dataRead.length)
+			
+			let s="";
+			
+			for (let i = 0; i < dataRead.length; i++) {
+				s += `${dataRead[i]}`
+				
+				if (i < dataRead.length - 1)
+					s += ","
+			}
+
+			document.getElementById("id-dataReceived").innerHTML += s
+			document.getElementById("id-dataReceived").innerHTML += "\n"
+			
+		}		
+	}
+
+	async function doClear() {
+		document.getElementById("id-dataReceived").innerHTML = ""
+	}
+	
+</script>
