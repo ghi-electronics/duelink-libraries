@@ -203,9 +203,9 @@ $(document).ready(function(){
             $("#id-connect").slideUp();
             $("#id-btSend").prop("disabled", false);	
             $("#id-baudrate").prop("disabled", false);	
+            $("#id-btClear").prop("disabled", false);	
 			
-			document.getElementById("id-dataReceived").focus(); 
-			document.getElementById("id-dataReceived").setSelectionRange(0, 0);
+			document.getElementById("id-dataReceived").innerHTML = ""
 
 			await duelink.Can.Initialize(500000);	
 
