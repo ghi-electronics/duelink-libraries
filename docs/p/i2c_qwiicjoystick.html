@@ -55,87 +55,57 @@ $(document).ready(function(){
 		
 
     <div id="id-selections" class="container">
-        
+        Connect QWIIC Joystick to QWIIC/STEMMA port and start playing!
 		<div class="row">	
 			<div class="center">
 				
 				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+					
 					<table >
 						<tr>
-							<td width="200">Slave address (7 bits)</td>	
-							<td width="200">												
-								<input type="text" id="id-address" value=""/><br>
+							<td width="120">X value: </td>
+							<td width="200">
+								<span id="joyStickX"></span>
 							</td>
-						
-						</tr>
-					
-						
-						<tr>
-							<td width="200">Data to write: (0,1,2... 255)</td>	
-							<td width="200">												
-								<input type="text" id="id-dataWrite" value="1,2,3"/><br>
-							</td>
-						
 						</tr>
 						<tr>
+							<td width="120">Y value: </td>
 							<td width="200">
-								<button class="btn btn-primary" onclick="doWrite()" id="id-btWrite" disabled="true" >Write</button>	<br><br>
+								<span id="joyStickY"></span>
 							</td>
-						
-						</tr>						
-						
-											
-						<tr>
-							<td width="200">Read byte count:</td>	
-							<td width="200">												
-								<input type="text" id="id-readCount" value="1"/><br>
-							</td>
-						
 						</tr>
 						<tr>
+							<td width="120">Button pressed: </td>
 							<td width="200">
-								<button class="btn btn-primary" onclick="doRead()" id="id-btRead" disabled="true" >Read</button>	<br><br>
+								<span id="joyStickButton"></span>
 							</td>
-						
-						</tr>	
-
-						<tr>
-							<td width="200">
-								<button class="btn btn-primary" onclick="doWriteRead()" id="id-btWriteRead" disabled="true" >WriteRead</button>	<br><br>
-							</td>
-						
 						</tr>						
 						
 					</table>		
-				</div>
-				
-				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >	
-					Received data
-					<table >												
-						
-						<tr>	
-							<td width="200">
-								<textarea rows="6" cols="50" id="id-dataReceived" disabled>
-									
-								</textarea>	
-							</td>
-						</tr>
-						
-						<tr>
-							<td width="200">
-								<button class="btn btn-primary" onclick="doClear()" id="id-btClear" disabled="true" >Clear</button>	<br><br>
-							</td>
-						
-						</tr>	
-					
+					<table>
+						<canvas id="myChart" > </canvas>
+						<script>
+							$("#myChart").hide();
+						</script>
 					</table>
-					
 				</div>
 				
 			</div>
 									
 		</div>
+	
+		<div class="row">				
+				<table >
+					<tr>
+							<td width="120"/>
+							<td width="200">
+							<button class="btn btn-primary" id="id-buttonRead" onclick="startReading()" disabled="true" >Start Reading</button>
+							</td>
+					</tr>
+				</table>
+			</div>
 				
+	
 	</div>
 
     <div id="id-status" style="display:none">
@@ -184,10 +154,7 @@ $(document).ready(function(){
             }
             $("#id-version").text(duelink.Version);
             $("#id-connect").slideUp();
-            $("#id-btWrite").prop("disabled", false);
-            $("#id-btRead").prop("disabled", false);
-            $("#id-btWriteRead").prop("disabled", false);
-            $("#id-btClear").prop("disabled", false);
+            $("#id-buttonRead").prop("disabled", false);
 	
         } catch (e) {
             showError("connect Error" + e);
@@ -198,10 +165,6 @@ $(document).ready(function(){
     
     function hideError() {
         $("#id-error").hide();
-    }
-	
-	function hideStatus() {
-        $("#id-status").hide();
     }
 
     function showStatus(message) {
@@ -221,129 +184,101 @@ $(document).ready(function(){
     }
 	
 
-	async function doWrite() {
+	function startReading() {
 		hideError();
-		hideStatus();
-		
-		const id = $("#id-address").val().trim();
-		const data = $("#id-dataWrite").val().trim().split(",");
-		
-		
-		var canWrite = true;
-		
-		var dataWrite = new Uint8Array(data.length)
-		
-		for (let i = 0; i < data.length; i++) {
 			
-			var x = parseInt(data[i], 10);
-			
-			if (isNaN(x) == true)  {
-				showError(`Error at index: ${i}, value: ${data[i]}` );
-				canWrite = false;
-	
-				break;
-			}
-
-			dataWrite[i] = x
+		buttonPressCounter += 1		
+		if ((buttonPressCounter % 2) == 1) {
+			document.getElementById("id-buttonRead").innerHTML = "Stop Reading";
+			doActionCallback()
+			$("#myChart").show();
+							
 		}
-		
-		if (canWrite) {
-			await duelink.I2c.Write(id,dataWrite,0,dataWrite.length)
-			
-			showStatus("Data sent");
-		}				
-	}
-	
-	async function doRead() {
-		hideError();
-		hideStatus();
-		
-		const id = $("#id-address").val().trim();
-		const count = $("#id-readCount").val().trim();
-				
-		var canRead = true;
-		
-					
-		var x = parseInt(count, 10);
-		
-		if (isNaN(x) == true)  {
-			showError("Error count" );
-			canRead = false;
-		}			
-		
-		
-		if (canRead) {
-			let data = new Uint8Array(x)
-			await duelink.I2c.Read(id,data,0,data.length)
-			
-			let s="";
-			
-			for (let i = 0; i < data.length; i++) {
-				s += `${data[i]}`
-				
-				if (i < data.length - 1)
-					s += ","
-			}
-
-			document.getElementById("id-dataReceived").innerHTML += s
+		else {	
+			document.getElementById("id-buttonRead").innerHTML = "Start Reading";
+			$("#myChart").hide();
 		}
 		
 	}
-	
-	async function doWriteRead() {
-		hideError();
-		hideStatus();
 		
-		const id = $("#id-address").val().trim();
-		const count = $("#id-readCount").val().trim();
-		const dataWrite = $("#id-dataWrite").val().trim().split(",");
-		
-		var canWriteRead = true;
-
-		var c = parseInt(count, 10);
-		
-		if (isNaN(c) == true)  {
-			showError("Error count" );
-			canWriteRead = false;
-		}
-		
-		var dataWrite2 = new Uint8Array(dataWrite.length)
-
-		for (let i = 0; i < dataWrite.length; i++) {
-			
-			let x = parseInt(dataWrite[i], 10);
-			
-			if (isNaN(x) == true)  {
-				showError(`Error at index: ${i}, value: ${dataWrite[i]}` );
-				canWriteRead = false;
-	
-				break;
-			}
-
-			dataWrite2[i] = x
-		}	
-
-		if (canWriteRead) {
-			let dataRead = new Uint8Array(c)
-			await duelink.I2c.WriteRead(id,dataWrite2,0,dataWrite2.length, dataRead, 0, dataRead.length)
-			
-			let s="";
-			
-			for (let i = 0; i < dataRead.length; i++) {
-				s += `${dataRead[i]}`
+	async function doActionCallback() {				
+		try 
+		{
+			if (isReading == false) {
+				Check();
+				isReading = true
 				
-				if (i < dataRead.length - 1)
-					s += ","
+				let writeBuffer = new Uint8Array(1)
+				let readBuffer = [0,0,0,0,0]
+				
+				writeBuffer[0] = 3
+				
+				await duelink.I2c.WriteRead(0x20,writeBuffer,0,1,readBuffer,0,5)
+				
+				let x = (readBuffer[0]<<8 | readBuffer[1])>>6
+				let y = (readBuffer[2]<<8 | readBuffer[3])>>6
+
+				document.getElementById("joyStickX").innerHTML = x;
+				document.getElementById("joyStickY").innerHTML = y;
+				document.getElementById("joyStickButton").innerHTML = readBuffer[4] == 0 ? "True" : "False"
+				
+				isReading = false	
+
+				showChart(x, y)
 			}
 
-			document.getElementById("id-dataReceived").innerHTML += s
-			document.getElementById("id-dataReceived").innerHTML += "\n"
-			
-		}		
-	}
+			if (buttonPressCounter % 2 == 1) {
+				setTimeout(() => {
+				  doActionCallback();
+				}, intervalCallBack);	
+			}
+		}
+		catch (err){
+			isReading = false
+			showError("Error: " + err)
+			buttonPressCounter = 0
+			document.getElementById("buttonRead").innerHTML = "Start Reading";
+		}
+    }
+	
+	let lastX = -1
+	let lastY = -1
+	
+	async function showChart(x, y) {
+				
+		if (lastX != x || lastY != y) {
+			lastX = x
+			lastY = y
+			if(Chart.getChart("myChart")) {
+			  Chart.getChart("myChart")?.destroy()
+			}
 
-	async function doClear() {
-		document.getElementById("id-dataReceived").innerHTML = ""
+			if (this.chart) {			
+				this.chart = null
+			}
+			
+			if (!this.chart ) {
+				this.chart = new Chart(ctx, {
+					type: 'bar',
+					data: {
+					  labels: ['X', 'Y'],
+					  datasets: [{
+						label: 'QWIIC Joytick values',
+						data: [x, y, ],
+						borderWidth: 1
+					  }]
+					},
+					options: {
+					  scales: {
+						y: {
+						  beginAtZero: true
+						}
+					  }
+					}
+				  });
+			}
+		}
 	}
+	
 	
 </script>
