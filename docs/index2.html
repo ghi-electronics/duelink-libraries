@@ -382,6 +382,7 @@ $(document).ready(function(){
                         </div>
                     </div>
                 </div>
+				<!-- NeoPixel Tab -->
                 <div class="tab-pane fade" id="tab5Content" role="tabpanel" aria-labelledby="tab5">
                     <div class="row">
                         <div class="center">
@@ -482,7 +483,7 @@ $(document).ready(function(){
 								<label>LED Index: </label>
                                 <input type="text" id="neoPixelIndex" name="neoPixelIndexName" value="0" />
 								<br>
-									<label>LED Count: </label>
+								<label>LED Count: </label>
                                 <input type="text" id="neoPixelCount" name="neoPixelCountName" value="4" />
 								<br>
                                     <button class="btn btn-primary" onclick="neoPixelSet()">Set Index</button>
@@ -492,7 +493,7 @@ $(document).ready(function(){
 									
                                 </div>
 								<br>
-							<a href="https://duelink.com/software/api/neopixel.html">NeoPixel API Documentation</a>
+							 <a href="https://duelink.com/software/api/neopixel.html">NeoPixel API Documentation</a>
                             </div>
                         </div>
                     </div>
@@ -526,23 +527,17 @@ $(document).ready(function(){
             </div>
 	   
         </fieldset>
- 	    <div id="id-bottom">
-		
+ 	    <div id="id-bottom">	
 		</div>
+
 	</div>
 
-	
-
-    <div id="id-status" style="display:none">
-        
+    <div id="id-status" style="display:none">       
     </div>
 
-    <div id="id-error" style="display: none;">
-        
+    <div id="id-error" style="display: none;">       
     </div>
 	
-
-
 </body>
 
 <script type="text/javascript" src="./common/js/dropdown_menu.js"></script>
@@ -696,6 +691,7 @@ $(document).ready(function(){
 			await duelink.Neo.Show(pinNeoPixel, countNeoPixel);
 				
 	}
+	
 	async function neoPixelSet() {
         Check();
 		var pinNeoPixel = $("#pinNumberNeoPixel").val()/1;
@@ -726,23 +722,14 @@ $(document).ready(function(){
         let outputBLUE = document.getElementById("demoNeoPixelBLUE");
         outputBLUE.innerHTML = rangesliderNeoPixelBLUE.value;
         var blue = rangesliderNeoPixelBLUE.value/1;
-
 		
-		var index = neoPixelIndex.value/1;
-		
+		var index = neoPixelIndex.value/1;		
 		var countNeoPixel = neoPixelCount.value/1;
-		
-	
+			
 		await duelink.Neo.SetRGB(index, red, green, blue);
-		
-
-		await duelink.Neo.Show(pinNeoPixel, countNeoPixel);
-		
-
-		
-		
-		
+		await duelink.Neo.Show(pinNeoPixel, countNeoPixel);		
     }
+	
 	async function setColorSwatch(){
 		
 		//RED Slider
