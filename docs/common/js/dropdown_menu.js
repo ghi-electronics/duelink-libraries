@@ -1,6 +1,6 @@
 function toggleMenu() {
 	var x = document.getElementById("id-sidemenu");
-	if (x.style.width === "250px") {
+	if (x.style.width === "200px") {
 		closeNav()
 	} else {
 		openNav();
@@ -9,15 +9,15 @@ function toggleMenu() {
 
 
 function openNav() {
-	document.getElementById("id-sidemenu").style.width = "250px";
+	document.getElementById("id-sidemenu").style.width = "200px";
 	
-	//document.getElementById("id-connect").style.left = "250px";
+	//document.getElementById("id-connect").style.left = "200px";
 	
 
 	document.getElementById("id-topbar").animate(
 		[
 			{ transform: "translateX(0)" }, 
-			{ transform: "translateX(250px)" } 
+			{ transform: "translateX(200px)" } 
 		],
 		{
 			duration: 350, // Animation duration in milliseconds
@@ -29,7 +29,7 @@ function openNav() {
 	document.getElementById("id-connect").animate(
 		[
 			{ transform: "translateX(0)" }, 
-			{ transform: "translateX(250px)" } 
+			{ transform: "translateX(200px)" } 
 		],
 		{
 			duration: 350, // Animation duration in milliseconds
@@ -41,7 +41,7 @@ function openNav() {
 	document.getElementById("id-status").animate(
 		[
 			{ transform: "translateX(0)" }, 
-			{ transform: "translateX(250px)" } 
+			{ transform: "translateX(200px)" } 
 		],
 		{
 			duration: 350, // Animation duration in milliseconds
@@ -53,7 +53,7 @@ function openNav() {
 	document.getElementById("id-error").animate(
 		[
 			{ transform: "translateX(0)" }, 
-			{ transform: "translateX(250px)" } 
+			{ transform: "translateX(200px)" } 
 		],
 		{
 			duration: 350, // Animation duration in milliseconds
@@ -66,14 +66,14 @@ function openNav() {
 }
 
 function closeNav() {
-	if (document.getElementById("id-sidemenu").style.width === "250px") {
+	if (document.getElementById("id-sidemenu").style.width === "200px") {
 		document.getElementById("id-sidemenu").style.width = "0";
 		
 		
 
 		document.getElementById("id-topbar").animate(
 			[
-				{ transform: "translateX(250px)" }, 
+				{ transform: "translateX(200px)" }, 
 				{ transform: "translateX(0)" } 
 			],
 			{
@@ -85,7 +85,7 @@ function closeNav() {
 		
 		document.getElementById("id-connect").animate(
 			[
-				{ transform: "translateX(250px)" }, 
+				{ transform: "translateX(200px)" }, 
 				{ transform: "translateX(0)" } 
 			],
 			{
@@ -97,7 +97,7 @@ function closeNav() {
 		
 		document.getElementById("id-status").animate(
 			[
-				{ transform: "translateX(250px)" }, 
+				{ transform: "translateX(200px)" }, 
 				{ transform: "translateX(0)" } 
 			],
 			{
@@ -109,7 +109,7 @@ function closeNav() {
 		
 		document.getElementById("id-error").animate(
 			[
-				{ transform: "translateX(250px)" }, 
+				{ transform: "translateX(200px)" }, 
 				{ transform: "translateX(0)" } 
 			],
 			{
