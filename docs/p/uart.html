@@ -76,12 +76,14 @@ $(document).ready(function(){
 						<label for="dataSend">Byte(s) to send: (0,1,2... 255)</label><br>
 						<input type="text" id="dataSend" value="10,20,30"/><br>
 						<label text="text2">(Use comma between each byte if sending multiple bytes)</label><br>
-						<button class="btn btn-primary" onclick="doUartSend()" id="id-btSend" disabled="true" >Send </button>	<br><br>
+						<button class="btn btn-primary" onclick="doUartSend()" id="id-btWrite" disabled="true" >Write </button>	<br><br>
 
 						<label for="id-dataReceived">Received data:</label><br>
 						<textarea rows="5" cols="50" id="id-dataReceived" disabled>
 							
-						</textarea>					
+						</textarea>	
+						<br>
+						<button class="btn btn-primary" onclick="doClear()" id="id-btClear" disabled="true" >Clear</button>	<br><br>						
 					</tr>
 				</div>
 				
@@ -116,8 +118,7 @@ $(document).ready(function(){
 	
 	let isReading = false;		
 	const intervalCallBack = 100;
-	const textareaMaxCharacterPerLine = 55;
-	const textareMaxLines = 5; //textarea rows="5" above
+	
 
 	
 	function Check() {
@@ -141,11 +142,12 @@ $(document).ready(function(){
             }
             $("#id-version").text(duelink.Version);
             $("#id-connect").slideUp();
-            $("#id-btSend").prop("disabled", false);	
+            $("#id-btWrite").prop("disabled", false);	
             $("#id-baudrate").prop("disabled", false);	
 			
-			document.getElementById("id-dataReceived").focus(); 
-			document.getElementById("id-dataReceived").setSelectionRange(0, 0);
+			$("#id-btClear").prop("disabled", false);
+			
+			document.getElementById("id-dataReceived").innerHTML = ""
 
 			await duelink.Uart.Enable(9600);	
 
@@ -175,21 +177,25 @@ $(document).ready(function(){
     function hideError() {
         $("#id-error").hide();
     }
+	
+	function hideStatus() {
+        $("#id-status").hide();
+    }
 
     function showStatus(message) {
-        $("#id-btSend").prop("disabled", true);
+        $("#id-btWrite").prop("disabled", true);
         $("#id-baudrate").prop("disabled", true);
         hideError();
         $("#id-status").show();
         $("#status-message").text(message);
         $.when($("#id-status").fadeOut(1000)).done(
-            function () { $("#id-btSend").prop("disabled", false); $("#id-baudrate").prop("disabled", false);}
+            function () { $("#id-btWrite").prop("disabled", false); $("#id-baudrate").prop("disabled", false);}
             
         );
     }
 
     function showError(message) {
-        //$("#id-btSend").prop("disabled", true);
+        //$("#id-btWrite").prop("disabled", true);
         //$("#id-baudrate").prop("disabled", true);
         $("#id-error").show();
         $("#error-message").text(message);
@@ -198,33 +204,51 @@ $(document).ready(function(){
 	let isWriting = false;
 	async function doUartSend() {
 		hideError();
+		hideStatus();
 
-		const data = $("#dataSend").val().trim().split(",");			
+		const data = $("#dataSend").val().trim().split(",");	
+
+		var dataWrite = new Uint8Array(data.length)
 		
-		isWriting = true;
+		
+		var canWrite = true;
 		for (let i = 0; i < data.length; i++) {
 			
 			var x = parseInt(data[i], 10);
 			
 			if (isNaN(x) == false) 
-			{				
-				await duelink.Uart.Write(x);
+			{								
+				dataWrite[i] = x;							
 			}
 			else  {				
 				showError(`Error at index: ${i}, value: ${data[i]}` );
-				
+				canWrite = false;
 				break;
 			}
 			
 		}
-		isWriting =  false;
+		
+		if (canWrite) {
+			isWriting = true;
+			
+			for (let i = 0; i < dataWrite.length; i++)
+			{
+				await duelink.Uart.Write(dataWrite[i]);
+				
+				
+			}
+			showStatus("Data sent.")
+				
+			isWriting =  false;
+		}
+		
 	}
 	
 	async function doUartInit() {
 		await duelink.Uart.Enable($("#id-baudrate").val()/1);			
 	}
 		
-	let receivedData = ""
+
 	async function doActionCallback() {				
 		try 
 		{
@@ -234,20 +258,18 @@ $(document).ready(function(){
 				
 				let available = await duelink.Uart.BytesToRead();
 				
-				for (let i = 0; i < available; i++) 
-				{
-					let data = await duelink.Uart.Read();
-					
-					if (receivedData.length != 0)
-						receivedData +=","					
+				if (available > 0) {
+					for (let i = 0; i < available; i++) 
+					{
+						let data = await duelink.Uart.Read();
 						
-					if (receivedData.length > (textareaMaxCharacterPerLine * textareMaxLines - 4))
-						receivedData = "";
+						if (document.getElementById("id-dataReceived").innerHTML.length > 0)
+							document.getElementById("id-dataReceived").innerHTML +=","
 						
-					receivedData += data
+						document.getElementById("id-dataReceived").innerHTML += data
 						
-					document.getElementById("id-dataReceived").innerHTML = receivedData
-					
+					}
+										
 				}
 				
 				isReading = false
@@ -262,5 +284,10 @@ $(document).ready(function(){
 			showError("Error: " + err)			
 		}
     }
+	
+	async function doClear() {
+
+		document.getElementById("id-dataReceived").innerHTML = ""
+	}
 		
 </script>

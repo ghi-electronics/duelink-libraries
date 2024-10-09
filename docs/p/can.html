@@ -133,6 +133,13 @@ $(document).ready(function(){
 								</textarea>	
 							</td>
 						</tr>
+						
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doClear()" id="id-btClear" disabled="true" >Clear</button>	<br><br>
+							</td>
+						
+						</tr>
 					
 					</table>
 					
@@ -196,9 +203,9 @@ $(document).ready(function(){
             $("#id-connect").slideUp();
             $("#id-btSend").prop("disabled", false);	
             $("#id-baudrate").prop("disabled", false);	
+            $("#id-btClear").prop("disabled", false);	
 			
-			document.getElementById("id-dataReceived").focus(); 
-			document.getElementById("id-dataReceived").setSelectionRange(0, 0);
+			document.getElementById("id-dataReceived").innerHTML = ""
 
 			await duelink.Can.Initialize(500000);	
 
@@ -318,5 +325,9 @@ $(document).ready(function(){
 		  doActionCallback();
 		}, intervalCallBack);	
     }
+	
+	async function doClear() {
+		document.getElementById("id-dataReceived").innerHTML = ""
+	}
 		
 </script>
