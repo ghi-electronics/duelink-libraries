@@ -61,7 +61,7 @@ $(document).ready(function(){
 						<tr>
 							<td width="200">Speed:</td>
 							<td width="200">
-								<select id="id-speed" onchange="doSpiInit()">
+								<select id="id-speed" onchange="doInit()">
 									<option value="1000">1MHz</option>
 									<option value="2000">2MHz</option>
 									<option value="3000">4MHz</option>
@@ -75,7 +75,7 @@ $(document).ready(function(){
 						<tr>
 							<td width="200">Mode:</td>
 							<td width="200">
-								<select id="id-mode" onchange="doSpiInit()">
+								<select id="id-mode" onchange="doInit()">
 									<option value="0">Mode 0</option>
 									<option value="1">Mode 1</option>
 									<option value="2">Mode 2</option>
@@ -89,6 +89,7 @@ $(document).ready(function(){
 							<td width="200">Chip Select</td>
 							<td width="200">
 								<select id="id-chipselect">
+									<option value="-1">None</option>
 									<option value="0">P0</option>
 									<option value="1">P1</option>
 									<option value="2">P2</option>
@@ -113,18 +114,40 @@ $(document).ready(function(){
 						<tr>
 							<td width="200">Byte(s) to write: (0,1,2... 255)</td>
 							<td width="200">
-								<input type="text" id="dataSend" /><br>
+								<input type="text" id="id-dataWrite" value="1,2,3"/><br>
 							</td>
 						</tr>						
 						<tr>
 							<td width="200">
-								<button class="btn btn-primary" onclick="doSpiSend()" id="id-btSend" disabled="true" >Send </button>	<br><br>
+								<button class="btn btn-primary" onclick="doWrite()" id="id-btWrite" disabled="true" >Write </button>	<br><br>
 							</td>
 										
 						</tr>
+						<tr>
+							<td width="200">Read bytes count:</td>	
+							<td width="200">												
+								<input type="text" id="id-readCount" value="1"/><br>
+							</td>
+						
+						</tr>
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doRead()" id="id-btRead" disabled="true" >Read</button>	<br><br>
+							</td>
+						
+						</tr>
+
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doWriteRead()" id="id-btWriteRead" disabled="true" >WriteRead</button>	<br><br>
+							</td>
+						
+						</tr>		
 					</table >
 
 				</div>
+				
+				
 				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >	
 					SPI Read
 					<table>
@@ -137,7 +160,13 @@ $(document).ready(function(){
 								
 								</textarea>	
 							</td>							
-						</tr>											
+						</tr>
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doClear()" id="id-btClear" disabled="true" >Clear</button>	<br><br>
+							</td>
+						
+						</tr>							
 					</table >
 				</div>
 			</div>
@@ -191,12 +220,14 @@ $(document).ready(function(){
                 await duelink.Display.Configuration(0, 0x3c);
             }
             $("#id-version").text(duelink.Version);
-            $("#id-connect").slideUp();
-            $("#id-btSend").prop("disabled", false);	
+            $("#id-connect").slideUp();         
             $("#id-speed").prop("disabled", false);	
+			$("#id-btWrite").prop("disabled", false);
+            $("#id-btRead").prop("disabled", false);
+            $("#id-btWriteRead").prop("disabled", false);
+            $("#id-btClear").prop("disabled", false);
 			
-			document.getElementById("id-dataReceived").focus(); 
-			document.getElementById("id-dataReceived").setSelectionRange(0, 0);
+			document.getElementById("id-dataReceived").innerHTML = ""
 
 			await duelink.Spi.Configuration(0, 1000);;	
 
@@ -212,45 +243,50 @@ $(document).ready(function(){
     function hideError() {
         $("#id-error").hide();
     }
+	
+	function hideStatus() {
+        $("#id-status").hide();
+    }
 
     function showStatus(message) {
-        $("#id-btSend").prop("disabled", true);
+        $("#id-btWrite").prop("disabled", true);
         $("#id-speed").prop("disabled", true);
         hideError();
         $("#id-status").show();
         $("#status-message").text(message);
         $.when($("#id-status").fadeOut(1000)).done(
-            function () { $("#id-btSend").prop("disabled", false); $("#id-speed").prop("disabled", false);}
+            function () { $("#id-btWrite").prop("disabled", false); $("#id-speed").prop("disabled", false);}
             
         );
     }
 
     function showError(message) {
-        //$("#id-btSend").prop("disabled", true);
+        //$("#id-btWrite").prop("disabled", true);
         //$("#id-speed").prop("disabled", true);
         $("#id-error").show();
         $("#error-message").text(message);
     }
 	
-	let isWriting = false;
-	async function doSpiSend() {
+	
+	async function doWrite() {
 		hideError();
+		hideStatus();
 
-		const data = $("#dataSend").val().trim().split(",");
-		var writeArray = new Uint8Array(data.length);	
+		const dataWrite = $("#id-dataWrite").val().trim().split(",");
+		var writeArray = new Uint8Array(dataWrite.length);	
 		var chipselectPin = $("#id-chipselect").val()/1;
 		
-		isWriting = true;
+		
 		var canWrite = true;
-		for (let i = 0; i < data.length; i++) {
+		for (let i = 0; i < dataWrite.length; i++) {
 			
-			var x = parseInt(data[i], 10);
+			var x = parseInt(dataWrite[i], 10);
 			
 			if (isNaN(x) == true) 
 			{				
 				//await duelink.Spi.Write(x);
 				canWrite = false;
-				showError(`Error at index: ${i}, value: ${data[i]}` );
+				showError(`Error at index: ${i}, value: ${dataWrite[i]}` );
 				break;
 			}
 			writeArray[i] = x;
@@ -260,62 +296,107 @@ $(document).ready(function(){
 			var readArray = new Uint8Array(writeArray.length);
 			await duelink.Spi.WriteRead(writeArray, 0, writeArray.length, readArray, 0, readArray.length, chipselectPin);
 			
-			document.getElementById("id-dataReceived").innerHTML = "";
-			
-			for (var i = 0; i < readArray.length; i++)  {
-				document.getElementById("id-dataReceived").innerHTML += readArray[i];
-				
-				if (i < readArray.length - 1)
-					document.getElementById("id-dataReceived").innerHTML += ","
-			}
-			
-			
+			showStatus("Data sent.");
 			
 		}
-		isWriting =  false;
+		
 	}
 	
-	async function doSpiInit() {
-		await duelink.Spi.Configuration($("#id-mode").val()/1, $("#id-speed").val()/1);		
-	}
+	async function doRead() {
+		hideError();
+		hideStatus();
 		
-	let receivedData = ""
-	async function doActionCallback() {				
-		try 
-		{
-			if (isReading == false && isWriting == false) {
-				Check();
-				isReading = true
+		var chipselectPin = $("#id-chipselect").val()/1;
+		const count = $("#id-readCount").val().trim();
 				
-				let available = await duelink.Spi.BytesToRead();
+		var canRead = true;
+		
+		var x = parseInt(count, 10);
+		
+		if (isNaN(x) == true)  {
+			showError("Error count" );
+			canRead = false;
+		}	
+
+		if (canRead) {
+			let writeArray = new Uint8Array(x);	
+			let readArray = new Uint8Array(x)
+			await duelink.Spi.WriteRead(writeArray, 0, writeArray.length, readArray, 0, readArray.length, chipselectPin);
+			
+			let s="";
+			
+			for (let i = 0; i < readArray.length; i++) {
+				s += `${readArray[i]}`
 				
-				for (let i = 0; i < available; i++) 
-				{
-					let data = await duelink.Spi.Read();
-					
-					if (receivedData.length != 0)
-						receivedData +=","					
-						
-					if (receivedData.length > (textareaMaxCharacterPerLine * textareMaxLines - 4))
-						receivedData = "";
-						
-					receivedData += data
-						
-					document.getElementById("id-dataReceived").innerHTML = receivedData
-					
-				}
-				
-				isReading = false
+				if (i < readArray.length - 1)
+					s += ","
 			}
 
-			setTimeout(() => {
-			  doActionCallback();
-			}, intervalCallBack);	
+			document.getElementById("id-dataReceived").innerHTML += s
+			document.getElementById("id-dataReceived").innerHTML += "\n"
 		}
-		catch (err){
-			isReading = false
-			showError("Error: " + err)			
-		}
-    }
+	}
+	
+	async function doWriteRead() {
+		hideError();
+		hideStatus();
 		
+		var chipselectPin = $("#id-chipselect").val()/1;
+		const count = $("#id-readCount").val().trim();
+		const dataWrite = $("#id-dataWrite").val().trim().split(",");
+
+		var canWriteRead = true;
+		
+		var c = parseInt(count, 10);
+		
+		if (isNaN(c) == true)  {
+			showError("Error count" );
+			canWriteRead = false;
+		}	
+
+		
+		if (canWriteRead) {
+		
+			let writeArray = new Uint8Array(c);	
+			let readArray = new Uint8Array(c)
+			
+			for (let i = 0; i < dataWrite.length; i++) {
+							
+				let x = parseInt(dataWrite[i], 10)
+				if (isNaN(x) == true) 
+				{				
+
+					canWriteRead = false;
+					showError(`Error at index: ${i}, value: ${dataWrite[i]}` );
+					break;
+				}
+				writeArray[i] = x;
+			}
+			
+			if (canWriteRead) {
+				await duelink.Spi.WriteRead(writeArray, 0, writeArray.length, readArray, 0, readArray.length, chipselectPin);
+				
+				let s="";
+				
+				for (let i = 0; i < readArray.length; i++) {
+					s += `${readArray[i]}`
+					
+					if (i < readArray.length - 1)
+						s += ","
+				}
+
+				document.getElementById("id-dataReceived").innerHTML += s
+				document.getElementById("id-dataReceived").innerHTML += "\n"
+			}
+		}
+	}
+	
+	async function doInit() {
+		await duelink.Spi.Configuration($("#id-mode").val()/1, $("#id-speed").val()/1);		
+	}
+	
+	async function doClear() {
+		document.getElementById("id-dataReceived").innerHTML = ""
+	}
+				
 </script>

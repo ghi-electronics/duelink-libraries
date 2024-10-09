@@ -188,6 +188,8 @@ $(document).ready(function(){
             $("#id-btRead").prop("disabled", false);
             $("#id-btWriteRead").prop("disabled", false);
             $("#id-btClear").prop("disabled", false);
+			
+			document.getElementById("id-dataReceived").innerHTML = ""
 	
         } catch (e) {
             showError("connect Error" + e);
