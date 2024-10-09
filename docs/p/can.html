@@ -133,6 +133,13 @@ $(document).ready(function(){
 								</textarea>	
 							</td>
 						</tr>
+						
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doClear()" id="id-btClear" disabled="true" >Clear</button>	<br><br>
+							</td>
+						
+						</tr>
 					
 					</table>
 					
@@ -318,5 +325,9 @@ $(document).ready(function(){
 		  doActionCallback();
 		}, intervalCallBack);	
     }
+	
+	async function doClear() {
+		document.getElementById("id-dataReceived").innerHTML = ""
+	}
 		
 </script>
