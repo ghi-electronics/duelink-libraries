@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DUELink I2C</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../sidenav_styles.css">	
+	<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	
+	<style>
+		#colorSection {
+			width: 400px;
+			height: 60px;
+			background-color: black;
+			border: 1px solid black;
+		}
+		
+		img {
+		  display: block;
+		  margin-left: auto;
+		  margin-right: auto;		  
+		}
+
+	</style>
+	
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){   
+	$('#id-topbar').load("../common/html/id_topbar.html");
+	$('#id-connect').load("../common/html/id_connect.html");
+	$('#id-sidemenu').load("../common/html/id_sidemenu.html");
+	$('#id-status').load("../common/html/id_status.html");
+	$('#id-error').load("../common/html/id_error.html");
+	$('#id-bottom').load("../common/html/id_bottom.html");
+});
+</script>	
+
+<body>
+	
+	<div class="topnav" id="id-topbar">
+				
+	</div>
+	
+	<div class="alert alert-primary" id="id-connect">		
+		
+	</div>
+	
+	<div class="sidenav" id="id-sidemenu" >		
+				
+	</div>
+		
+
+    <div id="id-selections" class="container">
+        Connect Qwiic GPS to Qwiic/STEMMA port and start playing!
+		
+		<img src="../images/qwiic-gps.png" alt="qwiic gps" style="width:200px;">		
+	
+		
+		<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >	
+			<table>
+				<tr>
+					<td width="200">
+						<button class="btn btn-primary" id="id-buttonRead" onclick="startReading()" disabled="true" >Start Reading</button>
+					</td>
+				</tr>
+				<tr>
+					<td width="200">Received data:</td>							
+				</tr>
+				<tr>
+					<td width="200">
+						<textarea rows="3" cols="90" id="id-dataReceived" readonly>
+						
+						</textarea>	
+					</td>							
+				</tr>
+				<tr>
+					<td width="200">
+						<button class="btn btn-primary" onclick="doClear()" id="id-btClear" disabled="true" >Clear</button>	<br><br>
+					</td>
+				
+				</tr>							
+			</table >
+		</div>
+				
+	
+	</div>
+
+    <div id="id-status" style="display:none">
+        
+    </div>
+
+    <div id="id-error" style="display: none;">
+        
+    </div>
+
+</body>
+
+</html>
+
+
+<script type="text/javascript" src="../common/js/dropdown_menu.js"></script>
+
+<script>
+    import("../src/serialweb/serialweb.js").then(mod => serial = mod);
+    import("../src/duelink/duelink.js").then(mod => due = mod);
+	import("../src/util.js").then(mod => util = mod);
+	
+	const ctx = document.getElementById('myChart');
+	let isReading = false;
+	let buttonPressCounter = 0;    
+	const intervalCallBack = 1000;
+	const MAX_PACKET_SIZE = 255;
+	const MT333x_ADDR = 0x10;
+	
+	const MAX_LINES = 5
+	const lines = []
+	let lineIdx = 0
+	let s = ' '
+	let countLines = 0;
+	
+	let _head = 0;
+	let _tail = 0;
+
+	let gpsData	= new Uint8Array(MAX_PACKET_SIZE)
+	
+	function Check() {
+        if (!this.duelink)
+            this.duelink = new due.DUELinkController(new serial.WebSerial());
+    }
+
+    async function connect() {
+        try {
+            hideError();
+            Check();
+            await duelink.Connect();
+            if (duelink.IsRave) {
+                color_depth = 16;
+                canvas.width = 160;
+                canvas.height = 120;
+                canvas.style.width = '320px';
+                canvas.style.height = '240px';
+            } else if (duelink.IsEdge) {
+                await duelink.Display.Configuration(0, 0x3c);
+            }
+            $("#id-version").text(duelink.Version);
+            $("#id-connect").slideUp();
+            $("#id-buttonRead").prop("disabled", false);
+			$("#id-btClear").prop("disabled", false);
+			
+			document.getElementById("id-dataReceived").innerHTML = ""
+			
+			
+	
+        } catch (e) {
+            showError("connect Error" + e);
+        }
+    }
+	    
+
+    
+    function hideError() {
+        $("#id-error").hide();
+    }
+
+    function showStatus(message) {
+        $("#id-buttonRead").prop("disabled", true);
+        hideError();
+        $("#id-status").show();
+        $("#status-message").text(message);
+        $.when($("#id-status").fadeOut(1000)).done(
+            function () { $("#id-buttonRead").prop("disabled", false); }
+        );
+    }
+
+    function showError(message) {
+        $("#id-buttonRead").prop("disabled", true);
+        $("#id-error").show();
+        $("#error-message").text(message);
+    }
+	
+
+	async function startReading() {
+		hideError();
+			
+		buttonPressCounter += 1		
+		if ((buttonPressCounter % 2) == 1) {
+			countLines = 0;
+			await gpsInit()
+			document.getElementById("id-buttonRead").innerHTML = "Stop Reading";
+			
+			
+			doActionCallback()
+			
+							
+		}
+		else {	
+			document.getElementById("id-buttonRead").innerHTML = "Start Reading";
+			
+		}
+		
+	}
+	
+	async function gpsInit() {		
+		var dataWrite = new Uint8Array(1);
+
+		var dataRead = new Uint8Array(1);
+		
+		dataWrite[0] = 0;
+
+		await duelink.I2c.Write(MT333x_ADDR, dataWrite);
+			
+
+		if (await duelink.I2c.Read(MT333x_ADDR, dataRead) == 0)
+		{
+			showError("Module failed to respond");
+		}
+	
+	}
+	
+	async function gpsCheck() {
+		var packetData = new Uint8Array(MAX_PACKET_SIZE); //Store all incoming I2C bytes
+
+		for (var x = 0; x < MAX_PACKET_SIZE; x++)
+			packetData[x] = 0x0A; //Fill with garbage byte
+
+		await duelink.I2c.Read(MT333x_ADDR, packetData);
+
+
+
+		//Move any valid bytes from packetData to gpsData array
+		for (var x = 0; x < MAX_PACKET_SIZE; x++)
+		{
+			if (packetData[x] != 0x0A)
+			{
+				gpsData[_head++] = packetData[x];
+
+				if (_head == MAX_PACKET_SIZE) 
+					_head = 0; //Wrap variable                    
+			}
+		}
+	}
+	
+	async function gpsAvailable() {
+		if (_tail == _head)
+		{
+			await gpsCheck(); //Check to module to see if new I2C bytes are available
+		}
+
+		//Return new data count
+		if (_head > _tail) return (_head - _tail);
+		if (_tail > _head) return (MAX_PACKET_SIZE - _tail + _head);
+		return (0); //No data available
+	}
+	
+	async function gpsRead() {
+		if (_tail != _head)
+		{
+			var datum = gpsData[_tail++];
+			if (_tail == MAX_PACKET_SIZE) _tail = 0; //Wrap variable
+				return String.fromCharCode(datum);
+		}
+		else
+			return String.fromCharCode(0); //No new data
+	}
+	
+
+	
+	async function doActionCallback() {				
+		try 
+		{
+			if (isReading == false) {
+				Check();
+				isReading = true
+				
+				while (await gpsAvailable() > 0) {
+					var c = await gpsRead();
+					if (c == '$') {
+						
+						
+						
+						if (countLines > 0) // ignore first read because may half of data
+							document.getElementById("id-dataReceived").innerHTML = s;
+						else 	
+							document.getElementById("id-dataReceived").innerHTML = "Please wait data ready";
+							
+						s = ' ';
+						countLines++;
+						
+						
+						break;
+						
+						
+					}
+					else if (c != String.fromCharCode(0)) { 
+						s += c.toString();
+						
+					}
+					
+					
+				}
+				
+				isReading = false	
+
+				
+			}
+
+			if (buttonPressCounter % 2 == 1) {
+				setTimeout(() => {
+				  doActionCallback();
+				}, intervalCallBack);	
+			}
+		}
+		catch (err){
+			isReading = false
+			showError("Error: " + err)
+			buttonPressCounter = 0
+			document.getElementById("id-buttonRead").innerHTML = "Start Reading";
+		}
+    }
+	
+	
+	async function doClear() {
+		document.getElementById("id-dataReceived").innerHTML = ""
+	}
+	
+</script>
