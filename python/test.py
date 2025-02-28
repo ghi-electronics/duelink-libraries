@@ -187,7 +187,7 @@ duelink = DUELinkController(availablePort)
 
 # Test getting duelink version
 
-firmware, productId, bootloader = duelink.serialPort.GetVersion()
+firmware, productId, bootloader = duelink.System.GetVersion()
 
 print("Firmware version on module:", firmware)
 print("Product ID of module:", productId)
