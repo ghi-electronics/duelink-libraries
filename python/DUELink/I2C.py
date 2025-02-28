@@ -3,12 +3,13 @@ from typing import Optional
 class I2cController:
     def __init__(self, serialPort) -> None:
         self.serialPort = serialPort
+        self.baudrate = 400
 
     def Write(self, address: int, data: bytes, offset: Optional[int] = 0, length: int = None) -> bool:
         if length is None:
             length = len(data)
         
-        return self.WriteRead(address, data, offset, length, None, 0, 0)
+        return self.WriteRead(address, data, length, None, 0, 0)
 
     def Read(self, address: int, data: bytearray, offset: Optional[int] = 0, length: int = None) -> bool:
         if length is None:
@@ -16,7 +17,19 @@ class I2cController:
 
         return self.WriteRead(address, None, 0, 0, data, offset, length)
 
-    def WriteRead(self, address: int, dataWrite: Optional[bytes], offsetWrite: int, countWrite: int, dataRead: Optional[bytearray], offsetRead: int, countRead: int) -> bool:
+    def I2cConfig(self, baudrate):
+
+        if not isinstance(baudrate, int):
+            raise ValueError("Enter an integer for the baudrate.")
+
+        self.baudrate = baudrate
+
+        cmd = f"i2ccfg({baudrate})"
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+        return res.success
+
+    def WriteRead(self, address: int, dataWrite: Optional[bytes], countWrite: int, dataRead: Optional[bytearray], countRead: int) -> bool:
         if (dataWrite is None and dataRead is None) or (countWrite == 0 and countRead == 0):
             raise ValueError("At least one of dataWrite or dataRead must be specified")
         
@@ -25,28 +38,14 @@ class I2cController:
 
         if dataRead is None and countRead != 0:
             raise Exception("dataRead null but countRead not zero")
-
-        if dataWrite is not None and offsetWrite + countWrite > len(dataWrite):
-            raise ValueError("Invalid range for dataWrite")
-
-        if dataRead is not None and offsetRead + countRead > len(dataRead):
-            raise ValueError("Invalid range for dataRead")
-
-        cmd = f"i2cstream({address},{countWrite},{countRead})"
-        self.serialPort.WriteCommand(cmd)        
-
-        if countWrite > 0:
-            res = self.serialPort.ReadRespone()
-
-            if not res.success:
-                raise ValueError("I2c error:" + res.respone)
-            
-            self.serialPort.WriteRawData(dataWrite, offsetWrite, countWrite)
-
-        if countRead > 0:
- 
-            if self.serialPort.ReadRawData(dataRead, offsetRead, countRead) != countRead:
-                raise ValueError("I2C read raw data error.")
-
+        
+        if dataRead is None:
+            dataRead = 0
+        
+        if dataWrite is None:
+            dataWrite = 0
+        
+        cmd = f"i2cwr({address},{dataWrite},{countWrite},{dataRead},{countRead})"
+        self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success

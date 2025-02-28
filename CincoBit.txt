@@ -1,0 +1,21 @@
+dim b1[10] = [11,19,18,21,22,7,5,0,8,6] # first 5 for col, second 5 for row
+
+Init()
+clear(0)
+
+fn Init()
+gfxcfg(4, b1, 5,5,0) # 4: 5x5 type, 0: direct
+fend
+
+fn IsColor()
+return 0
+fend
+ 
+ 
+fn GetW()
+return 5
+fend
+ 
+fn GetH()
+return 5
+fend

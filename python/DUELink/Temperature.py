@@ -24,7 +24,7 @@ class TemperatureController:
         self.serialPort = serialPort
 
     def Read(self, pin: int, sensortype: int) -> float:
-        cmd = f"log(temp({pin},{sensortype}))"
+        cmd = f"temp({pin},{sensortype})"
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()

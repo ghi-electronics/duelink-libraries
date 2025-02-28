@@ -1,32 +1,26 @@
 from DUELink.Analog import AnalogController
 from DUELink.Button import ButtonController
 from DUELink.Digital import DigitalController
-from DUELink.Display import DisplayController
-from DUELink.Display import DisplayConfiguration
-from DUELink.DisplayType import DisplayTypeController
+from DUELink.Graphics import GraphicsController
+from DUELink.GraphicsType import GraphicsTypeController
 from DUELink.DistanceSensor import DistanceSensorController
 from DUELink.Frequency import FrequencyController
 from DUELink.I2C import I2cController
 from DUELink.Infrared import InfraredController
-from DUELink.Neo import NeoController
 from DUELink.System import SystemController
 from DUELink.SerialInterface import SerialInterface
 from DUELink.Servo import ServoController
 from DUELink.Spi import SpiController
 from DUELink.Touch import TouchController
-from DUELink.Uart import UartController
 from DUELink.Led import LedController
-from DUELink.Script import ScriptController
+from DUELink.Engine import EngineController
 from DUELink.DeviceConfiguration import DeviceConfiguration
-from DUELink.Pin import PinController
 from DUELink.Temperature import TemperatureController
 from DUELink.Humidity import HudimityController
-from DUELink.Pulse import PulseController
-from DUELink.Can import CanController
 from DUELink.Sound import SoundController
 from DUELink.Temperature import TemperatureSensorType
 from DUELink.Humidity import HumiditySensorType
-from DUELink.Bluetooth import BluetoothController
+
 from enum import Enum
 import platform
 class DUELinkController:
@@ -57,24 +51,17 @@ class DUELinkController:
         self.Frequency = FrequencyController(self.serialPort)
         self.Spi = SpiController(self.serialPort)
         self.Infrared = InfraredController(self.serialPort)
-        self.Neo = NeoController(self.serialPort)
-        self.Uart = UartController(self.serialPort)
         self.Button = ButtonController(self.serialPort)
-        self.Distance = DistanceSensorController(self.serialPort)        
-        self.Display = DisplayController(self.serialPort)
+        self.Distance = DistanceSensorController(self.serialPort)
+        self.Graphics = GraphicsController(self, self.serialPort)
         self.Touch = TouchController(self.serialPort)
         self.Led = LedController(self.serialPort)
-        self.Script = ScriptController(self.serialPort)
-        self.Pin = PinController()
+        self.Engine = EngineController(self.serialPort)
         self.Temperature = TemperatureController(self.serialPort)
         self.Humidity = HudimityController(self.serialPort)
         self.System = SystemController(self.serialPort)        
-        self.DisplayType = DisplayTypeController()        
-  
-        self.Pulse = PulseController(self.serialPort)
-        self.Can = CanController(self.serialPort)
+        self.GraphicsType = GraphicsTypeController()        
         self.Sound = SoundController(self.serialPort)
-        self.Bluetooth = BluetoothController(self.serialPort)
 
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()
@@ -87,41 +74,41 @@ class DUELinkController:
         self.serialPort = SerialInterface(comPort)
         self.serialPort.Connect()
 
-        self.Version = self.serialPort.GetVersion().split("\n")[0]
+        self.Version = self.serialPort.GetVersion()[1].strip()
 
-        if self.Version == "" or len(self.Version) != 7:
-            raise Exception("The device is not supported.")
+        # if self.Version == "" or self.Version == "GHI Electronics DUELink v00.00:0000:00.09":
+        #     raise Exception("The device is not supported.")
         
         self.DeviceConfig = DeviceConfiguration()
 
-        if self.Version[len(self.Version) -1] == 'P':
-            self.DeviceConfig.IsPulse = True
-            self.DeviceConfig.MaxPinIO = 23
-            self.DeviceConfig.MaxPinAnalog = 29
-        elif self.Version[len(self.Version) -1] == 'I':
-            self.DeviceConfig.IsPico = True
-            self.DeviceConfig.MaxPinIO = 29
-            self.DeviceConfig.MaxPinAnalog = 29  
-        elif self.Version[len(self.Version) -1] == 'F':
-            self.DeviceConfig.IsFlea = True
-            self.DeviceConfig.MaxPinIO = 11
-            self.DeviceConfig.MaxPinAnalog = 29    
-        elif self.Version[len(self.Version) -1] == 'E':
-            self.DeviceConfig.IsEdge = True
-            self.DeviceConfig.MaxPinIO = 22
-            self.DeviceConfig.MaxPinAnalog = 11  
-        elif self.Version[len(self.Version) -1] == 'R':
-            self.DeviceConfig.IsRave = True
-            self.DeviceConfig.MaxPinIO = 23
-            self.DeviceConfig.MaxPinAnalog = 29
-        elif self.Version[len(self.Version) -1] == 'T':
-            self.DeviceConfig.IsTick = True
-            self.DeviceConfig.MaxPinIO = 23
-            self.DeviceConfig.MaxPinAnalog = 11
-        elif self.Version[len(self.Version) -1] == 'D':
-            self.DeviceConfig.IsDue = True
-            self.DeviceConfig.MaxPinIO = 15
-            self.DeviceConfig.MaxPinAnalog = 10
+        # if self.Version[len(self.Version) -1] == 'P':
+        #     self.DeviceConfig.IsPulse = True
+        #     self.DeviceConfig.MaxPinIO = 23
+        #     self.DeviceConfig.MaxPinAnalog = 29
+        # elif self.Version[len(self.Version) -1] == 'I':
+        #     self.DeviceConfig.IsPico = True
+        #     self.DeviceConfig.MaxPinIO = 29
+        #     self.DeviceConfig.MaxPinAnalog = 29  
+        # elif self.Version[len(self.Version) -1] == 'F':
+        #     self.DeviceConfig.IsFlea = True
+        #     self.DeviceConfig.MaxPinIO = 11
+        #     self.DeviceConfig.MaxPinAnalog = 29    
+        # elif self.Version[len(self.Version) -1] == 'E':
+        #     self.DeviceConfig.IsEdge = True
+        #     self.DeviceConfig.MaxPinIO = 22
+        #     self.DeviceConfig.MaxPinAnalog = 11  
+        # elif self.Version[len(self.Version) -1] == 'R':
+        #     self.DeviceConfig.IsRave = True
+        #     self.DeviceConfig.MaxPinIO = 23
+        #     self.DeviceConfig.MaxPinAnalog = 29
+        # elif self.Version[len(self.Version) -1] == 'T':
+        #     self.DeviceConfig.IsTick = True
+        #     self.DeviceConfig.MaxPinIO = 23
+        #     self.DeviceConfig.MaxPinAnalog = 11
+        # elif self.Version[len(self.Version) -1] == 'D':
+        #     self.DeviceConfig.IsDue = True
+        #     self.DeviceConfig.MaxPinIO = 15
+        #     self.DeviceConfig.MaxPinAnalog = 10
 
         self.serialPort.DeviceConfig = self.DeviceConfig
 
@@ -135,6 +122,19 @@ class DUELinkController:
 
     def Disconnect(self):
         self.serialPort.Disconnect()
+    
+    def Shutdown(self, pin: int):
+        cmd = f'shtdn({pin})'
+        self.serialPort.WriteCommand(cmd)
+        response = self.serialPort.ReadRespone()
+        return response.success
+
+    def GetVCC(self):
+        cmd = f"readvcc()"
+        self.serialPort.WriteCommand(cmd)
+        response = self.serialPort.ReadRespone()
+
+        return response.respone if response.success else -1
 
     def GetConnectionPort():
         try:
