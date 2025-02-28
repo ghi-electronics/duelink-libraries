@@ -12,7 +12,7 @@ class DigitalController:
             raise ValueError("Invalid pin")
 
         if not isinstance(inputType, int) or inputType not in (0, 1, 2):
-            raise ValueError("Invalid inputType. Please enter an integer 0-2")    
+            raise ValueError("Invalid inputType. Enter an integer 0-2")    
 
         cmd = f"dread({pin},{inputType})"
         self.serialPort.WriteCommand(cmd)

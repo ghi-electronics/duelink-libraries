@@ -101,28 +101,28 @@ duelink = DUELinkController(availablePort)
 
 # Test drawing shapes and lines on the Pixobit
 
-# duelink.Display.Clear(1)
+# duelink.Graphics.Clear(1)
 
-# duelink.Display.Pixel(0, 20, 20)
+# duelink.Graphics.Pixel(0, 20, 20)
 
-# duelink.Display.Circle(1, 30, 30, 2)
-# duelink.Display.Line(0, 20, 20, 70, 70)
-# duelink.Display.Rect(0, 30, 30, 20, 20)
-# duelink.Display.Fill(0, 30, 30, 20, 20)
-# duelink.Display.Text("Duelink Is Awesome", 0, 40, 50)
-# duelink.Display.TextT("Hi", 0, 0, 20)
+# duelink.Graphics.Circle(1, 30, 30, 2)
+# duelink.Graphics.Line(0, 20, 20, 70, 70)
+# duelink.Graphics.Rect(0, 30, 30, 20, 20)
+# duelink.Graphics.Fill(0, 30, 30, 20, 20)
+# duelink.Graphics.Text("Duelink Is Awesome", 0, 40, 50)
+# duelink.Graphics.TextT("Hi", 0, 0, 20)
 
-# duelink.Display.Show()
+# duelink.Graphics.Show()
 
-# print(duelink.Display.GetHeight())
-# print(duelink.Display.GetWidth())
-# print(duelink.Display.IsColor())
+# print(duelink.Graphics.GetHeight())
+# print(duelink.Graphics.GetWidth())
+# print(duelink.Graphics.IsColor())
 
 # Test rendering images on Pixobit
 
-# duelink.Display.Clear(0)
+# duelink.Graphics.Clear(0)
 
-# duelink.Display.DrawImageScale([0, 0, 0, 1, 1, 0, 0, 0, 
+# duelink.Graphics.DrawImageScale([0, 0, 0, 1, 1, 0, 0, 0, 
 # 0, 0, 1, 1, 1, 1, 0, 0, 
 # 0, 1, 1, 1, 1, 1, 1, 0,
 # 1, 1, 0, 1, 1, 0, 1, 1,
@@ -131,7 +131,7 @@ duelink = DUELinkController(availablePort)
 # 0, 1, 0, 1, 1, 0, 1, 0,
 # 1, 0, 1, 0, 0, 1, 0, 1], 0, 0, 8, 8, 3, 3, 0)
 
-# duelink.Display.DrawImage([0, 0, 0, 1, 1, 0, 0, 0, 
+# duelink.Graphics.DrawImage([0, 0, 0, 1, 1, 0, 0, 0, 
 # 0, 0, 1, 1, 1, 1, 0, 0, 
 # 0, 1, 1, 1, 1, 1, 1, 0,
 # 1, 1, 0, 1, 1, 0, 1, 1,
@@ -140,17 +140,17 @@ duelink = DUELinkController(availablePort)
 # 0, 1, 0, 1, 1, 0, 1, 0,
 # 1, 0, 1, 0, 0, 1, 0, 1], 0, 0, 8, 8, 0)
 
-# duelink.Display.Show()
+# duelink.Graphics.Show()
 
-# Test the Pixobit display
+# Test the Pixobit Graphics
 
-# duelink.Display.Show()
+# duelink.Graphics.Show()
 
 # x = 6
 # while True:
-#     duelink.Display.TextT("DUELink", 1, x, 0)
+#     duelink.Graphics.TextT("DUELink", 1, x, 0)
 
-#     duelink.Display.Show()
+#     duelink.Graphics.Show()
 
 #     x -= 1
 
@@ -158,16 +158,16 @@ duelink = DUELinkController(availablePort)
 #         x = 6
     
 #     time.sleep(.25)
-#     duelink.Display.Clear(0)
+#     duelink.Graphics.Clear(0)
 
 
-# Test displaying color on SPITFT23 Display
+# Test Displaying color on SPITFT23 Graphics
 
-# duelink.Display.Clear(0)
+# duelink.Graphics.Clear(0)
 
 # while True:
-#     duelink.Display.Text("DUELink", 0x00ff0000, 30, 5)
-#     duelink.Display.Show()
+#     duelink.Graphics.Text("DUELink", 0x00ff0000, 30, 5)
+#     duelink.Graphics.Show()
 #     time.sleep(1)
 
 
@@ -178,32 +178,31 @@ duelink = DUELinkController(availablePort)
 
 
 
-# Test NeoPixel Display
+# Test NeoPixel Graphics
 
-# duelink.Display.Clear(0)
-# duelink.Display.Circle(0xffff00, 3, 3, 2)
-# duelink.Display.Show()
+# duelink.Graphics.Clear(0)
+# duelink.Graphics.Circle(0xffff00, 3, 3, 2)
+# duelink.Graphics.Show()
 
 
 # Test getting duelink version
 
-# name, firmware, productId, bootloader = duelink.serialPort.GetVersion()
+firmware, productId, bootloader = duelink.serialPort.GetVersion()
 
-# print("Name of Module Version:", name)
-# print("Firmware version on module:", firmware)
-# print("Product ID of module:", productId)
-# print("Bootloader version on module:", bootloader)
+print("Firmware version on module:", firmware)
+print("Product ID of module:", productId)
+print("Bootloader version on module:", bootloader)
 
 
 # Test Select when using multiple modules
 
 # duelink.Engine.Select(1)
 
-# duelink.Display.Clear(0)
+# duelink.Graphics.Clear(0)
 
-# duelink.Display.Circle(1, 50, 50, 5)
+# duelink.Graphics.Circle(1, 50, 50, 5)
 
-# duelink.Display.Show()
+# duelink.Graphics.Show()
 
 # Test ReadVCC function
 
@@ -212,52 +211,52 @@ duelink = DUELinkController(availablePort)
 # Test Record
 
 
-duelink.Engine.Record('''
-dim b1[2]
+# duelink.Engine.Record('''
+# dim b1[2]
 
-fn SendCmd(c)
-	b1[0] = 0
-	b1[1] = c
-    i2cwr(0x3c,b1,[])
-fend
+# fn SendCmd(c)
+# 	b1[0] = 0
+# 	b1[1] = c
+#     i2cwr(0x3c,b1,[])
+# fend
 
-Init()
-Circle(1,20,20,10)
-show()
+# Init()
+# Circle(1,20,20,10)
+# show()
 
-fn Init()
-dwrite(11,1) # reset pin
-# config I2C bus with 400Kz
-i2ccfg(400)
-Wait(20)
-GfxCfg(1,[0x3C],128,64, 1)
+# fn Init()
+# dwrite(11,1) # reset pin
+# # config I2C bus with 400Kz
+# i2ccfg(400)
+# Wait(20)
+# GfxCfg(1,[0x3C],128,64, 1)
 
 
-SendCmd(0xAE):SendCmd(0x00):SendCmd(0x10)
-SendCmd(0x40):SendCmd(0x81):SendCmd(0xCF)
-SendCmd(0xA1):SendCmd(0xA6):SendCmd(0xA8)
-SendCmd(0x3F):SendCmd(0xD3):SendCmd(0x00)
-SendCmd(0xD5):SendCmd(0x80):SendCmd(0xD9)
-SendCmd(0xF1):SendCmd(0xDA):SendCmd(0x12)
-SendCmd(0xDB):SendCmd(0x40):SendCmd(0x8D)
-SendCmd(0x14):SendCmd(0xAF):SendCmd(0xC8)
-SendCmd(0x20):SendCmd(0x00):SendCmd(0x21)
-SendCmd(0):SendCmd(128-1)
-SendCmd(0x22):SendCmd(0):SendCmd(7)
+# SendCmd(0xAE):SendCmd(0x00):SendCmd(0x10)
+# SendCmd(0x40):SendCmd(0x81):SendCmd(0xCF)
+# SendCmd(0xA1):SendCmd(0xA6):SendCmd(0xA8)
+# SendCmd(0x3F):SendCmd(0xD3):SendCmd(0x00)
+# SendCmd(0xD5):SendCmd(0x80):SendCmd(0xD9)
+# SendCmd(0xF1):SendCmd(0xDA):SendCmd(0x12)
+# SendCmd(0xDB):SendCmd(0x40):SendCmd(0x8D)
+# SendCmd(0x14):SendCmd(0xAF):SendCmd(0xC8)
+# SendCmd(0x20):SendCmd(0x00):SendCmd(0x21)
+# SendCmd(0):SendCmd(128-1)
+# SendCmd(0x22):SendCmd(0):SendCmd(7)
 
-fend
+# fend
 
-fn IsColor()
-return 0
-fend
+# fn IsColor()
+# return 0
+# fend
 
-fn GetW()
-return 128
-fend
+# fn GetW()
+# return 128
+# fend
 
-fn GetH()
-return 64
-fend
-''')
+# fn GetH()
+# return 64
+# fend
+# ''')
 
-print(duelink.Engine.Read())
+# print(duelink.Engine.Read())

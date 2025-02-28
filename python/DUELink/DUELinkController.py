@@ -53,7 +53,7 @@ class DUELinkController:
         self.Infrared = InfraredController(self.serialPort)
         self.Button = ButtonController(self.serialPort)
         self.Distance = DistanceSensorController(self.serialPort)
-        self.Graphics = GraphicsController(self, self.serialPort)
+        self.Graphics = GraphicsController(self.serialPort)
         self.Touch = TouchController(self.serialPort)
         self.Led = LedController(self.serialPort)
         self.Engine = EngineController(self.serialPort)

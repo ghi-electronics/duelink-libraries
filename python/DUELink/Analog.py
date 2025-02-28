@@ -8,7 +8,7 @@ class AnalogController:
     def VoltageRead(self, pin):
 
         if pin not in self.serialPort.DeviceConfig.AnalogPins:
-            raise ValueError("Invalid pin. Please enter a valid analog pin.")
+            raise ValueError("Invalid pin. Enter a valid analog pin.")
 
         cmd = "vread({0})".format(pin)
 
