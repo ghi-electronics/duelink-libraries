@@ -16,10 +16,10 @@ class SpiController:
     def SpiConfig(self, mode, frequency):
         
         if not isinstance(mode, int) or mode not in {0,1,2,3}:
-            raise ValueError("Invalid mode. Please enter an integer between 0-3.")
+            raise ValueError("Invalid mode. Enter an integer between 0-3.")
         
         if not isinstance(frequency, int) or (not 200 <= frequency <= 20000):
-            raise ValueError("Invalid frequency. Please enter an integer between 200-20000.")
+            raise ValueError("Invalid frequency. Enter an integer between 200-20000.")
     
         cmd = f"spicfg({mode}, {frequency})"
         self.serialPort.WriteCommand(cmd)
@@ -29,7 +29,7 @@ class SpiController:
     def WriteByte(self, data: int):
         
         if not isinstance(data, int) or (not 0 <= data <= 255):
-            raise ValueError("Please enter only one byte as an integer into the data parameter.")
+            raise ValueError("Enter only one byte as an integer into the data parameter.")
     
         cmd = f"spiwr({data})"
         self.serialPort.WriteCommand(cmd)
