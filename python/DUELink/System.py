@@ -12,10 +12,8 @@ class SystemController:
         self.Version = ""         
 
     def Reset(self, option : int):
-        cmd = "reset({0})".format(1 if option == 1 else 0)
+        cmd = "reset({0})".format(option)
         self.serialPort.WriteCommand(cmd)
-        # The device will reset in bootloader or system reset
-        self.serialPort.Disconnect()
 
     def GetTickMicroseconds(self):
         cmd = "tickus()"
