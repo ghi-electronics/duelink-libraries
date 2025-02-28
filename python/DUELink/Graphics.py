@@ -16,7 +16,7 @@ class GraphicsController:
     def Gfxcfg(self, displayType, config, width, height, mode):
 
         if not isinstance(config, list) or not all(isinstance(x, int) and 0 <= x <= 255 for x in config):
-            raise ValueError("Please enter a list with one number into the config with a valid code for a display.")
+            raise ValueError("Enter a list with one number into the config with a valid code for a display.")
     
         inputConfig = map(hex, config)
         
