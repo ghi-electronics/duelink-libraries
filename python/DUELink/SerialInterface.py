@@ -89,7 +89,7 @@ class SerialInterface:
         version_boot_loader = match.group(2).split(":")[2]
 
 
-        return match.group(1), version_firmware, prod_id, version_boot_loader
+        return version_firmware, prod_id, version_boot_loader
 
     def RemoveEchoRespone(self, respone, cmd):
         if cmd in respone:
