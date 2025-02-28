@@ -3,13 +3,13 @@ class HumiditySensorType():
         pass
 
     def __get_Dht11(self):
-        return 11
+        return 1
     def __get_Dht12(self):
-        return 12
+        return 2
     def __get_Dht21(self):
-        return 21
+        return 3
     def __get_Dht22(self):
-        return 22
+        return 4
 
     def __set_empty(self, value: int):
         return   

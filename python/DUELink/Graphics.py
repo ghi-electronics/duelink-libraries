@@ -2,11 +2,11 @@ from enum import IntEnum
 
 
 class GraphicsType(IntEnum):
-    BuiltIn = 0
-    ILI9342 = 0x80
-    ILI9341 = 0x81
-    ST7735 = 0x82
-    SSD1306 = 0x3C
+    None = 0
+    I2C = 1
+    SPI = 2
+    Neo = 3
+    Matrix5x5 = 4
 
 
 class GraphicsController:
@@ -24,15 +24,7 @@ class GraphicsController:
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
-    
-    def Init(self):
-        cmd = "init()"
-
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
-
-        return res.success
-    
+        
     def Show(self):
         cmd = "show()"
         self.serialPort.WriteCommand(cmd)

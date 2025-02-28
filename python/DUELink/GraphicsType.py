@@ -4,25 +4,23 @@ class GraphicsTypeController():
     def __init__(self):
         pass
 
-    def __get_ILI9342(self):
-        return GraphicsType.ILI9342
-    def __get_ILI9341(self):
-        return GraphicsType.ILI9341
-    def __get_ST7735(self):
-        return GraphicsType.ST7735
-    def __get_SSD1306(self):
-        return GraphicsType.SSD1306
-    def __get_BuiltIn(self):
-        return GraphicsType.BuiltIn
+    def __get_I2C(self):
+        return GraphicsType.I2C
+    def __get_SPI(self):
+        return GraphicsType.SPI
+    def __get_Neo(self):
+        return GraphicsType.Neo
+    def __get_Matrix5x5(self):
+        return GraphicsType.Matrix5x5
     
     def __set_empty(self, value: int):
         return   
 
-    ILI9342 = property(__get_ILI9342, __set_empty)  
-    ILI9341 = property(__get_ILI9341, __set_empty)  
-    ST7735 = property(__get_ST7735, __set_empty)  
-    SSD1306 = property(__get_SSD1306, __set_empty)  
-    BuiltIn = property(__get_BuiltIn, __set_empty)  
+    I2c = property(__get_I2C, __set_empty)  
+    Spi = property(__get_SPI, __set_empty)  
+    Neo = property(__get_Neo, __set_empty)  
+    Matrix5x5 = property(__get_Matrix5x5, __set_empty)  
+    
 
 
 

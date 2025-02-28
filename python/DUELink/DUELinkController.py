@@ -26,14 +26,6 @@ import platform
 class DUELinkController:
 
     def __init__(self, comPort: str):
-        self.IsPulse = False
-        self.IsFlea = False
-        self.IsPico = False
-        self.IsEdge = False
-        self.IsRave = False
-        self.IsTick = False
-        self.IsDue = False
-
         if comPort is None:
             raise ValueError(f"Invalid comport: {comPort}")
         try:
@@ -110,15 +102,7 @@ class DUELinkController:
         #     self.DeviceConfig.MaxPinIO = 15
         #     self.DeviceConfig.MaxPinAnalog = 10
 
-        self.serialPort.DeviceConfig = self.DeviceConfig
-
-        self.IsPulse = self.DeviceConfig.IsPulse
-        self.IsFlea = self.DeviceConfig.IsFlea
-        self.IsPico = self.DeviceConfig.IsPico
-        self.IsEdge = self.DeviceConfig.IsEdge
-        self.IsRave = self.DeviceConfig.IsRave
-        self.IsTick = self.DeviceConfig.IsTick
-        self.IsDue = self.DeviceConfig.IsDue
+        self.serialPort.DeviceConfig = self.DeviceConfig        
 
     def Disconnect(self):
         self.serialPort.Disconnect()

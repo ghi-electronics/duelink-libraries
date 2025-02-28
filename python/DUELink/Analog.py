@@ -5,7 +5,7 @@ class AnalogController:
         self.serialPort = serialPort
         self.Fixed_Frequency = 50
 
-    def VoltageRead(self, pin):
+    def VRead(self, pin):
 
         if pin not in self.serialPort.DeviceConfig.AnalogPins:
             raise ValueError("Invalid pin. Enter a valid analog pin.")
@@ -24,7 +24,7 @@ class AnalogController:
 
         return -1
     
-    def Write(self, pin, duty_cycle):
+    def PWrite(self, pin, duty_cycle):
         
         if pin not in self.serialPort.DeviceConfig.PWMPins: # Led
             raise ValueError('Invalid pin. Enter a valid pwm pin.')
