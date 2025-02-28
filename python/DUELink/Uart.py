@@ -15,7 +15,7 @@ class UartController:
         return res.success
 
     def BytesToRead(self):
-        cmd = "x=uartcount():log(x)"
+        cmd = "x=uartcount():print(x)"
         self.serialport.WriteCommand(cmd)
         res = self.serialport.ReadRespone()
         if res.success:
@@ -27,7 +27,7 @@ class UartController:
         raise Exception("BytesToRead error!")
 
     def Read(self):
-        cmd = "x=uartread():log(x)"
+        cmd = "x=uartread():print(x)"
         self.serialport.WriteCommand(cmd)
         res = self.serialport.ReadRespone()
         if res.success:

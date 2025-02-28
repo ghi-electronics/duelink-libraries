@@ -2,6 +2,7 @@ import time
 import serial
 from datetime import datetime, timedelta
 from DUELink.DeviceConfiguration import DeviceConfiguration
+import re
 
 class SerialInterface:
     CommandCompleteText = ">"
@@ -71,6 +72,9 @@ class SerialInterface:
 
         # self.ReadCommandComplete()
 
+        match = re.match(r"^([\w\s]+).*?(v[\d\.].*)", version.respone)
+
+
         if version.success:
             if self.echo and command in version.respone:
             #if self.echo :
@@ -80,7 +84,12 @@ class SerialInterface:
                 self.portName.reset_output_buffer()
                 version.respone = version.respone[len(command):]
 
-        return version.respone
+        version_firmware = match.group(2).split(":")[0]
+        prod_id = match.group(2).split(":")[1]
+        version_boot_loader = match.group(2).split(":")[2]
+
+
+        return match.group(1), version_firmware, prod_id, version_boot_loader
 
     def RemoveEchoRespone(self, respone, cmd):
         if cmd in respone:
@@ -91,6 +100,7 @@ class SerialInterface:
     # def CheckResult(self, actual, expected):
     #     if actual != expected:
     #         raise Exception(f"Expected {expected}, got {actual}.")
+    
     def DiscardInBuffer(self):
         self.portName.reset_input_buffer()
 

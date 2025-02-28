@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 
-class DisplayType(IntEnum):
+class GraphicsType(IntEnum):
     BuiltIn = 0
     ILI9342 = 0x80
     ILI9341 = 0x81
@@ -9,121 +9,124 @@ class DisplayType(IntEnum):
     SSD1306 = 0x3C
 
 
-class DisplayConfiguration:
-    def __init__(self, serialPort, display):
-        self.Type = DisplayType.BuiltIn
+# class DisplayConfiguration:
+#     def __init__(self, serialPort, display):
+#         self.Type = DisplayType.BuiltIn
 
-        self.SpiChipSelect = 0
-        self.SpiDataControl = 0
-        self.SpiPortrait = False
-        self.SpiFlipScreenHorizontal = False
-        self.SpiFlipScreenVertical = False
-        self.SpiSwapRedBlueColor = False
-        self.SpiSwapByteEndianness = False
-        self.WindowStartX = 0
-        self.WindowStartY = 0
+#         self.SpiChipSelect = 0
+#         self.SpiDataControl = 0
+#         self.SpiPortrait = False
+#         self.SpiFlipScreenHorizontal = False
+#         self.SpiFlipScreenVertical = False
+#         self.SpiSwapRedBlueColor = False
+#         self.SpiSwapByteEndianness = False
+#         self.WindowStartX = 0
+#         self.WindowStartY = 0
 
+#         self.serialPort = serialPort
+#         self.display = display
+        
+
+#         if (self.serialPort.DeviceConfig.IsPulse or self.serialPort.DeviceConfig.IsRave):
+#             self.Update()
+
+#     def Update(self) -> bool:
+#         address = 0
+#         config = 0
+#         chipselect = 0
+#         datacontrol = 0
+
+#         address = (self.Type)
+
+#         portrait = 0
+
+#         if (self.SpiPortrait == True):
+#             portrait = 1
+
+#         mirror = 0
+
+#         if (self.SpiFlipScreenHorizontal == True):
+#             mirror = 1
+
+#         flip = 0
+
+#         if (self.SpiFlipScreenVertical == True):
+#             flip = 1
+
+#         swapgrb = 0
+
+#         if (self.SpiSwapRedBlueColor == True):
+#             swapgrb = 1
+
+#         swapbytes = 0
+
+#         if (self.SpiSwapByteEndianness == True):
+#             swapbytes = 1
+
+#         config |= portrait << 0
+#         config |= mirror << 1
+#         config |= flip << 2
+#         config |= swapgrb << 3
+#         config |= swapbytes << 4
+
+#         config |= (self.WindowStartX) << 8
+#         config |= (self.WindowStartY) << 12
+
+#         chipselect = self.SpiChipSelect
+#         datacontrol = self.SpiDataControl
+
+#         if ((self.serialPort.DeviceConfig.IsTick or self.serialPort.DeviceConfig.IsEdge) and (
+#                 self.Type != DisplayType.BuiltIn and self.Type != DisplayType.SSD1306)):
+#             raise Exception("The device does not support SPI display")
+
+#         if self.Type == DisplayType.SSD1306:
+#             self.display.Width = 128
+#             self.display.Height = 64
+
+#         elif self.Type == DisplayType.ILI9342:
+#             self.display.Width = 160
+#             self.display.Height = 120
+
+#         elif self.Type == DisplayType.ILI9341:
+#             self.display.Width = 160
+#             self.display.Height = 120
+
+
+#         elif self.Type == DisplayType.ST7735:
+#             self.display.Width = 160
+#             self.display.Height = 128
+
+#         elif self.Type == DisplayType.BuiltIn:
+#             if (
+#                     self.serialPort.DeviceConfig.IsTick == False and self.serialPort.DeviceConfig.IsPulse == False and self.serialPort.DeviceConfig.IsRave == False and self.serialPort.DeviceConfig.IsDue == False):
+#                 raise Exception("The device does not support BuiltIn display")
+
+#             if self.serialPort.DeviceConfig.IsTick:
+#                 self.display.Width = 5
+#                 self.display.Height = 5
+
+#             elif self.serialPort.DeviceConfig.IsPulse:
+#                 self.display.Width = 128
+#                 self.display.Height = 64
+
+#             elif self.serialPort.DeviceConfig.IsRave:
+#                 self.display.Width = 160
+#                 self.display.Height = 120
+
+#         cmd = f"gfxcfg({address}, {config}, {chipselect}, {datacontrol})"
+
+#         self.serialPort.WriteCommand(cmd)
+#         res = self.serialPort.ReadRespone()
+
+#         return res.success
+
+
+class GraphicsController:
+    def __init__(self, duelink, serialPort):
+        
+        self.duelink = duelink
         self.serialPort = serialPort
-        self.display = display
-
-        if (self.serialPort.DeviceConfig.IsPulse or self.serialPort.DeviceConfig.IsRave):
-            self.Update()
-
-    def Update(self) -> bool:
-        address = 0
-        config = 0
-        chipselect = 0
-        datacontrol = 0
-
-        address = (self.Type)
-
-        portrait = 0
-
-        if (self.SpiPortrait == True):
-            portrait = 1
-
-        mirror = 0
-
-        if (self.SpiFlipScreenHorizontal == True):
-            mirror = 1
-
-        flip = 0
-
-        if (self.SpiFlipScreenVertical == True):
-            flip = 1
-
-        swapgrb = 0
-
-        if (self.SpiSwapRedBlueColor == True):
-            swapgrb = 1
-
-        swapbytes = 0
-
-        if (self.SpiSwapByteEndianness == True):
-            swapbytes = 1
-
-        config |= portrait << 0
-        config |= mirror << 1
-        config |= flip << 2
-        config |= swapgrb << 3
-        config |= swapbytes << 4
-
-        config |= (self.WindowStartX) << 8
-        config |= (self.WindowStartY) << 12
-
-        chipselect = self.SpiChipSelect
-        datacontrol = self.SpiDataControl
-
-        if ((self.serialPort.DeviceConfig.IsTick or self.serialPort.DeviceConfig.IsEdge) and (
-                self.Type != DisplayType.BuiltIn and self.Type != DisplayType.SSD1306)):
-            raise Exception("The device does not support SPI display")
-
-        if self.Type == DisplayType.SSD1306:
-            self.display.Width = 128
-            self.display.Height = 64
-
-        elif self.Type == DisplayType.ILI9342:
-            self.display.Width = 160
-            self.display.Height = 120
-
-        elif self.Type == DisplayType.ILI9341:
-            self.display.Width = 160
-            self.display.Height = 120
-
-
-        elif self.Type == DisplayType.ST7735:
-            self.display.Width = 160
-            self.display.Height = 128
-
-        elif self.Type == DisplayType.BuiltIn:
-            if (
-                    self.serialPort.DeviceConfig.IsTick == False and self.serialPort.DeviceConfig.IsPulse == False and self.serialPort.DeviceConfig.IsRave == False and self.serialPort.DeviceConfig.IsDue == False):
-                raise Exception("The device does not support BuiltIn display")
-
-            if self.serialPort.DeviceConfig.IsTick:
-                self.display.Width = 5
-                self.display.Height = 5
-
-            elif self.serialPort.DeviceConfig.IsPulse:
-                self.display.Width = 128
-                self.display.Height = 64
-
-            elif self.serialPort.DeviceConfig.IsRave:
-                self.display.Width = 160
-                self.display.Height = 120
-
-        cmd = f"lcdconfig({address}, {config}, {chipselect}, {datacontrol})"
-
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
-
-        return res.success
-
-
-class DisplayController:
-    def __init__(self, serialPort):
-        self.serialPort = serialPort
-        self.Configuration = DisplayConfiguration(self.serialPort, self)
+        # self.Configuration = DisplayConfiguration(self.serialPort, self)
         self.__palette = [
             0x000000,  # Black
             0xFFFFFF,  # White
@@ -152,15 +155,35 @@ class DisplayController:
         if (self.serialPort.DeviceConfig.IsTick):
             self.Width = 5
             self.Height = 5
+    
+    def Gfxcfg(self, displayType, config, width, height, mode):
 
+        if not isinstance(config, list) or not all(isinstance(x, int) and 0 <= x <= 255 for x in config):
+            raise ValueError("Please enter a list with one number into the config with a valid code for a display.")
+    
+        inputConfig = map(hex, config)
+        
+        cmd = f"gfxcfg({displayType}, [{",".join(inputConfig)}], {width}, {height}, {mode})"
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+        return res.success
+    
+    def Init(self):
+        cmd = "init()"
+
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadRespone()
+
+        return res.success
+    
     def Show(self):
-        cmd = "lcdshow()"
+        cmd = "show()"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
 
     def Clear(self, color):
-        cmd = f"lcdclear({color})"
+        cmd = f"clear({color})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
@@ -183,56 +206,56 @@ class DisplayController:
                 return False
         return True
 
-    def SetPixel(self, color, x, y):
-        cmd = f"lcdpixel({color},{x},{y})"
+    def Pixel(self, color, x, y):
+        cmd = f"pixel({color},{x},{y})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def DrawCircle(self, color, x, y, radius):
-        cmd = f"lcdcircle({color},{x},{y},{radius})"
+    def Circle(self, color, x, y, radius):
+        cmd = f"circle({color},{x},{y},{radius})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def DrawRectangle(self, color, x, y, width, height):
-        cmd = f"lcdrect({color},{x},{y},{width},{height})"
+    def Rect(self, color, x, y, width, height):
+        cmd = f"rect({color},{x},{y},{width},{height})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def DrawFillRect(self, color, x, y, width, height):
-        cmd = f"lcdfill({color},{x},{y},{width},{height})"
+    def Fill(self, color, x, y, width, height):
+        cmd = f"fill({color},{x},{y},{width},{height})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def DrawLine(self, color, x1, y1, x2, y2):
-        cmd = f"lcdline({color},{x1},{y1},{x2},{y2})"
+    def Line(self, color, x1, y1, x2, y2):
+        cmd = f"line({color},{x1},{y1},{x2},{y2})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def DrawText(self, text, color, x, y):
-        cmd = f"lcdtext(\"{text}\",{color},{x},{y})"
+    def Text(self, text, color, x, y):
+        cmd = f"text(\"{text}\",{color},{x},{y})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
     
-    def DrawTextTiny(self, text, color, x, y):
-        cmd = f"lcdtextt(\"{text}\",{color},{x},{y})"
+    def TextT(self, text, color, x, y):
+        cmd = f"textt(\"{text}\",{color},{x},{y})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
 
-    def DrawTextScale(self, text, color, x, y, scalewidth, scaleheight):
-        cmd = f"lcdtexts(\"{text}\",{color},{x},{y},{scalewidth},{scaleheight})"
+    def TextS(self, text, color, x, y, scalewidth, scaleheight):
+        cmd = f"texts(\"{text}\",{color},{x},{y},{scalewidth},{scaleheight})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
 
     def __Stream(self, data, color_depth: int):
-        cmd = f"lcdstream({color_depth})"
+        cmd = f"stream({color_depth})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
 
@@ -389,21 +412,18 @@ class DisplayController:
 
         return self.__Stream(buffer, color_depth)
 
-    def DrawImageScale(self, img, x: int, y: int, scaleWidth: int, scaleHeight: int, transform: int) -> bool:
-
-        width = img[0]
-        height = img[1]
+    def DrawImageScale(self, img, x: int, y: int, width: int, height: int, scaleWidth: int, scaleHeight: int, transform: int) -> bool:
 
         if width <= 0 or height <= 0 or len(img) < width * height:
             raise Exception("Invalid arguments")
 
-        cmd = f"dim a[{len(img)}]"
+        cmd = f"dim b1[{len(img)}]"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
 
         for i in range(len(img)):
-            cmd = f"a[{(i)}] = {img[i]}"
+            cmd = f"b1[{(i)}] = {img[i]}"
             self.serialPort.WriteCommand(cmd)
             res = self.serialPort.ReadRespone()
 
@@ -411,20 +431,20 @@ class DisplayController:
                 break
 
         if (res.success == True):
-            cmd = f"lcdimgs(a, {x}, {y}, {scaleWidth}, {scaleHeight}, {transform})"
+            cmd = f"imgs(b1, {x}, {y}, {width}, {height}, {scaleWidth}, {scaleHeight}, {transform})"
 
             self.serialPort.WriteCommand(cmd)
             res = self.serialPort.ReadRespone()
 
-        cmd = "dim a[0]"
+        cmd = "dim b1[0]"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
 
         return res.success
 
-    def DrawImage(self, img, x: int, y: int, transform: int) -> bool:
-        return self.DrawImageScale(img, x, y, 1, 1, transform)
+    def DrawImage(self, img, x: int, y: int, width: int, height: int, transform: int) -> bool:
+        return self.DrawImageScale(img, x, y, width, height, 1, 1, transform)
 
     # def CreateImage(self, data, width: int, height: int):
     #    if width <=0 or height <=0 or len(data) < width*height:

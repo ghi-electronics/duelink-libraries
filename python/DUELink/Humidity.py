@@ -24,10 +24,15 @@ class HudimityController:
         self.serialPort = serialPort
 
     def Read(self, pin: int, sensortype: int) -> float:
-        cmd = f"log(humidity({pin},{sensortype}))"
+
+        if pin < 0 or pin > self.serialPort.DeviceConfig.MaxPinIO:
+            raise ValueError("Invalid pin. Enter a pin between 0-27.")
+        
+        cmd = f"humid({pin},{sensortype})"
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
+
         return float(res.respone)
     
     

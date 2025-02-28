@@ -1,0 +1,44 @@
+dim b1[2]
+
+fn SendCmd(c)
+	b1[0] = 0
+	b1[1] = c
+    i2cwr(0x3c,b1,[])
+fend
+
+Init()
+show()
+
+fn Init()
+dwrite(11,1) # reset pin
+# config I2C bus with 400Kz
+i2ccfg(400)
+Wait(20)
+GfxCfg(1,[0x3C],128,64, 1)
+
+
+SendCmd(0xAE):SendCmd(0x00):SendCmd(0x10)
+SendCmd(0x40):SendCmd(0x81):SendCmd(0xCF)
+SendCmd(0xA1):SendCmd(0xA6):SendCmd(0xA8)
+SendCmd(0x3F):SendCmd(0xD3):SendCmd(0x00)
+SendCmd(0xD5):SendCmd(0x80):SendCmd(0xD9)
+SendCmd(0xF1):SendCmd(0xDA):SendCmd(0x12)
+SendCmd(0xDB):SendCmd(0x40):SendCmd(0x8D)
+SendCmd(0x14):SendCmd(0xAF):SendCmd(0xC8)
+SendCmd(0x20):SendCmd(0x00):SendCmd(0x21)
+SendCmd(0):SendCmd(128-1)
+SendCmd(0x22):SendCmd(0):SendCmd(7)
+
+fend
+
+fn IsColor()
+return 0
+fend
+
+fn GetW()
+return 128
+fend
+
+fn GetH()
+return 64
+fend
