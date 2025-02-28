@@ -35,12 +35,12 @@ duelink = DUELinkController(availablePort)
 
 # Test buttons
 
-# duelink.Button.Enable(23, 1)
+# duelink.Button.Enable(20, 1)
 
 
 # while True:
-#     d = duelink.Button.Down(23)
-#     u = duelink.Button.Up(23)
+#     d = duelink.Button.Down(20)
+#     u = duelink.Button.Up(20)
 
 #     if (d):
 #         print("Button A down")
@@ -262,3 +262,36 @@ duelink = DUELinkController(availablePort)
 # print(duelink.Engine.Read())
 
 # duelink.System.Reset(0)
+
+# Test the CincoBit graphics
+
+# x = 0
+# while True:
+#     duelink.Graphics.TextT("DUELink", 1, x, 0)
+#     duelink.Graphics.Show()
+#     x -= 1
+#     if x < -40:
+#         x = 6
+#     time.sleep(0.1)
+#     duelink.Graphics.Clear(0)
+
+# Draw Circles on either pixobit or tft display
+
+# x = 50
+# d = 10
+# width = int(float(duelink.Engine.Run("getw()")))
+# height = int(float(duelink.Engine.Run("geth()")))
+
+# print("Driver Version is:", duelink.Engine.Run("dver()"))
+
+# while True:
+#     duelink.Graphics.Circle(1, x, height//2, 10)
+#     duelink.Graphics.Show()
+
+#     x = x + d
+
+#     if (x > width or x < 0):
+#         d = d * -1
+#         duelink.Graphics.Clear(0)
+
+#     time.sleep(0.1)

@@ -1448,225 +1448,15 @@ class LedController {
   }
 }
 
-class NeoController {
-  MAX_LED_NUM = 1024;
-
-  constructor(serialPort) {
-    this.serialPort = serialPort;
-    this.SupportLedNumMax = this.MAX_LED_NUM;
-  }
-
-  async Show(pin, count) {
-    const cmd = `neoshow(${pin}, ${count})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    // each led need 1.25us delay blocking mode
-    const delay = (this.MAX_LED_NUM * 3 * 8 * 1.25) / 1000000;
-    /*setTimeout(async () => {
-            const res = await this.serialPort.ReadResponse();
-            return res.success;
-        }, delay);*/
-
-    await new Promise((resolve) => setTimeout(resolve, delay));
-    const res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-
-  async Clear() {
-    const cmd = "neoclear()";
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-
-    return res.success;
-  }
-
-  async SetColor(id, color) {
-    const red = (color >> 16) & 0xff;
-    const green = (color >> 8) & 0xff;
-    const blue = (color >> 0) & 0xff;
-
-    if (id < 0 || id > this.MAX_LED_NUM) {
-      return false;
-    }
-
-    const cmd = `neoset(${id},${red},${green},${blue})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-
-    return res.success;
-  }
-
-  async SetRGB(id, red, green, blue) {
-    if (id < 0 || id > this.MAX_LED_NUM) {
-      return false;
-    }
-
-    const cmd = `neoset(${id},${red},${green},${blue})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-
-    return res.success;
-  }
-
-  async SetMultiple(pin, color) {
-    if (color.length > this.MAX_LED_NUM) {
-      return false;
-    }
-
-    const length = color.length;
-    let offset = 0;
-
-    const data = new Uint8Array(length * 3);
-
-    for (let i = offset; i < length + offset; i++) {
-      data[(i - offset) * 3 + 0] = (color[i] >> 16) & 0xff;
-      data[(i - offset) * 3 + 1] = (color[i] >> 8) & 0xff;
-      data[(i - offset) * 3 + 2] = (color[i] >> 0) & 0xff;
-    }
-
-    const cmd = `neostream(${pin}, ${data.length})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-
-    if (res.success) {
-      this.serialPort.WriteRawData(data, 0, data.length);
-      const res2 = await this.serialPort.ReadResponse();
-      return res2.success;
-    }
-
-    return res.success;
-  }
-}
-
-class PinController {
-  constructor() {}
-
-  __get_button_a() {
-    return 97;
-  }
-
-  __get_button_b() {
-    return 98;
-  }
-
-  __get_button_up() {
-    return 85;
-  }
-
-  __get_button_down() {
-    return 68;
-  }
-
-  __get_button_left() {
-    return 76;
-  }
-
-  __get_button_right() {
-    return 82;
-  }
-
-  __get_led() {
-    return 108;
-  }
-
-  __get_piezo() {
-    return 112;
-  }
-
-  __get_pullnone() {
-    return 0;
-  }
-
-  __get_pullup() {
-    return 1;
-  }
-
-  __get_pulldown() {
-    return 2;
-  }
-
-  __set_empty(value) {
-    return;
-  }
-
-  get ButtonA() {
-    return this.__get_button_a();
-  }
-
-  get ButtonB() {
-    return this.__get_button_b();
-  }
-
-  get ButtonUp() {
-    return this.__get_button_up();
-  }
-
-  get ButtonDown() {
-    return this.__get_button_down();
-  }
-
-  get ButtonLeft() {
-    return this.__get_button_left();
-  }
-
-  get ButtonRight() {
-    return this.__get_button_right();
-  }
-
-  get Led() {
-    return this.__get_led();
-  }
-
-  get Piezo() {
-    return this.__get_piezo();
-  }
-
-  get PullNone() {
-    return this.__get_pullnone();
-  }
-
-  get PullUp() {
-    return this.__get_pullup();
-  }
-
-  get PullDown() {
-    return this.__get_pulldown();
-  }
-}
-
 class ScriptController {
   constructor(serialPort) {
     this.serialPort = serialPort;
-    this.loadscript = "";
   }
 
-  async New() {
-    this.loadscript = "";
-    const cmd = "new";
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-
-    return res.success;
-  }
-
-  async Load(script) {
-    this.loadscript += script;
-    this.loadscript += "\n";
-  }
-
-  async Record() {
-    if (this.loadscript === "") {
-      throw new Error("No script for recording.");
-    }
-
+  async Record(script) {
     const script = this.loadscript;
 
-    const cmd = "pgmstream()";
+    const cmd = "pgmbrst()";
 
     const raw = new TextEncoder().encode(script);
 
@@ -1690,43 +1480,6 @@ class ScriptController {
 
     this.loadscript = "";
     return res2.success;
-  }
-
-  async __Load2(script) {
-    let ret = true;
-    const cmd = "$";
-    await this.serialPort.WriteCommand(cmd);
-    await Util.sleep(1);
-    script = script.replace("\r", "");
-
-    let startIdx = 0;
-
-    for (let i = 0; i < script.length; i++) {
-      let subscript = "";
-
-      if (script[i] === "\n") {
-        subscript = script.substring(startIdx, i - startIdx);
-        startIdx = i + 1;
-      } else if (i === script.length - 1) {
-        subscript = script.substring(startIdx, i - startIdx + 1);
-      }
-
-      await this.serialPort.WriteCommand(subscript);
-
-      const res = await this.serialPort.ReadResponse();
-
-      if (res.success === false) {
-        ret = false;
-        break;
-      }
-    }
-
-    const cmd2 = ">";
-    await this.serialPort.WriteCommand(cmd2);
-
-    const res2 = await this.serialPort.ReadResponse();
-
-    return ret && res2.success;
   }
 
   async Read() {
@@ -1756,15 +1509,8 @@ class ServoController {
   }
 
   async Set(pin, position) {
-    if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO) {
-      console.log("Invalid pin");
-      //throw new ValueError('Invalid pin');
-      return false;
-    }
-    if (position < 0 || position > 180) {
-      //throw new ValueError('Position must be in the range 0..180');
-      console.log("Position must be in the range 0..180");
-      return false;
+    if (pin < 0 || pin > this.serialPort.DeviceConfig.MaxPinIO) {
+      throw new ValueError("Invalid pin");
     }
 
     const cmd = `servoset(${pin}, ${position})`;
@@ -2166,7 +1912,6 @@ class DUELinkController {
     this.Touch = new TouchController(this.serialPort);
     this.Led = new LedController(this.serialPort);
     this.Script = new ScriptController(this.serialPort);
-    this.Pin = new PinController();
     this.Temperature = new TemperatureController(this.serialPort);
     this.Humidity = new HudimityController(this.serialPort);
     this.System = new SystemController(this.serialPort);
