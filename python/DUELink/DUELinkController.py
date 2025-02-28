@@ -58,7 +58,7 @@ class DUELinkController:
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()
         
-        self.System.Version = self.Version
+        self.System.Version = self.System.GetVersion()[1].strip()
 
         
     
@@ -66,7 +66,7 @@ class DUELinkController:
         self.serialPort = SerialInterface(comPort)
         self.serialPort.Connect()
 
-        self.Version = self.serialPort.GetVersion()[1].strip()
+        # self.Version = self.serialPort.GetVersion()[1].strip()
 
         # if self.Version == "" or self.Version == "GHI Electronics DUELink v00.00:0000:00.09":
         #     raise Exception("The device is not supported.")

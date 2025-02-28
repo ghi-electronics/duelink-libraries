@@ -1,8 +1,7 @@
 from enum import IntEnum
 
 
-class GraphicsType(IntEnum):
-    None = 0
+class GraphicsType(IntEnum):    
     I2C = 1
     SPI = 2
     Neo = 3
