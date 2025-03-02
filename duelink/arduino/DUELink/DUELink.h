@@ -2,9 +2,9 @@
 
 #include "Arduino.h"
 #include "Wire.h"
-#include "DueLinkLib.h"
+#include "DUELinkLib.h"
 
-class TwoWireTransport : public DueLinkTransport {
+class TwoWireTransport : public DUELinkTransport {
 public:
     TwoWireTransport(TwoWire &link, int i2cAddress = 0x52) : m_link(link), m_i2cAddress(i2cAddress) {}
 
