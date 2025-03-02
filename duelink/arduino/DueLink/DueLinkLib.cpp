@@ -2,15 +2,15 @@
 #include "Arduino.h"
 #endif
 
-#include "DueLinkLib.h"
+#include "DUELinkLib.h"
 
-void DueLink::begin(DueLinkTransport &transport) {
+void DUELink::begin(DUELinkTransport &transport) {
     m_pTransport = &transport;
     m_pTransport->begin();
     echo(0);
   }
   
-  DueLink::Response DueLink::execute(const char *command) {
+  DUELink::Response DUELink::execute(const char *command) {
     char buf[128] = {0};
   
     m_pTransport->beginTransmission();
@@ -23,20 +23,20 @@ void DueLink::begin(DueLinkTransport &transport) {
     return getResponse(command, buf);
   }
   
-  void DueLink::echo(int state) {
+  void DUELink::echo(int state) {
     if (state) 
       execute("echo(1)");
     else
       execute("echo(0)");
   }
   
-  void DueLink::led(int high, int low, int count) {
+  void DUELink::led(int high, int low, int count) {
     char cmd[32];
     sprintf(cmd, "led(%d,%d,%d)", high, low, count);
     execute(cmd);
   }
   
-  bool DueLink::dread(int pin, int pull) {
+  bool DUELink::dread(int pin, int pull) {
     char cmd[32];
     sprintf(cmd, "dread(%d,%d)", pin, pull);
     Response result = execute(cmd);
@@ -44,13 +44,13 @@ void DueLink::begin(DueLinkTransport &transport) {
     return false;
   }
   
-  void DueLink::dwrite(int pin, int state) {
+  void DUELink::dwrite(int pin, int state) {
     char cmd[32];
     sprintf(cmd, "dwrite(%d,%d)", pin, state);
     execute(cmd);
   }
   
-  float DueLink::vread(int pin) {
+  float DUELink::vread(int pin) {
     char cmd[32];
     sprintf(cmd, "vread(%d)", pin);
     Response result = execute(cmd);
@@ -58,25 +58,25 @@ void DueLink::begin(DueLinkTransport &transport) {
     return 0;
   }
   
-  void DueLink::pwrite(int pin, float power) {
+  void DUELink::pwrite(int pin, float power) {
     char cmd[32];
     sprintf(cmd, "pwrite(%d,%f)", pin, power);
     execute(cmd);
   }
   
-  void DueLink::beep(int pin, int freq, int duration) {
+  void DUELink::beep(int pin, int freq, int duration) {
     char cmd[32];
     sprintf(cmd, "beep(%d,%d,%d)", pin, freq, duration);
     execute(cmd);
   }
   
-  void DueLink::btnEnable(int pin, bool enable) {
+  void DUELink::btnEnable(int pin, bool enable) {
     char cmd[32];
     sprintf(cmd, "btnenable(%d,%d)", pin, enable ? 1 : 0);
     execute(cmd);
   }
   
-  bool DueLink::btnUp(int pin) {
+  bool DUELink::btnUp(int pin) {
     char cmd[32];
     sprintf(cmd, "btnup(%d)", pin);
     Response result = execute(cmd);
@@ -84,7 +84,7 @@ void DueLink::begin(DueLinkTransport &transport) {
     return false;
   }
   
-  bool DueLink::btnDown(int pin) {
+  bool DUELink::btnDown(int pin) {
     char cmd[32];
     sprintf(cmd, "btndown(%d)", pin);
     Response result = execute(cmd);
@@ -92,7 +92,7 @@ void DueLink::begin(DueLinkTransport &transport) {
     return false;
   }
   
-  DueLink::Response DueLink::getResponse(String command, String response) {
+  DUELink::Response DUELink::getResponse(String command, String response) {
     int cmdIdx = response.indexOf(command);
     if (cmdIdx == -1) {
       cmdIdx = 0;

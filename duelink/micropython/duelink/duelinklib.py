@@ -33,7 +33,7 @@ class I2CTransport:
                         if bytesToRead == 0:
                             break
     
-class DueLink:
+class DUELink:
     def __init__(self, transport):
         self.transport = transport
         

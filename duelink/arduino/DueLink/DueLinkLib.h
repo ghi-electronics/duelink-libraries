@@ -14,7 +14,7 @@ public:
 };
 #endif
 
-class DueLinkTransport {
+class DUELinkTransport {
 public:
     virtual void begin() = 0;
     virtual void beginTransmission() = 0;
@@ -24,7 +24,7 @@ public:
     virtual int read(char *buf, int bytes, unsigned long timeout) = 0;
 };
 
-class DueLink {
+class DUELink {
 public:
     struct Response {
 #ifdef ARDUINO
@@ -36,7 +36,7 @@ public:
     };
 
 public:
-    void begin(DueLinkTransport &transport); 
+    void begin(DUELinkTransport &transport); 
     
     Response execute(const char *command);
 
@@ -60,7 +60,7 @@ private:
     Response getResponse(String command, String response);
 
 private:
-    DueLinkTransport *m_pTransport = NULL;
+    DUELinkTransport *m_pTransport = NULL;
     int m_i2cAddress;
 
     const static unsigned long DUELINK_TIMEOUT = 1000;
