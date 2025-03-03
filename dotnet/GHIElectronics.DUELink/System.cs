@@ -13,7 +13,9 @@ namespace GHIElectronics.DUELink {
 
         public enum ResetOption {
             SystemReset = 0,
-            Bootloader
+            Bootloader = 1,
+            STBootloader = 2,
+            EraseAll = 3,
 
 
         }
@@ -34,11 +36,9 @@ namespace GHIElectronics.DUELink {
                 ;
             }
 
-            
+            public void Reset(ResetOption option) {
 
-            public void Reset(int option) {
-
-                var cmd = string.Format("reset({0})", (option > 0) ? 1 : 0);
+                var cmd = $"reset({option.ToString()})";
                 this.serialPort.WriteCommand(cmd);
 
                 // The device will reset in bootloader or system reset
@@ -47,7 +47,7 @@ namespace GHIElectronics.DUELink {
             }
 
             public int GetTickMicroseconds() {
-                var cmd = string.Format("log(tickus())");
+                var cmd = string.Format("tickus())=");
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -68,7 +68,7 @@ namespace GHIElectronics.DUELink {
             }
 
             public int GetTickMilliseconds() {
-                var cmd = string.Format("log(tickms())");
+                var cmd = string.Format("tickms()");
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -87,27 +87,7 @@ namespace GHIElectronics.DUELink {
 
                 return -1;
             }
-
-
-
             
-
-            
-
-            public bool Wait(int millisecond) {
-
-                var cmd = string.Format("wait({0})", millisecond);
-
-                this.serialPort.WriteCommand(cmd);
-
-                Thread.Sleep(millisecond);
-
-                var res = this.serialPort.ReadRespone();
-
-                return res.success;
-            }
-
-            //public string Version { get; internal set; }
             public Version GetVersion() {
                 if (this._version == null) {
                     var command = "version()";

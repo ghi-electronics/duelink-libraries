@@ -24,30 +24,27 @@ namespace GHIElectronics.DUELink {
           
 
             public bool Read(int pin, InputType inputType = InputType.None) {
+                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO ))
+                    throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 var input = (int)inputType;
 
-                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)PinController.BUTTON_A && pin != (int)PinController.BUTTON_B && pin != (int)PinController.BUTTON_U && pin != (int)PinController.BUTTON_D && pin != (int)PinController.BUTTON_L && pin != (int)PinController.BUTTON_R && pin != (int)PinController.LED))
-                    throw new ArgumentOutOfRangeException("Invalid pin.");
+              
+            
 
-                var pull = "0";
-
-                if (input == PinController.PULLUP) pull = "1";
-                if (input == PinController.PULLDOWN) pull = "2";
-
-                var cmd = string.Format("log(dread({0},{1}))", pin.ToString(), pull);
+                var cmd = string.Format("dread({0},{1})", pin.ToString(), input.ToString());
 
 
 
                 this.serialPort.WriteCommand(cmd);
 
-                var respone = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadRespone();
 
-                if (respone.success) {
+                if (response.success) {
 
-                    respone.respone = this.serialPort.RemoveEchoRespone(respone.respone, cmd);
+                    response.respone = this.serialPort.RemoveEchoRespone(response.respone, cmd);
                     try {
-                        var value = int.Parse(respone.respone);
+                        var value = int.Parse(response.respone);
 
                         return value == 1;
                     }
@@ -58,25 +55,10 @@ namespace GHIElectronics.DUELink {
 
                 return false;
             }
-
-            public bool Read(char c, InputType input = InputType.None) {
-                var pin = -1;
-
-                if (c == 'a' || c == 'A')
-                    pin = PinController.BUTTON_A;
-
-                if (c == 'b' || c == 'B')
-                    pin = PinController.BUTTON_B;
-
-                if (pin != -1) {
-                    return this.Read(pin, input);   
-                }
-
-                return false;
-            }
+            
 
             public bool Write(int pin, bool value) {
-                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin != (int)PinController.LED))
+                if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO ))
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 var v = (value == true ? 1 : 0);
@@ -85,17 +67,12 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var respone = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadRespone();
 
-                return respone.success;
+                return response.success;
             }
 
-            public bool Write(char c, bool value) {
-                if (c == 'l' || c == 'L')
-                    return this.Write((int)PinController.LED, value);
-
-                return false;
-            }
+           
         }
 
        

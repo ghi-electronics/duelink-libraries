@@ -11,9 +11,10 @@ namespace GHIElectronics.DUELink {
     public class DeviceConfiguration {
         public uint MaxPinIO { get;  } = 27;
         public uint MaxPinAnalog { get;  } = 10;
-        public uint MaxPinPWM { get; } = 9;
 
-
+        public int[] PWMPins = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 11 };
+        public int[] InterruptPins = new int[] { 1, 2, 3, 4, 5, 6, 7, 12 };
+        public int[] AnalogPins = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 17 };
     }
     public partial class DUELinkController {
 
@@ -42,29 +43,29 @@ namespace GHIElectronics.DUELink {
 
         public InfraredController Infrared { get; internal set; }
 
-        public NeoController Neo { get; internal set; }
+
 
         public SystemController System { get; internal set; }
 
         public UartController Uart { get; internal set; }
         public ButtonController Button { get; internal set; }
         public DistanceSensorController Distance { get; internal set; }
-        public DisplayController Display { get; internal set; }
+        public GraphicsController Graphics { get; internal set; }
 
         public TouchController Touch { get; internal set; }
 
         public LedController Led { get; internal set; }
 
-        public ScriptController Script { get; internal set; }
+        public EngineController Script { get; internal set; }
 
-        public PinController Pin { get; internal set; }
+
 
         public TemperatureController Temperature { get; internal set; }
 
         public HumidityController Humidity { get; internal set; }
 
         public PulseController Pulse { get; internal set; }
-        public CanController Can { get; internal set; }
+
         public SoundController Sound { get; internal set; }
       
 
@@ -95,21 +96,21 @@ namespace GHIElectronics.DUELink {
             this.Frequency = new FrequencyController(this.serialPort);
             this.Spi = new SpiController(this.serialPort);
             this.Infrared = new InfraredController(this.serialPort);
-            this.Neo = new NeoController(this.serialPort);
+ 
             this.Uart = new UartController(this.serialPort);
             this.Button = new ButtonController(this.serialPort);
             this.Distance = new DistanceSensorController(this.serialPort);
-            this.Display = new DisplayController(this.serialPort);
+            this.Graphics = new GraphicsController(this.serialPort);
             this.Touch = new TouchController(this.serialPort);
             this.Led = new LedController(this.serialPort);
-            this.Script = new ScriptController(this.serialPort);
-            this.Pin = new PinController();
+            this.Script = new EngineController(this.serialPort);
+
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);
             this.System = new SystemController(this.serialPort);
 
             this.Pulse = new PulseController(this.serialPort);
-            this.Can = new CanController(this.serialPort);
+
             this.Sound = new SoundController(this.serialPort);
         }
 

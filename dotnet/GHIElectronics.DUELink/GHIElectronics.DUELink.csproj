@@ -32,7 +32,11 @@
 
   <ItemGroup>
     <Compile Remove="Bluetooth.cs" />
+    <Compile Remove="Can.cs" />
     <Compile Remove="Configuration.cs" />
+    <Compile Remove="Neo.cs" />
+    <Compile Remove="Pin.cs" />
+    <Compile Remove="Pulse.cs" />
     <Compile Remove="Pwm.cs" />
   </ItemGroup>
 

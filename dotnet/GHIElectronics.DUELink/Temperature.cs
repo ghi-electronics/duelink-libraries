@@ -8,32 +8,33 @@ using System.Threading.Tasks;
 namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
 
-        //public enum TemperatureSensorType: uint {
-        //    DHT11 = 11,
-        //    DHT12 = 12,
-        //    DHT21 = 21,
-        //    DHT22 = 22,
+        public enum TemperatureSensorType : uint {
+            CPU = 0,
+            DHT11 = 1,
+            DHT12 = 2,
+            DHT21 = 3,
+            DHT22 = 4,
 
-        //}
+        }
         public class TemperatureController {
             SerialInterface serialPort;
 
             public TemperatureController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public double Read(int pin, int sensortype) {
+            public double Read(int pin, TemperatureSensorType type) {
                 if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
 
-                var cmd = string.Format("log(temp({0}, {1}))", pin.ToString(), ((int)(sensortype)).ToString());
+                var cmd = string.Format("temp({0}, {1})", pin.ToString(), ((int)(type)).ToString());
 
                 this.serialPort.WriteCommand(cmd);
 
-                var respone = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadRespone();
 
-                if (respone.success) {
+                if (response.success) {
                     try {
-                        var value = float.Parse(respone.respone);
+                        var value = float.Parse(response.respone);
 
                         return value;
                     }
@@ -45,11 +46,6 @@ namespace GHIElectronics.DUELink {
                 return -1;
 
             }
-
-            //public int Dht11 { get; } = 11;
-            //public int Dht12 { get; } = 12;
-            //public int Dht21 { get; } =21;
-            //public int Dht22 { get; } = 22;
         }
     }
 }
