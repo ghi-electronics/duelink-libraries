@@ -10,7 +10,7 @@ using System.Xml.Linq;
 namespace GHIElectronics.DUELink {
     public class SerialInterface {
 
-        
+
 
         protected const string CommandCompleteText = ">";
 
@@ -96,10 +96,26 @@ namespace GHIElectronics.DUELink {
                 this.port.DiscardOutBuffer();
 
                 try {
-                    var version = this.GetVersion();
+                    //var version = this.GetVersion();
 
-                    if (version != string.Empty && version[2] == '.' && version[4] == '.' ) {                        
-                        break;
+                    var command = "version()";
+
+
+                    this.WriteCommand(command);
+
+
+                    var version = this.ReadRespone();
+
+
+                    if (version.success) {
+
+                        if (version.respone != string.Empty && version.respone.Contains(command)) {
+                            this.TurnEchoOff();
+
+                        }
+                        if (version.respone != string.Empty && version.respone.Contains("GHI Electronics")) {
+                            break;
+                        }
                     }
                 }
                 catch {
@@ -111,44 +127,21 @@ namespace GHIElectronics.DUELink {
             this.port.ReadTimeout = (int)this.ReadTimeout.TotalMilliseconds;
         }
 
-        private bool echo = true;
+        private bool Echo { get; set; } = true;
 
-        private void TurnEchoOff() {
-            if (!this.echo)
+
+
+        public void TurnEchoOff() {
+            if (!this.Echo)
                 return;
 
             this.WriteCommand("echo(0)");
 
             this.ReadRespone();
 
-            this.echo = false;
+            this.Echo = false;
 
 
-        }
-        public string GetVersion() {
-            var command = "version()";
-
-
-            this.WriteCommand(command);
-
-
-            var version = this.ReadRespone();
-
-
-            if (version.success) {
-                if (this.echo && version.respone.Contains(command)) {
-                    // echo is on=> need to turn off
-
-                    this.TurnEchoOff();
-
-                    this.port.DiscardInBuffer();
-                    this.port.DiscardOutBuffer();
-
-                    version.respone = version.respone.Substring(command.Length, version.respone.Length - command.Length);
-                }
-            }
-
-            return version.respone;
         }
 
         internal string RemoveEchoRespone(string respone, string cmd) {
@@ -227,7 +220,7 @@ namespace GHIElectronics.DUELink {
                         //return str.Substring(0, idx);
                         var idx3 = str.IndexOf("!");
 
-                        if (idx3 != -1 ) {
+                        if (idx3 != -1) {
                             //respone.respone = respone.respone.Substring(0, respone.respone);
                             respone.success = false;
                         }
@@ -319,35 +312,28 @@ namespace GHIElectronics.DUELink {
         }
 
 
-        int transferBlockSizeMax1 = 1024;
+
         int transferBlockSizeMax2 = 512;
         public int TransferBlockSizeMax {
             get {
-                if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
-                    return this.transferBlockSizeMax1;
-                else return this.transferBlockSizeMax2;
+
+                return this.transferBlockSizeMax2; ;
 
             }
             set {
-                if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
-                    this.transferBlockSizeMax1 = value;
-                else this.transferBlockSizeMax2 = value;
+                this.transferBlockSizeMax2 = value; ;
             }
         }
 
         int transferBlockDelay1 = 2;
-        int transferBlockDelay2 = 10;        
+        int transferBlockDelay2 = 10;
         public int TransferBlockDelay {
             get {
-                if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
-                    return this.transferBlockDelay1;
-                else return this.transferBlockDelay2;
+                return this.transferBlockDelay2; ;
 
             }
             set {
-                if (this.DeviceConfig != null && !this.DeviceConfig.IsEdge)
-                    this.transferBlockDelay1 = value;
-                else this.transferBlockDelay2 = value;
+                this.transferBlockDelay2 = value; ;
             }
         }
 

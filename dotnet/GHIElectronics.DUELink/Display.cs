@@ -48,18 +48,18 @@ namespace GHIElectronics.DUELink {
                 this.serialPort = serialPort;
                 
                     
-                if (this.serialPort.DeviceConfig.IsRave) {
-                    this.Width = 160;
-                    this.Height = 120;
-                }
-                else if (this.serialPort.DeviceConfig.IsTick) {
-                    this.Width = 5;
-                    this.Height = 5;
-                }
-                else {
-                    this.Width = 128;
-                    this.Height = 64;
-                }
+                //if (this.serialPort.DeviceConfig.IsRave) {
+                //    this.Width = 160;
+                //    this.Height = 120;
+                //}
+                //else if (this.serialPort.DeviceConfig.IsTick) {
+                //    this.Width = 5;
+                //    this.Height = 5;
+                //}
+                //else {
+                //    this.Width = 128;
+                //    this.Height = 64;
+                //}
 
                 this.Configuration = new DisplayConfiguration(this.serialPort, this);
 
@@ -329,181 +329,181 @@ namespace GHIElectronics.DUELink {
 
 
             // This function for testing firmware that support 1,4,8,16bit
-            public void ShowBuffer(byte[] bitmap, int color_depth) {
-                if (bitmap == null) {
-                    throw new Exception("Bitmap array is null");
-                }
+            //public void ShowBuffer(byte[] bitmap, int color_depth) {
+            //    if (bitmap == null) {
+            //        throw new Exception("Bitmap array is null");
+            //    }
 
-                if (this.Configuration.Type == DisplayType.BuiltIn) {
-                    if (this.serialPort.DeviceConfig.IsPulse && color_depth != 1)
-                        throw new Exception("BuiltIn support one bit only");
+            //    if (this.Configuration.Type == DisplayType.BuiltIn) {
+            //        if (this.serialPort.DeviceConfig.IsPulse && color_depth != 1)
+            //            throw new Exception("BuiltIn support one bit only");
 
-                    //else if (this.serialPort.DeviceConfig.IsRave && color_depth == 1)
-                    //    throw new Exception("BuiltIn does not support one bit");
-                }
+            //        //else if (this.serialPort.DeviceConfig.IsRave && color_depth == 1)
+            //        //    throw new Exception("BuiltIn does not support one bit");
+            //    }
 
-                var width = this.Width;
-                var height = this.Height;
+            //    var width = this.Width;
+            //    var height = this.Height;
 
-                var buffer_size = 0;
-                var i = 0;
-                var buffer = Array.Empty<byte>();
+            //    var buffer_size = 0;
+            //    var i = 0;
+            //    var buffer = Array.Empty<byte>();
             
-                var typeI2c = ((uint)this.Configuration.Type < 0x80) && ((uint)this.Configuration.Type > 0);
+            //    var typeI2c = ((uint)this.Configuration.Type < 0x80) && ((uint)this.Configuration.Type > 0);
 
-                switch (color_depth) {
-                    case 1:
-                        if (typeI2c || (this.Configuration.Type == DisplayType.BuiltIn && (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsDue))) {
-                            buffer_size = width * height / 8;
-                            buffer = new byte[buffer_size];
+            //    switch (color_depth) {
+            //        case 1:
+            //            if (typeI2c || (this.Configuration.Type == DisplayType.BuiltIn && (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsDue))) {
+            //                buffer_size = width * height / 8;
+            //                buffer = new byte[buffer_size];
 
-                            for (var y = 0; y < height; y++) {
-                                for (var x = 0; x < width; x++) {
-                                    var index = (y >> 3) * width + x;
+            //                for (var y = 0; y < height; y++) {
+            //                    for (var x = 0; x < width; x++) {
+            //                        var index = (y >> 3) * width + x;
 
-                                    var red = bitmap[i];
-                                    var green = bitmap[i + 1];
-                                    var blue = bitmap[i + 2];
+            //                        var red = bitmap[i];
+            //                        var green = bitmap[i + 1];
+            //                        var blue = bitmap[i + 2];
 
-                                    if (red + green + blue > 0) {
-                                        buffer[index] |= (byte)(1 << (y & 7));
-                                    }
-                                    else {
-                                        buffer[index] &= (byte)(~(1 << (y & 7)));
-                                    }
+            //                        if (red + green + blue > 0) {
+            //                            buffer[index] |= (byte)(1 << (y & 7));
+            //                        }
+            //                        else {
+            //                            buffer[index] &= (byte)(~(1 << (y & 7)));
+            //                        }
 
-                                    i += 4;
-                                }
-                            }
-                        }
-                        else {
-                            buffer_size = width * height / 8;
-                            buffer = new byte[buffer_size];
+            //                        i += 4;
+            //                    }
+            //                }
+            //            }
+            //            else {
+            //                buffer_size = width * height / 8;
+            //                buffer = new byte[buffer_size];
 
-                            byte data = 0;
-                            i = 0;
-                            var bit = 0;
-                            var j = 0;
+            //                byte data = 0;
+            //                i = 0;
+            //                var bit = 0;
+            //                var j = 0;
 
-                            for (var y = 0; y < height; y++) {
-                                for (var x = 0; x < width; x++) {
+            //                for (var y = 0; y < height; y++) {
+            //                    for (var x = 0; x < width; x++) {
 
-                                    var red = bitmap[i];
-                                    var green = bitmap[i + 1];
-                                    var blue = bitmap[i + 2];
-                                    var clr = (uint)((red << 16) | (green << 8) | blue);
+            //                        var red = bitmap[i];
+            //                        var green = bitmap[i + 1];
+            //                        var blue = bitmap[i + 2];
+            //                        var clr = (uint)((red << 16) | (green << 8) | blue);
 
-                                    if (clr != 0) {
-                                        data |= (byte)(1 << bit);
-                                    }
+            //                        if (clr != 0) {
+            //                            data |= (byte)(1 << bit);
+            //                        }
 
-                                    bit++;
+            //                        bit++;
 
-                                    if (bit == 8) {
-                                        buffer[j] = data;
-                                        j++;
+            //                        if (bit == 8) {
+            //                            buffer[j] = data;
+            //                            j++;
 
-                                        bit = 0;
-                                        data = 0;
+            //                            bit = 0;
+            //                            data = 0;
                                         
-                                    }
+            //                        }
 
-                                    i += 4;
+            //                        i += 4;
                                     
-                                }
-                            }
-                        }
-                        break;
+            //                    }
+            //                }
+            //            }
+            //            break;
 
-                    case 4:
-                        buffer_size = width * height / 2;
-                        buffer = new byte[buffer_size];
+            //        case 4:
+            //            buffer_size = width * height / 2;
+            //            buffer = new byte[buffer_size];
 
-                        for (var j = 0; j < buffer.Length; j++) {
-                            var red = bitmap[i];
-                            var green = bitmap[i + 1];
-                            var blue = bitmap[i + 2];
-                            var pixel1 = (uint)((red << 16) | (green << 8) | blue);
+            //            for (var j = 0; j < buffer.Length; j++) {
+            //                var red = bitmap[i];
+            //                var green = bitmap[i + 1];
+            //                var blue = bitmap[i + 2];
+            //                var pixel1 = (uint)((red << 16) | (green << 8) | blue);
 
-                            red = bitmap[i + 4];
-                            green = bitmap[i + 4 + 1];
-                            blue = bitmap[i + 4 + 2];
-                            var pixel2 = (uint)((red << 16) | (green << 8) | blue);
+            //                red = bitmap[i + 4];
+            //                green = bitmap[i + 4 + 1];
+            //                blue = bitmap[i + 4 + 2];
+            //                var pixel2 = (uint)((red << 16) | (green << 8) | blue);
 
-                            buffer[j] = (byte)((this.PaletteLookup(pixel1) << 4) | this.PaletteLookup(pixel2));
-                            i += 8;
-                        }
-                        break;
+            //                buffer[j] = (byte)((this.PaletteLookup(pixel1) << 4) | this.PaletteLookup(pixel2));
+            //                i += 8;
+            //            }
+            //            break;
 
-                    case 8:
-                        buffer_size = width * height;
-                        buffer = new byte[buffer_size];
+            //        case 8:
+            //            buffer_size = width * height;
+            //            buffer = new byte[buffer_size];
 
-                        for (var j = 0; j < buffer.Length; j++) {
-                            var red = bitmap[i];
-                            var green = bitmap[i + 1];
-                            var blue = bitmap[i + 2];
+            //            for (var j = 0; j < buffer.Length; j++) {
+            //                var red = bitmap[i];
+            //                var green = bitmap[i + 1];
+            //                var blue = bitmap[i + 2];
 
-                            buffer[j] = (byte)(((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6));
-                            i += 4;
-                        }
-                        break;
+            //                buffer[j] = (byte)(((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6));
+            //                i += 4;
+            //            }
+            //            break;
 
-                    case 16:
-                        buffer_size = width * height * 2;
+            //        case 16:
+            //            buffer_size = width * height * 2;
 
-                        buffer = new byte[buffer_size];
+            //            buffer = new byte[buffer_size];
 
 
-                        i = 0;
-                        for (var y = 0; y < height; y++) {
-                            for (var x = 0; x < width; x++) {
-                                var index = (y * width + x) * 2;
-                                var red = bitmap[i];
-                                var green = bitmap[i + 1];
-                                var blue = bitmap[i + 2];
-                                var clr = (uint)((red << 16) | (green << 8) | blue);
+            //            i = 0;
+            //            for (var y = 0; y < height; y++) {
+            //                for (var x = 0; x < width; x++) {
+            //                    var index = (y * width + x) * 2;
+            //                    var red = bitmap[i];
+            //                    var green = bitmap[i + 1];
+            //                    var blue = bitmap[i + 2];
+            //                    var clr = (uint)((red << 16) | (green << 8) | blue);
 
-                                buffer[index + 0] = (byte)(((clr & 0b0000_0000_0000_0000_0001_1100_0000_0000) >> 5) | ((clr & 0b0000_0000_0000_0000_0000_0000_1111_1000) >> 3));
-                                buffer[index + 1] = (byte)(((clr & 0b0000_0000_1111_1000_0000_0000_0000_0000) >> 16) | ((clr & 0b0000_0000_0000_0000_1110_0000_0000_0000) >> 13));
-                                i += 4;
-                            }
-                        }
+            //                    buffer[index + 0] = (byte)(((clr & 0b0000_0000_0000_0000_0001_1100_0000_0000) >> 5) | ((clr & 0b0000_0000_0000_0000_0000_0000_1111_1000) >> 3));
+            //                    buffer[index + 1] = (byte)(((clr & 0b0000_0000_1111_1000_0000_0000_0000_0000) >> 16) | ((clr & 0b0000_0000_0000_0000_1110_0000_0000_0000) >> 13));
+            //                    i += 4;
+            //                }
+            //            }
 
-                        break;
-                    default:
-                        throw new ArgumentException("Invalid color depth", nameof(color_depth));
-                }
+            //            break;
+            //        default:
+            //            throw new ArgumentException("Invalid color depth", nameof(color_depth));
+            //    }
 
-                if (buffer != null) {
+            //    if (buffer != null) {
 
-                    this.Stream(buffer, (int)color_depth);
-                }
+            //        this.Stream(buffer, (int)color_depth);
+            //    }
 
             
-            }
+            //}
 
-            public byte[] BufferFrom(Image image) {
-                var bmp = new Bitmap(this.Width, this.Height);
-                var g = Graphics.FromImage(bmp);
-                g.DrawImage(image, 0, 0, this.Width, this.Height);
+            //public byte[] BufferFrom(Image image) {
+            //    var bmp = new Bitmap(this.Width, this.Height);
+            //    var g = Graphics.FromImage(bmp);
+            //    g.DrawImage(image, 0, 0, this.Width, this.Height);
 
-                var pixels = new byte[this.Width * this.Height * 4];
+            //    var pixels = new byte[this.Width * this.Height * 4];
 
-                var bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-                unsafe {
-                    var ptr = (byte*)bmpData.Scan0.ToPointer();
-                    for (var y = 0; y < bmpData.Height; y++) {
-                        for (var x = 0; x < bmpData.Width * 4; x += 4) {
-                            pixels[y * bmpData.Width * 4 + x] = ptr[y * bmpData.Stride + x + 2];        // Red
-                            pixels[y * bmpData.Width * 4 + x + 1] = ptr[y * bmpData.Stride + x + 1];    // Green
-                            pixels[y * bmpData.Width * 4 + x + 2] = ptr[y * bmpData.Stride + x];        // Blue
-                        }
-                    }
-                }
-                bmp.UnlockBits(bmpData);
-                return pixels;
-            }
+            //    var bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            //    unsafe {
+            //        var ptr = (byte*)bmpData.Scan0.ToPointer();
+            //        for (var y = 0; y < bmpData.Height; y++) {
+            //            for (var x = 0; x < bmpData.Width * 4; x += 4) {
+            //                pixels[y * bmpData.Width * 4 + x] = ptr[y * bmpData.Stride + x + 2];        // Red
+            //                pixels[y * bmpData.Width * 4 + x + 1] = ptr[y * bmpData.Stride + x + 1];    // Green
+            //                pixels[y * bmpData.Width * 4 + x + 2] = ptr[y * bmpData.Stride + x];        // Blue
+            //            }
+            //        }
+            //    }
+            //    bmp.UnlockBits(bmpData);
+            //    return pixels;
+            //}
 
             //public bool DrawBufferBytes(byte[] color) {
 
@@ -665,94 +665,9 @@ namespace GHIElectronics.DUELink {
             //this.system = system;
             this.Type = DisplayType.BuiltIn;
 
-            if (this.serialPort.DeviceConfig.IsPulse || this.serialPort.DeviceConfig.IsRave) {
-                
-
-                this.Update();
-            }
-        }
-        public bool Update() {
-
-
-            var address = 0U;
-            var config = 0U;
-            var chipselect = 0;
-            var datacontrol = 0;
             
-
-
-            address = (uint)(this.Type);
-
-
-
-            config |= (uint)(this.SpiPortrait == true ? 1 : 0) << 0;
-            config |= (uint)(this.SpiFlipScreenHorizontal == true ? 1 : 0) << 1;
-            config |= (uint)(this.SpiFlipScreenVertical == true ? 1 : 0) << 2;
-            config |= (uint)(this.SpiSwapRedBlueColor == true ? 1 : 0) << 3;
-            config |= (uint)(this.SpiSwapByteEndianness == true ? 1 : 0) << 4;
-            config |= (uint)((this.WindowStartX << 8));
-            config |= (uint)((this.WindowStartY << 12));
-
-            chipselect = this.SpiChipSelect;
-            datacontrol = this.SpiDataControl;
-
-            if ((this.serialPort.DeviceConfig.IsTick || this.serialPort.DeviceConfig.IsEdge) && this.Type != DisplayType.SSD1306 && this.Type != DisplayType.BuiltIn) {
-                throw new Exception("The device does not support SPI display");
-            }
-
-            
-            switch (this.Type) {
-                case DisplayType.SSD1306:
-                    this.display.Width = 128;
-                    this.display.Height = 64;           
-
-                    break;
-
-                case DisplayType.ILI9342:
-                case DisplayType.ILI9341:
-                    this.display.Width = 160;
-                    this.display.Height = 120;                    
-                    break;
-
-                case DisplayType.ST7735:                
-                    this.display.Width = 160;
-                    this.display.Height = 128;                    
-                    break;
-
-                case DisplayType.BuiltIn:
-                    if (this.serialPort.DeviceConfig.IsTick == false && this.serialPort.DeviceConfig.IsPulse == false && this.serialPort.DeviceConfig.IsRave == false && this.serialPort.DeviceConfig.IsDue == false) {
-                        throw new Exception("The device does not support BuiltIn display");
-                    }
-
-                    if (this.serialPort.DeviceConfig.IsTick) {
-                        this.display.Width = 5;
-                        this.display.Height = 5;
-                    }
-                    else if (this.serialPort.DeviceConfig.IsPulse) {
-                        this.display.Width = 128;
-                        this.display.Height = 64;
-                    }
-                    else if (this.serialPort.DeviceConfig.IsRave) {
-                        this.display.Width = 160;
-                        this.display.Height = 120;
-                    }
-                    break;
-
-
-
-            }
-
-            var cmd = string.Format("lcdconfig({0}, {1}, {2}, {3})", address, config, chipselect, datacontrol);
-
-            this.serialPort.WriteCommand(cmd);
-
-            var res = this.serialPort.ReadRespone();
-
-            return res.success;
         }
-        public void Default() {
-
-        }
+        
     }
 
 

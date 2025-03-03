@@ -13,41 +13,43 @@ namespace GHIElectronics.DUELink {
 
             public AnalogController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public int Read(int pin) {
+            public double VRead(int pin) {
                 if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinAnalog)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
 
-                var cmd = string.Format("log(aread({0}))", pin.ToString());
+                var cmd = string.Format("vread({0})", pin.ToString());
 
                 this.serialPort.WriteCommand(cmd);
 
-                var respone = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadRespone();
 
-                if (respone.success) {                   
+                if (response.success) {                   
                     try {
-                        var value = int.Parse(respone.respone);
+                        var value = double.Parse(response.respone);
 
                         return value;
                     }
-                    catch { }
+                    catch {
+
+                    }
 
 
                 }
 
-                return -1;
+                return 0;
             }
 
             public int FixedFrequency { get; } = 50;
-            public bool Write(int pin, int dutycyle) {
+            public bool PWrite(int pin, double dc) {
                 if (pin < 0 || ((pin >= this.serialPort.DeviceConfig.MaxPinIO ) && pin != (int)PinController.LED)) 
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
-                if (dutycyle < 0 || dutycyle > 1000) {
-                    throw new Exception("Dutycle must be in 0..1000");
+                if (dc < 0 || dc > 1) {
+                    throw new Exception("Dutycle must be in 0..0.1");
                 }
 
-                var cmd = string.Format("awrite({0},{1})", pin.ToString(), dutycyle.ToString());
+                var cmd = string.Format("pwrite({0},{1})", pin.ToString(), dc.ToString());
 
 
                 this.serialPort.WriteCommand(cmd);
@@ -61,12 +63,6 @@ namespace GHIElectronics.DUELink {
                 return false;
             }
 
-            public bool Write(char pin, int dutycyle) {
-                if (pin == 'l' || pin == 'L')
-                    return this.Write((int)PinController.LED, dutycyle);
-
-                throw new Exception("Invalid pin.");
-            }
         }
     }
 }

@@ -9,26 +9,14 @@ using Microsoft.Win32;
 namespace GHIElectronics.DUELink {
 
     public class DeviceConfiguration {
-        public bool IsPulse { get; internal set; } = false;
-        public bool IsPico { get; internal set; } = false;
-        public bool IsFlea { get; internal set; } = false;
-        public bool IsEdge { get; internal set; } = false;
-        public bool IsRave { get; internal set; } = false;
-
-        public bool IsTick { get; internal set; } = false;
-        public bool IsDue { get; internal set; } = false;
-        public uint MaxPinIO { get; set; }
-        public uint MaxPinAnalog { get; set; }
+        public uint MaxPinIO { get;  } = 27;
+        public uint MaxPinAnalog { get;  } = 10;
+        public uint MaxPinPWM { get; } = 9;
 
 
     }
     public partial class DUELinkController {
 
-        //public enum Pin {
-        //    ButtonA = 97,
-        //    ButtonB = 98,
-        //    Led = 108,
-        //}
 
         SerialInterface serialPort = default!;
 
@@ -78,20 +66,9 @@ namespace GHIElectronics.DUELink {
         public PulseController Pulse { get; internal set; }
         public CanController Can { get; internal set; }
         public SoundController Sound { get; internal set; }
+      
 
-        public BluetoothController Bluetooth { get; internal set; }
-
-        public string Version { get; internal set; } = string.Empty;
-
-        public bool IsPulse => this.DeviceConfig is null ? false : this.DeviceConfig.IsPulse;
-        public bool IsPico => this.DeviceConfig is null ? false : this.DeviceConfig.IsPico;
-        public bool IsFlea => this.DeviceConfig is null ? false : this.DeviceConfig.IsFlea;
-        public bool IsEdge => this.DeviceConfig is null ? false : this.DeviceConfig.IsEdge;
-        public bool IsRave => this.DeviceConfig is null ? false : this.DeviceConfig.IsRave;
-
-        public bool IsTick => this.DeviceConfig is null ? false : this.DeviceConfig.IsTick;
-
-        public bool IsDue => this.DeviceConfig is null ? false : this.DeviceConfig.IsDue;
+       
 
         public int MaxIO { get; internal set; }
         public int MaxAnalog { get; internal set; }
@@ -134,9 +111,6 @@ namespace GHIElectronics.DUELink {
             this.Pulse = new PulseController(this.serialPort);
             this.Can = new CanController(this.serialPort);
             this.Sound = new SoundController(this.serialPort);
-            this.Bluetooth = new BluetoothController(this.serialPort);
-
-            this.System.Version = this.Version;
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {
@@ -235,63 +209,11 @@ namespace GHIElectronics.DUELink {
             this.serialPort = new SerialInterface(comPort);
             this.serialPort.Connect();
 
-            this.Version = this.serialPort.GetVersion().Substring(0);
+            this.DeviceConfig = new DeviceConfiguration();
+            this.serialPort.DeviceConfig = this.DeviceConfig;
 
-            if (this.Version != null && this.Version != string.Empty && this.Version.Length == 7) {
 
-                this.DeviceConfig = new DeviceConfiguration();
-
-                if (this.Version[this.Version.Length - 1] == 'P') {
-                    this.DeviceConfig.IsPulse = true;
-                    this.DeviceConfig.MaxPinIO = 23;
-                    this.DeviceConfig.MaxPinAnalog = 29;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'I') {
-                    this.DeviceConfig.IsPico = true;
-                    this.DeviceConfig.MaxPinIO = 29;
-                    this.DeviceConfig.MaxPinAnalog = 29;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'F') {
-                    this.DeviceConfig.IsFlea = true;
-                    this.DeviceConfig.MaxPinIO = 11;
-                    this.DeviceConfig.MaxPinAnalog = 29;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'E') {
-                    this.DeviceConfig.IsEdge = true;
-                    this.DeviceConfig.MaxPinIO = 22;
-                    this.DeviceConfig.MaxPinAnalog = 11;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'R') {
-                    this.DeviceConfig.IsRave = true;
-                    this.DeviceConfig.MaxPinIO = 23;
-                    this.DeviceConfig.MaxPinAnalog = 29;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'T') {
-                    this.DeviceConfig.IsTick = true;
-                    this.DeviceConfig.MaxPinIO = 13;
-                    this.DeviceConfig.MaxPinAnalog = 11;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'D') {
-                    this.DeviceConfig.IsDue = true;
-                    this.DeviceConfig.MaxPinIO = 15;
-                    this.DeviceConfig.MaxPinAnalog = 10;
-
-                }
-                else {
-                    throw new Exception("Not support the version " + this.Version);
-                }
-
-                this.serialPort.DeviceConfig = this.DeviceConfig;
-            }
-            else {
-                throw new Exception("The device is not supported.");
-            }
+            
         }
 
         public void Disconnect() => this.serialPort.Disconnect();

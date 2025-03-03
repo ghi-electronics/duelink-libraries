@@ -17,34 +17,24 @@ namespace GHIElectronics.DUELink {
 
 
         }
+
+        public class Version {
+            public string Firmware;
+            public string ProductId;
+            public string Bootloader;
+        }
         public class SystemController {
 
             SerialInterface serialPort;
-            //DisplayController display;
-            
 
-            //int DISPLAY_MAX_LINES = 8;
-            //int DISPLAY_MAX_CHARACTER_PER_LINE = 21;
 
             public SystemController(SerialInterface serialPort) {
-                this.serialPort = serialPort;
+                this.serialPort = serialPort; ;
 
-                //this.UpdateDisplay(display);
+                ;
             }
 
-            //internal void UpdateDisplay(DisplayController display) {
-            //    this.display = display; 
-
-            //    DISPLAY_MAX_LINES = this.display.Height / 8;
-            //    DISPLAY_MAX_CHARACTER_PER_LINE = this.display.Width / 6;
-
-            //    print_posx = 0;
-
-            //    this.displayText = new string[DISPLAY_MAX_LINES];
-            //    for (var i = 0; i < DISPLAY_MAX_LINES; i++) {
-            //        displayText[i] = string.Empty;
-            //    }
-            //}
+            
 
             public void Reset(int option) {
 
@@ -100,92 +90,9 @@ namespace GHIElectronics.DUELink {
 
 
 
-            //string[] displayText;
+            
 
-            //int print_posx = 0;
-            //private void PrnChar(char c) {
-            //    if (print_posx == DISPLAY_MAX_CHARACTER_PER_LINE && c != '\r' && c != '\n')
-            //        return;
-
-
-            //    if (c == '\r' || c == '\n') {
-            //        print_posx = 0;
-
-            //        for (var i = 1; i < DISPLAY_MAX_LINES; i++) { // move up the last line
-            //            displayText[i - 1] = displayText[i];
-            //        }
-
-            //        displayText[DISPLAY_MAX_LINES - 1] = string.Empty;
-            //    }
-            //    else {
-            //        displayText[DISPLAY_MAX_LINES - 1] += c;
-            //        print_posx++;
-            //    }
-
-            //}
-
-            private void PrnText(string text, bool newline) {
-                //for (var i = 0; i < text.Length; i++) {
-                //    this.PrnChar(text[i]);
-                //}
-
-                //display.Clear(0);
-
-                //for (var i = 0; i < displayText.Length; i++) {
-                //    if (displayText[i] != string.Empty) {
-                //        display.DrawText(displayText[i], 1, 0, i * 8);
-                //    }
-
-                //}
-
-                //display.Show();
-
-                //if (newline) {
-                //    this.PrnChar('\r');
-                //}
-                
-                var cmd = string.Format(newline ? "println(\"{0}\")" : "print(\"{0}\")", text);
-
-                this.serialPort.WriteCommand(cmd);
-
-                var res = this.serialPort.ReadRespone();
-               
-            }
-            public bool Print(string text) {
-
-                Debug.Write(text);
-
-                this.PrnText(text, false);
-
-                return true;
-
-
-            }
-
-            public bool Print(int value) {
-                return this.Print(value.ToString());
-            }
-
-            public bool Print(bool value) {
-                return this.Print(value ? 1 : 0);
-            }
-
-            public bool Println(string text) {
-
-                Debug.WriteLine(text);
-
-                this.PrnText(text, true);
-
-                return true;
-            }
-
-            public bool Println(int value) {
-                return this.Println(value.ToString());
-            }
-
-            public bool Println(bool value) {
-                return this.Println(value ? 1 : 0);
-            }
+            
 
             public bool Wait(int millisecond) {
 
@@ -200,7 +107,43 @@ namespace GHIElectronics.DUELink {
                 return res.success;
             }
 
-            public string Version { get; internal set; }
+            //public string Version { get; internal set; }
+            public Version GetVersion() {
+                if (this._version == null) {
+                    var command = "version()";
+
+
+                    this.serialPort.WriteCommand(command);
+
+
+                    var response = this.serialPort.ReadRespone();
+
+
+                    if (response.success) {
+                        if (response.respone != null) {
+                            // echo is on=> need to turn off
+                            this._version = new Version();
+
+                            this.serialPort.TurnEchoOff();
+
+                            this.serialPort.DiscardInBuffer();
+                            this.serialPort.DiscardOutBuffer();
+
+                            var versions = response.respone.Substring(25).Split(':');
+
+                            this._version.Firmware = versions[0];
+                            this._version.ProductId = versions[1];
+                            this._version.Bootloader = versions[2];
+                            
+                        }
+                    }
+                }
+
+                return this._version;
+            }
+
+            private Version _version;
+
         }
     }
 }
