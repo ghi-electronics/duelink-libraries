@@ -104,16 +104,16 @@ namespace GHIElectronics.DUELink {
                     this.WriteCommand(command);
 
 
-                    var version = this.ReadRespone();
+                    var version = this.ReadResponse();
 
 
                     if (version.success) {
 
-                        if (version.respone != string.Empty && version.respone.Contains(command)) {
+                        if (version.response != string.Empty && version.response.Contains(command)) {
                             this.TurnEchoOff();
 
                         }
-                        if (version.respone != string.Empty && version.respone.Contains("GHI Electronics")) {
+                        if (version.response != string.Empty && version.response.Contains("GHI Electronics")) {
                             break;
                         }
                     }
@@ -137,21 +137,21 @@ namespace GHIElectronics.DUELink {
 
             this.WriteCommand("echo(0)");
 
-            this.ReadRespone();
+            this.ReadResponse();
 
             this.Echo = false;
 
 
         }
 
-        internal string RemoveEchoRespone(string respone, string cmd) {
+        //internal string RemoveEchoRespone(string respone, string cmd) {
 
-            if (respone.Contains(cmd)) {
-                respone = respone.Substring(cmd.Length, respone.Length - cmd.Length);
-            }
+        //    if (respone.Contains(cmd)) {
+        //        respone = respone.Substring(cmd.Length, respone.Length - cmd.Length);
+        //    }
 
-            return respone;
-        }
+        //    return respone;
+        //}
 
 
         //private void CheckResult(string actual, string expected)
@@ -175,11 +175,11 @@ namespace GHIElectronics.DUELink {
         }
 
 
-        public CmdRespone ReadRespone() {
+        public CmdResponse ReadResponse() {
             var str = this.leftOver;
             var end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks;
 
-            var respone = new CmdRespone();
+            var response = new CmdResponse();
 
 
             lock (this.objlock) {
@@ -214,19 +214,19 @@ namespace GHIElectronics.DUELink {
 
                         this.leftOver = str.Substring(idx + 1);
 
-                        respone.success = true;
-                        respone.respone = str.Substring(0, idx);
+                        response.success = true;
+                        response.response = str.Substring(0, idx);
 
                         //return str.Substring(0, idx);
                         var idx3 = str.IndexOf("!");
 
                         if (idx3 != -1) {
                             //respone.respone = respone.respone.Substring(0, respone.respone);
-                            respone.success = false;
+                            response.success = false;
                         }
 
 
-                        return respone;
+                        return response;
                     }
 
                 }
@@ -237,17 +237,17 @@ namespace GHIElectronics.DUELink {
                 this.port.DiscardOutBuffer();
             }
 
-            respone.success = false;
-            respone.respone = string.Empty;
+            response.success = false;
+            response.response = string.Empty;
 
-            return respone;
+            return response;
         }
 
-        public CmdRespone ReadRespone2() {
+        public CmdResponse ReadResponse2() {
             var str = this.leftOver;
             var end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks;
 
-            var respone = new CmdRespone();
+            var response = new CmdResponse();
 
 
             lock (this.objlock) {
@@ -282,19 +282,19 @@ namespace GHIElectronics.DUELink {
 
                         this.leftOver = str.Substring(idx + 1);
 
-                        respone.success = true;
-                        respone.respone = str.Substring(0, idx);
+                        response.success = true;
+                        response.response = str.Substring(0, idx);
 
                         //return str.Substring(0, idx);
                         var idx3 = str.IndexOf("!");
 
-                        if (idx3 != -1 && (respone.respone.Contains("error") || respone.respone.Contains("unknown"))) {
+                        if (idx3 != -1 && (response.response.Contains("error") || response.response.Contains("unknown"))) {
                             //respone.respone = respone.respone.Substring(0, respone.respone);
-                            respone.success = false;
+                            response.success = false;
                         }
 
 
-                        return respone;
+                        return response;
                     }
 
                 }
@@ -305,10 +305,10 @@ namespace GHIElectronics.DUELink {
                 this.port.DiscardOutBuffer();
             }
 
-            respone.success = false;
-            respone.respone = string.Empty;
+            response.success = false;
+            response.response = string.Empty;
 
-            return respone;
+            return response;
         }
 
 
@@ -436,8 +436,8 @@ namespace GHIElectronics.DUELink {
         //    return string.Empty;
         //}
 
-        public class CmdRespone {
-            public string respone;
+        public class CmdResponse {
+            public string response;
             public bool success;
         };
 

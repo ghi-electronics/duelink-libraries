@@ -35,7 +35,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 return res.success;
 

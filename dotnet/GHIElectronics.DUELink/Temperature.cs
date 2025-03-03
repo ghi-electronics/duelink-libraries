@@ -30,11 +30,11 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var response = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadResponse();
 
                 if (response.success) {
                     try {
-                        var value = float.Parse(response.respone);
+                        var value = float.Parse(response.response);
 
                         return value;
                     }

@@ -19,10 +19,10 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var response = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadResponse();
 
                 if (response.success)
-                    return response.respone.ToString();
+                    return response.response.ToString();
 
                 throw new Exception("Run failed");                
 
@@ -33,7 +33,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var response = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadResponse();
 
                 return response.success;
 
@@ -45,7 +45,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var response = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadResponse();
 
                 if (!response.success)
                     throw new Exception("Unable to erase the chip memory.");
@@ -63,7 +63,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 if (!res.success) {
                     return false;
@@ -71,7 +71,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteRawData(data, 0, data.Length);
 
-                res = this.serialPort.ReadRespone();
+                res = this.serialPort.ReadResponse();
        
                 return res.success;
             }            
@@ -80,10 +80,10 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var response = this.serialPort.ReadRespone2();
+                var response = this.serialPort.ReadResponse2();
 
 
-                return response.respone;
+                return response.response;
 
             }
 
@@ -92,7 +92,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var respone = this.serialPort.ReadRespone();
+                var respone = this.serialPort.ReadResponse();
 
                 return respone.success;
             }

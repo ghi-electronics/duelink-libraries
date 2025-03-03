@@ -24,11 +24,11 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 if (res.success) {
                     try {
-                        var distance = float.Parse(res.respone);
+                        var distance = float.Parse(res.response);
                         return distance;
                     }
                     catch {

@@ -19,7 +19,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
             }
 
             public bool Write(byte address, byte[] data) => this.WriteRead(address, data, 0, data.Length, null, 0, 0);
@@ -60,7 +60,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 return res.success;
             }

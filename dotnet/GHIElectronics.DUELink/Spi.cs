@@ -53,7 +53,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 return res.success;
 
@@ -70,7 +70,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
                 return res.success;
             }
 
@@ -79,11 +79,11 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var response = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadResponse();
 
                 if (response.success) {                    
                     try {
-                        var value = int.Parse(response.respone);
+                        var value = int.Parse(response.response);
 
                         return (int)value;
                     }

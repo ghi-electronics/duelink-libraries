@@ -51,11 +51,11 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 if (res.success) {
                     try {
-                        var tick = int.Parse(res.respone);
+                        var tick = int.Parse(res.response);
                         return tick;
                     }
                     catch {
@@ -72,11 +72,11 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 if (res.success) {
                     try {
-                        var tick = int.Parse(res.respone);
+                        var tick = int.Parse(res.response);
                         return tick;
                     }
                     catch {
@@ -96,11 +96,11 @@ namespace GHIElectronics.DUELink {
                     this.serialPort.WriteCommand(command);
 
 
-                    var response = this.serialPort.ReadRespone();
+                    var response = this.serialPort.ReadResponse();
 
 
                     if (response.success) {
-                        if (response.respone != null) {
+                        if (response.response != null) {
                             // echo is on=> need to turn off
                             this._version = new Version();
 
@@ -109,7 +109,7 @@ namespace GHIElectronics.DUELink {
                             this.serialPort.DiscardInBuffer();
                             this.serialPort.DiscardOutBuffer();
 
-                            var versions = response.respone.Substring(25).Split(':');
+                            var versions = response.response.Substring(25).Split(':');
 
                             this._version.Firmware = versions[0];
                             this._version.ProductId = versions[1];

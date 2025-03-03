@@ -64,7 +64,7 @@ namespace GHIElectronics.DUELink {
 
         public HumidityController Humidity { get; internal set; }
 
-        public PulseController Pulse { get; internal set; }
+
 
         public SoundController Sound { get; internal set; }
       
@@ -109,7 +109,7 @@ namespace GHIElectronics.DUELink {
             this.Humidity = new HumidityController(this.serialPort);
             this.System = new SystemController(this.serialPort);
 
-            this.Pulse = new PulseController(this.serialPort);
+
 
             this.Sound = new SoundController(this.serialPort);
         }

@@ -20,7 +20,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 return res.success;
 
@@ -35,14 +35,14 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd_dim_array);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 for (var i = 0; i < notes.Length; i++) {
                     cmd_dim_array = string.Format("a1[{0}] = {1}", (i), notes[i]);
 
                     this.serialPort.WriteCommand(cmd_dim_array);
 
-                    res = this.serialPort.ReadRespone();
+                    res = this.serialPort.ReadResponse();
 
                     if (!res.success) {
                         break;
@@ -55,7 +55,7 @@ namespace GHIElectronics.DUELink {
 
                     this.serialPort.WriteCommand(cmd);
 
-                    res = this.serialPort.ReadRespone();
+                    res = this.serialPort.ReadResponse();
 
                   
                 }
@@ -64,7 +64,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd_dim_array);
 
-                res = this.serialPort.ReadRespone();
+                res = this.serialPort.ReadResponse();
 
                 return res.success;
 
@@ -79,7 +79,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
             }
         }
     }

@@ -17,13 +17,13 @@ namespace GHIElectronics.DUELink {
                 var cmd = "irread()";
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
                 var val = 255;
                 if (res.success) {
                    
 
                     try {
-                        val = int.Parse(res.respone);
+                        val = int.Parse(res.response);
                     }
                     catch { }
                 }
@@ -42,7 +42,7 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 if (res.success) {
                     return true;
