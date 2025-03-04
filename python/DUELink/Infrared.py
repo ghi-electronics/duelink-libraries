@@ -16,8 +16,8 @@ class InfraredController:
 
     def Enable(self, pin:int, enable: bool):
         
-        if pin < 0 or pin > self.serialPort.DeviceConfig.MaxPinIO:
-            raise ValueError("Invalid pin. Enter a pin between 0-27.")
+        if pin != 0:
+            raise ValueError("IR is only available on pin 0")
         
         cmd = f"iren({pin}, {int(enable)})"
         self.serialPort.WriteCommand(cmd)

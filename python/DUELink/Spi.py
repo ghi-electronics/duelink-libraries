@@ -18,8 +18,8 @@ class SpiController:
         if not isinstance(mode, int) or mode not in {0,1,2,3}:
             raise ValueError("Invalid mode. Enter an integer between 0-3.")
         
-        if not isinstance(frequency, int) or (not 200 <= frequency <= 20000):
-            raise ValueError("Invalid frequency. Enter an integer between 200-20000.")
+        if not isinstance(frequency, int) or (not 200 <= frequency <= 24000):
+            raise ValueError("Invalid frequency. Enter an integer between 200-24000.")
     
         cmd = f"spicfg({mode}, {frequency})"
         self.serialPort.WriteCommand(cmd)
@@ -42,15 +42,12 @@ class SpiController:
 
     #     return self.WriteRead(None, 0, 0, dataRead, offset, length, chipselect)
 
-    def WriteRead(self, dataWrite: Optional[bytes], offsetWrite: int, countWrite: int) -> bool:
+    def WriteRead(self, dataWrite: Optional[bytes], dataRead: Optional[bytes]) -> bool:
 
-        if (dataWrite is None) or (countWrite == 0):
-            raise ValueError("Invalid arguments")
 
-        # if dataWrite is not None and offsetWrite + countWrite > len(dataWrite):
-        #     raise ValueError("Invalid arguments")
 
-        cmd = f"spiwrs({dataWrite},{offsetWrite},{countWrite})"
+
+        cmd = f"spiwrs({dataWrite},{dataRead})"
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
