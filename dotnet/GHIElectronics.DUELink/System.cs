@@ -120,6 +120,30 @@ namespace GHIElectronics.DUELink {
                 return this._version;
             }
 
+            public int Info(int code) {
+                var cmd = string.Format("info({0})", code.ToString());
+
+                this.serialPort.WriteCommand(cmd);
+
+                var response = this.serialPort.ReadResponse();
+
+                if (response.success) {
+
+
+                    try {
+                        var value = int.Parse(response.response);
+
+                        return value;
+                    }
+                    catch { }
+
+
+                }
+
+                return 0;
+
+            }
+
             private Version _version;
 
         }

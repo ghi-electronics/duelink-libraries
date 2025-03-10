@@ -1242,6 +1242,20 @@ class SystemController {
 
     return this.version;
   }
+
+  async Info(code) {
+    const command = `info(${code})`;
+    await this.serialPort.WriteCommand(cmd);
+    let res = await this.serialPort.ReadResponse();
+    if (res.success) {
+      try {
+        return parseInt(res.response);
+      } catch {}
+    }
+    return -1;
+
+  }
+
 }
 
 class TemperatureController {

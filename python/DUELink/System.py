@@ -67,6 +67,22 @@ class SystemController:
 
         return version_firmware, prod_id, version_boot_loader
     
+    def Info(self, code):
+        cmd = f"info({code})"
+        self.serialPort.WriteCommand(cmd)
+
+        respone = self.serialPort.ReadRespone()
+
+        if respone.success:            
+            try:
+                value = int(respone.respone)
+                return value
+            except:
+                pass
+
+        return 0
+
+    
 
 
 
