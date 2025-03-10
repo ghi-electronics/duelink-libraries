@@ -1,4 +1,4 @@
-export { SerialInterface, DUELinkController, CanMessage };
+export { SerialInterface, DUELinkController };
 import { Util } from "./util.js";
 
 class SerialInterface {
@@ -6,7 +6,6 @@ class SerialInterface {
   isBrowser = false;
   static CommandCompleteText = ">";
   static Decoder = new TextDecoder();
-  version = "0.0";
 
   constructor(serial) {
     this.DeviceConfig = null;
@@ -52,11 +51,23 @@ class SerialInterface {
       this.portName.resetInputBuffer();
       this.portName.resetOutputBuffer();
       try {
-        const version = await this.GetVersion();
-        if (version != "" && version[2] == "." && version[4] == ".") {
-          this.isReady = true;
-          break;
+        let cmd = "version()";
+
+        await this.WriteCommand(cmd);
+        let res = await this.ReadResponse();
+
+        if (res.success) {
+          if (res.response && res.response.includes(cmd)) {
+            await this.TurnEchoOff()
+          }
+
+          if (res.response && res.response.includes("GHI Electronics")) {
+            break;          
+          }
+
         }
+
+        
       } catch {}
       tryCount -= 1;
       await Util.sleep(10);
@@ -73,33 +84,6 @@ class SerialInterface {
     this.echo = false;
   }
 
-  async GetVersion() {
-    const command = "version()";
-    await this.WriteCommand(command);
-
-    const version = await this.ReadResponse();
-
-    if (version.success) {
-      if (this.echo && version.response.includes(command)) {
-        // echo is on => need to turn off
-        await this.TurnEchoOff();
-        this.portName.resetInputBuffer();
-        this.portName.resetOutputBuffer();
-        version.response = version.response.slice(command.length);
-      }
-      this.version = version.response;
-    }
-
-    return version.response;
-  }
-
-  RemoveEchoresponse(response, cmd) {
-    if (cmd in response) {
-      response = response.slice(cmd.length);
-    }
-
-    return response;
-  }
 
   DiscardInBuffer() {
     this.portName.resetInputBuffer();
@@ -271,17 +255,10 @@ class Cmdresponse {
 }
 
 class DeviceConfiguration {
-  constructor() {
-    this.IsPulse = false;
-    this.IsFlea = false;
-    this.IsPico = false;
-    this.IsEdge = false;
-    this.IsRave = false;
-    this.IsTick = false;
-    this.IsDue = false;
+  constructor() {   
     this.MaxPinIO = 27;
     this.PWMPins = new Set([1, 2, 3, 4, 5, 6, 7, 8, 11]);
-    this.AnalogPins = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 17]);
+    this.AnalogPins = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 23]);
     this.InterruptPins = new Set([1, 2, 3, 4, 5, 6, 7, 12]);
   }
 }
@@ -289,12 +266,12 @@ class DeviceConfiguration {
 class AnalogController {
   constructor(serialPort) {
     this.serialPort = serialPort;
-    this.Fixed_Frequency = 50;
   }
 
-  async Read(pin) {
-    if (!this.serialPort.DeviceConfig.AnalogPins.has(pin)) {
-      throw new Error("Invalid pin. Please enter a valid analog pin.");
+  async VRead(pin) {  
+    if (!this.serialPort.DeviceConfig.AnalogPins.has(pin))
+    {
+      throw new Error("Invalid pin");
     }
 
     const cmd = `vread(${pin})`;
@@ -312,103 +289,43 @@ class AnalogController {
     return -1;
   }
 
-  // async Write(pin, duty_cycle) {
-  //   if (pin === "l" || pin === "L") {
-  //     pin = 108;
-  //   }
+  async PWrite(pin, dc) {
+    if (!this.serialPort.DeviceConfig.AnalogPins.has(pin)) {
+      throw new Error("Invalid pin");
+    }
 
-  //   if (
-  //     pin < 0 ||
-  //     (pin >= this.serialPort.DeviceConfig.MaxPinIO && pin !== 108)
-  //   ) {
-  //     throw new Error("Invalid pin");
-  //   }
+    if (dc < 0 || dc > 1) {
+      throw new Error("Duty cycle must be in the range 0.0 ... 1.0");
+    }
 
-  //   if (duty_cycle < 0 || duty_cycle > 1000) {
-  //     throw new Error("Duty cycle must be in the range 0..1000");
-  //   }
+    const cmd = `pwrite(${pin}, ${dc})`;
+    await this.serialPort.WriteCommand(cmd);
 
-  //   const cmd = `pwrite(${pin}, ${duty_cycle})`;
-  //   await this.serialPort.WriteCommand(cmd);
+    const res = await this.serialPort.ReadResponse();
 
-  //   const res = await this.serialPort.ReadResponse();
+    if (res.success) {
+      return true;
+    }
 
-  //   if (res.success) {
-  //     return true;
-  //   }
-
-  //   return false;
-  // }
+    return false;
+  }
 }
 
-class BluetoothController {
-  constructor(serialPort) {
-    this.serialPort = serialPort;
-  }
 
-  async SetName(name) {
-    if (typeof name != "string") {
-      throw new Error("Invalid name");
-    }
-
-    const cmd = `wname("${name}", ${name.length})`;
-
-    await this.serialPort.WriteCommand(cmd);
-
-    await Util.sleep(6000); // Bluetooth reset take ~6 seconds
-
-    const res = await this.serialPort.ReadResponse();
-
-    return res.success;
-  }
-
-  async SetSpeed(speed) {
-    if (speed != 115200 && speed != 9600) {
-      throw new Error("Support speed 9600 or 115200 only");
-    }
-
-    const cmd = `wspeed("${speed}")`;
-
-    await this.serialPort.WriteCommand(cmd);
-    const res = await this.serialPort.ReadResponse();
-
-    return res.success;
-  }
-
-  async SetPinCode(pinCode) {
-    if (typeof pinCode != "string" || pinCode.length != 4) {
-      throw new Error("Invalid pinCode");
-    }
-
-    const cmd = `wcode("${pinCode}")`;
-
-    await this.serialPort.WriteCommand(cmd);
-
-    await Util.sleep(6000); // Bluetooth reset take ~6 seconds
-
-    const res = await this.serialPort.ReadResponse();
-
-    return res.success;
-  }
-}
 
 class ButtonController {
   constructor(serialPort) {
     this.serialPort = serialPort;
   }
 
-  IsButtonValid(pin) {
-    if (!this.serialPort.DeviceConfig.InterruptPins.has(pin)) {
-      return false;
-    }
-
-    return true;
-  }
-
   async Enable(pin, enable) {
-    // if (this.IsButtonValid(pin) == false) {
-    //   throw new Error("Invalid pin. Please enter an interrupt capable pin.");
-    // }
+    if (
+      typeof pin !== "number" ||
+      pin < 0 ||
+      (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+    ) {
+      throw new Error("Invalid pin");
+    }
 
     const cmd = `btnen(${pin}, ${Number(enable)})`;
 
@@ -419,10 +336,13 @@ class ButtonController {
   }
 
   async Down(pin) {
-    // if (IsButtonValid(pin) == false) {
-    //   throw new Error("Invalid pin. Please enter a valid interrupt pin.");
-    // }
-
+    if (
+      typeof pin !== "number" ||
+      pin < 0 ||
+      (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+    ) {
+      throw new Error("Invalid pin");
+    }
     const cmd = `btndown(${pin})`;
 
     await this.serialPort.WriteCommand(cmd);
@@ -436,14 +356,18 @@ class ButtonController {
       }
     }
 
-    console.log("Press ERROR");
     return false;
   }
 
   async Up(pin) {
-    // if (IsButtonValid(pin) == false) {
-    //   throw new Error("Invalid pin. Please enter a valid interrupt pin.");
-    // }
+
+    if (
+      typeof pin !== "number" ||
+      pin < 0 ||
+      (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+    ) {
+      throw new Error("Invalid pin");
+    }
 
     const cmd = `btnup(${pin})`;
 
@@ -460,135 +384,6 @@ class ButtonController {
   }
 }
 
-class CanMessage {
-  constructor(id, extended, remoteRequest, data, offset, length) {
-    this.Id = id;
-    this.Extended = extended;
-    this.RemoteRequest = remoteRequest;
-    this.Length = length;
-    this.Data = new Uint8Array(8);
-
-    for (let i = offset; i < offset + length; i++) {
-      this.Data[i - offset] = data[i];
-    }
-  }
-}
-
-class CanController {
-  constructor(serialPort) {
-    this.serialPort = serialPort;
-  }
-
-  async Initialize(bitrate) {
-    if (
-      bitrate != 125000 &&
-      bitrate != 250000 &&
-      bitrate != 500000 &&
-      bitrate != 1000000
-    )
-      throw new Error("Bit rate must be 125_000, 250_000, 500_000, 1000_000");
-
-    const cmd = `caninit(${bitrate})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    const response = await this.serialPort.ReadResponse();
-
-    return response.success;
-  }
-
-  async InitializeExt(phase1, phase2, prescaler, synchronizationJumpWidth) {
-    const cmd = `caninitext(${phase1}, ${phase2}, ${prescaler}, ${synchronizationJumpWidth})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    const response = await this.serialPort.ReadResponse();
-
-    return response.success;
-  }
-
-  async Available() {
-    const cmd = `canavailable()`;
-
-    await this.serialPort.WriteCommand(cmd);
-    const res = await this.serialPort.ReadResponse();
-
-    if (res.success) {
-      try {
-        return parseInt(res.response);
-      } catch {}
-    }
-
-    return -1;
-  }
-
-  async Write(message) {
-    let data = new Uint8Array(16);
-
-    data[0] = (message.Id >> 24) & 0xff;
-    data[1] = (message.Id >> 16) & 0xff;
-    data[2] = (message.Id >> 8) & 0xff;
-    data[3] = (message.Id >> 0) & 0xff;
-
-    if (!message.Extended) data[4] = 0;
-    else data[4] = 1;
-
-    if (!message.RemoteRequest) data[5] = 0;
-    else data[5] = 1;
-
-    data[6] = message.Length;
-    data[7] = 0;
-
-    for (let i = 0; i < 8; i++) {
-      data[i + 8] = message.Data[i];
-    }
-
-    const cmd = `canwritestream()`;
-
-    await this.serialPort.WriteCommand(cmd);
-    const res = await this.serialPort.ReadResponse();
-
-    if (!res.success) {
-      throw new Exception("CAN write error: " + res.respone);
-    }
-
-    await this.serialPort.WriteRawData(data, 0, data.length);
-
-    const res2 = await this.serialPort.ReadResponse();
-
-    return res2.success;
-  }
-
-  async Read() {
-    const cmd = `canreadstream()`;
-
-    await this.serialPort.WriteCommand(cmd);
-    const res = await this.serialPort.ReadResponse();
-
-    if (!res.success) {
-      throw new Exception("CAN read error: " + res.respone);
-    }
-
-    let data = new Uint8Array(16);
-
-    await this.serialPort.ReadRawData(data, 0, data.length);
-
-    let id = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
-
-    let message = new CanMessage(
-      id,
-      data[4] > 0 ? true : false,
-      data[5] > 0 ? true : false,
-      data,
-      8,
-      data[6]
-    );
-
-    const res2 = await this.serialPort.ReadResponse();
-
-    if (res2.success) return message;
-
-    return null;
-  }
-}
 
 class DigitalController {
   constructor(serialPort) {
@@ -599,11 +394,9 @@ class DigitalController {
     if (
       typeof pin !== "number" ||
       pin < 0 ||
-      pin > this.serialPort.DeviceConfig.MaxPinIO
+      (pin >= this.serialPort.DeviceConfig.MaxPinIO)
     ) {
-      throw new Error(
-        `Invalid pin. Please enter a pin between 0-${this.serialPort.DeviceConfig.MaxPinIO}`
-      );
+      throw new Error("Invalid pin");
     }
 
     if (typeof pull !== "number" || ![0, 1, 2].includes(pull)) {
@@ -626,10 +419,12 @@ class DigitalController {
   }
 
   async Write(pin, value) {
-    if (pin < 0 || pin > this.serialPort.DeviceConfig.MaxPinIO) {
-      throw new Error(
-        `Invalid pin. Please enter a pin between 0-${this.serialPort.DeviceConfig.MaxPinIO}`
-      );
+   if (
+      typeof pin !== "number" ||
+      pin < 0 ||
+      (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+    ) {
+      throw new Error("Invalid pin");
     }
 
     const cmd = `dwrite(${pin},${value ? 1 : 0})`;
@@ -1241,15 +1036,23 @@ class DistanceSensorController {
   }
 
   async Read(pulsePin, echoPin) {
-    if (pulsePin < 0 || pulsePin >= this.serialPort.DeviceConfig.MaxPinIO) {
+    if (
+      typeof pulsePin !== "number" ||
+      pulsePin < 0 ||
+      (pulsePin >= this.serialPort.DeviceConfig.MaxPinIO)
+    ) {
       throw new Error("Invalid pin");
     }
 
-    if (echoPin >= this.serialPort.DeviceConfig.MaxPinIO) {
+    if (
+      typeof echoPin !== "number" ||
+      echoPin < 0 ||
+      (echoPin >= this.serialPort.DeviceConfig.MaxPinIO)
+    ) {
       throw new Error("Invalid pin");
-    }
+    } 
 
-    const cmd = `distance(${pulsePin},${echoPin})`;
+    const cmd = `dist(${pulsePin},${echoPin})`;
     await this.serialPort.WriteCommand(cmd);
 
     const res = await this.serialPort.ReadResponse();
@@ -1259,7 +1062,7 @@ class DistanceSensorController {
         const distance = parseFloat(res.response);
         return distance;
       } catch (error) {
-        // do nothing
+
       }
     }
 
@@ -1274,24 +1077,26 @@ class FrequencyController {
     this.MinFrequency = 15;
   }
 
-  async Write(pin, frequency, duration_ms = 0, dutycyle = 50) {
+  async Write(pin, frequency, duration_ms = 0, dc = 0.5) {
+    if (
+      typeof pin !== "number" ||
+      pin < 0 ||
+      (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+    ) {
+      throw new Error("Invalid pin");
+    }
+
     if (frequency < this.MinFrequency || frequency > this.MaxFrequency) {
-      throw new Error("Frequency must be in range 15Hz..10000000Hz");
+      throw new Error("Frequency must be in range 15Hz...10000000Hz");
+    }
+   
+
+    if (dc < 0 || dc > 1) {
+      throw new Error("dutycyle must be in range 0.0...1.0");
     }
 
-    if (duration_ms > 99999999) {
-      throw new Error("duration_ms must be in range 0..99999999");
-    }
 
-    if (dutycyle < 0 || dutycyle > 100) {
-      throw new Error("dutycyle must be in range 0..100");
-    }
-
-    if (pin == "p" || pin == "P") {
-      pin = 112;
-    }
-
-    let cmd = `freq(${pin}, ${frequency}, ${duration_ms}, ${dutycyle})`;
+    let cmd = `freq(${pin}, ${frequency}, ${duration_ms}, ${dc})`;
     await this.serialPort.WriteCommand(cmd);
 
     let res = await this.serialPort.ReadResponse();
@@ -1300,13 +1105,21 @@ class FrequencyController {
   }
 }
 
-class HudimityController {
+class HumidityController {
   constructor(serialPort) {
     this.serialPort = serialPort;
   }
 
   async Read(pin, sensortype) {
-    let cmd = `humidity(${pin},${sensortype})`;
+    if (
+      typeof pin !== "number" ||
+      pin < 0 ||
+      (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+    ) {
+      throw new Error("Invalid pin");
+    }
+
+    let cmd = `humid(${pin},${sensortype})`;
     await this.serialPort.WriteCommand(cmd);
 
     let res = await this.serialPort.ReadResponse();
@@ -1365,27 +1178,20 @@ class I2cController {
       throw new Error("Invalid range for dataRead");
     }
 
-    const cmd = `i2cstream(${address},${countWrite},${countRead})`;
-    await this.serialPort.WriteCommand(cmd);
+    let write_array = "[";
 
-    if (countWrite > 0) {
-      const res = await this.serialPort.ReadResponse();
-
-      if (!res.success) {
-        throw new Error("I2c error:" + res.response);
-      }
-
-      await this.serialPort.WriteRawData(dataWrite, offsetWrite, countWrite);
+    for (let i = 0; i < countWrite; i++) {
+      write_array += dataWrite[i];
+  
+      if (i < countWrite - 1)
+          write_array += ",";
     }
 
-    if (countRead > 0) {
-      if (
-        (await this.serialPort.ReadRawData(dataRead, offsetRead, countRead)) !==
-        countRead
-      ) {
-        throw new Error("I2C read raw data error.");
-      }
-    }
+    write_array += "]";
+
+    // I2C write only
+    const cmd = `i2cwr(${address},${write_array},0)`;
+    await this.serialPort.WriteCommand(cmd);    
 
     const res = await this.serialPort.ReadResponse();
     return res.success;
@@ -1411,17 +1217,11 @@ class InfraredController {
     return -1;
   }
 
-  async Enable(pin, enable) {
-    let en = 0;
+  async Enable(pin, enable) {        
+    if (pin != 0)
+      throw new Error("IR is only available on pin 0");
 
-    if (enable === true) {
-      en = 1;
-    }
-
-    if (pin != 2 && pin != 8)
-      throw new Error("IR is only available on pin 2 and 8");
-
-    const cmd = `irenable(${pin}, ${en})`;
+    const cmd = `iren(${pin}, ${Number(enable)})`;
     await this.serialPort.WriteCommand(cmd);
 
     const res = await this.serialPort.ReadResponse();
@@ -1448,287 +1248,46 @@ class LedController {
   }
 }
 
-class NeoController {
-  MAX_LED_NUM = 1024;
-
+class EngineController {
   constructor(serialPort) {
     this.serialPort = serialPort;
-    this.SupportLedNumMax = this.MAX_LED_NUM;
+
   }
 
-  async Show(pin, count) {
-    const cmd = `neoshow(${pin}, ${count})`;
-    await this.serialPort.WriteCommand(cmd);
+  async Record(script) {
 
-    // each led need 1.25us delay blocking mode
-    const delay = (this.MAX_LED_NUM * 3 * 8 * 1.25) / 1000000;
-    /*setTimeout(async () => {
-            const res = await this.serialPort.ReadResponse();
-            return res.success;
-        }, delay);*/
+    await this.serialPort.WriteCommand("new");
 
-    await new Promise((resolve) => setTimeout(resolve, delay));
-    const res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
+    const response_new = await this.serialPort.ReadResponse();
 
-  async Clear() {
-    const cmd = "neoclear()";
-    await this.serialPort.WriteCommand(cmd);
+    if (response_new.success) {      
 
-    const res = await this.serialPort.ReadResponse();
+      const cmd = "pgmstream()";
 
-    return res.success;
-  }
+      const raw = new TextEncoder().encode(script);
 
-  async SetColor(id, color) {
-    const red = (color >> 16) & 0xff;
-    const green = (color >> 8) & 0xff;
-    const blue = (color >> 0) & 0xff;
+      const data = new Uint8Array(raw.length + 1);
 
-    if (id < 0 || id > this.MAX_LED_NUM) {
-      return false;
-    }
+      data[raw.length] = 0; // stop the stream
 
-    const cmd = `neoset(${id},${red},${green},${blue})`;
-    await this.serialPort.WriteCommand(cmd);
+      data.set(raw, 0);
 
-    const res = await this.serialPort.ReadResponse();
-
-    return res.success;
-  }
-
-  async SetRGB(id, red, green, blue) {
-    if (id < 0 || id > this.MAX_LED_NUM) {
-      return false;
-    }
-
-    const cmd = `neoset(${id},${red},${green},${blue})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-
-    return res.success;
-  }
-
-  async SetMultiple(pin, color) {
-    if (color.length > this.MAX_LED_NUM) {
-      return false;
-    }
-
-    const length = color.length;
-    let offset = 0;
-
-    const data = new Uint8Array(length * 3);
-
-    for (let i = offset; i < length + offset; i++) {
-      data[(i - offset) * 3 + 0] = (color[i] >> 16) & 0xff;
-      data[(i - offset) * 3 + 1] = (color[i] >> 8) & 0xff;
-      data[(i - offset) * 3 + 2] = (color[i] >> 0) & 0xff;
-    }
-
-    const cmd = `neostream(${pin}, ${data.length})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-
-    if (res.success) {
-      this.serialPort.WriteRawData(data, 0, data.length);
-      const res2 = await this.serialPort.ReadResponse();
-      return res2.success;
-    }
-
-    return res.success;
-  }
-}
-
-class PinController {
-  constructor() {}
-
-  __get_button_a() {
-    return 97;
-  }
-
-  __get_button_b() {
-    return 98;
-  }
-
-  __get_button_up() {
-    return 85;
-  }
-
-  __get_button_down() {
-    return 68;
-  }
-
-  __get_button_left() {
-    return 76;
-  }
-
-  __get_button_right() {
-    return 82;
-  }
-
-  __get_led() {
-    return 108;
-  }
-
-  __get_piezo() {
-    return 112;
-  }
-
-  __get_pullnone() {
-    return 0;
-  }
-
-  __get_pullup() {
-    return 1;
-  }
-
-  __get_pulldown() {
-    return 2;
-  }
-
-  __set_empty(value) {
-    return;
-  }
-
-  get ButtonA() {
-    return this.__get_button_a();
-  }
-
-  get ButtonB() {
-    return this.__get_button_b();
-  }
-
-  get ButtonUp() {
-    return this.__get_button_up();
-  }
-
-  get ButtonDown() {
-    return this.__get_button_down();
-  }
-
-  get ButtonLeft() {
-    return this.__get_button_left();
-  }
-
-  get ButtonRight() {
-    return this.__get_button_right();
-  }
-
-  get Led() {
-    return this.__get_led();
-  }
-
-  get Piezo() {
-    return this.__get_piezo();
-  }
-
-  get PullNone() {
-    return this.__get_pullnone();
-  }
-
-  get PullUp() {
-    return this.__get_pullup();
-  }
-
-  get PullDown() {
-    return this.__get_pulldown();
-  }
-}
-
-class ScriptController {
-  constructor(serialPort) {
-    this.serialPort = serialPort;
-    this.loadscript = "";
-  }
-
-  async New() {
-    this.loadscript = "";
-    const cmd = "new";
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-
-    return res.success;
-  }
-
-  async Load(script) {
-    this.loadscript += script;
-    this.loadscript += "\n";
-  }
-
-  async Record() {
-    if (this.loadscript === "") {
-      throw new Error("No script for recording.");
-    }
-
-    const script = this.loadscript;
-
-    const cmd = "pgmstream()";
-
-    const raw = new TextEncoder().encode(script);
-
-    const data = new Uint8Array(raw.length + 1);
-
-    data[raw.length] = 0;
-
-    data.set(raw, 0);
-
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-
-    if (res.success === false) {
-      return false;
-    }
-
-    this.serialPort.WriteRawData(data, 0, data.length);
-
-    const res2 = await this.serialPort.ReadResponse();
-
-    this.loadscript = "";
-    return res2.success;
-  }
-
-  async __Load2(script) {
-    let ret = true;
-    const cmd = "$";
-    await this.serialPort.WriteCommand(cmd);
-    await Util.sleep(1);
-    script = script.replace("\r", "");
-
-    let startIdx = 0;
-
-    for (let i = 0; i < script.length; i++) {
-      let subscript = "";
-
-      if (script[i] === "\n") {
-        subscript = script.substring(startIdx, i - startIdx);
-        startIdx = i + 1;
-      } else if (i === script.length - 1) {
-        subscript = script.substring(startIdx, i - startIdx + 1);
-      }
-
-      await this.serialPort.WriteCommand(subscript);
+      await this.serialPort.WriteCommand(cmd);
 
       const res = await this.serialPort.ReadResponse();
 
       if (res.success === false) {
-        ret = false;
-        break;
+        return false;
       }
+
+      this.serialPort.WriteRawData(data, 0, data.length);
+
+      const res2 = await this.serialPort.ReadResponse();
+
+      return res2.success;
     }
-
-    const cmd2 = ">";
-    await this.serialPort.WriteCommand(cmd2);
-
-    const res2 = await this.serialPort.ReadResponse();
-
-    return ret && res2.success;
   }
-
+  
   async Read() {
     const cmd = "list";
 
@@ -1756,18 +1315,16 @@ class ServoController {
   }
 
   async Set(pin, position) {
-    if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO) {
-      console.log("Invalid pin");
-      //throw new ValueError('Invalid pin');
-      return false;
-    }
-    if (position < 0 || position > 180) {
-      //throw new ValueError('Position must be in the range 0..180');
-      console.log("Position must be in the range 0..180");
-      return false;
+    if (!this.serialPort.DeviceConfig.PWMPins.has(pin))
+    {
+      throw new Error("Invalid pin");
     }
 
-    const cmd = `servoset(${pin}, ${position})`;
+    if (position < 0 || position > 180) {
+      throw new ValueError('Position must be in the range 0..180');            
+    }
+
+    const cmd = `servost(${pin}, ${position})`;
     await this.serialPort.WriteCommand(cmd);
 
     const response = await this.serialPort.ReadResponse();
@@ -1782,6 +1339,14 @@ class SoundController {
   }
 
   async Beep(pin, frequency, duration) {
+    if (
+      typeof pin !== "number" ||
+      pin < 0 ||
+      (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+    ) {
+      throw new Error("Invalid pin");
+    }
+
     if (
       !Number.isInteger(pin) ||
       !Number.isInteger(frequency) ||
@@ -1819,6 +1384,23 @@ class SoundController {
     await this.serialPort.WriteCommand(cmd);
     let res = await this.serialPort.ReadResponse();
     return res.success;
+  }
+
+  async MelodyStop(pin) {
+    if (
+      !Number.isInteger(pin) ||
+      pin < 0 ||
+      !this.DeviceConfig.PWMPins.has(pin)
+    ) {
+      throw new Error("Please enter a valid PWM pin as an integer.");
+    }
+
+    cmd = `MelodyS(${pin})`;
+
+    await this.serialPort.WriteCommand(cmd);
+    let res = await this.serialPort.ReadResponse();
+    return res.success;
+  
   }
 }
 
@@ -1861,12 +1443,8 @@ class SpiController {
     countWrite,
     dataRead,
     offsetRead,
-    countRead,
-    chipselect = -1
+    countRead
   ) {
-    if (chipselect >= this.serialPort.DeviceConfig.MaxPinIO) {
-      throw new Error("InvalidPin");
-    }
 
     if (
       (dataWrite === null && dataRead === null) ||
@@ -1883,53 +1461,42 @@ class SpiController {
       throw new Error("Invalid arguments");
     }
 
-    if (chipselect < 0) {
-      chipselect = 255;
+    let write_array = "[";
+
+    for (let i = 0; i < countWrite; i++) {
+      write_array += dataWrite[i];
+  
+      if (i < countWrite - 1)
+          write_array += ",";
     }
 
-    const cmd = `spistream(${countWrite},${countRead},${chipselect})`;
+    write_array += "]";
+
+    // I2C write only
+    const cmd = `spiwrs(${write_array},0)`;
+    await this.serialPort.WriteCommand(cmd);    
+
+    const res = await this.serialPort.ReadResponse();
+    return res.success;
+  }
+
+  async WriteByte(data) {   
+
+    const cmd = `spiwr(${data})`;
+
     await this.serialPort.WriteCommand(cmd);
 
     const res = await this.serialPort.ReadResponse();
+    if (res.success) {
+      try {
+        const value = parseInt(res.response);
+        return value;
+      } catch {
 
-    if (!res.success) {
-      return false;
-    }
-
-    while (countWrite > 0 || countRead > 0) {
-      let num = countRead;
-
-      if (countWrite < countRead) {
-        num = countWrite;
-      }
-
-      if (countWrite === 0) {
-        num = countRead;
-      }
-
-      if (countRead === 0) {
-        num = countWrite;
-      }
-
-      if (num > this.serialPort.TransferBlockSizeMax) {
-        num = this.serialPort.TransferBlockSizeMax;
-      }
-
-      if (countWrite > 0) {
-        await this.serialPort.WriteRawData(dataWrite, offsetWrite, num);
-        offsetWrite += num;
-        countWrite -= num;
-      }
-
-      if (countRead > 0) {
-        await this.serialPort.ReadRawData(dataRead, offsetRead, num);
-        offsetRead += num;
-        countRead -= num;
       }
     }
 
-    const res2 = await this.serialPort.ReadResponse();
-    return res2.success;
+    return -1;
   }
 
   async Configuration(mode, frequencyKHz) {
@@ -1937,11 +1504,11 @@ class SpiController {
       throw new Error("Mode must be in range 0...3.");
     }
 
-    if (frequencyKHz < 200 || frequencyKHz > 20000) {
-      throw new Error("FrequencyKHz must be in range 200KHz to 20MHz.");
+    if (frequencyKHz < 200 || frequencyKHz > 24000) {
+      throw new Error("FrequencyKHz must be in range 200KHz to 24MHz.");
     }
 
-    const cmd = `palette(${mode},${frequencyKHz})`;
+    const cmd = `spicfg(${mode},${frequencyKHz})`;
 
     await this.serialPort.WriteCommand(cmd);
 
@@ -1950,14 +1517,24 @@ class SpiController {
   }
 }
 
+
+class Version {
+  constructor() {
+    this.Firmware = "";
+    this.ProductId = "";
+    this.Bootloader = "";
+  }
+
+}
 class SystemController {
   constructor(serialPort) {
     this.serialPort = serialPort;
-    this.Version = "";
+    this.version = new Version();
+
   }
 
   async Reset(option) {
-    let cmd = `reset(${option.value === 1 ? 1 : 0})`;
+    let cmd = `reset(${option.value})`;
     await this.serialPort.WriteCommand(cmd);
     this.serialPort.Disconnect();
   }
@@ -1985,49 +1562,25 @@ class SystemController {
     }
     return -1;
   }
+  
+  async GetVersion() {
+    const command = "version()";
+    await this.serialPort.WriteCommand(command);
 
-  async #PrnText(text, newline) {
-    let cmd = `print("${text}")`;
+    const resp = await this.serialPort.ReadResponse();
 
-    if (newline) cmd = `println("${text}")`;
+    if (resp.success) {
+      if (resp.response && resp.response.length > 0) {
 
-    await this.serialPort.WriteCommand(cmd);
-    let res = await this.serialPort.ReadResponse();
-  }
+        let versions = resp.response.slice(25).split(':');
 
-  async Print(text) {
-    if (typeof text === "string") {
-      console.log(text);
-      await this.#PrnText(text, false);
-    } else if (typeof text === "boolean") {
-      console.log(text ? "1" : "0");
-      await this.#PrnText(text ? "1" : "0", false);
-    } else {
-      console.log(text.toString());
-      await this.#PrnText(text.toString(), false);
+        this.version.Firmware = versions[0];
+        this.version.ProductId = versions[1];
+        this.version.Bootloader = versions[2];
+      }
     }
 
-    return true;
-  }
-
-  async Println(text) {
-    if (typeof text === "string") {
-      console.log(text);
-      await this.#PrnText(text, true);
-    } else if (typeof text === "boolean") {
-      console.log(text ? "1" : "0");
-      await this.#PrnText(text ? "1" : "0", true);
-    } else {
-      console.log(text.toString());
-      await this.#PrnText(text.toString(), true);
-    }
-
-    return true;
-  }
-
-  async Wait(millisecond) {
-    await Util.sleep(millisecond);
-    return true;
+    return this.version;
   }
 }
 
@@ -2037,6 +1590,14 @@ class TemperatureController {
   }
 
   async Read(pin, sensortype) {
+    if (
+      typeof pin !== "number" ||
+      pin < 0 ||
+      (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+    ) {
+      throw new Error("Invalid pin");
+    }
+
     let cmd = `temp(${pin},${sensortype})`;
     await this.serialPort.WriteCommand(cmd);
 
@@ -2050,8 +1611,8 @@ class TouchController {
     this.serialPort = serialPort;
   }
 
-  async Read(pin) {
-    const cmd = `touchread(${pin})`;
+  async Touch(pin, charge_t, charge_s, timeout) {
+    const cmd = `touch(${pin}, ${charge_t}, ${charge_s}, ${timeout})`;
     await this.serialPort.WriteCommand(cmd);
 
     const res = await this.serialPort.ReadResponse();
@@ -2071,45 +1632,45 @@ class UartController {
     this.serialPort = serialPort;
   }
 
-  async Enable(baudrate) {
-    let cmd = `uartinit(${baudrate})`;
-    await this.serialPort.WriteCommand(cmd);
-    let res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
+  // async Enable(baudrate) {
+  //   let cmd = `uartinit(${baudrate})`;
+  //   await this.serialPort.WriteCommand(cmd);
+  //   let res = await this.serialPort.ReadResponse();
+  //   return res.success;
+  // }
 
-  async Write(data) {
-    let cmd = `uartwrite(${data})`;
-    await this.serialPort.WriteCommand(cmd);
-    let res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
+  // async Write(data) {
+  //   let cmd = `uartwrite(${data})`;
+  //   await this.serialPort.WriteCommand(cmd);
+  //   let res = await this.serialPort.ReadResponse();
+  //   return res.success;
+  // }
 
-  async BytesToRead() {
-    let cmd = "uartcount()";
-    await this.serialPort.WriteCommand(cmd);
-    let res = await this.serialPort.ReadResponse();
-    if (res.success) {
-      try {
-        let ready = parseInt(res.response);
-        return ready;
-      } catch {}
-    }
-    throw "BytesToRead error!";
-  }
+  // async BytesToRead() {
+  //   let cmd = "uartcount()";
+  //   await this.serialPort.WriteCommand(cmd);
+  //   let res = await this.serialPort.ReadResponse();
+  //   if (res.success) {
+  //     try {
+  //       let ready = parseInt(res.response);
+  //       return ready;
+  //     } catch {}
+  //   }
+  //   throw "BytesToRead error!";
+  // }
 
-  async Read() {
-    let cmd = "uartread()";
-    await this.serialPort.WriteCommand(cmd);
-    let res = await this.serialPort.ReadResponse();
-    if (res.success) {
-      try {
-        let data = parseInt(res.response);
-        return data;
-      } catch {}
-    }
-    throw "Uart receving error!";
-  }
+  // async Read() {
+  //   let cmd = "uartread()";
+  //   await this.serialPort.WriteCommand(cmd);
+  //   let res = await this.serialPort.ReadResponse();
+  //   if (res.success) {
+  //     try {
+  //       let data = parseInt(res.response);
+  //       return data;
+  //     } catch {}
+  //   }
+  //   throw "Uart receving error!";
+  // }
 }
 
 class PulseController {
@@ -2136,14 +1697,6 @@ class PulseController {
 class DUELinkController {
   constructor(serial) {
     this.serialPort = new SerialInterface(serial);
-
-    this.IsPulse = false;
-    this.IsFlea = false;
-    this.IsPico = false;
-    this.IsEdge = false;
-    this.IsRave = false;
-    this.IsTick = false;
-    this.IsDue = false;
   }
 
   async InitDevice() {
@@ -2158,79 +1711,29 @@ class DUELinkController {
     this.Frequency = new FrequencyController(this.serialPort);
     this.Spi = new SpiController(this.serialPort);
     this.Infrared = new InfraredController(this.serialPort);
-    this.Neo = new NeoController(this.serialPort);
     this.Uart = new UartController(this.serialPort);
     this.Button = new ButtonController(this.serialPort);
     this.Distance = new DistanceSensorController(this.serialPort);
     this.Display = new DisplayController(this.serialPort);
     this.Touch = new TouchController(this.serialPort);
     this.Led = new LedController(this.serialPort);
-    this.Script = new ScriptController(this.serialPort);
-    this.Pin = new PinController();
+    this.Engine = new EngineController(this.serialPort);
     this.Temperature = new TemperatureController(this.serialPort);
-    this.Humidity = new HudimityController(this.serialPort);
+    this.Humidity = new HumidityController(this.serialPort);
     this.System = new SystemController(this.serialPort);
 
     this.Pulse = new PulseController(this.serialPort);
-    this.Can = new CanController(this.serialPort);
     this.Sound = new SoundController(this.serialPort);
-    this.Bluetooth = new BluetoothController(this.serialPort);
 
-    this.System.Version = this.Version;
+
   }
 
   async Connect() {
     await this.serialPort.Connect();
 
-    this.Version = await this.serialPort.GetVersion();
-    this.Version = this.Version.split("\n")[0];
-    this.Version = this.Version.replace("\r", "");
-    // if (this.Version === "" || this.Version.length !== 7) {
-    //     throw ("The device is not supported: ${this.Version}");
-    // }
-
     this.DeviceConfig = new DeviceConfiguration();
 
-    // if (this.Version[this.Version.length - 1] === "P") {
-    //     this.DeviceConfig.IsPulse = true;
-    //     this.DeviceConfig.MaxPinIO = 23;
-    //     this.DeviceConfig.MaxPinAnalog = 29;
-    // } else if (this.Version[this.Version.length - 1] === "I") {
-    //     this.DeviceConfig.IsPico = true;
-    //     this.DeviceConfig.MaxPinIO = 29;
-    //     this.DeviceConfig.MaxPinAnalog = 29;
-    // } else if (this.Version[this.Version.length - 1] === "F") {
-    //     this.DeviceConfig.IsFlea = true;
-    //     this.DeviceConfig.MaxPinIO = 11;
-    //     this.DeviceConfig.MaxPinAnalog = 29;
-    // } else if (this.Version[this.Version.length - 1] === "E") {
-    //     this.DeviceConfig.IsEdge = true;
-    //     this.DeviceConfig.MaxPinIO = 22;
-    //     this.DeviceConfig.MaxPinAnalog = 11;
-    // } else if (this.Version[this.Version.length - 1] === "R") {
-    //     this.DeviceConfig.IsRave = true;
-    //     this.DeviceConfig.MaxPinIO = 23;
-    //     this.DeviceConfig.MaxPinAnalog = 29;
-    // } else if (this.Version[this.Version.length - 1] === "T") {
-    //     this.DeviceConfig.IsTick = true;
-    //     this.DeviceConfig.MaxPinIO = 23;
-    //     this.DeviceConfig.MaxPinAnalog = 11;
-    // } else if (this.Version[this.Version.length - 1] === "D") {
-    //     this.DeviceConfig.IsDue = true;
-    //     this.DeviceConfig.MaxPinIO = 15;
-    //     this.DeviceConfig.MaxPinAnalog = 10;
-
-    // } else {
-    //     throw new Error("The device is not supported. ${this.Version}");
-    // }
-
-    // this.IsPulse = this.DeviceConfig.IsPulse;
-    // this.IsFlea = this.DeviceConfig.IsFlea;
-    // this.IsPico = this.DeviceConfig.IsPico;
-    // this.IsEdge = this.DeviceConfig.IsEdge;
-    // this.IsRave = this.DeviceConfig.IsRave;
-    // this.IsTick = this.DeviceConfig.IsTick;
-    // this.IsDue = this.DeviceConfig.IsDue;
+    
 
     this.serialPort.DeviceConfig = this.DeviceConfig;
     await this.InitDevice();
