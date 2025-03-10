@@ -130,16 +130,7 @@ $(document).ready(function(){
             hideError();
             Check();
             await duelink.Connect();
-            if (duelink.IsRave) {
-                color_depth = 16;
-                canvas.width = 160;
-                canvas.height = 120;
-                canvas.style.width = '320px';
-                canvas.style.height = '240px';
-            } else if (duelink.IsEdge) {
-                await duelink.Display.Configuration(0, 0x3c);
-            }
-            $("#id-version").text(duelink.Version);
+                        
             $("#id-connect").slideUp();
             $("#id-buttonRead").prop("disabled", false);
 			$("#id-btClear").prop("disabled", false);
@@ -179,20 +170,22 @@ $(document).ready(function(){
 	async function startReading() {
 		hideError();
 			
-		buttonPressCounter += 1		
-		if ((buttonPressCounter % 2) == 1) {
-			countLines = 0;
+		<!-- buttonPressCounter += 1		 -->
+		<!-- if ((buttonPressCounter % 2) == 1) { -->
+			<!-- countLines = 0; -->
 			
-			document.getElementById("id-buttonRead").innerHTML = "Stop Reading";
+			<!-- document.getElementById("id-buttonRead").innerHTML = "Stop Reading"; -->
 						
-			doActionCallback()
+			<!-- doActionCallback() -->
 			
 							
-		}
-		else {	
-			document.getElementById("id-buttonRead").innerHTML = "Start Reading";
+		<!-- } -->
+		<!-- else {	 -->
+			<!-- document.getElementById("id-buttonRead").innerHTML = "Start Reading"; -->
 			
-		}
+		<!-- } -->
+		
+		
 		
 	}
 		

@@ -131,15 +131,7 @@ $(document).ready(function(){
             hideError();
             Check();
             await duelink.Connect();
-            if (duelink.IsRave) {
-                color_depth = 16;
-                canvas.width = 160;
-                canvas.height = 120;
-                canvas.style.width = '320px';
-                canvas.style.height = '240px';
-            } else if (duelink.IsEdge) {
-                await duelink.Display.Configuration(0, 0x3c);
-            }
+           
             $("#id-version").text(duelink.Version);
             $("#id-connect").slideUp();
             $("#id-btWrite").prop("disabled", false);	
@@ -149,9 +141,9 @@ $(document).ready(function(){
 			
 			document.getElementById("id-dataReceived").innerHTML = ""
 
-			await duelink.Uart.Enable(9600);	
+			<!-- await duelink.Uart.Enable(9600);	 -->
 
-			doActionCallback();
+			<!-- doActionCallback(); -->
 						
         } catch (e) {
             showError("connect Error" + e);
@@ -231,13 +223,15 @@ $(document).ready(function(){
 		if (canWrite) {
 			isWriting = true;
 			
-			for (let i = 0; i < dataWrite.length; i++)
-			{
-				await duelink.Uart.Write(dataWrite[i]);
+			<!-- for (let i = 0; i < dataWrite.length; i++) -->
+			<!-- { -->
+				<!-- await duelink.Uart.Write(dataWrite[i]); -->
 				
 				
-			}
-			showStatus("Data sent.")
+			<!-- } -->
+			<!-- showStatus("Data sent.") -->
+			
+			showError("This module is under testing...");
 				
 			isWriting =  false;
 		}

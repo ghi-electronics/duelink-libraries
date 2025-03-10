@@ -190,16 +190,7 @@ $(document).ready(function(){
             hideError();
             Check();
             await duelink.Connect();
-            if (duelink.IsRave) {
-                color_depth = 16;
-                canvas.width = 160;
-                canvas.height = 120;
-                canvas.style.width = '320px';
-                canvas.style.height = '240px';
-            } else if (duelink.IsEdge) {
-                await duelink.Display.Configuration(0, 0x3c);
-            }
-            $("#id-version").text(duelink.Version);
+               
             $("#id-connect").slideUp();
             $("#id-btSend").prop("disabled", false);	
             $("#id-baudrate").prop("disabled", false);	
@@ -207,9 +198,9 @@ $(document).ready(function(){
 			
 			document.getElementById("id-dataReceived").innerHTML = ""
 
-			await duelink.Can.Initialize(500000);	
+			<!-- await duelink.Can.Initialize(500000);	 -->
 
-			await doActionCallback();
+			<!-- await doActionCallback(); -->
 						
         } catch (e) {
             showError("connect Error" + e);
@@ -266,11 +257,13 @@ $(document).ready(function(){
 		}
 		
 		if (canSend) {
-			var message = new due.CanMessage(id, ext, rmr, data, 0, len);
+			<!-- var message = new due.CanMessage(id, ext, rmr, data, 0, len); -->
 			
-			isSending = true;
-			await duelink.Can.Write(message)
-			isSending = false;
+			<!-- isSending = true; -->
+			<!-- await duelink.Can.Write(message) -->
+			<!-- isSending = false; -->
+			
+			showError("This module is under testing...");
 		}
 	}
 	

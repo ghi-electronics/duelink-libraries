@@ -60,9 +60,7 @@ $(document).ready(function(){
 	</div>
 		
 
-    <div id="id-selections" class="container">
-        Connect 3 pins Temperature/Humidity (DHT11) to pin P0 and start playing!
-		
+    <div id="id-selections" class="container">		
 		<img src="../images/3pin-temp.png" alt="dht11" style="width:200px;">
 		<div class="row">	
 			<div class="center">
@@ -146,16 +144,7 @@ $(document).ready(function(){
             hideError();
             Check();
             await duelink.Connect();
-            if (duelink.IsRave) {
-                color_depth = 16;
-                canvas.width = 160;
-                canvas.height = 120;
-                canvas.style.width = '320px';
-                canvas.style.height = '240px';
-            } else if (duelink.IsEdge) {
-                await duelink.Display.Configuration(0, 0x3c);
-            }
-            $("#id-version").text(duelink.Version);
+    
             $("#id-connect").slideUp();
             $("#id-buttonRead").prop("disabled", false);
 			
@@ -193,18 +182,18 @@ $(document).ready(function(){
 	function startReading() {
 		hideError();
 			
-		buttonPressCounter += 1		
-		if ((buttonPressCounter % 2) == 1) {
-			document.getElementById("id-buttonRead").innerHTML = "Stop Reading";
-			//doActionCallback()
-			$("#myChart").show();
+		<!-- buttonPressCounter += 1		 -->
+		<!-- if ((buttonPressCounter % 2) == 1) { -->
+			<!-- document.getElementById("id-buttonRead").innerHTML = "Stop Reading"; -->
+			<!-- //doActionCallback() -->
+			<!-- $("#myChart").show(); -->
 							
-		}
-		else {	
-			document.getElementById("id-buttonRead").innerHTML = "Start Reading";
-			$("#myChart").hide();
-		}
-		
+		<!-- } -->
+		<!-- else {	 -->
+			<!-- document.getElementById("id-buttonRead").innerHTML = "Start Reading"; -->
+			<!-- $("#myChart").hide(); -->
+		<!-- } -->
+		showError("This module is under testing...");
 	}
 	
 

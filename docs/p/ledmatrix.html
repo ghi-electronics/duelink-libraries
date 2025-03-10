@@ -375,8 +375,7 @@ $(document).ready(function(){
 				<tr>
 					<td width="166">Pin
 					
-						<select id="pinNumberNeoPixel">
-							<option value="0">P0</option>
+						<select id="pinNumberNeoPixel">                     
 							<option value="1">P1</option>
 							<option value="2">P2</option>
 							<option value="3">P3</option>
@@ -388,7 +387,12 @@ $(document).ready(function(){
 							<option value="9">P9</option>
 							<option value="10">P10</option>
 							<option value="11">P11</option>
-						</select>											
+							<option value="12">P12</option>
+							<option value="13">P13</option>
+							<option value="14">P14</option>
+							<option value="15">P15</option>
+							<option value="16">P16</option>
+						</select>									
 					</td>								
 				</tr>
 
@@ -525,18 +529,7 @@ $(document).ready(function(){
             hideError();
             Check();
             await duelink.Connect();
-            if (duelink.IsRave) {
-                color_depth = 16;
-                canvas.width = 160;
-                canvas.height = 120;
-                canvas.style.width = '320px';
-                canvas.style.height = '240px';
-            } else if (duelink.IsEdge) {
-                await duelink.Display.Configuration(0, 0x3c);
-            }
-			await duelink.Neo.Clear();
-			await duelink.Neo.Show(6,256)
-            $("#id-version").text(duelink.Version);
+            
             $("#id-connect").slideUp();
             $("#id-inputs").prop("disabled", false);
 
@@ -546,12 +539,17 @@ $(document).ready(function(){
     }
 	
    async function setPixel(x,y,r,g,b){
-    	if ((x & 0x01) != 0){
-        	y = 15 - y;
-		}
-    	index= x * 16 + y;
-    	await duelink.Neo.SetRGB(index,r,g,b);
-		await duelink.Neo.Show(6,256)
+    	<!-- if ((x & 0x01) != 0){ -->
+        	<!-- y = 15 - y; -->
+		<!-- } -->
+		
+		var pinNeoPixel = $("#pinNumberNeoPixel").val()/1;
+		
+		await duelink.Graphics.Configuration(3, [pinNeoPixel, 16, 16 , 0], 16, 16, 1);
+		
+    	//index= x * 16 + y;
+    	await duelink.Graphics.Pixel((r<<16) | (g << 8) | (b<<0),x, y);
+		await duelink.Graphics.Show()
 	}
 	
 	async function changeColor(element, x, y) {

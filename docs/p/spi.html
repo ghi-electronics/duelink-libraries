@@ -210,16 +210,8 @@ $(document).ready(function(){
             hideError();
             Check();
             await duelink.Connect();
-            if (duelink.IsRave) {
-                color_depth = 16;
-                canvas.width = 160;
-                canvas.height = 120;
-                canvas.style.width = '320px';
-                canvas.style.height = '240px';
-            } else if (duelink.IsEdge) {
-                await duelink.Display.Configuration(0, 0x3c);
-            }
-            $("#id-version").text(duelink.Version);
+            
+ 
             $("#id-connect").slideUp();         
             $("#id-speed").prop("disabled", false);	
 			$("#id-btWrite").prop("disabled", false);
@@ -294,9 +286,11 @@ $(document).ready(function(){
 		
 		if (canWrite) {
 			var readArray = new Uint8Array(writeArray.length);
-			await duelink.Spi.WriteRead(writeArray, 0, writeArray.length, readArray, 0, readArray.length, chipselectPin);
+			<!-- await duelink.Spi.WriteRead(writeArray, 0, writeArray.length, readArray, 0, readArray.length, chipselectPin); -->
 			
-			showStatus("Data sent.");
+			<!-- showStatus("Data sent."); -->
+			
+			showError("This module is under testing...");
 			
 		}
 		

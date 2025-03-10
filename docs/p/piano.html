@@ -145,15 +145,7 @@ $(document).ready(function(){
             hideError();
             Check();
             await duelink.Connect();
-            if (duelink.IsRave) {
-                color_depth = 16;
-                canvas.width = 160;
-                canvas.height = 120;
-                canvas.style.width = '320px';
-                canvas.style.height = '240px';
-            } else if (duelink.IsEdge) {
-                await duelink.Display.Configuration(0, 0x3c);
-            }
+            
             $("#id-version").text(duelink.Version);
             $("#id-connect").slideUp();
             $("#id-inputs").prop("disabled", false);
@@ -200,7 +192,7 @@ $(document).ready(function(){
     };
 
 		var note = frequencies[note];
-        await duelink.Frequency.Write('p', note , 400);	
+        await duelink.Frequency.Write(4, note , 400);	
 }
   
 	
