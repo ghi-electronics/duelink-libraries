@@ -538,9 +538,9 @@ $(document).ready(function(){
                                     <!-- </div> -->
                                     <!-- <button class="btn btn-primary" onclick="sendImage()">Show Image</button> -->
 									<p>
-										<td width="136">Select DUELink module</td>
+										<td width="136">Select DUELink display</td>
 										<td width="152">
-											<select id="pinNumberNeoPixel">                     
+											<select id="displayNumber">                     
 												<option value="1">TFT CP23</option>
 												<option value="2">PixoBit</option>
 												<option value="3">CincoBit</option>
@@ -805,10 +805,17 @@ $(document).ready(function(){
 
     async function sendText() {
         Check();
-        await duelink.Graphics.Clear(0);
-        var msg = $("#textsendid").val();
-        await duelink.Graphics.Text(msg, 1, 1, 1);
-        await duelink.Graphics.Show();
+		
+		var displayNumber = $("#displayNumber").val()/1;
+		if (displayNumber < 4) {
+			await duelink.Graphics.Clear(0);
+			var msg = $("#textsendid").val();
+			await duelink.Graphics.Text(msg, 1, 1, 1);
+			await duelink.Graphics.Show();
+		}
+		else {		
+			showError("This display is under testing...");
+		}
     }
 
     function hideError() {
