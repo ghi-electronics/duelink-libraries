@@ -569,7 +569,7 @@ class GraphicsController {
 
     img_array += "]";
     
-    cmd = `imgs(${img_array}, ${x}, ${y}, ${scaleWidth}, ${scaleHeight}, ${transform})`;
+    cmd = `imgs(${img_array}, ${x}, ${y}, ${width}, ${height},${scaleWidth}, ${scaleHeight}, ${transform})`;
 
     await this.serialPort.WriteCommand(cmd);
 
@@ -578,116 +578,10 @@ class GraphicsController {
     return res.success;
   }
 
-  async DrawImage(img, x, y, transform) {
-    return await this.DrawImageScale(img, x, y, 1, 1, transform);
+  async DrawImage(img, x, y, w, h, transform) {
+    return await this.DrawImageScale(img, x, y, w, h, 1, 1, transform);
   }
-
-  __get_transform_none() {
-    return 0;
-  }
-  __get_transform_fliphorizontal() {
-    return 1;
-  }
-  __get_transform_flipvertical() {
-    return 2;
-  }
-  __get_transform_rotate90() {
-    return 3;
-  }
-  __get_transform_rotate180() {
-    return 4;
-  }
-  __get_transform_rotate270() {
-    return 5;
-  }
-  __set_transform() {
-    return;
-  }
-
-  get TransformNone() {
-    return this.__get_transform_none();
-  }
-  get TransformFlipHorizontal() {
-    return this.__get_transform_fliphorizontal();
-  }
-  get TransformFlipVertical() {
-    return this.__get_transform_flipvertical();
-  }
-  get TransformRotate90() {
-    return this.__get_transform_rotate90();
-  }
-  get TransformRotate180() {
-    return this.__get_transform_rotate180();
-  }
-  get TransformRotate270() {
-    return this.__get_transform_rotate270();
-  }
-}
-
-class PaletteBuilder {
-  #_bucketSize;
-
-  constructor(bucketsPerChannel) {
-    const ValuesPerChannel = 256;
-
-    if (bucketsPerChannel < 1 || bucketsPerChannel > ValuesPerChannel) {
-      throw new Error(
-        `Buckets per channel must be between 1 and ${ValuesPerChannel}`
-      );
-    }
-
-    this.#_bucketSize = ValuesPerChannel / bucketsPerChannel;
-  }
-
-  BuildPalette(pixels) {
-    let histogram = {};
-
-    for (let i = 0; i < pixels.length; i += 4) {
-      let pixel =
-        (pixels[i + 0] << 16) | (pixels[i + 1] << 8) | (pixels[i + 2] << 0);
-
-      let key = this.#CreateColorKey(pixel);
-      if (key in histogram) {
-        histogram[key].push(pixel);
-      } else {
-        histogram[key] = [pixel];
-      }
-    }
-
-    // sort buckets
-    let buckets = Object.values(histogram);
-    let sortedBuckets = buckets.sort((a, b) => a.length - b.length).reverse();
-
-    let palette = new Uint32Array(16);
-    let i = 0;
-    for (let i = 0; i < 16; i++) {
-      palette[i] = this.#AverageColor(sortedBuckets[i % sortedBuckets.length]);
-    }
-    return palette;
-  }
-
-  #AverageColor(colors) {
-    let r = 0;
-    let g = 0;
-    let b = 0;
-    for (let color of colors) {
-      r += (color >> 16) & 0xff;
-      g += (color >> 8) & 0xff;
-      b += (color >> 0) & 0xff;
-    }
-    var count = colors.length;
-    r = Math.floor(r / count);
-    g = Math.floor(g / count);
-    b = Math.floor(b / count);
-    return ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
-  }
-
-  #CreateColorKey(color) {
-    var redBucket = Math.floor(((color >> 16) & 0xff) / this.#_bucketSize);
-    var greenBucket = Math.floor(((color >> 8) & 0xff) / this.#_bucketSize);
-    var blueBucket = Math.floor(((color >> 0) & 0xff) / this.#_bucketSize);
-    return (redBucket << 16) | (greenBucket << 8) | blueBucket;
-  }
+  
 }
 
 class DistanceSensorController {
@@ -1132,7 +1026,7 @@ class SpiController {
 
     write_array += "]";
 
-    // I2C write only
+    // SPI write only
     const cmd = `spiwrs(${write_array},0)`;
     await this.serialPort.WriteCommand(cmd);    
 
@@ -1396,7 +1290,7 @@ class DUELinkController {
     this.Humidity = new HumidityController(this.serialPort);
     this.System = new SystemController(this.serialPort);
 
-    this.Pulse = new PulseController(this.serialPort);
+
     this.Sound = new SoundController(this.serialPort);
 
 
