@@ -1121,7 +1121,7 @@ class SystemController {
     }
   
     async Info(code) {
-      const command = `info(${code})`;
+      const cmd = `info(${code})`;
       await this.serialPort.WriteCommand(cmd);
       let res = await this.serialPort.ReadResponse();
       if (res.success) {
