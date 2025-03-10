@@ -726,7 +726,7 @@ $(document).ready(function(){
 		for(let i=0; i<countNeoPixel;i++){
 			await duelink.Graphics.Clear();	
 			await delay(10); 
-			await duelink.Graphics.Pixel((red<<8) | (green << 16) | (blue<<0),i, 0 );
+			await duelink.Graphics.Pixel((red<<16) | (green << 8) | (blue<<0),i, 0 );
 			await duelink.Graphics.Show();
 			await delay(10); 
 		}				
