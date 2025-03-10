@@ -101,13 +101,11 @@ namespace GHIElectronics.DUELink {
 
                     if (response.success) {
                         if (response.response != null) {
-                            // echo is on=> need to turn off
+
                             this._version = new Version();
 
-                            this.serialPort.TurnEchoOff();
+                            
 
-                            this.serialPort.DiscardInBuffer();
-                            this.serialPort.DiscardOutBuffer();
 
                             var versions = response.response.Substring(25).Split(':');
 

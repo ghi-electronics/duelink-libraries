@@ -14,7 +14,7 @@ namespace GHIElectronics.DUELink {
 
         public int[] PWMPins = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 11 };
         public int[] InterruptPins = new int[] { 1, 2, 3, 4, 5, 6, 7, 12 };
-        public int[] AnalogPins = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 17 };
+        public int[] AnalogPins = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 23 };
     }
     public partial class DUELinkController {
 

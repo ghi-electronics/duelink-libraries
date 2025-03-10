@@ -14,7 +14,7 @@ namespace GHIElectronics.DUELink {
             SerialInterface serialPort;
             public I2cController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public void I2cConfig(int speed_khz) {
+            public void Configuration(int speed_khz) {
                 var cmd = $"i2ccfg({speed_khz})";
 
                 this.serialPort.WriteCommand(cmd);
@@ -48,7 +48,7 @@ namespace GHIElectronics.DUELink {
                 write_array = "[";
 
                 for (var i = 0; i < countWrite; i++) {
-                    write_array += dataRead[i];
+                    write_array += dataWrite[i];
 
                     if (i < countWrite - 1)
                         write_array += ",";

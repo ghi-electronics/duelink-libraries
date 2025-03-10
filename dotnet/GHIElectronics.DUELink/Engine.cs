@@ -92,9 +92,9 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var respone = this.serialPort.ReadResponse();
+                var response = this.serialPort.ReadResponse();
 
-                return respone.success;
+                return response.success;
             }
 
             //public bool IsRunning() {

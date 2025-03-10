@@ -13,7 +13,7 @@ class SpiController:
 
     #     return self.WriteRead(dataWrite, offset, length, None, 0, 0, chipselect)
 
-    def SpiConfig(self, mode, frequency):
+    def Configuration(self, mode, frequency):
         
         if not isinstance(mode, int) or mode not in {0,1,2,3}:
             raise ValueError("Invalid mode. Enter an integer between 0-3.")

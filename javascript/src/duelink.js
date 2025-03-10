@@ -434,487 +434,147 @@ class DigitalController {
   }
 }
 
-export class DisplayType {
-  static get ILI9342() {
-    return 0x80;
+export class GraphicsType {
+  static get I2c() {
+    return 1;
   }
 
-  static get ILI9341() {
-    return 0x81;
+  static get Spi() {
+    return 2;
   }
 
-  static get ST7735() {
-    return 0x82;
+  static get Neo() {
+    return 3;
   }
 
-  static get SSD1306() {
-    return 0x3c;
-  }
-
-  static get BuiltIn() {
-    return 0;
+  static get Matrix5x5() {
+    return 4;
   }
 }
 
-// class DisplayConfiguration {
-//   constructor(serialPort, display) {
-//     this.serialPort = serialPort;
-//     this.display = display;
 
-//     this.Type = DisplayType.BuiltIn;
 
-//     this.I2cAddress = 0;
-
-//     this.SpiChipSelect = 0;
-//     this.SpiDataControl = 0;
-//     this.SpiPortrait = false;
-//     this.SpiFlipScreenHorizontal = false;
-//     this.SpiFlipScreenVertical = false;
-//     this.SpiSwapRedBlueColor = false;
-//     this.SpiSwapByteEndianness = false;
-//     this.WindowStartX = 0;
-//     this.WindowStartY = 0;
-//   }
-
-//   async Update() {
-//     let address = 0;
-//     let config = 0;
-//     let chipselect = 0;
-//     let datacontrol = 0;
-
-//     address |= this.Type;
-
-//     config |= (this.SpiPortrait == true ? 1 : 0) << 0;
-//     config |= (this.SpiFlipScreenHorizontal == true ? 1 : 0) << 1;
-//     config |= (this.SpiFlipScreenVertical == true ? 1 : 0) << 2;
-//     config |= (this.SpiSwapRedBlueColor == true ? 1 : 0) << 3;
-//     config |= (this.SpiSwapByteEndianness == true ? 1 : 0) << 4;
-//     config |= this.WindowStartX << 8;
-//     config |= this.WindowStartY << 12;
-
-//     chipselect = this.SpiChipSelect;
-//     datacontrol = this.SpiDataControl;
-
-//     if (
-//       (this.serialPort.DeviceConfig.IsTick ||
-//         this.serialPort.DeviceConfig.IsEdge) &&
-//       this.Type != DisplayType.SSD1306 &&
-//       this.Type != DisplayType.BuiltIn
-//     ) {
-//       throw new Error("The device does not support SPI display");
-//     }
-
-//     switch (this.Type) {
-//       case DisplayType.SSD1306:
-//         this.display.Width = 128;
-//         this.display.Height = 64;
-
-//         break;
-
-//       case DisplayType.ILI9342:
-//       case DisplayType.ILI9341:
-//         this.display.Width = 160;
-//         this.display.Height = 120;
-//         break;
-
-//       case DisplayType.ST7735:
-//         this.display.Width = 160;
-//         this.display.Height = 128;
-//         break;
-//       case DisplayType.BuiltIn:
-//         if (
-//           this.serialPort.DeviceConfig.IsTick === false &&
-//           this.serialPort.DeviceConfig.IsPulse === false &&
-//           this.serialPort.DeviceConfig.IsRave === false &&
-//           this.serialPort.DeviceConfig.IsDue === false
-//         ) {
-//           throw new Error("The device does not support BuiltIn display");
-//         }
-
-//         if (this.serialPort.DeviceConfig.IsTick) {
-//           this.display.Width = 5;
-//           this.display.Height = 5;
-//         } else if (this.serialPort.DeviceConfig.IsPulse) {
-//           this.display.Width = 128;
-//           this.display.Height = 64;
-//         } else if (this.serialPort.DeviceConfig.IsRave) {
-//           this.display.Width = 160;
-//           this.display.Height = 120;
-//         }
-//         break;
-//     }
-
-//     const cmd = `lcdconfig(${address}, ${config}, ${chipselect}, ${datacontrol})`;
-
-//     await this.serialPort.WriteCommand(cmd);
-
-//     const res = await this.serialPort.ReadResponse();
-
-//     return res.success;
-//   }
-// }
-
-class DisplayController {
-  #_palette;
-
+class GraphicsController {
+ 
   constructor(serialPort) {
-    this.serialPort = serialPort;
-    this.Width = 128;
-    this.Height = 64;
+    this.serialPort = serialPort;    
+  }
 
-    if (this.serialPort.DeviceConfig.IsRave) {
-      this.Width = 160;
-      this.Height = 120;
-    } else if (this.serialPort.DeviceConfig.IsRave) {
-      this.Width = 5;
-      this.Height = 5;
+  async Configuration(type, config, width, height, mode) {
+    let cfg_array = "[";
+
+    for (let i = 0; i < config.length; i++) {
+      cfg_array += config[i];
+  
+      if (i < config.length - 1)
+        cfg_array += ",";
     }
 
-    // this.Configuration = new DisplayConfiguration(this.serialPort, this);
+    cfg_array += "]";
 
-    this.#_palette = [
-      0x000000, // Black
-      0xffffff, // White
-      0xff0000, // Red
-      0x32cd32, // Lime
-      0x0000ff, // Blue
-      0xffff00, // Yellow
-      0x00ffff, // Cyan
-      0xff00ff, // Magenta
-      0xc0c0c0, // Silver
-      0x808080, // Gray
-      0x800000, // Maroon
-      0xbab86c, // Oliver
-      0x00ff00, // Green
-      0xa020f0, // Purple
-      0x008080, // Teal
-      0x000080, // Navy
-    ];
+
+    let cmd = `gfxcfg(${type},${cfg_array},${width},${height},${mode})`;
+
+    await this.serialPort.WriteCommand(cmd);
+    let res = await this.serialPort.ReadResponse();
+    return res.success;
   }
 
   async Show() {
-    let cmd = "lcdshow()";
+    let cmd = "show()";
     await this.serialPort.WriteCommand(cmd);
     let res = await this.serialPort.ReadResponse();
     return res.success;
   }
 
   async Clear(color) {
-    let cmd = `lcdclear(${color})`;
+    let cmd = `clear(${color})`;
+    await this.serialPort.WriteCommand(cmd);
+    let res = await this.serialPort.ReadResponse();
+    return res.success;
+  }
+  
+
+  async Pixel(color, x, y) {
+    let cmd = `pixel(${color},${x},${y})`;
     await this.serialPort.WriteCommand(cmd);
     let res = await this.serialPort.ReadResponse();
     return res.success;
   }
 
-  async Palette(id, color) {
-    if (id > 16) {
-      throw new Error("Palette supports 16 color index only.");
+  async Circle(color, x, y, radius) {
+    let cmd = `circle(${color},${x},${y},${radius})`;
+    await this.serialPort.WriteCommand(cmd);
+    let res = await this.serialPort.ReadResponse();
+    return res.success;
+  }
+
+  async Rect(color, x, y, width, height) {
+    let cmd = `rect(${color},${x},${y},${width},${height})`;
+    await this.serialPort.WriteCommand(cmd);
+    let res = await this.serialPort.ReadResponse();
+    return res.success;
+  }
+
+  async Fill(color, x, y, width, height) {
+    let cmd = `fill(${color},${x},${y},${width},${height})`;
+    await this.serialPort.WriteCommand(cmd);
+
+    let res = await this.serialPort.ReadResponse();
+    return res.success;
+  }
+
+  async Line(color, x1, y1, x2, y2) {
+    let cmd = `line(${color},${x1},${y1},${x2},${y2})`;
+    await this.serialPort.WriteCommand(cmd);
+
+    let res = await this.serialPort.ReadResponse();
+    return res.success;
+  }
+
+  async Text(text, color, x, y) {
+    let cmd = `text("${text}",${color},${x},${y})`;
+    await this.serialPort.WriteCommand(cmd);
+    let res = await this.serialPort.ReadResponse();
+    return res.success;
+  }
+
+  async TextS(text, color, x, y, scalewidth, scaleheight) {
+    let cmd = `texts("${text}",${color},${x},${y},${scalewidth},${scaleheight})`;
+    await this.serialPort.WriteCommand(cmd);
+
+    let res = await this.serialPort.ReadResponse();
+    return res.success;
+  }
+
+  async TextT(text, color, x, y) {
+    let cmd = `textt("${text}",${color},${x},${y})`;
+    await this.serialPort.WriteCommand(cmd);
+
+    let res = await this.serialPort.ReadResponse();
+    return res.success;
+  }
+  
+  async DrawImageScale(img, x, y, width, height, scaleWidth, scaleHeight, transform) {
+    if (!img || !width || !height) throw new Error("Invalid argument.");
+    
+    let img_array = "[";
+
+    for (let i = 0; i < width * height; i++) {
+      img_array += img[i];
+  
+      if (i < countWrite - 1)
+        img_array += ",";
     }
 
-    this.#_palette[id] = color;
-
-    const cmd = `palette(${id},${color})`;
-
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-
-  async PaletteFromBuffer(pixels, bucketDepth = 8) {
-    let builder = new PaletteBuilder(bucketDepth);
-    let palette = builder.BuildPalette(pixels);
-    for (let i = 0; i < palette.length; i++) {
-      if (!(await this.Palette(i, palette[i]))) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  async SetPixel(color, x, y) {
-    let cmd = `lcdpixel(${color},${x},${y})`;
-    await this.serialPort.WriteCommand(cmd);
-    let res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-
-  async DrawCircle(color, x, y, radius) {
-    let cmd = `lcdcircle(${color},${x},${y},${radius})`;
-    await this.serialPort.WriteCommand(cmd);
-    let res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-
-  async DrawRectangle(color, x, y, width, height) {
-    let cmd = `lcdrect(${color},${x},${y},${width},${height})`;
-    await this.serialPort.WriteCommand(cmd);
-    let res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-
-  async DrawFillRect(color, x, y, width, height) {
-    let cmd = `lcdfill(${color},${x},${y},${width},${height})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    let res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-
-  async DrawLine(color, x1, y1, x2, y2) {
-    let cmd = `lcdline(${color},${x1},${y1},${x2},${y2})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    let res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-
-  async DrawText(text, color, x, y) {
-    let cmd = `lcdtext("${text}",${color},${x},${y})`;
-    await this.serialPort.WriteCommand(cmd);
-    let res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-
-  async DrawTextTiny(text, color, x, y) {
-    let cmd = `lcdtextt("${text}",${color},${x},${y})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    let res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-
-  async DrawTextScale(text, color, x, y, scalewidth, scaleheight) {
-    let cmd = `lcdtexts("${text}",${color},${x},${y},${scalewidth},${scaleheight})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    let res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-
-  async __Stream(data, color_depth) {
-    let cmd = `lcdstream(${color_depth})`;
-    await this.serialPort.WriteCommand(cmd);
-    let res = await this.serialPort.ReadResponse();
-
-    if (res.success) {
-      this.serialPort.WriteRawData(data, 0, data.length);
-      res = await this.serialPort.ReadResponse();
-    }
-
-    return res.success;
-  }
-
-  #ColorDistance(color1, color2) {
-    let r1 = (color1 >> 16) & 0xff;
-    let g1 = (color1 >> 8) & 0xff;
-    let b1 = (color1 >> 0) & 0xff;
-
-    let r2 = (color2 >> 16) & 0xff;
-    let g2 = (color2 >> 8) & 0xff;
-    let b2 = (color2 >> 0) & 0xff;
-
-    let rd = (r1 - r2) * (r1 - r2);
-    let gd = (g1 - g2) * (g1 - g2);
-    let bd = (b1 - b2) * (b1 - b2);
-    return rd + gd + bd;
-  }
-
-  #PaletteLookup(color) {
-    let bestDistance = this.#ColorDistance(this.#_palette[0], color);
-    let bestEntry = 0;
-    for (let i = 1; i < this.#_palette.length; i++) {
-      let distance = this.#ColorDistance(this.#_palette[i], color);
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestEntry = i;
-      }
-    }
-    return bestEntry;
-  }
-
-  async ShowBuffer(bitmap, color_depth) {
-    if (!bitmap) {
-      throw new Error("Bitmap array is null");
-    }
-
-    if (this.Configuration.Type == DisplayType.BuiltIn) {
-      if (this.serialPort.DeviceConfig.IsPulse && color_depth != 1)
-        throw new Error("BuiltIn support one bit only");
-    }
-
-    const width = this.Width;
-    const height = this.Height;
-
-    let buffer_size = 0;
-    let i = 0;
-    let buffer = null;
-
-    let typeI2c = this.Configuration.Type < 0x80 && this.Configuration.Type > 0;
-
-    switch (color_depth) {
-      case 1:
-        if (
-          typeI2c ||
-          (this.Configuration.Type == DisplayType.BuiltIn &&
-            (this.serialPort.DeviceConfig.IsPulse ||
-              this.serialPort.DeviceConfig.IsDue))
-        ) {
-          buffer_size = Math.floor((width * height) / 8);
-          buffer = new Uint8Array(buffer_size);
-          for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-              let index = (y >> 3) * width + x;
-
-              let red = bitmap[i];
-              let green = bitmap[i + 1];
-              let blue = bitmap[i + 2];
-
-              if (red + green + blue > 0) {
-                buffer[index] |= 1 << (y & 7);
-              } else {
-                buffer[index] &= ~(1 << (y & 7));
-              }
-
-              i += 4; // Move to next pixel
-            }
-          }
-        } else {
-          buffer_size = Math.floor((width * height) / 8);
-          buffer = new Uint8Array(buffer_size);
-
-          let data = 0;
-          i = 0;
-          let bit = 0;
-          let j = 0;
-
-          for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-              let red = bitmap[i];
-              let green = bitmap[i + 1];
-              let blue = bitmap[i + 2];
-              let clr = (red << 16) | (green << 8) | blue;
-
-              if (clr != 0) {
-                data |= 1 << bit;
-              }
-
-              bit += 1;
-
-              if (bit == 8) {
-                buffer[j] = data;
-                j += 1;
-
-                bit = 0;
-                data = 0;
-              }
-
-              i += 4;
-            }
-          }
-        }
-        break;
-      case 4:
-        buffer_size = (width * height) / 2;
-        buffer = new Uint8Array(buffer_size);
-        for (let j = 0; j < buffer_size; i += 8, j++) {
-          let red = bitmap[i];
-          let green = bitmap[i + 1];
-          let blue = bitmap[i + 2];
-          let pixel1 = (red << 16) | (green << 8) | blue;
-
-          red = bitmap[i + 4];
-          green = bitmap[i + 4 + 1];
-          blue = bitmap[i + 4 + 2];
-          let pixel2 = (red << 16) | (green << 8) | blue;
-
-          buffer[j] =
-            (this.#PaletteLookup(pixel1) << 4) | this.#PaletteLookup(pixel2);
-        }
-        break;
-      case 8:
-        buffer_size = width * height;
-        buffer = new Uint8Array(buffer_size);
-        for (let j = 0; j < buffer_size; i += 4, j++) {
-          let red = bitmap[i];
-          let green = bitmap[i + 1];
-          let blue = bitmap[i + 2];
-
-          buffer[j] = ((red >> 5) << 5) | ((green >> 5) << 2) | (blue >> 6);
-        }
-        break;
-      case 16:
-        buffer_size = width * height * 2;
-        buffer = new Uint8Array(buffer_size);
-        for (var y = 0; y < height; y++) {
-          for (var x = 0; x < width; x++) {
-            var index = (y * width + x) * 2;
-
-            let red = bitmap[i];
-            let green = bitmap[i + 1];
-            let blue = bitmap[i + 2];
-            let clr = (red << 16) | (green << 8) | blue;
-
-            buffer[index + 0] =
-              (((clr & 0b0000_0000_0000_0000_0001_1100_0000_0000) >> 5) |
-                ((clr & 0b0000_0000_0000_0000_0000_0000_1111_1000) >> 3)) &
-              0xff;
-            buffer[index + 1] =
-              (((clr & 0b0000_0000_1111_1000_0000_0000_0000_0000) >> 16) |
-                ((clr & 0b0000_0000_0000_0000_1110_0000_0000_0000) >> 13)) &
-              0xff;
-            i += 4;
-          }
-        }
-        break;
-      default:
-        throw new Error("Invalid color depth");
-    }
-
-    return await this.__Stream(buffer, color_depth);
-  }
-
-  async DrawImageScale(img, x, y, scaleWidth, scaleHeight, transform) {
-    if (!img) throw new Error("Data null.");
-
-    const width = img[0];
-    const height = img[1];
-
-    if (width <= 0 || height <= 0 || img.length < width * height) {
-      throw new Error("Invalid arguments");
-    }
-
-    let cmd = `dim a[${img.length}]`;
-
-    await this.serialPort.WriteCommand(cmd);
-
-    let res = await this.serialPort.ReadResponse();
-
-    for (let i = 0; i < img.length; i++) {
-      cmd = `a[${i}] = ${img[i]}`;
-      await this.serialPort.WriteCommand(cmd);
-
-      res = await this.serialPort.ReadResponse();
-
-      if (res.success === false) {
-        break;
-      }
-    }
-
-    if (res.success === true) {
-      cmd = `lcdimgs(a, ${x}, ${y}, ${scaleWidth}, ${scaleHeight}, ${transform})`;
-
-      await this.serialPort.WriteCommand(cmd);
-
-      res = await this.serialPort.ReadResponse();
-    }
-
-    cmd = "dim a[0]";
+    img_array += "]";
+    
+    cmd = `imgs(${img_array}, ${x}, ${y}, ${scaleWidth}, ${scaleHeight}, ${transform})`;
 
     await this.serialPort.WriteCommand(cmd);
 
     res = await this.serialPort.ReadResponse();
-
+    
     return res.success;
   }
 
@@ -1714,7 +1374,7 @@ class DUELinkController {
     this.Uart = new UartController(this.serialPort);
     this.Button = new ButtonController(this.serialPort);
     this.Distance = new DistanceSensorController(this.serialPort);
-    this.Display = new DisplayController(this.serialPort);
+    this.Graphics = new GraphicsController(this.serialPort);
     this.Touch = new TouchController(this.serialPort);
     this.Led = new LedController(this.serialPort);
     this.Engine = new EngineController(this.serialPort);

@@ -17,7 +17,7 @@ class I2cController:
 
         return self.WriteRead(address, None, 0, 0, data, offset, length)
 
-    def I2cConfig(self, baudrate):
+    def Configuration(self, baudrate):
 
         if not isinstance(baudrate, int):
             raise ValueError("Enter an integer for the baudrate.")

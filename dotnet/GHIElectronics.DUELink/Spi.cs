@@ -59,7 +59,7 @@ namespace GHIElectronics.DUELink {
 
             }
           
-            public bool SpiConfig(uint mode, uint frequencyKHz ) {
+            public bool Configuration(uint mode, uint frequencyKHz ) {
                 if (mode > 3 )
                     throw new ArgumentOutOfRangeException("Mode must be in range 0...3.");
 

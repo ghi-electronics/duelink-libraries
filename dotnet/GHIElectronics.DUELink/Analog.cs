@@ -40,7 +40,6 @@ namespace GHIElectronics.DUELink {
                 return 0;
             }
 
-            public int FixedFrequency { get; } = 50;
             public bool PWrite(int pin, double dc) {
                 if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO ) ) 
                     throw new ArgumentOutOfRangeException("Invalid pin.");

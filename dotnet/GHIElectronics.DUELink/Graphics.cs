@@ -21,7 +21,7 @@ namespace GHIElectronics.DUELink {
                 
             }
 
-            public void Gfxcfg(DisplayType displayType, byte[] config, int width, int height, int mode) {
+            public void Configuration(DisplayType type, byte[] config, int width, int height, int mode) {
 
                 //var cmd_dim_array = string.Format("dim b1[{0}]", config.Length);
 
@@ -60,7 +60,7 @@ namespace GHIElectronics.DUELink {
 
                 config_array += "]";
 
-                var cmd = string.Format($"gfxcfg({displayType.ToString()}, {config_array}, {width}, {height}, {mode})");
+                var cmd = string.Format($"gfxcfg({type.ToString()}, {config_array}, {width}, {height}, {mode})");
 
             }
 
@@ -185,7 +185,7 @@ namespace GHIElectronics.DUELink {
                     throw new ArgumentNullException("Data null.");
                 }
 
-                if (width == 0 || height == 0 || img == null || img.Length < (width * height)) {
+                if (width == 0 || height == 0 || img == null || img.Length != (width * height)) {
                     throw new ArgumentException("Invalid argument.");
                 }
 
