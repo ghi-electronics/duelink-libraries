@@ -807,11 +807,22 @@ $(document).ready(function(){
         Check();
 		
 		var displayNumber = $("#displayNumber").val()/1;
-		if (displayNumber < 4) {
+		
+		console.log(displayNumber)
+		if (displayNumber == 3) {
+			await duelink.Graphics.Clear(0);
+			var msg = $("#textsendid").val();
+			await duelink.Graphics.TextT(msg, 1, 0, 0);
+			await duelink.Graphics.Show();
+			
+			
+		}
+		else if (displayNumber < 4) {
 			await duelink.Graphics.Clear(0);
 			var msg = $("#textsendid").val();
 			await duelink.Graphics.Text(msg, 1, 1, 1);
 			await duelink.Graphics.Show();
+
 		}
 		else {		
 			showError("This display is under testing...");
