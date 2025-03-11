@@ -434,7 +434,7 @@ $(document).ready(function(){
                                     </p>
 									<p>
                                         <!-- <label>Input text:</label> -->
-										<button class="btn btn-primary" onclick="sendText()">Show Line </button>                                        
+										<button class="btn btn-primary" onclick="sendLine()">Show Line </button>                                        
 										<label>X1</label>
 										<input type="text" id="linePosX1" name="lineX1Name" size="1" value="2" />
 										<label>, Y1</label>
@@ -446,19 +446,30 @@ $(document).ready(function(){
 									</p>
 									<p>
                                         <!-- <label>Input text:</label> -->
-										<button class="btn btn-primary" onclick="sendText()">Show Circle </button>                                        
+										<button class="btn btn-primary" onclick="sendCircle()">Show Circle </button>                                        
 										
 										<label>X</label>
-										<input type="text" id="circlePosX" name="circleXName" size="1" value="10" />
+										<input type="text" id="circlePosX" name="circleXName" size="1" value="20" />
 										<label>, Y</label>
-										<input type="text" id="circlePosY" name="circleYName" size="1" value="10" />		
+										<input type="text" id="circlePosY" name="circleYName" size="1" value="20" />		
 										<label>, Radius </label>
 										<input type="text" id="circleRadius" name="circleRadiusName" size="1" value="15" />										
 									</p>
 									
 									<p>
+										Color:
+										<label>Red</label>
+										<input type="text" id="colorRed" name="colorRedName" size="1" value="255" />
+										<label>, Green</label>
+										<input type="text" id="colorGreen" name="colorGreenName" size="1" value="255" />		
+										<label>, Blue </label>
+										<input type="text" id="colorBlue" name="colorBlueName" size="1" value="255" />	
+									
+									</p>
+									
+									<p>
                                         <!-- <label>Input text:</label> -->
-										<button class="btn btn-primary" onclick="sendText()">Clear </button>                                        
+										<button class="btn btn-primary" onclick="sendClear()">Clear </button>                                        
 																				
 									</p>
 									
@@ -606,9 +617,62 @@ $(document).ready(function(){
 			let frameBuffer = ctx.getImageData(0, 0, canvas.width, canvas.height);
         	await duelink.Display.ShowBuffer(frameBuffer.data, color_depth);		     
     }
+	
+	async function sendClear() {
+		await duelink.Graphics.Clear(0);
+		await duelink.Graphics.Show();
+	}
+	
+	async function sendLine() {
+		var x1 = $("#linePosX1").val()/1
+		var y1 = $("#linePosY1").val()/1
+		
+		var x2 = $("#linePosX2").val()/1
+		var y2 = $("#linePosY2").val()/1
+		
+		var r = $("#colorRed").val()/1
+		var g = $("#colorGreen").val()/1
+		var b = $("#colorBlue").val()/1
+		
+		var c = (r << 16) | (g << 8) | (b << 0)
+		
+		await duelink.Graphics.Line(c, x1, y1, x2, y2)
+		await duelink.Graphics.Show()
+	}
+	
+	async function sendCircle() {
+		
+		
+		
+		var x = $("#circlePosX").val()/1
+		var y = $("#circlePosY").val()/1
+		var rd = $("#circleRadius").val()/1
+		
+		var r = $("#colorRed").val()/1
+		var g = $("#colorGreen").val()/1
+		var b = $("#colorBlue").val()/1
+		
+		var c = (r << 16) | (g << 8) | (b << 0)
+		
+		await duelink.Graphics.Circle(c, x, y, rd)
+		await duelink.Graphics.Show()
+	}
 
     async function sendText() {
         Check();
+		var x = $("#textPosX").val()/1
+		var y = $("#textPosY").val()/1
+		
+		var r = $("#colorRed").val()/1
+		var g = $("#colorGreen").val()/1
+		var b = $("#colorBlue").val()/1
+		
+		var c = (r << 16) | (g << 8) | (b << 0)
+		
+		var msg = $("#textsendid").val()
+		
+		await duelink.Graphics.TextT(msg, c, x, y)
+		await duelink.Graphics.Show()
 		
 		<!-- var displayNumber = $("#displayNumber").val()/1; -->
 		
