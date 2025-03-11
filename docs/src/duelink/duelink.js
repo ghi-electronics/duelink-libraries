@@ -265,7 +265,7 @@ class AnalogController {
     
         if (res.success) {
           try {
-            return parseInt(res.response);
+            return parseFloat(res.response);
           } catch {}
         }
     

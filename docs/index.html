@@ -71,8 +71,8 @@ $(document).ready(function(){
     <div class="alert alert-primary" id="id-connect">
     </div>
 
-    <div class="sidenav" id="id-sidemenu">
-    </div>
+    <!-- <div class="sidenav" id="id-sidemenu"> -->
+    <!-- </div> -->
 
     <div id="id-selections" class="container">
         <div id="id-top">
@@ -92,10 +92,7 @@ $(document).ready(function(){
                     <a class="nav-link" id="tab4" data-toggle="tab" href="#tab4Content" role="tab" aria-controls="tab4Content" aria-selected="false">Servo</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="tab5" data-toggle="tab" href="#tab5Content" role="tab" aria-controls="tab5Content" aria-selected="false">NeoPixel</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="tab6" data-toggle="tab" href="#tab6Content" role="tab" aria-controls="tab6Content" aria-selected="false">Display</a>
+                    <a class="nav-link" id="tab6" data-toggle="tab" href="#tab6Content" role="tab" aria-controls="tab6Content" aria-selected="false">Graphics</a>
                 </li>
             </ul>
 
@@ -199,9 +196,7 @@ $(document).ready(function(){
                                     </table>
                                     <button class="btn btn-primary" onclick="digitalRead()">Read</button>
                                 </div>
-                                <br>
-                                <a href="https://duelink.com/software/api/digital.html">Digital API Documentation</a>
-
+                                <br>                                
                             </div>
                         </div>
                     </div>
@@ -211,7 +206,7 @@ $(document).ready(function(){
                     <div class="row">
                         <div class="center">
                             <div class="center">
-                                Analog Write
+                                Power Write
                                 <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
                                     <table width="300">
                                         <tr>
@@ -242,10 +237,10 @@ $(document).ready(function(){
                                                 <script>
                                                     let rangeslider = document.getElementById("sliderRange");
                                                     let output = document.getElementById("demo");
-                                                    output.innerHTML = rangeslider.value;
+                                                    output.innerHTML = rangeslider.value + "%";
 
                                                     rangeslider.oninput = function () {
-                                                        output.innerHTML = this.value;
+                                                        output.innerHTML = this.value + "%";
                                                     }
                                                 </script>
                                             </td>
@@ -264,13 +259,13 @@ $(document).ready(function(){
                     <div class="row">
                         <div class="center">
                             <div class="center">
-                                Analog Read
+                                Volt Read
                                 <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
                                     <table width="300">
                                         <tr>
                                             <td width="109">Pin</td>
                                             <td width="129">
-                                                <select id="pinNumber">
+                                                <select id="pinNumberAnalogRead">
                                                     <option value="1">P1</option>
                                                     <option value="2">P2</option>
                                                     <option value="3">P3</option>
@@ -293,8 +288,7 @@ $(document).ready(function(){
                                     </table>
                                     <button class="btn btn-primary" onclick="analoglRead()">Read</button>
                                 </div>
-                                <br>
-                                <a href="https://duelink.com/software/api/analog.html">Analog API Documentation</a>
+                                <br>                                
                             </div>
                         </div>
                     </div>
@@ -303,7 +297,7 @@ $(document).ready(function(){
                 <div class="tab-pane fade" id="tab3Content" role="tabpanel" aria-labelledby="tab3">
                     <div class="row">
                         <div class="center">
-                            Sound
+                            Beep
                             <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
                                 <table width="300">
                                     <tr>
@@ -326,22 +320,21 @@ $(document).ready(function(){
                                         <td width="125">Duration</td>
                                         <td width="144">
                                             <select id="playNote">
-                                                <option value="130">C - 130Hz</option>
-                                                <option value="146">D - 146Hz</option>
-                                                <option value="164">E - 164Hz</option>
-                                                <option value="174">F - 174Hz</option>
-                                                <option value="196">G - 196Hz</option>
-                                                <option value="220">A - 220Hz</option>
-                                                <option value="246">B - 246Hz</option>
-                                                <option value="261">C - 261Hz</option>
+                                                <option value="130">C4 - 130Hz</option>
+                                                <option value="146">D4 - 146Hz</option>
+                                                <option value="164">E4 - 164Hz</option>
+                                                <option value="174">F4 - 174Hz</option>
+                                                <option value="196">G4 - 196Hz</option>
+                                                <option value="220">A4 - 220Hz</option>
+                                                <option value="246">B4 - 246Hz</option>
+                                                <option value="261">C5 - 261Hz</option>
                                             </select>
                                         </td>
                                     </tr>
                                 </table>
                                 <button class="btn btn-primary" onclick="playSound()">Beep</button>
                             </div>
-                            <br>
-                            <a href="https://duelink.com/software/api/sound.html">Sound API Documentation</a>
+                            <br>                            
                         </div>
                     </div>
                 </div>
@@ -393,141 +386,16 @@ $(document).ready(function(){
                                     </table>
                                     <button class="btn btn-primary" onclick="setServo()">Set</button>
                                 </div>
-                                <br>
-                                <a href="https://duelink.com/software/api/servo.html">Servo API Documentation</a>
+                                <br>                                
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- NeoPixel Tab -->
-                <div class="tab-pane fade" id="tab5Content" role="tabpanel" aria-labelledby="tab5">
-                    <div class="row">
-                        <div class="center">
-                            <div class="center">
-                                NeoPixel
-                                <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
-                                    <table width="300">
-                                        <tr>
-                                            <td width="136">Pin</td>
-                                            <td width="152">
-                                                <select id="pinNumberNeoPixel">                     
-                                                    <option value="1">P1</option>
-                                                    <option value="2">P2</option>
-                                                    <option value="3">P3</option>
-                                                    <option value="4">P4</option>
-                                                    <option value="5">P5</option>
-                                                    <option value="6">P6</option>
-                                                    <option value="7">P7</option>
-                                                    <option value="8">P8</option>
-                                                    <option value="9">P9</option>
-                                                    <option value="10">P10</option>
-                                                    <option value="11">P11</option>
-													<option value="12">P12</option>
-                                                    <option value="13">P13</option>
-                                                    <option value="14">P14</option>
-                                                    <option value="15">P15</option>
-                                                    <option value="16">P16</option>
-                                                </select>
-                                            </td>
-			
-											
-											
-                                        </tr>
-										
-										
-
-                                        <!---NeoPixel RED Slider-->
-                                        <td>
-
-                                            <div class="rangesliderNeoPixelRED">
-                                                <input type="range" min="0" max="255"
-                                                       value="128" class="mysliderNeoPixelRED"
-                                                       id="sliderRangeNeoPixelRED">
-                                                <p>Red: <span id="demoNeoPixelRED"></span></p>
-                                            </div>
-
-                                            <script>
-                                                let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
-                                                let outputRED = document.getElementById("demoNeoPixelRED");
-                                                outputRED.innerHTML = rangesliderNeoPixelRED.value;
-
-                                                rangesliderNeoPixelRED.oninput = function () {
-                                                    setColorSwatch();
-                                                    outputRED.innerHTML = this.value;
-                                                }
-                                            </script>
-                                        </td>
-
-                                        <!---NeoPixel GREEN Slider-->
-                                        <td>
-
-                                            <div class="rangesliderNeoPixelGREEN">
-                                                <input type="range" min="0" max="255"
-                                                       value="128" class="mysliderNeoPixelGREEN"
-                                                       id="sliderRangeNeoPixelGREEN">
-                                                <p>Green: <span id="demoNeoPixelGREEN"></span></p>
-                                            </div>
-
-                                            <script>
-                                                let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
-                                                let outputGREEN = document.getElementById("demoNeoPixelGREEN");
-                                                outputGREEN.innerHTML = rangesliderNeoPixelGREEN.value;
-
-                                                rangesliderNeoPixelGREEN.oninput = function () {
-                                                    setColorSwatch();
-                                                    outputGREEN.innerHTML = this.value;
-                                                }
-                                            </script>
-                                        </td>
-
-                                        <!---NeoPixel BLUE Slider-->
-                                        <td>
-
-                                            <div class="rangesliderNeoPixelBLUE">
-                                                <input type="range" min="0" max="255"
-                                                       value="128" class="mysliderNeoPixelBLUE"
-                                                       id="sliderRangeNeoPixelBLUE">
-                                                <p>Blue: <span id="demoNeoPixelBLUE"></span></p>
-                                            </div>
-
-                                            <script>
-                                                let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
-                                                let outputBLUE = document.getElementById("demoNeoPixelBLUE");
-                                                outputBLUE.innerHTML = rangesliderNeoPixelBLUE.value;
-
-                                                rangesliderNeoPixelBLUE.oninput = function () {
-                                                    setColorSwatch();
-                                                    outputBLUE.innerHTML = this.value;
-                                                }
-                                            </script>
-                                        </td>
-                                        <div id="colorSection"></div>
-                                        <br>
-
-                                    </table>
-                                   								
-									<label>LED Index: </label>
-                                    <input type="text" id="neoPixelIndex" name="neoPixelIndexName" value="0" />
-                                    <br>
-                                    <label>LED Count: </label>
-                                    <input type="text" id="neoPixelCount" name="neoPixelCountName" value="16" />
-                                    <br>
-                                    <button class="btn btn-primary" onclick="neoPixelSet()">Set Index</button>
-                                    <button class="btn btn-primary" onclick="neoPixelCycle()">Cycle</button>
-                                    <button class="btn btn-primary" onclick="neoPixelClearAll()">Clear All</button>
-
-
-                                </div>
-                                <br>
-                                <a href="https://duelink.com/software/api/neopixel.html">NeoPixel API Documentation</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
                 <div class="tab-pane fade" id="tab6Content" role="tabpanel" aria-labelledby="tab6">
                     <div class="row">
                         <div class="center">
-                            Display
+                            Graphics
                             <div class="center">
                                 <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
                                     <!-- <div style="text-align:center;"> -->
@@ -537,32 +405,67 @@ $(document).ready(function(){
                                         <!-- </p> -->
                                     <!-- </div> -->
                                     <!-- <button class="btn btn-primary" onclick="sendImage()">Show Image</button> -->
-									<p>
-										<td width="136">Select DUELink display</td>
-										<td width="152">
-											<select id="displayNumber">                     
-												<option value="1">TFT CP23</option>
-												<option value="2">PixoBit</option>
-												<option value="3">CincoBit</option>
-												<option value="4">LCD 16x2</option>
-												<option value="5">LCD 20x4</option>
-												<option value="6">OLED 096</option>
-												<option value="7">TFT N18</option>
-												<option value="8">TFT R128</option>
-												<option value="9">TFT T32</option>
-												<option value="10">VFD B8</option>											
-											</select>
-										</td>
-									</p>
+									<!-- <p> -->
+										<!-- <td width="136">Select DUELink display</td> -->
+										<!-- <td width="152"> -->
+											<!-- <select id="displayNumber">                      -->
+												<!-- <option value="1">TFT CP23</option> -->
+												<!-- <option value="2">PixoBit</option> -->
+												<!-- <option value="3">CincoBit</option> -->
+												<!-- <option value="4">LCD 16x2</option> -->
+												<!-- <option value="5">LCD 20x4</option> -->
+												<!-- <option value="6">OLED 096</option> -->
+												<!-- <option value="7">TFT N18</option> -->
+												<!-- <option value="8">TFT R128</option> -->
+												<!-- <option value="9">TFT T32</option> -->
+												<!-- <option value="10">VFD B8</option>											 -->
+											<!-- </select> -->
+										<!-- </td> -->
+									<!-- </p> -->
                                     <p>
-                                        <br>
-                                        <label>Input text:</label>
-                                        <input type="text" id="textsendid" name="textsendname" value="Hello DUELink!" />
-                                        <button class="btn btn-primary" onclick="sendText()">Show Text </button>
+                                        <!-- <label>Input text:</label> -->
+										<button class="btn btn-primary" onclick="sendText()">Show Text </button>
+                                        <input type="text" id="textsendid" name="textsendname" size="12" value="Hello DUELink!" />
+										<label>, X</label>
+										<input type="text" id="textPosX" name="textXName" size="1" value="0" />
+										<label>, Y</label>
+										<input type="text" id="textPosY" name="textYName" size="1" value="0" />
+							
                                     </p>
+									<p>
+                                        <!-- <label>Input text:</label> -->
+										<button class="btn btn-primary" onclick="sendText()">Show Line </button>                                        
+										<label>X1</label>
+										<input type="text" id="linePosX1" name="lineX1Name" size="1" value="2" />
+										<label>, Y1</label>
+										<input type="text" id="linePosY1" name="lineY1Name" size="1" value="3" />
+										<label>, X2</label>
+										<input type="text" id="linePosX2" name="lineX2Name" size="1" value="22" />
+										<label>, Y2</label>
+										<input type="text" id="linePosY2" name="lineY2Name" size="1" value="33" />
+									</p>
+									<p>
+                                        <!-- <label>Input text:</label> -->
+										<button class="btn btn-primary" onclick="sendText()">Show Circle </button>                                        
+										
+										<label>X</label>
+										<input type="text" id="circlePosX" name="circleXName" size="1" value="10" />
+										<label>, Y</label>
+										<input type="text" id="circlePosY" name="circleYName" size="1" value="10" />		
+										<label>, Radius </label>
+										<input type="text" id="circleRadius" name="circleRadiusName" size="1" value="15" />										
+									</p>
+									
+									<p>
+                                        <!-- <label>Input text:</label> -->
+										<button class="btn btn-primary" onclick="sendText()">Clear </button>                                        
+																				
+									</p>
+									
+									The <a href="https://www.duelink.com/docs/engine/graphics" target="_blank" >Graphics documentation</a> page lists all available drawing functions.
+									
                                 </div>
-                                <br>
-                                <a href="https://duelink.com/software/api/lcd.html">Display API Documentation</a>
+                                <br>                                
                             </div>
                         </div>
                     </div>
@@ -663,7 +566,7 @@ $(document).ready(function(){
         }
         var valueRange = rangeslider.value;
         var aValue = valueRange / 1;
-        await duelink.Analog.Write(pinAWrite, aValue);
+        await duelink.Analog.PWrite(pinAWrite, aValue);
     }
 
     async function setServo() {
@@ -684,111 +587,12 @@ $(document).ready(function(){
 
     async function analoglRead() {
         Check();
-        var returnAnalogRead = await duelink.Analog.Read(0);
-        document.getElementById("analogReadReturn").innerHTML = returnAnalogRead;
+		var pinRead = $("#pinNumberAnalogRead").val()/1;
+        var returnAnalogRead = await duelink.Analog.VRead(pinRead);
+        document.getElementById("analogReadReturn").innerHTML = returnAnalogRead + "V";
     }
 	
-    async function neoPixelClearAll() {
-        Check();
-		var pinNeoPixel = $("#pinNumberNeoPixel").val()/1;
-		var countNeoPixel = neoPixelCount.value/1;
-		
-		await duelink.Graphics.Configuration(3, [pinNeoPixel, countNeoPixel, 1 , 0], countNeoPixel, 1, 1);
-		
-       	await duelink.Graphics.Clear();	
-		await duelink.Graphics.Show();
-       
-    }
-	
-	async function neoPixelCycle(){
-		
-		var pinNeoPixel = $("#pinNumberNeoPixel").val()/1;
-
-		//RED Slider Value
-		let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
-        var red = rangesliderNeoPixelRED.value/1;
-		
-		//GREEN Slider Value
-		let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
-        var green = rangesliderNeoPixelGREEN.value/1;
-
-		
-		//GREEN Slider
-		let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
-		var blue = rangesliderNeoPixelBLUE.value/1;
-
-		
-
-		var countNeoPixel = neoPixelCount.value/1;
-		
-		await duelink.Graphics.Configuration(3, [pinNeoPixel, countNeoPixel, 1, 0], countNeoPixel, 1, 1);
-				
-		for(let i=0; i<countNeoPixel;i++){
-			await duelink.Graphics.Clear();	
-			await delay(10); 
-			await duelink.Graphics.Pixel((red<<16) | (green << 8) | (blue<<0),i, 0 );
-			await duelink.Graphics.Show();
-			await delay(10); 
-		}				
-	}
-	
-	async function neoPixelSet() {
-        Check();
-		var pinNeoPixel = $("#pinNumberNeoPixel").val()/1;
-
-		//RED Slider
-		let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
-        let outputRED = document.getElementById("demoNeoPixelRED");
-        outputRED.innerHTML = rangesliderNeoPixelRED.value;
-
-        rangesliderNeoPixelRED.oninput = function () {
-            outputRED.innerHTML = this.value;
-        }
-        var red = rangesliderNeoPixelRED.value/1;
-		
-		//GREEN Slider
-		let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
-        let outputGREEN = document.getElementById("demoNeoPixelGREEN");
-        outputGREEN.innerHTML = rangesliderNeoPixelGREEN.value;
-
-        rangesliderNeoPixelGREEN.oninput = function () {
-            outputGREEN.innerHTML = this.value;
-        }
-        var green = rangesliderNeoPixelGREEN.value/1;
-
-		
-		//GREEN Slider
-		let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
-        let outputBLUE = document.getElementById("demoNeoPixelBLUE");
-        outputBLUE.innerHTML = rangesliderNeoPixelBLUE.value;
-        var blue = rangesliderNeoPixelBLUE.value/1;
-		
-		var index = neoPixelIndex.value/1;		
-		var countNeoPixel = neoPixelCount.value/1;
-			
-		await duelink.Graphics.Configuration(3, [pinNeoPixel, countNeoPixel, 1, 0], countNeoPixel, 1, 1);
-		await duelink.Graphics.Pixel(((red<<16) | (green << 8) | (blue<<0)),index, 0 );
-		await duelink.Graphics.Show();		
-    }
-	
-	async function setColorSwatch(){
-		
-		//RED Slider
-		let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
-        var red = rangesliderNeoPixelRED.value/1;
-		
-		//GREEN Slider
-		let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
-        var green = rangesliderNeoPixelGREEN.value/1;
-		
-		//GREEN Slider
-		let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
-        var blue = rangesliderNeoPixelBLUE.value/1;	
-			
-		
-		const color = `rgb(${red}, ${green}, ${blue})`;
-    document.getElementById('colorSection').style.backgroundColor = color;
-	}	
+    
 
     async function playSound() {
         Check();
@@ -806,27 +610,27 @@ $(document).ready(function(){
     async function sendText() {
         Check();
 		
-		var displayNumber = $("#displayNumber").val()/1;
+		<!-- var displayNumber = $("#displayNumber").val()/1; -->
 		
-		console.log(displayNumber)
-		if (displayNumber == 3) {
-			await duelink.Graphics.Clear(0);
-			var msg = $("#textsendid").val();
-			await duelink.Graphics.TextT(msg, 1, 0, 0);
-			await duelink.Graphics.Show();
+		<!-- console.log(displayNumber) -->
+		<!-- if (displayNumber == 3) { -->
+			<!-- await duelink.Graphics.Clear(0); -->
+			<!-- var msg = $("#textsendid").val(); -->
+			<!-- await duelink.Graphics.TextT(msg, 1, 0, 0); -->
+			<!-- await duelink.Graphics.Show(); -->
 			
 			
-		}
-		else if (displayNumber < 4) {
-			await duelink.Graphics.Clear(0);
-			var msg = $("#textsendid").val();
-			await duelink.Graphics.Text(msg, 1, 1, 1);
-			await duelink.Graphics.Show();
+		<!-- } -->
+		<!-- else if (displayNumber < 4) { -->
+			<!-- await duelink.Graphics.Clear(0); -->
+			<!-- var msg = $("#textsendid").val(); -->
+			<!-- await duelink.Graphics.Text(msg, 1, 1, 1); -->
+			<!-- await duelink.Graphics.Show(); -->
 
-		}
-		else {		
-			showError("This display is under testing...");
-		}
+		<!-- } -->
+		<!-- else {		 -->
+			<!-- showError("This display is under testing..."); -->
+		<!-- } -->
     }
 
     function hideError() {
