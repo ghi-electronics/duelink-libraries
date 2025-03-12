@@ -20,11 +20,11 @@ namespace GHIElectronics.DUELink {
 
         }
 
-        public class Version {
-            public string Firmware;
-            public string ProductId;
-            public string Bootloader;
-        }
+        //public class Version {
+        //    public string Firmware;
+        //    public string ProductId;
+        //    public string Bootloader;
+        //}
         public class SystemController {
 
             SerialInterface serialPort;
@@ -88,37 +88,37 @@ namespace GHIElectronics.DUELink {
                 return -1;
             }
             
-            public Version GetVersion() {
-                if (this._version == null) {
-                    var command = "version()";
+            //public Version GetVersion() {
+            //    if (this._version == null) {
+            //        var command = "version()";
 
 
-                    this.serialPort.WriteCommand(command);
+            //        this.serialPort.WriteCommand(command);
 
 
-                    var response = this.serialPort.ReadResponse();
+            //        var response = this.serialPort.ReadResponse();
 
 
-                    if (response.success) {
-                        if (response.response != null) {
+            //        if (response.success) {
+            //            if (response.response != null) {
 
-                            this._version = new Version();
+            //                this._version = new Version();
 
                             
 
 
-                            var versions = response.response.Substring(25).Split(':');
+            //                var versions = response.response.Substring(25).Split(':');
 
-                            this._version.Firmware = versions[0];
-                            this._version.ProductId = versions[1];
-                            this._version.Bootloader = versions[2];
+            //                this._version.Firmware = versions[0];
+            //                this._version.ProductId = versions[1];
+            //                this._version.Bootloader = versions[2];
                             
-                        }
-                    }
-                }
+            //            }
+            //        }
+            //    }
 
-                return this._version;
-            }
+            //    return this._version;
+            //}
 
             public int Info(int code) {
                 var cmd = string.Format("info({0})", code.ToString());

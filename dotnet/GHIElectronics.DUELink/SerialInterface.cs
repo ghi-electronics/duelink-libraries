@@ -77,54 +77,64 @@ namespace GHIElectronics.DUELink {
             this.WriteRawData(new byte[] { 127 }, 0, 1);
 
             Thread.Sleep(300);
+           
+            this.port.DiscardInBuffer();
+            this.port.DiscardOutBuffer();
+
+            this.TurnEchoOff();
+
+            this.leftOver = "";
+
+            this.port.DiscardInBuffer();
+            this.port.DiscardOutBuffer();
 
 
-            var orig = this.ReadTimeout;
+            //var orig = this.ReadTimeout;
 
-            this.ReadTimeout = TimeSpan.FromSeconds(1);
+            //this.ReadTimeout = TimeSpan.FromSeconds(1);
 
-            this.port.ReadTimeout = (int)this.ReadTimeout.TotalMilliseconds;
+            //this.port.ReadTimeout = (int)this.ReadTimeout.TotalMilliseconds;
 
-            var tryCount = 3;
+            //var tryCount = 3;
 
-            while (tryCount-- > 0) {
-                Thread.Sleep(10);
+            //while (tryCount-- > 0) {
+            //    Thread.Sleep(10);
 
-                this.leftOver = "";
+            //    this.leftOver = "";
 
-                this.port.DiscardInBuffer();
-                this.port.DiscardOutBuffer();
+            //    this.port.DiscardInBuffer();
+            //    this.port.DiscardOutBuffer();
 
-                try {
-                    //var version = this.GetVersion();
+            //    try {
+            //        //var version = this.GetVersion();
 
-                    var command = "version()";
-
-
-                    this.WriteCommand(command);
+            //        var command = "version()";
 
 
-                    var version = this.ReadResponse();
+            //        this.WriteCommand(command);
 
 
-                    if (version.success) {
+            //        var version = this.ReadResponse();
 
-                        if (version.response != string.Empty && version.response.Contains(command)) {
-                            this.TurnEchoOff();
 
-                        }
-                        if (version.response != string.Empty && version.response.Contains("GHI Electronics")) {
-                            break;
-                        }
-                    }
-                }
-                catch {
+            //        if (version.success) {
 
-                }
-            }
+            //            if (version.response != string.Empty && version.response.Contains(command)) {
+            //                this.TurnEchoOff();
 
-            this.ReadTimeout = orig;
-            this.port.ReadTimeout = (int)this.ReadTimeout.TotalMilliseconds;
+            //            }
+            //            if (version.response != string.Empty && version.response.Contains("GHI Electronics")) {
+            //                break;
+            //            }
+            //        }
+            //    }
+            //    catch {
+
+            //    }
+            //}
+
+            //this.ReadTimeout = orig;
+            //this.port.ReadTimeout = (int)this.ReadTimeout.TotalMilliseconds;
         }
 
         private bool Echo { get; set; } = true;
