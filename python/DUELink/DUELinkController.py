@@ -58,7 +58,6 @@ class DUELinkController:
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()
         
-        self.System.Version = self.System.GetVersion()[1].strip()
 
         
     
