@@ -1055,18 +1055,9 @@ class SpiController {
     }
 }
 
-class Version {
-    constructor() {
-      this.Firmware = "";
-      this.ProductId = "";
-      this.Bootloader = "";
-    }
-  
-}
 class SystemController {
     constructor(serialPort) {
       this.serialPort = serialPort;
-      this.version = new Version();
   
     }
   
@@ -1098,26 +1089,6 @@ class SystemController {
         } catch {}
       }
       return -1;
-    }
-    
-    async GetVersion() {
-      const command = "version()";
-      await this.serialPort.WriteCommand(command);
-  
-      const resp = await this.serialPort.ReadResponse();
-  
-      if (resp.success) {
-        if (resp.response && resp.response.length > 0) {
-  
-          let versions = resp.response.slice(25).split(':');
-  
-          this.version.Firmware = versions[0];
-          this.version.ProductId = versions[1];
-          this.version.Bootloader = versions[2];
-        }
-      }
-  
-      return this.version;
     }
   
     async Info(code) {
