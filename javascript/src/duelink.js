@@ -42,37 +42,17 @@ class SerialInterface {
     cmd[0] = 0x7f;
 
     await this.WriteRawData(cmd, 0, 1);
+	
+	await Util.sleep(300);
+	
+	this.portName.resetInputBuffer();
+	this.portName.resetOutputBuffer();
+	
+	await this.TurnEchoOff();
 
-    const orig = this.portName.getTimeout();
-    this.portName.setTimeout(1);
-    let tryCount = 3;
-    while (tryCount > 0) {
-      this.leftOver = "";
-      this.portName.resetInputBuffer();
-      this.portName.resetOutputBuffer();
-      try {
-        let cmd = "version()";
-
-        await this.WriteCommand(cmd);
-        let res = await this.ReadResponse();
-
-        if (res.success) {
-          if (res.response && res.response.includes(cmd)) {
-            await this.TurnEchoOff()
-          }
-
-          if (res.response && res.response.includes("GHI Electronics")) {
-            break;          
-          }
-
-        }
-
-        
-      } catch {}
-      tryCount -= 1;
-      await Util.sleep(10);
-    }
-    this.portName.setTimeout(orig);
+	this.leftOver = "";
+	this.portName.resetInputBuffer();
+	this.portName.resetOutputBuffer();
   }
 
   async TurnEchoOff() {
@@ -461,7 +441,7 @@ class GraphicsController {
   }
 
   async Configuration(type, config, width, height, mode) {
-    let cfg_array = "[";
+    let cfg_array = "{";
 
     for (let i = 0; i < config.length; i++) {
       cfg_array += config[i];
@@ -470,7 +450,7 @@ class GraphicsController {
         cfg_array += ",";
     }
 
-    cfg_array += "]";
+    cfg_array += "}";
 
 
     let cmd = `gfxcfg(${type},${cfg_array},${width},${height},${mode})`;
