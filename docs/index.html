@@ -77,6 +77,8 @@ $(document).ready(function(){
     <div id="id-selections" class="container">
         <div id="id-top">
         </div>
+		<span id="devInfo"></span>
+		
         <fieldset id="id-inputs" class="border p-3" disabled="true">
             <ul class="nav nav-tabs" role="tablist">
 				<li class="nav-item">
@@ -100,37 +102,13 @@ $(document).ready(function(){
             </ul>
 
             <div class="tab-content mt-3">
+		
 				<div class="tab-pane fade show active" id="tab0Content" role="tabpanel" aria-labelledby="tab0">
-                    <!-- LED Tab -->
-					<div class="row">
-                        <div class="center">
-                            <div class="center">
-                                Toggle 
-                                <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
-                                    <table>
-										
-										
-										<tr>
-											<td> 
-												<button class="btn btn-primary" onclick="setLed()">Set</button>
-												<select id="ledState">  
-													<option value="0">False</option>
-													<option value="1">True</option>	
-												</select>
-												
-												
-											</td> 
-														
-										</tr>
-									</table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- LED Tab -->					
                     <div class="row">
                         <div class="center">
                             <div class="center">
-                                Blink
+                                LED Blink
                                 <div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
                                     <table>
 										<tr>                               
@@ -138,17 +116,15 @@ $(document).ready(function(){
 												<button class="btn btn-primary" onclick="setLedBlink()">Set</button>
 												
 												<label>High (ms)</label>
-												<input type="text" id="ledHigh" name="ledHighName" size="1" value="100" />
+												<input type="text" id="ledHigh" name="ledHighName" size="1" value="200" />
 												<label>, Low (ms)</label>
-												<input type="text" id="ledLow" name="ledLowName" size="1" value="100" />
+												<input type="text" id="ledLow" name="ledLowName" size="1" value="200" />
 												<label>, count</label>
-												<input type="text" id="ledCount" name="ledCountName" size="1" value="5" />
+												<input type="text" id="ledCount" name="ledCountName" size="1" value="40" />
 												
 												
 											</td>
 										</tr>
-										
-										
 									</table>
                                 </div>
                             </div>
@@ -602,17 +578,38 @@ $(document).ready(function(){
             hideError();
             Check();
             await duelink.Connect();
+			
+			await getInfo(true);
             
             $("#id-version").text(duelink.Version);
             $("#id-connect").slideUp();
             $("#id-inputs").prop("disabled", false);
 
         } catch (e) {
-            showError("connect Error" + e);
+            await getInfo(false);
+			showError("connect Error" + e);
+			
         }
     }
 	
-	
+	async function getInfo(connected) {
+        Check();  
+		
+		let output = document.getElementById("devInfo");
+		
+		if (connected) {
+			var dev_num = (await duelink.System.Info(0)).toString().padStart(4, '0');
+			var fw_num = (await duelink.System.Info(1)).toString().padStart(3, '0');
+			var bl_num = (await duelink.System.Info(2)).toString().padStart(3, '0');
+			
+
+			var info = `Device ID:${dev_num} - FW:${fw_num} - BL:${bl_num} connected.`
+			output.innerHTML = info;
+		}
+		else {
+			output.innerHTML = "";
+		}
+    }
 	
 	async function setLed() {
         Check();
