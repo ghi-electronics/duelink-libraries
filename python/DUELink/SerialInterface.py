@@ -36,25 +36,18 @@ class SerialInterface:
         cmd[0] = 127
 
         self.WriteRawData(cmd, 0, 1)
+        
+        time.sleep(0.3)
+                
+        self.portName.reset_input_buffer()
+        self.portName.reset_output_buffer() 
+        
+        self.TurnEchoOff()
+        
+        self.leftOver = ""
+        self.portName.reset_input_buffer()
+        self.portName.reset_output_buffer() 
     
-        orig = self.portName.timeout
-        self.portName.timeout = 1
-        tryCount = 3
-        while tryCount > 0:
-            time.sleep(0.01)
-            self.leftOver = ""
-            self.portName.reset_input_buffer()
-            self.portName.reset_output_buffer()
-            try:
-                version = self.GetVersion()
-                if version != "" and version[2] == '.' and version[4] == '.':
-                    break
-            except:
-                pass
-            tryCount -= 1
-        self.portName.timeout = orig
-
-
 
     def TurnEchoOff(self):
         if not self.echo:
