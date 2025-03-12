@@ -49,7 +49,7 @@ namespace GHIElectronics.DUELink {
 
                 var config_array = string.Empty;
 
-                config_array = "[";
+                config_array = "{";
 
                 for (var i = 0; i < config.Length; i++) {
                     config_array += config[i];
@@ -58,7 +58,7 @@ namespace GHIElectronics.DUELink {
                         config_array += ",";
                 }
 
-                config_array += "]";
+                config_array += "}";
 
                 var cmd = string.Format($"gfxcfg({type.ToString()}, {config_array}, {width}, {height}, {mode})");
 
