@@ -19,7 +19,11 @@ class GraphicsController:
     
         inputConfig = map(hex, config)
         
-        cmd = f"gfxcfg({displayType}, [{",".join(inputConfig)}], {width}, {height}, {mode})"
+        inputConfigArray = ",".join(inputConfig)
+        
+        inputConfigArray = "{" + inputConfigArray + "}"
+        
+        cmd = f"gfxcfg({displayType}, {inputConfigArray}, {width}, {height}, {mode})"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         return res.success
