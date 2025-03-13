@@ -96,7 +96,7 @@ class SerialInterface {
         }
 
         while (new Date() <= end) {
-            const data = await this.portName.readbyte();
+            const data = await this.portName.read();
 			
             if (data) 
 			{
