@@ -1,6 +1,6 @@
 {
 	"name": "dlserialusb",
-	"version": "1.0.0",
+	"version": "1.2.1",
 	"description": "Serial-usb driver for DUELink",
 	"source": "./dlserialusb.js",
 	"main": "dist/dlserialusb.js",
