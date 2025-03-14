@@ -1094,8 +1094,13 @@ class SystemController {
     let res = await this.serialPort.ReadResponse();
     if (res.success) {
       try {
-        return parseInt(res.response);
-      } catch {}
+			if (code == 0) {
+				return parseInt(res.response);
+			}
+			else {
+				return parseFloat(res.response);
+			}
+        } catch {}
     }
     return -1;
 
