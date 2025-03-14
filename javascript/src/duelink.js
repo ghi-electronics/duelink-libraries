@@ -237,7 +237,7 @@ class Cmdresponse {
 class DeviceConfiguration {
   constructor() {   
     this.MaxPinIO = 27;
-    this.PWMPins = new Set([1, 2, 3, 4, 5, 6, 7, 8, 11]);
+    this.PWMPins = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 11]);
     this.AnalogPins = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 23]);
     this.InterruptPins = new Set([1, 2, 3, 4, 5, 6, 7, 12]);
   }
@@ -270,7 +270,7 @@ class AnalogController {
   }
 
   async PWrite(pin, dc) {
-    if (!this.serialPort.DeviceConfig.AnalogPins.has(pin)) {
+    if (!this.serialPort.DeviceConfig.PWMPins.has(pin)) {
       throw new Error("Invalid pin");
     }
 
