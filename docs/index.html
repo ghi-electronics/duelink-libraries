@@ -655,8 +655,8 @@ $(document).ready(function(){
 		
 		if (connected) {
 			var dev_num = await toHex(await duelink.System.Info(0)/1);
-			var fw_num = (await duelink.System.Info(1)/100).toString();
-			var bl_num = (await duelink.System.Info(2)/100).toString();
+			var fw_num = (await duelink.System.Info(1)).toString();
+			var bl_num = (await duelink.System.Info(2)).toString();
 			
 
 			var info = `Device ID: 0x${dev_num} - FW: ${fw_num} - BL: ${bl_num}`
