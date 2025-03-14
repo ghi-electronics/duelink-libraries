@@ -712,7 +712,7 @@ $(document).ready(function(){
             output.innerHTML = this.value;
         }
         var valueRange = rangeslider.value;
-        var aValue = valueRange / 1;
+        var aValue = (valueRange / 1)/255.0;
         await duelink.Analog.PWrite(pinAWrite, aValue);
     }
 
