@@ -2,6 +2,7 @@ import time
 import serial
 from datetime import datetime, timedelta
 from DUELink.DeviceConfiguration import DeviceConfiguration
+import re
 
 class SerialInterface:
     CommandCompleteText = ">"
@@ -35,25 +36,18 @@ class SerialInterface:
         cmd[0] = 127
 
         self.WriteRawData(cmd, 0, 1)
+        
+        time.sleep(0.3)
+                
+        self.portName.reset_input_buffer()
+        self.portName.reset_output_buffer() 
+        
+        self.TurnEchoOff()
+        
+        self.leftOver = ""
+        self.portName.reset_input_buffer()
+        self.portName.reset_output_buffer() 
     
-        orig = self.portName.timeout
-        self.portName.timeout = 1
-        tryCount = 3
-        while tryCount > 0:
-            time.sleep(0.01)
-            self.leftOver = ""
-            self.portName.reset_input_buffer()
-            self.portName.reset_output_buffer()
-            try:
-                version = self.GetVersion()
-                if version != "" and version[2] == '.' and version[4] == '.':
-                    break
-            except:
-                pass
-            tryCount -= 1
-        self.portName.timeout = orig
-
-
 
     def TurnEchoOff(self):
         if not self.echo:
@@ -63,24 +57,6 @@ class SerialInterface:
         self.echo = False
 
 
-    def GetVersion(self):
-        command = "version()"
-        self.WriteCommand(command)
-
-        version = self.ReadRespone()
-
-        # self.ReadCommandComplete()
-
-        if version.success:
-            if self.echo and command in version.respone:
-            #if self.echo :
-                # echo is on => need to turn off
-                self.TurnEchoOff()
-                self.portName.reset_input_buffer()
-                self.portName.reset_output_buffer()
-                version.respone = version.respone[len(command):]
-
-        return version.respone
 
     def RemoveEchoRespone(self, respone, cmd):
         if cmd in respone:
@@ -91,6 +67,7 @@ class SerialInterface:
     # def CheckResult(self, actual, expected):
     #     if actual != expected:
     #         raise Exception(f"Expected {expected}, got {actual}.")
+    
     def DiscardInBuffer(self):
         self.portName.reset_input_buffer()
 
@@ -211,7 +188,7 @@ class SerialInterface:
     TransferBlockDelay = 0.005
 
     def WriteRawData(self, buffer, offset, count):
-        block = count // self.TransferBlockSizeMax
+        block = count / self.TransferBlockSizeMax
         remain = count % self.TransferBlockSizeMax
 
         idx = offset

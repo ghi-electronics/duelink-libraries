@@ -1,5 +1,6 @@
 from enum import Enum
 import time
+import re
 
 class SystemController:
     class ResetOption(Enum):
@@ -8,16 +9,17 @@ class SystemController:
 
 
     def __init__(self, serialPort):
-        self.serialPort = serialPort           
+        self.serialPort = serialPort
+        self.Version = ""         
 
-    def Reset(self, option : Enum):
-        cmd = "reset({0})".format(1 if option.value == 1 else 0)
+    def Reset(self, option : int):
+        cmd = "reset({0})".format(1 if option == 1 else 0)
         self.serialPort.WriteCommand(cmd)
         # The device will reset in bootloader or system reset
         self.serialPort.Disconnect()
 
     def GetTickMicroseconds(self):
-        cmd = "log(tickus())"
+        cmd = "tickus()"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         if res.success:
@@ -28,7 +30,7 @@ class SystemController:
         return -1
     
     def GetTickMilliseconds(self):
-        cmd = "log(tickms())"
+        cmd = "tickms()"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadRespone()
         if res.success:
@@ -38,59 +40,44 @@ class SystemController:
                 pass
         return -1
     
-    def Beep(self, pin:int, frequency:int, duration:int)->bool:
-        if frequency < 0 or frequency > 10000:
-            raise ValueError("Frequency is within range[0,10000] Hz")
-        if duration < 0 or duration > 1000:
-            raise ValueError("duration is within range[0,1000] millisecond")
-        if pin == 'p' or pin == 'P':
-            pin = 0x70
-        
-        cmd = "beep({0}, {1}, {2})".format(pin, frequency, duration)
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
-        return res.success   
-    
-    def __PrnText(self, text:str, newline: bool):
-        cmd = f"print(\"{text}\")"
+    # def GetVersion(self):
+        # command = "version()"
+        # self.serialPort.WriteCommand(command)
 
-        if (newline):
-            cmd = f"println(\"{text}\")"
+        # version = self.serialPort.ReadRespone()
 
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()        
         
 
+        # match = re.match(r"^([\w\s]+).*?(v[\d\.].*)", version.respone)
 
-    def Print(self, text)->bool:
-        print(text)
 
-        if isinstance(text, str):
-            self.__PrnText(text, False)
-        elif isinstance(text, bool):
-            self.__PrnText('1' if True else '0', False)
-        else:
-            self.__PrnText(str(text), False)
+        # if version.success:
+            # self.serialPort.TurnEchoOff()
+            # self.serialPort.portName.reset_input_buffer()
+            # self.serialPort.portName.reset_output_buffer()
+            # version.respone = version.respone[len(command):]
 
-        return True
+        # version_firmware = match.group(2).split(":")[0]
+        # prod_id = match.group(2).split(":")[1]
+        # version_boot_loader = match.group(2).split(":")[2]
+
+
+        # return version_firmware, prod_id, version_boot_loader
     
-    def Println(self, text)->bool:
-        print(text)
-        if isinstance(text, str):
-            self.__PrnText(text, True)
-        elif isinstance(text, bool):
-            self.__PrnText('1' if text else '0', True)
-        else:
-            self.__PrnText(str(text), True)
-
-        return True
-    
-    def Wait(self, millisecond: int)->bool:
-        cmd = f"wait({millisecond})"       
+    def Info(self, code):
+        cmd = f"info({code})"
         self.serialPort.WriteCommand(cmd)
-        time.sleep(millisecond / 1000)
-        res = self.serialPort.ReadRespone()
-        return res.success
+
+        respone = self.serialPort.ReadRespone()
+
+        if respone.success:            
+            try:
+                value = int(respone.respone)
+                return value
+            except:
+                pass
+
+        return 0
 
     
 

@@ -6,23 +6,15 @@ class DigitalController:
     def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
-    def Read(self, pin, inputType: 0) -> bool:
-        if pin == 'a' or pin == 'A':
-            pin = 97
+    def Read(self, pin, inputType: int) -> bool:
 
-        if pin == 'b' or pin == 'B':
-            pin = 98
-
-        if pin < 0 or (pin >= self.serialPort.DeviceConfig.MaxPinIO and pin != 97 and pin != 98 and pin != 108): #A, B, Led
+        if pin < 0 or pin > self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError("Invalid pin")
 
-        pull = "0"
-        if inputType == 1:
-            pull = "1"
-        elif inputType == 2:
-            pull = "2"
+        if not isinstance(inputType, int) or inputType not in (0, 1, 2):
+            raise ValueError("Invalid inputType. Enter an integer 0-2")    
 
-        cmd = f"log(dread({pin},{pull}))"
+        cmd = f"dread({pin},{inputType})"
         self.serialPort.WriteCommand(cmd)
 
         respone = self.serialPort.ReadRespone()
@@ -36,13 +28,11 @@ class DigitalController:
 
         return False
 
-    def Write(self, pin, value: bool) -> bool:
-        if pin == 'l' or pin == 'L':
-            pin = 108
+    def Write(self, pin: int, value: bool) -> bool:
 
-        if pin < 0 or (pin >= self.serialPort.DeviceConfig.MaxPinIO and pin != 108): # Led
+        if pin < 0 or pin > self.serialPort.DeviceConfig.MaxPinIO:
             raise ValueError("Invalid pin")
-
+        
         cmd = f"dwrite({pin},{1 if value else 0})"
         self.serialPort.WriteCommand(cmd)
 

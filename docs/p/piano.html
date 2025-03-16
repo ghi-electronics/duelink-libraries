@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DUELink NeoPixel Matrix</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../sidenav_styles.css">	
+	<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	
+	<style>
+		.piano {
+    position: relative;
+	}
+
+	.piano img {
+    width: auto;
+    height: auto;
+	}
+	</style>
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){   
+	$('#id-topbar').load("../common/html/id_topbar.html");
+	$('#id-connect').load("../common/html/id_connect.html");
+	$('#id-sidemenu').load("../common/html/id_sidemenu.html");
+	$('#id-status').load("../common/html/id_status.html");
+	$('#id-error').load("../common/html/id_error.html");
+	$('#id-bottom').load("../common/html/id_bottom.html");
+});
+</script>	
+
+<body>
+    <div class="topnav" id="id-topbar">
+				
+	</div>
+	
+	<div class="alert alert-primary" id="id-connect">		
+		
+	</div>
+	
+	<div class="sidenav" id="id-sidemenu" >		
+				
+	</div>
+	
+	
+
+<div class="piano" align="center">
+      <img src="../images/piano-keys.png" alt="Piano Keys" width="408" usemap="#piano-map">
+        <map name="piano-map">
+            <area shape="rect" coords="-3,318,111,512" alt="C" onclick="playSound('C')">
+			<area shape="rect" coords="90,7,143,308" alt="C#" onclick="playSound('C#')">
+            <area shape="rect" coords="123,315,227,509" alt="D" onclick="playSound('D')">
+			<area shape="rect" coords="204,10,257,311" alt="D#" onclick="playSound('D#')">
+            <area shape="rect" coords="236,319,338,512" alt="E" onclick="playSound('E')">
+			<area shape="rect" coords="348,321,451,511" alt="F" onclick="playSound('F')">
+			<area shape="rect" coords="431,10,484,311" alt="F#" onclick="playSound('F#')">     
+			<area shape="rect" coords="463,319,567,513" alt="G" onclick="playSound('G')">
+			<area shape="rect" coords="547,9,596,309" alt="G#" onclick="playSound('G#')">
+            <area shape="rect" coords="579,320,679,511" alt="A" onclick="playSound('A')">		
+            <area shape="rect" coords="658,7,711,309" alt="A#" onclick="playSound('A#')">
+			<area shape="rect" coords="693,320,792,513" alt="B" onclick="playSound('B')">
+			
+			
+			<area shape="rect" coords="803,320,907,512" alt="C" onclick="playSound('C2')">
+			<area shape="rect" coords="887,9,940,310" alt="C#2" onclick="playSound('C#2')">
+            <area shape="rect" coords="918,318,1022,512" alt="D" onclick="playSound('D2')">
+			<area shape="rect" coords="999,9,1052,310" alt="D#2" onclick="playSound('D#2')">
+            <area shape="rect" coords="1033,318,1135,511" alt="E" onclick="playSound('E2')">
+			<area shape="rect" coords="1144,319,1247,509" alt="F" onclick="playSound('F2')">
+			<area shape="rect" coords="1227,9,1280,310" alt="F#" onclick="playSound('F#2')">     
+			<area shape="rect" coords="1259,317,1363,511" alt="G" onclick="playSound('G2')">
+			<area shape="rect" coords="1342,11,1391,311" alt="G#" onclick="playSound('G#2')">
+            <area shape="rect" coords="1374,318,1474,509" alt="A" onclick="playSound('A2')">		
+            <area shape="rect" coords="1454,9,1507,311" alt="A#" onclick="playSound('A#2')">
+			<area shape="rect" coords="1488,319,1587,512" alt="B" onclick="playSound('B2')">
+			<area shape="rect" coords="1598,322,1697,515" alt="C3" onclick="playSound('C3')">
+			
+      </map>
+</div>
+	
+
+    <div id="id-status" style="display:none">
+        <div class="alert alert-success" role="alert">
+            <span>
+                <svg class="align-middle mr-2" style="fill:Green" focusable="false" width="24" height="24"
+                     aria-hidden="true">
+                    <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20, 12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10, 10 0 0,0 22,12A10, 10 0 0,0 12,2M11,17H13V11H11V17Z">
+                    </path>
+                </svg>
+            </span>
+            <span id="status-message"></span>
+        </div>
+    </div>
+
+    <div id="id-error" style="display: none;">
+        <div class="alert alert-danger" role="alert">
+            <span>
+                <svg class="align-middle mr-2" style="fill:red" focusable="false" width="24" height="24"
+                     aria-hidden="true">
+                    <path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z">
+                    </path>
+                </svg>
+            </span>
+            <span id="error-message"></span>
+        </div>
+    </div>
+
+</body>
+
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="../common/js/dropdown_menu.js"></script>
+
+<script>
+    import("../src/serialweb/serialweb.js").then(mod => serial = mod);
+    import("../src/duelink/duelink.js").then(mod => due = mod);
+	import("../src/util.js").then(mod => util = mod);
+	
+	
+	let isReading = false;		
+	const intervalCallBack = 100;
+	const textareaMaxCharacterPerLine = 55;
+	const textareMaxLines = 5; //textarea rows="5" above
+
+	
+	function Check() {
+        if (!this.duelink)
+            this.duelink = new due.DUELinkController(new serial.WebSerial());
+    }
+
+    async function connect() {
+        try {
+            hideError();
+            Check();
+            await duelink.Connect();
+            
+            $("#id-version").text(duelink.Version);
+            $("#id-connect").slideUp();
+            $("#id-inputs").prop("disabled", false);
+
+        } catch (e) {
+            showError("connect Error" + e);
+        }
+    }
+	
+   async function playSound(note) {
+		 Check();
+    //const oscillator = audioContext.createOscillator();
+    //const gainNode = audioContext.createGain();
+
+    //oscillator.connect(gainNode);
+    //gainNode.connect(audioContext.destination);
+
+    const frequencies = {
+        'C': 261.63,
+		'C#': 277.18,
+        'D': 293.66,
+		'D#': 311.13,
+        'E': 329.63,
+        'F': 349.23,
+		'F#': 369.99,
+        'G': 392.0,
+		'G#': 415.30,
+        'A': 440.0,
+		'A#': 466.16,
+        'B': 493.88,
+		'C2': 523.25,
+		'C#2': 554.37,
+        'D2': 587.33,
+		'D#2': 622.25,
+        'E2': 659.25,
+        'F2': 698.46,
+		'F#2': 739.99,
+        'G2': 783.99,
+		'G#2': 830.61,
+        'A2': 880.0,
+		'A#2': 932.33,
+        'B2': 987.77,
+		'C3': 1046.5
+    };
+
+		var note = frequencies[note];
+        await duelink.Frequency.Write(4, note , 400);	
+}
+  
+	
+	
+	
+    
+    function hideError() {
+        $("#id-error").hide();
+    }
+
+    function showStatus(message) {
+        $("#id-btSend").prop("disabled", true);
+        $("#id-speed").prop("disabled", true);
+        hideError();
+        $("#id-status").show();
+        $("#status-message").text(message);
+        $.when($("#id-status").fadeOut(1000)).done(
+            function () { $("#id-btSend").prop("disabled", false); $("#id-speed").prop("disabled", false);}
+            
+        );
+    }
+
+    function showError(message) {
+        //$("#id-btSend").prop("disabled", true);
+        //$("#id-speed").prop("disabled", true);
+        $("#id-error").show();
+        $("#error-message").text(message);
+    }
+	
+	
+		
+</script>

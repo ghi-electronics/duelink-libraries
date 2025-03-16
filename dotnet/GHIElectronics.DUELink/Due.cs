@@ -9,25 +9,15 @@ using Microsoft.Win32;
 namespace GHIElectronics.DUELink {
 
     public class DeviceConfiguration {
-        public bool IsPulse { get; internal set; } = false;
-        public bool IsPico { get; internal set; } = false;
-        public bool IsFlea { get; internal set; } = false;
-        public bool IsEdge { get; internal set; } = false;
-        public bool IsRave { get; internal set; } = false;
+        public uint MaxPinIO { get;  } = 27;
+        public uint MaxPinAnalog { get;  } = 10;
 
-        public bool IsTick { get; internal set; } = false;
-        public uint MaxPinIO { get; set; }
-        public uint MaxPinAnalog { get; set; }
-
-
+        public int[] PWMPins = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 11 };
+        public int[] InterruptPins = new int[] { 1, 2, 3, 4, 5, 6, 7, 12 };
+        public int[] AnalogPins = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 23 };
     }
     public partial class DUELinkController {
 
-        //public enum Pin {
-        //    ButtonA = 97,
-        //    ButtonB = 98,
-        //    Led = 108,
-        //}
 
         SerialInterface serialPort = default!;
 
@@ -53,36 +43,33 @@ namespace GHIElectronics.DUELink {
 
         public InfraredController Infrared { get; internal set; }
 
-        public NeoController Neo { get; internal set; }
+
 
         public SystemController System { get; internal set; }
 
         public UartController Uart { get; internal set; }
         public ButtonController Button { get; internal set; }
         public DistanceSensorController Distance { get; internal set; }
-        public DisplayController Display { get; internal set; }
+        public GraphicsController Graphics { get; internal set; }
 
         public TouchController Touch { get; internal set; }
 
         public LedController Led { get; internal set; }
 
-        public ScriptController Script { get; internal set; }
+        public EngineController Script { get; internal set; }
 
-        public PinController Pin { get; internal set; }
+
 
         public TemperatureController Temperature { get; internal set; }
 
         public HumidityController Humidity { get; internal set; }
 
-        public string Version { get; internal set; } = string.Empty;
 
-        public bool IsPulse => DeviceConfig is null ? false : DeviceConfig.IsPulse;
-        public bool IsPico => DeviceConfig is null ? false : DeviceConfig.IsPico;
-        public bool IsFlea => DeviceConfig is null ? false : DeviceConfig.IsFlea;
-        public bool IsEdge => DeviceConfig is null ? false : DeviceConfig.IsEdge;
-        public bool IsRave => DeviceConfig is null ? false : DeviceConfig.IsRave;
 
-        public bool IsTick => DeviceConfig is null ? false : DeviceConfig.IsTick;
+        public SoundController Sound { get; internal set; }
+      
+
+       
 
         public int MaxIO { get; internal set; }
         public int MaxAnalog { get; internal set; }
@@ -109,20 +96,22 @@ namespace GHIElectronics.DUELink {
             this.Frequency = new FrequencyController(this.serialPort);
             this.Spi = new SpiController(this.serialPort);
             this.Infrared = new InfraredController(this.serialPort);
-            this.Neo = new NeoController(this.serialPort);
+ 
             this.Uart = new UartController(this.serialPort);
             this.Button = new ButtonController(this.serialPort);
             this.Distance = new DistanceSensorController(this.serialPort);
-            this.Display = new DisplayController(this.serialPort);
+            this.Graphics = new GraphicsController(this.serialPort);
             this.Touch = new TouchController(this.serialPort);
             this.Led = new LedController(this.serialPort);
-            this.Script = new ScriptController(this.serialPort);
-            this.Pin = new PinController();
+            this.Script = new EngineController(this.serialPort);
+
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);
             this.System = new SystemController(this.serialPort);
 
-            this.Display.Configuration = new DisplayConfiguration(this.serialPort, this.Display/*, this.System*/);
+
+
+            this.Sound = new SoundController(this.serialPort);
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {
@@ -187,14 +176,31 @@ namespace GHIElectronics.DUELink {
             }
             else {
                 var ports = SerialPort.GetPortNames();
-
                 if (ports != null) {
+
+                    // MACOS
                     foreach (var port in ports) {
                         if (port.Contains("usbmodemDUE_SC131"))
                             return "/dev/tty.usbmodemDUE_SC131";
                         else if (port.Contains("usbmodemDUE_SC0071"))
                             return "/dev/tty.usbmodemDUE_SC0071";
                     }
+
+                    // Linux
+                    //var processInfo = new ProcessStartInfo("/usr/sbin/ghiusbports.sh") {
+                    //    RedirectStandardOutput = true,
+                    //};
+
+                    //var p = Process.Start(processInfo);
+
+                    //Thread.Sleep(300);
+
+                    //var outputs = p.StandardOutput.ReadToEnd().Split("\n");
+                    //foreach (var output in outputs) {
+                    //    if (output.Contains("GHI_Electronics"))
+                    //        return output.Split(" ")[0];
+                    //}
+
                 }
             }
 
@@ -204,57 +210,11 @@ namespace GHIElectronics.DUELink {
             this.serialPort = new SerialInterface(comPort);
             this.serialPort.Connect();
 
-            this.Version = this.serialPort.GetVersion().Substring(0);
+            this.DeviceConfig = new DeviceConfiguration();
+            this.serialPort.DeviceConfig = this.DeviceConfig;
 
-            if (this.Version != null && this.Version != string.Empty && this.Version.Length == 7) {
 
-                this.DeviceConfig = new DeviceConfiguration();
-
-                if (this.Version[this.Version.Length - 1] == 'P') {
-                    this.DeviceConfig.IsPulse = true;
-                    this.DeviceConfig.MaxPinIO = 23;
-                    this.DeviceConfig.MaxPinAnalog = 29;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'I') {
-                    this.DeviceConfig.IsPico = true;
-                    this.DeviceConfig.MaxPinIO = 29;
-                    this.DeviceConfig.MaxPinAnalog = 29;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'F') {
-                    this.DeviceConfig.IsFlea = true;
-                    this.DeviceConfig.MaxPinIO = 11;
-                    this.DeviceConfig.MaxPinAnalog = 29;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'E') {
-                    this.DeviceConfig.IsEdge = true;
-                    this.DeviceConfig.MaxPinIO = 22;
-                    this.DeviceConfig.MaxPinAnalog = 11;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'R') {
-                    this.DeviceConfig.IsRave = true;
-                    this.DeviceConfig.MaxPinIO = 23;
-                    this.DeviceConfig.MaxPinAnalog = 29;
-
-                }
-                else if (this.Version[this.Version.Length - 1] == 'T') {
-                    this.DeviceConfig.IsTick = true;
-                    this.DeviceConfig.MaxPinIO = 23;
-                    this.DeviceConfig.MaxPinAnalog = 11;
-
-                }
-                else {
-                    throw new Exception("Not support the version " + this.Version);
-                }
-
-                this.serialPort.DeviceConfig = this.DeviceConfig;
-            }
-            else {
-                throw new Exception("The device is not supported.");
-            }
+            
         }
 
         public void Disconnect() => this.serialPort.Disconnect();

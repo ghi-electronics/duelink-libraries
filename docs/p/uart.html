@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DUELink Uart</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../sidenav_styles.css">	
+	<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	
+	<style>
+		#colorSection {
+			width: 400px;
+			height: 60px;
+			background-color: black;
+			border: 1px solid black;
+		}
+
+	</style>
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){   
+	$('#id-topbar').load("../common/html/id_topbar.html");
+	$('#id-connect').load("../common/html/id_connect.html");
+	$('#id-sidemenu').load("../common/html/id_sidemenu.html");
+	$('#id-status').load("../common/html/id_status.html");
+	$('#id-error').load("../common/html/id_error.html");
+	$('#id-bottom').load("../common/html/id_bottom.html");
+});
+</script>	
+
+<body>
+    <div class="topnav" id="id-topbar">
+				
+	</div>
+	
+	<div class="alert alert-primary" id="id-connect">		
+		
+	</div>
+	
+	<div class="sidenav" id="id-sidemenu" >		
+				
+	</div>
+
+    <div id="id-selections" class="container">
+		<div class="row">	
+			<div class="center">				
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >							
+								
+					<tr>
+						<td width="109">Enable Baudrate:</td><br>
+						<td width="97">
+							<select id="id-baudrate" onchange="doUartInit()" disabled="true">
+								<option value="9600">9600</option>
+								<option value="19200">19200</option>
+								<option value="38400">38400</option>
+								<option value="57600">57600</option>
+								<option value="115200">115200</option>
+								<option value="230400">230400</option>
+								<option value="460800">460800</option>
+								<option value="921600">921600</option>
+							</select>
+						</td>
+					</tr>
+					<br>
+					<tr>						
+						<label for="dataSend">Byte(s) to send: (0,1,2... 255)</label><br>
+						<input type="text" id="dataSend" value="10,20,30"/><br>
+						<label text="text2">(Use comma between each byte if sending multiple bytes)</label><br>
+						<button class="btn btn-primary" onclick="doUartSend()" id="id-btWrite" disabled="true" >Write </button>	<br><br>
+
+						<label for="id-dataReceived">Received data:</label><br>
+						<textarea rows="5" cols="50" id="id-dataReceived" disabled>
+							
+						</textarea>	
+						<br>
+						<button class="btn btn-primary" onclick="doClear()" id="id-btClear" disabled="true" >Clear</button>	<br><br>						
+					</tr>
+				</div>
+				
+			</div>
+						
+			
+		</div>
+					
+	
+	</div>
+
+    <div id="id-status" style="display:none">
+        
+    </div>
+
+    <div id="id-error" style="display: none;">
+        
+    </div>
+
+</body>
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="../common/js/dropdown_menu.js"></script>
+
+<script>
+    import("../src/serialweb/serialweb.js").then(mod => serial = mod);
+    import("../src/duelink/duelink.js").then(mod => due = mod);
+	import("../src/util.js").then(mod => util = mod);
+	
+	
+	let isReading = false;		
+	const intervalCallBack = 100;
+	
+
+	
+	function Check() {
+        if (!this.duelink)
+            this.duelink = new due.DUELinkController(new serial.WebSerial());
+    }
+
+    async function connect() {
+        try {
+            hideError();
+            Check();
+            await duelink.Connect();
+           
+            $("#id-version").text(duelink.Version);
+            $("#id-connect").slideUp();
+            $("#id-btWrite").prop("disabled", false);	
+            $("#id-baudrate").prop("disabled", false);	
+			
+			$("#id-btClear").prop("disabled", false);
+			
+			document.getElementById("id-dataReceived").innerHTML = ""
+
+			<!-- await duelink.Uart.Enable(9600);	 -->
+
+			<!-- doActionCallback(); -->
+						
+        } catch (e) {
+            showError("connect Error" + e);
+        }
+    }
+	
+    async function ledOn() {
+        Check();
+        await duelink.Digital.Write('l', true);
+    }
+
+	async function ledOff() {
+        Check();
+        await duelink.Digital.Write('l', false);
+    }
+   
+    async function buzzer() {
+        Check();
+        await duelink.Frequency.Write('p', 230, 1000);
+    }
+
+    
+    function hideError() {
+        $("#id-error").hide();
+    }
+	
+	function hideStatus() {
+        $("#id-status").hide();
+    }
+
+    function showStatus(message) {
+        $("#id-btWrite").prop("disabled", true);
+        $("#id-baudrate").prop("disabled", true);
+        hideError();
+        $("#id-status").show();
+        $("#status-message").text(message);
+        $.when($("#id-status").fadeOut(1000)).done(
+            function () { $("#id-btWrite").prop("disabled", false); $("#id-baudrate").prop("disabled", false);}
+            
+        );
+    }
+
+    function showError(message) {
+        //$("#id-btWrite").prop("disabled", true);
+        //$("#id-baudrate").prop("disabled", true);
+        $("#id-error").show();
+        $("#error-message").text(message);
+    }
+	
+	let isWriting = false;
+	async function doUartSend() {
+		hideError();
+		hideStatus();
+
+		const data = $("#dataSend").val().trim().split(",");	
+
+		var dataWrite = new Uint8Array(data.length)
+		
+		
+		var canWrite = true;
+		for (let i = 0; i < data.length; i++) {
+			
+			var x = parseInt(data[i], 10);
+			
+			if (isNaN(x) == false) 
+			{								
+				dataWrite[i] = x;							
+			}
+			else  {				
+				showError(`Error at index: ${i}, value: ${data[i]}` );
+				canWrite = false;
+				break;
+			}
+			
+		}
+		
+		if (canWrite) {
+			isWriting = true;
+			
+			<!-- for (let i = 0; i < dataWrite.length; i++) -->
+			<!-- { -->
+				<!-- await duelink.Uart.Write(dataWrite[i]); -->
+				
+				
+			<!-- } -->
+			<!-- showStatus("Data sent.") -->
+			
+			showError("This module is under testing...");
+				
+			isWriting =  false;
+		}
+		
+	}
+	
+	async function doUartInit() {
+		await duelink.Uart.Enable($("#id-baudrate").val()/1);			
+	}
+		
+
+	async function doActionCallback() {				
+		try 
+		{
+			if (isReading == false && isWriting == false) {
+				Check();
+				isReading = true
+				
+				let available = await duelink.Uart.BytesToRead();
+				
+				if (available > 0) {
+					for (let i = 0; i < available; i++) 
+					{
+						let data = await duelink.Uart.Read();
+						
+						if (document.getElementById("id-dataReceived").innerHTML.length > 0)
+							document.getElementById("id-dataReceived").innerHTML +=","
+						
+						document.getElementById("id-dataReceived").innerHTML += data
+						
+					}
+										
+				}
+				
+				isReading = false
+			}
+
+			setTimeout(() => {
+			  doActionCallback();
+			}, intervalCallBack);	
+		}
+		catch (err){
+			isReading = false
+			showError("Error: " + err)			
+		}
+    }
+	
+	async function doClear() {
+
+		document.getElementById("id-dataReceived").innerHTML = ""
+	}
+		
+</script>

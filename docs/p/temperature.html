@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DUELink I2C</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../sidenav_styles.css">	
+	<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	
+	<style>
+		#colorSection {
+			width: 400px;
+			height: 60px;
+			background-color: black;
+			border: 1px solid black;
+		}
+		
+		img {
+		  display: block;
+		  margin-left: auto;
+		  margin-right: auto;		  
+		}
+
+	</style>
+	
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){   
+	$('#id-topbar').load("../common/html/id_topbar.html");
+	$('#id-connect').load("../common/html/id_connect.html");
+	$('#id-sidemenu').load("../common/html/id_sidemenu.html");
+	$('#id-status').load("../common/html/id_status.html");
+	$('#id-error').load("../common/html/id_error.html");
+	$('#id-bottom').load("../common/html/id_bottom.html");
+});
+</script>	
+
+<body>
+	
+	<div class="topnav" id="id-topbar">
+				
+	</div>
+	
+	<div class="alert alert-primary" id="id-connect">		
+		
+	</div>
+	
+	<div class="sidenav" id="id-sidemenu" >		
+				
+	</div>
+		
+
+    <div id="id-selections" class="container">		
+		<img src="../images/3pin-temp.png" alt="dht11" style="width:200px;">
+		<div class="row">	
+			<div class="center">
+				
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+					
+					<table >
+						<tr>
+							<td width="200">Temperature value: </td>
+							<td width="200">
+								<span id="id-temperature"></span>
+							</td>
+						</tr>
+						<tr>
+							<td width="120">Humidity value: </td>
+							<td width="200">
+								<span id="id-humidity"></span>
+							</td>
+						</tr>
+											
+						
+					</table>		
+					<table>
+						<canvas id="myChart" > </canvas>
+						<script>
+							$("#myChart").hide();
+						</script>
+					</table>
+				</div>
+				
+			</div>
+									
+		</div>
+	
+		<div class="row">				
+				<table >
+					<tr>
+							<td width="120"/>
+							<td width="200">
+							<button class="btn btn-primary" id="id-buttonRead" onclick="startReading()" disabled="true" >Start Reading</button>
+							</td>
+					</tr>
+				</table>
+			</div>
+				
+	
+	</div>
+
+    <div id="id-status" style="display:none">
+        
+    </div>
+
+    <div id="id-error" style="display: none;">
+        
+    </div>
+
+</body>
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="../common/js/dropdown_menu.js"></script>
+
+<script>
+    import("../src/serialweb/serialweb.js").then(mod => serial = mod);
+    import("../src/duelink/duelink.js").then(mod => due = mod);
+	import("../src/util.js").then(mod => util = mod);
+	
+	
+	let isReading = false;
+	let buttonPressCounter = 0;    
+	const intervalCallBack = 1200; // minimum 1000ms for temp/humidity sensor update new values
+	
+	function Check() {
+        if (!this.duelink)
+            this.duelink = new due.DUELinkController(new serial.WebSerial());
+    }
+
+    async function connect() {
+        try {
+            hideError();
+            Check();
+            await duelink.Connect();
+    
+            $("#id-connect").slideUp();
+            $("#id-buttonRead").prop("disabled", false);
+			
+	
+        } catch (e) {
+            showError("connect Error" + e);
+        }
+    }
+	    
+
+    
+    function hideError() {
+        $("#id-error").hide();
+    }
+
+    function showStatus(message) {
+        $("#id-buttonRead").prop("disabled", true);
+        hideError();
+        $("#id-status").show();
+        $("#status-message").text(message);
+        $.when($("#id-status").fadeOut(1000)).done(
+            function () { $("#id-buttonRead").prop("disabled", false); }
+        );
+    }
+
+    function showError(message) {
+        $("#id-buttonRead").prop("disabled", true);
+        $("#id-error").show();
+        $("#error-message").text(message);
+    }
+	
+
+	let counter = 0;
+	
+	function startReading() {
+		hideError();
+			
+		<!-- buttonPressCounter += 1		 -->
+		<!-- if ((buttonPressCounter % 2) == 1) { -->
+			<!-- document.getElementById("id-buttonRead").innerHTML = "Stop Reading"; -->
+			<!-- //doActionCallback() -->
+			<!-- $("#myChart").show(); -->
+							
+		<!-- } -->
+		<!-- else {	 -->
+			<!-- document.getElementById("id-buttonRead").innerHTML = "Start Reading"; -->
+			<!-- $("#myChart").hide(); -->
+		<!-- } -->
+		showError("This module is under testing...");
+	}
+	
+
+	
+
+	
+	
+	
+	const canvas_chart = document.getElementById('myChart');
+	canvas_chart.height = 250;
+
+	const labels = [
+	  '0'
+	 
+	];
+
+	const data = {
+	  labels: labels,
+	  datasets: [
+		  {
+			label: 'Temperature',
+			backgroundColor: 'rgb(255, 99, 132)',
+			borderColor: 'rgb(255, 99, 132)',
+			data: [0],
+		  },
+		  {
+			label: 'Humidity',
+			backgroundColor: 'rgb(0, 99, 132)',
+			borderColor: 'rgb(0, 99, 132)',
+			data: [0],
+		  },
+	  ]
+	};
+
+	const config = {
+	  type: 'line',
+	  data: data,
+	  options: {
+		<!-- animations: { -->
+		  <!-- tension: { -->
+			<!-- duration: 1000, -->
+			<!-- easing: 'linear', -->
+			<!-- from: 1, -->
+			<!-- to: 0, -->
+			<!-- loop: true -->
+		  <!-- } -->
+		<!-- }, -->
+		scales: {
+		  y: { // defining min and max so hiding the dataset does not change scale range
+			min: 0,
+			max: 100
+		  }
+		}
+	  }
+	};
+
+	const myChart = new Chart(
+	  canvas_chart,
+	  config
+	);
+
+	// function to update the chart 
+	function addData(chart, label, t, h) {
+		if (counter > 10)
+			chart.data.labels.shift();
+			
+		chart.data.labels.push(label);
+				
+		var c = 0;
+		chart.data.datasets.forEach((dataset) => {
+			
+			if (counter > 10)
+				dataset.data.shift();
+			
+			if (c == 0)
+				dataset.data.push(t);
+			else 
+				dataset.data.push(h);
+			
+			c++;
+		});
+		chart.update();
+	}
+
+	
+	// randomly add new data
+	setInterval(async function() {
+	
+		if (buttonPressCounter % 2 == 1) {
+			var temp = 0;
+			var hum = 0;
+	
+			try 
+			{
+				if (isReading == false) {
+					Check();
+					isReading = true
+					
+					temp = await duelink.Temperature.Read(0, 11)
+					hum = await duelink.Humidity.Read(0, 11)
+
+					document.getElementById("id-temperature").innerHTML = temp;
+					document.getElementById("id-humidity").innerHTML = hum;				
+					
+					isReading = false	
+
+					
+				}
+				
+			}
+			catch (err){
+				isReading = false
+				showError("Error: " + err)
+				buttonPressCounter = 0
+				document.getElementById("buttonRead").innerHTML = "Start Reading";
+			}
+		
+			counter++;
+			const time = new Date().toLocaleTimeString();
+			
+
+			addData(myChart, time, temp, hum);
+		}
+	}, intervalCallBack);
+	
+	
+</script>

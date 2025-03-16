@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DUELink I2C</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../sidenav_styles.css">	
+	<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	
+	<style>
+		#colorSection {
+			width: 400px;
+			height: 60px;
+			background-color: black;
+			border: 1px solid black;
+		}
+		
+		img {
+		  display: block;
+		  margin-left: auto;
+		  margin-right: auto;		  
+		}
+
+	</style>
+	
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){   
+	$('#id-topbar').load("../common/html/id_topbar.html");
+	$('#id-connect').load("../common/html/id_connect.html");
+	$('#id-sidemenu').load("../common/html/id_sidemenu.html");
+	$('#id-status').load("../common/html/id_status.html");
+	$('#id-error').load("../common/html/id_error.html");
+	$('#id-bottom').load("../common/html/id_bottom.html");
+});
+</script>	
+
+<body>
+	
+	<div class="topnav" id="id-topbar">
+				
+	</div>
+	
+	<div class="alert alert-primary" id="id-connect">		
+		
+	</div>
+	
+	<div class="sidenav" id="id-sidemenu" >		
+				
+	</div>
+		
+
+    <div id="id-selections" class="container">
+        Connect Qwiic Joystick to Qwiic/STEMMA port and start playing!
+		
+		<img src="../images/qwiic-joystick.png" alt="qwiic joystick" style="width:200px;">
+		<div class="row">	
+			<div class="center">
+				
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+					
+					<table >
+						<tr>
+							<td width="120">X value: </td>
+							<td width="200">
+								<span id="joyStickX"></span>
+							</td>
+						</tr>
+						<tr>
+							<td width="120">Y value: </td>
+							<td width="200">
+								<span id="joyStickY"></span>
+							</td>
+						</tr>
+						<tr>
+							<td width="120">Button pressed: </td>
+							<td width="200">
+								<span id="joyStickButton"></span>
+							</td>
+						</tr>						
+						
+					</table>		
+					<table>
+						<canvas id="myChart" > </canvas>
+						<script>
+							$("#myChart").hide();
+						</script>
+					</table>
+				</div>
+				
+			</div>
+									
+		</div>
+	
+		<div class="row">				
+				<table >
+					<tr>
+							<td width="120"/>
+							<td width="200">
+							<button class="btn btn-primary" id="id-buttonRead" onclick="startReading()" disabled="true" >Start Reading</button>
+							</td>
+					</tr>
+				</table>
+			</div>
+				
+	
+	</div>
+
+    <div id="id-status" style="display:none">
+        
+    </div>
+
+    <div id="id-error" style="display: none;">
+        
+    </div>
+
+</body>
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="../common/js/dropdown_menu.js"></script>
+
+<script>
+    import("../src/serialweb/serialweb.js").then(mod => serial = mod);
+    import("../src/duelink/duelink.js").then(mod => due = mod);
+	import("../src/util.js").then(mod => util = mod);
+	
+	const ctx = document.getElementById('myChart');
+	let isReading = false;
+	let buttonPressCounter = 0;    
+	const intervalCallBack = 200;
+	
+	function Check() {
+        if (!this.duelink)
+            this.duelink = new due.DUELinkController(new serial.WebSerial());
+    }
+
+    async function connect() {
+        try {
+            hideError();
+            Check();
+            await duelink.Connect();
+            
+            $("#id-version").text(duelink.Version);
+            $("#id-connect").slideUp();
+            $("#id-buttonRead").prop("disabled", false);
+	
+        } catch (e) {
+            showError("connect Error" + e);
+        }
+    }
+	    
+
+    
+    function hideError() {
+        $("#id-error").hide();
+    }
+
+    function showStatus(message) {
+        $("#id-buttonRead").prop("disabled", true);
+        hideError();
+        $("#id-status").show();
+        $("#status-message").text(message);
+        $.when($("#id-status").fadeOut(1000)).done(
+            function () { $("#id-buttonRead").prop("disabled", false); }
+        );
+    }
+
+    function showError(message) {
+        $("#id-buttonRead").prop("disabled", true);
+        $("#id-error").show();
+        $("#error-message").text(message);
+    }
+	
+
+	function startReading() {
+		hideError();
+			
+		<!-- buttonPressCounter += 1		 -->
+		<!-- if ((buttonPressCounter % 2) == 1) { -->
+			<!-- document.getElementById("id-buttonRead").innerHTML = "Stop Reading"; -->
+			<!-- doActionCallback() -->
+			<!-- $("#myChart").show(); -->
+							
+		<!-- } -->
+		<!-- else {	 -->
+			<!-- document.getElementById("id-buttonRead").innerHTML = "Start Reading"; -->
+			<!-- $("#myChart").hide(); -->
+		<!-- } -->
+		
+		showError("This module is under testing...");
+		
+	}
+		
+	async function doActionCallback() {				
+		try 
+		{
+			if (isReading == false) {
+				Check();
+				isReading = true
+				
+				let writeBuffer = new Uint8Array(1)
+				let readBuffer = [0,0,0,0,0]
+				
+				writeBuffer[0] = 3
+				
+				await duelink.I2c.WriteRead(0x20,writeBuffer,0,1,readBuffer,0,5)
+				
+				let x = (readBuffer[0]<<8 | readBuffer[1])>>6
+				let y = (readBuffer[2]<<8 | readBuffer[3])>>6
+
+				document.getElementById("joyStickX").innerHTML = x;
+				document.getElementById("joyStickY").innerHTML = y;
+				document.getElementById("joyStickButton").innerHTML = readBuffer[4] == 0 ? "True" : "False"
+				
+				isReading = false	
+
+				showChart(x, y)
+			}
+
+			if (buttonPressCounter % 2 == 1) {
+				setTimeout(() => {
+				  doActionCallback();
+				}, intervalCallBack);	
+			}
+		}
+		catch (err){
+			isReading = false
+			showError("Error: " + err)
+			buttonPressCounter = 0
+			document.getElementById("buttonRead").innerHTML = "Start Reading";
+		}
+    }
+	
+	let lastX = -1
+	let lastY = -1
+	
+	async function showChart(x, y) {
+				
+		if (lastX != x || lastY != y) {
+			lastX = x
+			lastY = y
+			if(Chart.getChart("myChart")) {
+			  Chart.getChart("myChart")?.destroy()
+			}
+
+			if (this.chart) {			
+				this.chart = null
+			}
+			
+			if (!this.chart ) {
+				this.chart = new Chart(ctx, {
+					type: 'bar',
+					data: {
+					  labels: ['X', 'Y'],
+					  datasets: [{
+						label: 'QWIIC Joytick values',
+						data: [x, y, ],
+						borderWidth: 1
+					  }]
+					},
+					options: {
+					  scales: {
+						y: {
+						  beginAtZero: true
+						}
+					  }
+					}
+				  });
+			}
+		}
+	}
+	
+	
+</script>

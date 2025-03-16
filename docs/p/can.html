@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DUELink CAN</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../sidenav_styles.css">	
+	<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	
+	<style>
+		#colorSection {
+			width: 400px;
+			height: 60px;
+			background-color: black;
+			border: 1px solid black;
+		}
+
+	</style>
+	
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){   
+	$('#id-topbar').load("../common/html/id_topbar.html");
+	$('#id-connect').load("../common/html/id_connect.html");
+	$('#id-sidemenu').load("../common/html/id_sidemenu.html");
+	$('#id-status').load("../common/html/id_status.html");
+	$('#id-error').load("../common/html/id_error.html");
+	$('#id-bottom').load("../common/html/id_bottom.html");
+});
+</script>
+
+<body>
+    <div class="topnav" id="id-topbar">
+				
+	</div>
+	
+	<div class="alert alert-primary" id="id-connect">		
+		
+	</div>
+	
+	<div class="sidenav" id="id-sidemenu" >		
+				
+	</div>
+
+    <div id="id-selections" class="container">
+		<div class="row">	
+			<div class="center">	
+					
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >
+					CAN Initial	
+					<table >
+						<td width="200">Enable Baudrate:</td>	
+							<td width="200">						
+								<select id="id-baudrate" onchange="doCanInit()" disabled="true">
+									<option value="125000">125000</option>
+									<option value="250000">250000</option>
+									<option value="500000">500000</option>
+									<option value="1000000">1000000</option>
+									<option selected="selected">
+									500000
+									</option>									
+								</select>
+							</td>
+					</table>
+				</div>
+					
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >
+					Send Message	
+					<table >
+						<tr>
+							<td width="200">CAN Id</td>	
+							<td width="200">					
+								<input type="text" id="id-canId" value="111"/>
+							</td>
+						
+						</tr>
+
+						<tr>
+							<td width="200">Extended mode</td>	
+							<td width="200">										
+								<select id="id-extended" >
+									<option value="false">False</option>
+									<option value="true">True</option>														
+								</select>
+							</td>
+						</tr>
+						
+						<tr>
+							<td width="200">Remote request</td>	
+							<td width="200">						
+								<select id="id-remote" >
+									<option value="false">False</option>
+									<option value="true">True</option>														
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td width="200">Data to send (max 8 bytes): (0,1,2... 255)</td>	
+							<td width="200">												
+								<input type="text" id="id-dataSend" value="1,2,3"/><br>
+							</td>
+						
+						</tr>
+						
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doCanSend()" id="id-btSend" disabled="true" >Send </button>	<br><br>
+							</td>
+						
+						</tr>
+					</table>
+				</div>
+				
+				
+				<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; " >	
+					Received Message
+					<table >												
+						
+						<tr>	
+							<td width="200">
+								<textarea rows="6" cols="50" id="id-dataReceived" disabled>
+									
+								</textarea>	
+							</td>
+						</tr>
+						
+						<tr>
+							<td width="200">
+								<button class="btn btn-primary" onclick="doClear()" id="id-btClear" disabled="true" >Clear</button>	<br><br>
+							</td>
+						
+						</tr>
+					
+					</table>
+					
+				</div>
+				
+			</div>
+						
+			
+		</div>
+					
+	
+	</div>
+
+    <div id="id-status" style="display:none">
+        
+    </div>
+
+    <div id="id-error" style="display: none;">
+        
+    </div>
+
+</body>
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="../common/js/dropdown_menu.js"></script>
+
+<script>
+    import("../src/serialweb/serialweb.js").then(mod => serial = mod);
+    import("../src/duelink/duelink.js").then(mod => due = mod);
+	import("../src/util.js").then(mod => util = mod);
+	
+	
+	let isReading = false;		
+	const intervalCallBack = 100;
+	const textareaMaxCharacterPerLine = 55;
+	const textareMaxLines = 5; //textarea rows="5" above
+
+	
+	function Check() {
+        if (!this.duelink)
+            this.duelink = new due.DUELinkController(new serial.WebSerial());
+    }
+
+    async function connect() {
+        try {
+            hideError();
+            Check();
+            await duelink.Connect();
+               
+            $("#id-connect").slideUp();
+            $("#id-btSend").prop("disabled", false);	
+            $("#id-baudrate").prop("disabled", false);	
+            $("#id-btClear").prop("disabled", false);	
+			
+			document.getElementById("id-dataReceived").innerHTML = ""
+
+			<!-- await duelink.Can.Initialize(500000);	 -->
+
+			<!-- await doActionCallback(); -->
+						
+        } catch (e) {
+            showError("connect Error" + e);
+        }
+    }
+	
+    
+
+    
+    function hideError() {
+        $("#id-error").hide();
+    }
+
+    function showStatus(message) {
+        $("#id-btSend").prop("disabled", true);
+        $("#id-baudrate").prop("disabled", true);
+        hideError();
+        $("#id-status").show();
+        $("#status-message").text(message);
+        $.when($("#id-status").fadeOut(1000)).done(
+            function () { $("#id-btSend").prop("disabled", false); $("#id-baudrate").prop("disabled", false);}
+            
+        );
+    }
+
+    function showError(message) {
+        //$("#id-btSend").prop("disabled", true);
+        //$("#id-baudrate").prop("disabled", true);
+        $("#id-error").show();
+        $("#error-message").text(message);
+    }
+	
+	let isSending = false
+	async function doCanSend() {
+		hideError();
+
+		const data = $("#id-dataSend").val().trim().split(",");
+		const id = $("#id-canId").val().trim();
+		const ext = $("#id-extended").val() == "false" ? false : true;
+		const rmr = $("#id-remote").val()== "false" ? false : true;
+		const len = data.length > 8 ? 8 : data.length
+		let canSend = true;
+
+		for (let i = 0; i < data.length; i++) {
+			
+			var x = parseInt(data[i], 10);
+			
+			if (isNaN(x) == true)  {
+				showError(`Error at index: ${i}, value: ${data[i]}` );
+				canSend = false;
+	
+				break;
+			}			
+		}
+		
+		if (canSend) {
+			<!-- var message = new due.CanMessage(id, ext, rmr, data, 0, len); -->
+			
+			<!-- isSending = true; -->
+			<!-- await duelink.Can.Write(message) -->
+			<!-- isSending = false; -->
+			
+			showError("This module is under testing...");
+		}
+	}
+	
+	async function doCanInit() {
+		await duelink.Can.Initialize($("#id-baudrate").val()/1);			
+	}
+		
+	let receivedData = ""
+	let totalMsgReceivedCount = 0;
+	async function doActionCallback() {				
+		try 
+		{
+			if (isReading == false && isSending == false) {
+				Check();
+				isReading = true
+				
+				var available = await duelink.Can.Available();
+				
+				for (var i = 0; i < available; i++) {
+				
+					var msg = await duelink.Can.Read();
+					
+					totalMsgReceivedCount++;
+					
+					var id_hex = (msg.Id/1).toString(16);
+					
+					var s = `Count: ${totalMsgReceivedCount}\nId: 0x${id_hex}\nExtended: ${msg.Extended}\nRemoteRequest: ${msg.RemoteRequest}\nLength: ${msg.Length}\nData:`;
+					
+					for (var i = 0; i < msg.Length; i++) {
+						s += `${msg.Data[i]}`
+						
+						if (i < msg.Length - 1)
+							s += ","
+					}
+					
+						
+					document.getElementById("id-dataReceived").innerHTML = s
+					
+				}
+				
+				isReading = false
+			}
+
+			
+		}
+		catch (err){
+			isReading = false
+			showError("Error: " + err)			
+		}
+		
+		setTimeout(() => {
+		  doActionCallback();
+		}, intervalCallBack);	
+    }
+	
+	async function doClear() {
+		document.getElementById("id-dataReceived").innerHTML = ""
+	}
+		
+</script>

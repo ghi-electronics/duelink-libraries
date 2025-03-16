@@ -15,25 +15,14 @@ namespace GHIElectronics.DUELink {
             SerialInterface serialPort;
             public ButtonController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            private bool IsButtonValid(int pin) {
-                if (pin != 0 && pin != 1 && pin != 2 &&  pin != 13 && pin != 14 && pin != 15 && pin != 16 && pin != 65 && pin != 66 && pin != 68 && pin != 76 && pin != 82 && pin != 85) {
-                    return false;
-                }
 
-                return true;
-            }
             public bool Enable(int pin, bool enable) {
-                pin &= 0xdf;
-                if (IsButtonValid(pin) == false) {
-                    throw new ArgumentException("Invalid pin", nameof(pin));
-                }
-
-
-                var cmd = string.Format("btnenable({0},{1})", pin, enable==true? 1:0);
+  
+                var cmd = string.Format("btnen({0},{1})", pin, enable==true? 1:0);
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 return res.success;
 
@@ -41,22 +30,18 @@ namespace GHIElectronics.DUELink {
 
             public bool Enable(char pin, bool enable) => this.Enable((int)pin, enable);
 
+            public bool Down(int pin) {
+        
 
-            public bool WasPressed(int pin) {
-                pin &= 0xdf;
-                if (IsButtonValid(pin) == false) {
-                    throw new ArgumentException("Invalid pin", nameof(pin));
-                }
-
-                var cmd = string.Format("log(btndown({0}))", pin);
+                var cmd = string.Format("btndown({0})", pin);
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 if (res.success) {
                     try {
-                        var ready = int.Parse(res.respone);
+                        var ready = int.Parse(res.response);
                         return ready == 1 ? true : false ;
                     }
                     catch {
@@ -68,38 +53,26 @@ namespace GHIElectronics.DUELink {
                 return false;
             }
 
-            public bool JustPressed(char pin) => this.WasPressed((int)pin);
+            public bool Up(int pin) {
 
-            public bool IsReleased(int pin) {
-                pin &= 0xdf;
-                if (IsButtonValid(pin) == false) {
-                    throw new ArgumentException("Invalid pin", nameof(pin));
-                }
-
-                var cmd = string.Format("log(btnup({0}))", pin);
+                var cmd = string.Format("btnup({0})", pin);
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 if (res.success) {
                     try {
-                        var ready = int.Parse(res.respone);
+                        var ready = int.Parse(res.response);
                         return ready == 1 ? true : false;
                     }
                     catch {
 
                     }
-
                 }
 
                 return false;
-
-
             }
-
-            public bool JustReleased(char pin) => this.IsReleased((int)pin);
-
         }
     }
 }

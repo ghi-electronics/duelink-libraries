@@ -14,17 +14,17 @@ namespace GHIElectronics.DUELink {
 
             public TouchController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public bool Read(int pin) {
-                var cmd = string.Format("log(touchread({0}))", pin);
+            public bool Touch(int pin, int charge_t, int charge_s, int timeout) {
+                var cmd = $"touch({pin}, {charge_t}, {charge_s}, {timeout})";
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
                 var val = false;
                 if (res.success) {
 
 
                     try {
-                        val = int.Parse(res.respone) == 1 ? true : false;
+                        val = int.Parse(res.response) == 1 ? true : false;
                     }
                     catch { }
                 }

@@ -12,7 +12,7 @@ namespace GHIElectronics.DUELink {
 
             SerialInterface serialPort;
 
-            public const int MAX_LED_NUM = 256;
+            public const int MAX_LED_NUM = 1024;
 
             public NeoController(SerialInterface serialPort) => this.serialPort = serialPort;
 
@@ -96,17 +96,33 @@ namespace GHIElectronics.DUELink {
                 return res.success;
             }
 
+            public bool SetRGB(int id, byte red, byte green, byte blue) {               
+                //return this.SetColor(id, red, green, blue);
+
+                if (id < 0 || id > MAX_LED_NUM) {
+                    return false;
+                }
+                var cmd = string.Format("neoset({0},{1},{2},{3})", id.ToString(), red.ToString(), green.ToString(), blue.ToString());
+
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadRespone();
+
+                return res.success;
+            }
+
             public bool SetMultiple(int pin, uint[] color) {
                 if (color == null || color.Length > MAX_LED_NUM) {
                     return false;
                 }
 
-                int length = color.Length;
-                int offset = 0;
+                var length = color.Length;
+                var offset = 0;
 
                 var data = new byte[length *  3];
 
-                for (int i = offset; i < length; i++) {
+                for (var i = offset; i < length; i++) {
                     data[(i - offset) * 3 + 0 ] = (byte)((color[i] >> 16) & 0xff);
                     data[(i - offset) * 3 + 1 ] = (byte)((color[i] >> 8) & 0xff);
                     data[(i - offset) * 3 + 2 ] = (byte)((color[i] >> 0) & 0xff);

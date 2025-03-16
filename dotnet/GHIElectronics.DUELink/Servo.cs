@@ -14,20 +14,20 @@ namespace GHIElectronics.DUELink {
             public ServoController(SerialInterface serialPort) => this.serialPort = serialPort;
 
             public bool Set(int pin, int position) {
-                if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
+                if (pin < 0 || Array.IndexOf(this.serialPort.DeviceConfig.PWMPins, pin) == -1)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
                 if (position < 0 || position > 180) {
-                    throw new Exception("position must be in 0..100");
+                    throw new Exception("position must be in 0..180");
                 }
 
-                var cmd = string.Format("servoset({0},{1})", pin.ToString(), position.ToString());
+                var cmd = string.Format("servost({0},{1})", pin.ToString(), position.ToString());
 
                 this.serialPort.WriteCommand(cmd);
 
-                var respone = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadResponse();
 
-                return respone.success;
+                return response.success;
             }
 
         }

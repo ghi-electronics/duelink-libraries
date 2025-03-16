@@ -14,16 +14,16 @@ namespace GHIElectronics.DUELink {
             public InfraredController(SerialInterface serialPort) => this.serialPort = serialPort;
 
             public int Read() {
-                var cmd = "log(irread())";
+                var cmd = "irread()";
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
                 var val = 255;
                 if (res.success) {
                    
 
                     try {
-                        val = int.Parse(res.respone);
+                        val = int.Parse(res.response);
                     }
                     catch { }
                 }
@@ -32,29 +32,17 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            //public bool Clear() {
-            //    var cmd = "R" + " " + "C";
 
-            //    this.serialPort.WriteLine(cmd);
-
-            //    var res = this.serialPort.ReadRespone();
-
-            //    if (res.success) {
-            //        return true;
-            //    }
-
-            //    return false;
-            //}
 
             public bool Enable(int pin, bool enable) {
-                if (pin != 2 && pin != 8)
-                    throw new Exception("IR is only available on pin 2 and 8");
+                if (pin != 0)
+                    throw new Exception("IR is only available on pin 0");
 
-                var cmd = string.Format("irenable({0}, {1})", pin, enable == true?1:0);
+                var cmd = string.Format("iren({0}, {1})", pin, enable?1:0);
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+                var res = this.serialPort.ReadResponse();
 
                 if (res.success) {
                     return true;

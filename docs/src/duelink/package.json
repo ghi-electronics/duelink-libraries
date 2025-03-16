@@ -1,0 +1,30 @@
+{
+	"name": "duelink",
+	"version": "1.2.2",
+	"description": "DUELink driver",
+	"source": "./duelink.js",
+	"main": "dist/duelink.js",
+	"module": "dist/module.js",
+	"scripts": {
+		"watch": "parcel watch",
+		"build": "parcel build",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"DUELink",
+		"GHI Electronics",
+		"SITCore",
+		"TinyCLR",
+		"BrainPad"
+	],
+	"author": "GHI Electronics",
+	"license": "MIT",
+	"devDependencies": {
+		"buffer": "^5.7.1",
+		"parcel": "2.8.3",
+		"parcel-bundler": "^1.12.5",
+		"path-browserify": "^1.0.1",
+		"stream-browserify": "^3.0.0",
+		"util": "^0.12.5"
+	}
+}

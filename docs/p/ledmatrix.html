@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DUELink NeoPixel Matrix</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../sidenav_styles.css">	
+	<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	
+	<style>
+	.grid-container {
+		display: grid;
+		grid-template-columns: repeat(16, 30px);
+		grid-template-rows: repeat(16, 30px);
+		gap: 1px;
+	}
+
+	.grid-item {
+		width: 30px;
+		height: 30px;
+		background-color: black;
+		border: 1px solid black;
+	}
+
+
+	#colorSection {
+		width: 500px;
+		height: 60px;
+		background-color: black;
+		border: 1px solid black;
+	}
+
+	img {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;		  
+	}
+	</style>
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){   
+	$('#id-topbar').load("../common/html/id_topbar.html");
+	$('#id-connect').load("../common/html/id_connect.html");
+	$('#id-sidemenu').load("../common/html/id_sidemenu.html");
+	$('#id-status').load("../common/html/id_status.html");
+	$('#id-error').load("../common/html/id_error.html");
+	$('#id-bottom').load("../common/html/id_bottom.html");
+});
+</script>	
+
+<body>
+    <div class="topnav" id="id-topbar">
+				
+	</div>
+	
+	<div class="alert alert-primary" id="id-connect">		
+		
+	</div>
+	
+	<div class="sidenav" id="id-sidemenu" >		
+				
+	</div>
+	
+	
+
+
+<div id="id-selections" class="container">
+	Connect any 16x16 LED Matrix select the pin and start creating!
+	
+	
+	<div class="row">
+		<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+			<table width="496">										
+				<tr>
+					<td>
+						<div class="grid-container">
+
+							<!--1-16-->
+							<div class="grid-item" onclick="changeColor(this,0,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,0)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,0)"></div>
+							
+							
+							<!--17-32-->
+							<div class="grid-item" onclick="changeColor(this,0,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,1)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,1)"></div>
+							<!--33-49-->
+							<div class="grid-item" onclick="changeColor(this,0,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,2)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,2)"></div>
+							<!--50-66-->
+							<div class="grid-item" onclick="changeColor(this,0,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,3)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,3)"></div>
+							<!--67-82-->
+							<div class="grid-item" onclick="changeColor(this,0,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,4)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,4)"></div>
+							<!--83-99-->
+							<div class="grid-item" onclick="changeColor(this,0,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,5)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,5)"></div>
+							<!--100-116-->
+							<div class="grid-item" onclick="changeColor(this,0,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,6)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,6)"></div>
+							<!--117-132-->
+							<div class="grid-item" onclick="changeColor(this,0,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,7)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,7)"></div>
+							<!--133-149-->
+							<div class="grid-item" onclick="changeColor(this,0,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,8)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,8)"></div>
+							<!--150-166-->
+							<div class="grid-item" onclick="changeColor(this,0,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,9)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,9)"></div>
+							<!--167-182-->
+							<div class="grid-item" onclick="changeColor(this,0,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,10)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,10)"></div>
+							<!--183-199-->
+							<div class="grid-item" onclick="changeColor(this,0,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,11)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,11)"></div>
+							<!--200-216-->
+							<div class="grid-item" onclick="changeColor(this,0,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,12)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,12)"></div>
+							<!--232-246-->
+							<div class="grid-item" onclick="changeColor(this,0,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,13)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,13)"></div>
+
+							<div class="grid-item" onclick="changeColor(this,0,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,14)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,14)"></div>
+							<!--247-256-->   
+							<div class="grid-item" onclick="changeColor(this,0,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,1,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,2,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,3,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,4,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,5,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,6,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,7,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,8,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,9,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,10,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,11,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,12,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,13,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,14,15)"></div>
+							<div class="grid-item" onclick="changeColor(this,15,15)"></div> 
+						</div>	
+					</td>
+						
+					<td>
+						<img src="../images/ledmatrix.gif" alt="led matrix" style="width:270px;">
+					</td>
+				</tr>	
+			</table>
+		</div>	
+	</div>	
+	<div class="row">
+		<div style="border: solid 1px; padding: 0.5em; margin-top:0.5em; ">
+			<table width="496">										
+				<tr>
+					<td width="166">Pin
+					
+						<select id="pinNumberNeoPixel">                     
+							<option value="1">P1</option>
+							<option value="2">P2</option>
+							<option value="3">P3</option>
+							<option value="4">P4</option>
+							<option value="5">P5</option>
+							<option value="6">P6</option>
+							<option value="7">P7</option>
+							<option value="8">P8</option>
+							<option value="9">P9</option>
+							<option value="10">P10</option>
+							<option value="11">P11</option>
+							<option value="12">P12</option>
+							<option value="13">P13</option>
+							<option value="14">P14</option>
+							<option value="15">P15</option>
+							<option value="16">P16</option>
+						</select>									
+					</td>								
+				</tr>
+
+				<!---NeoPixel RED Slider-->
+				<td>
+
+					<div class="rangesliderNeoPixelRED">
+						<input type="range" min="0" max="255"
+							   value="128" class="mysliderNeoPixelRED"
+							   id="sliderRangeNeoPixelRED">
+						<p>Red: <span id="demoNeoPixelRED"></span></p>
+					</div>
+
+					<script>
+						let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
+						let outputRED = document.getElementById("demoNeoPixelRED");
+						outputRED.innerHTML = rangesliderNeoPixelRED.value;
+
+						rangesliderNeoPixelRED.oninput = function () {
+							setColorSwatch();
+							outputRED.innerHTML = this.value;
+						}
+					</script>
+				</td>
+
+				<!---NeoPixel GREEN Slider-->
+				<td width="178">
+
+					<div class="rangesliderNeoPixelGREEN">
+						<input type="range" min="0" max="255"
+							   value="128" class="mysliderNeoPixelGREEN"
+							   id="sliderRangeNeoPixelGREEN">
+						<p>Green: <span id="demoNeoPixelGREEN"></span></p>
+					</div>
+
+					<script>
+						let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
+						let outputGREEN = document.getElementById("demoNeoPixelGREEN");
+						outputGREEN.innerHTML = rangesliderNeoPixelGREEN.value;
+
+						rangesliderNeoPixelGREEN.oninput = function () {
+							setColorSwatch();
+							outputGREEN.innerHTML = this.value;
+						}
+					</script>
+				</td>
+
+				<!---NeoPixel BLUE Slider-->
+				<td width="136">
+
+					<div class="rangesliderNeoPixelBLUE">
+						<input type="range" min="0" max="255"
+							   value="128" class="mysliderNeoPixelBLUE"
+							   id="sliderRangeNeoPixelBLUE">
+						<p>Blue: <span id="demoNeoPixelBLUE"></span></p>
+					</div>
+
+					<script>
+						let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
+						let outputBLUE = document.getElementById("demoNeoPixelBLUE");
+						outputBLUE.innerHTML = rangesliderNeoPixelBLUE.value;
+
+						rangesliderNeoPixelBLUE.oninput = function () {
+							setColorSwatch();
+							outputBLUE.innerHTML = this.value;
+						}
+					</script>
+					
+					
+				</td>
+				
+				<div id="colorSection"> </div>
+				<br>
+				
+			</table>		
+		</div>					
+	</div>
+	
+	
+
+    <div id="id-status" style="display:none">
+        <div class="alert alert-success" role="alert">
+            <span>
+                <svg class="align-middle mr-2" style="fill:Green" focusable="false" width="24" height="24"
+                     aria-hidden="true">
+                    <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20, 12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10, 10 0 0,0 22,12A10, 10 0 0,0 12,2M11,17H13V11H11V17Z">
+                    </path>
+                </svg>
+            </span>
+            <span id="status-message"></span>
+        </div>
+    </div>
+
+    <div id="id-error" style="display: none;">
+        <div class="alert alert-danger" role="alert">
+            <span>
+                <svg class="align-middle mr-2" style="fill:red" focusable="false" width="24" height="24"
+                     aria-hidden="true">
+                    <path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z">
+                    </path>
+                </svg>
+            </span>
+            <span id="error-message"></span>
+        </div>
+    </div>
+
+</body>
+
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="../common/js/dropdown_menu.js"></script>
+
+<script>
+    import("../src/serialweb/serialweb.js").then(mod => serial = mod);
+    import("../src/duelink/duelink.js").then(mod => due = mod);
+	import("../src/util.js").then(mod => util = mod);
+	
+	
+	let isReading = false;		
+	const intervalCallBack = 100;
+	const textareaMaxCharacterPerLine = 55;
+	const textareMaxLines = 5; //textarea rows="5" above
+
+	
+	function Check() {
+        if (!this.duelink)
+            this.duelink = new due.DUELinkController(new serial.WebSerial());
+    }
+
+    async function connect() {
+        try {
+            hideError();
+            Check();
+            await duelink.Connect();
+            
+            $("#id-connect").slideUp();
+            $("#id-inputs").prop("disabled", false);
+
+        } catch (e) {
+            showError("connect Error" + e);
+        }
+    }
+	
+   async function setPixel(x,y,r,g,b){
+    	<!-- if ((x & 0x01) != 0){ -->
+        	<!-- y = 15 - y; -->
+		<!-- } -->
+		
+		var pinNeoPixel = $("#pinNumberNeoPixel").val()/1;
+		
+		await duelink.Graphics.Configuration(3, [pinNeoPixel, 16, 16 , 0], 16, 16, 1);
+		
+    	//index= x * 16 + y;
+    	await duelink.Graphics.Pixel((r<<16) | (g << 8) | (b<<0),x, y);
+		await duelink.Graphics.Show()
+	}
+	
+	async function changeColor(element, x, y) {
+
+		//RED Slider
+		let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
+        rangesliderNeoPixelRED.oninput = function () {
+			setColorSwatch()
+            outputRED.innerHTML = this.value;
+        }
+        var red = rangesliderNeoPixelRED.value/1;
+		
+		//GREEN Slider
+		let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
+        let outputGREEN = document.getElementById("demoNeoPixelGREEN");
+        rangesliderNeoPixelGREEN.oninput = function () {
+			setColorSwatch()
+            outputGREEN.innerHTML = this.value;
+        }
+        var green = rangesliderNeoPixelGREEN.value/1;
+
+		//BLUE Slider
+		let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
+        rangesliderNeoPixelBLUE.oninput = function () {
+			setColorSwatch()
+            outputBLUE.innerHTML = this.value;
+        }
+        var blue = rangesliderNeoPixelBLUE.value/1;
+
+		
+		let r = red.toString();
+		let g = green.toString();
+		let b = blue.toString();
+		
+		element.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
+		
+		setPixel(x,y, red, green, blue);			
+  }	
+	
+	async function setColorSwatch(){
+		
+		//RED Slider
+		let rangesliderNeoPixelRED = document.getElementById("sliderRangeNeoPixelRED");
+        var red = rangesliderNeoPixelRED.value/1;
+		
+		//GREEN Slider
+		let rangesliderNeoPixelGREEN = document.getElementById("sliderRangeNeoPixelGREEN");
+        var green = rangesliderNeoPixelGREEN.value/1;
+		
+		//GREEN Slider
+		let rangesliderNeoPixelBLUE = document.getElementById("sliderRangeNeoPixelBLUE");
+        var blue = rangesliderNeoPixelBLUE.value/1;	
+			
+		
+		const color = `rgb(${red}, ${green}, ${blue})`;
+    	document.getElementById('colorSection').style.backgroundColor = color;
+	}	
+	
+    
+    function hideError() {
+        $("#id-error").hide();
+    }
+
+    function showStatus(message) {
+        $("#id-btSend").prop("disabled", true);
+        $("#id-speed").prop("disabled", true);
+        hideError();
+        $("#id-status").show();
+        $("#status-message").text(message);
+        $.when($("#id-status").fadeOut(1000)).done(
+            function () { $("#id-btSend").prop("disabled", false); $("#id-speed").prop("disabled", false);}
+            
+        );
+    }
+
+    function showError(message) {
+        //$("#id-btSend").prop("disabled", true);
+        //$("#id-speed").prop("disabled", true);
+        $("#id-error").show();
+        $("#error-message").text(message);
+    }
+	
+	
+		
+</script>

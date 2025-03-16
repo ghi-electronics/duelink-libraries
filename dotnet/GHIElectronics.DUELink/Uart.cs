@@ -13,68 +13,68 @@ namespace GHIElectronics.DUELink {
 
             public UartController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public bool Enable(int baurdate) {
+//            public bool Enable(int baurdate) {
 
-                var cmd = string.Format("uartinit({0})", baurdate);
+//                var cmd = string.Format("uartinit({0})", baurdate);
 
-                this.serialPort.WriteCommand(cmd);
+//                this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+//                var res = this.serialPort.ReadRespone();
 
-                return res.success;
-            }
+//                return res.success;
+//            }
 
-            public bool Write(byte data) {
-                var cmd = string.Format("uartwrite({0})", data);
+//            public bool Write(byte data) {
+//                var cmd = string.Format("uartwrite({0})", data);
 
-                this.serialPort.WriteCommand(cmd);
+//                this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+//                var res = this.serialPort.ReadRespone();
 
-                return res.success;
-            }
+//                return res.success;
+//            }
 
-            public int BytesToRead() {
-                var cmd = string.Format("log(uartcount())");
+//            public int BytesToRead() {
+//                var cmd = string.Format("log(uartcount())");
 
-                this.serialPort.WriteCommand(cmd);
+//                this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+//                var res = this.serialPort.ReadRespone();
 
-                if (res.success) {
-                    try {
-                        var ready = int.Parse(res.respone);
-                        return ready;
-                    }
-                    catch {
-                        goto error;
-                    }
+//                if (res.success) {
+//                    try {
+//                        var ready = int.Parse(res.respone);
+//                        return ready;
+//                    }
+//                    catch {
+//                        goto error;
+//                    }
 
-                }
-error:
-                throw new Exception("BytesToRead error!");
-            }
+//                }
+//error:
+//                throw new Exception("BytesToRead error!");
+//            }
 
-            public byte Read() {
-                var cmd = string.Format("log(uartread())");
+//            public byte Read() {
+//                var cmd = string.Format("log(uartread())");
 
-                this.serialPort.WriteCommand(cmd);
+//                this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadRespone();
+//                var res = this.serialPort.ReadRespone();
 
-                if (res.success) {
-                    try {
-                        var data = (byte)int.Parse(res.respone);
-                        return data;
-                    }
-                    catch {
-                        goto error;
-                    }
+//                if (res.success) {
+//                    try {
+//                        var data = (byte)int.Parse(res.respone);
+//                        return data;
+//                    }
+//                    catch {
+//                        goto error;
+//                    }
                    
-                }
-error:
-                throw new Exception("Uart receving error!");
-            }
+//                }
+//error:
+//                throw new Exception("Uart receving error!");
+//            }
         }
     }
 }

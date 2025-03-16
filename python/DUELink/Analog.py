@@ -5,12 +5,12 @@ class AnalogController:
         self.serialPort = serialPort
         self.Fixed_Frequency = 50
 
-    def Read(self, pin):
+    def VRead(self, pin):
 
-        if pin < 0 or pin >= self.serialPort.DeviceConfig.MaxPinAnalog:
-            raise ValueError("Invalid pin")
+        if pin not in self.serialPort.DeviceConfig.AnalogPins:
+            raise ValueError("Invalid pin. Enter a valid analog pin.")
 
-        cmd = "log(aread({0}))".format(str(pin))
+        cmd = "vread({0})".format(pin)
 
         self.serialPort.WriteCommand(cmd)
 
@@ -18,26 +18,25 @@ class AnalogController:
 
         if res.success:
             try:
-                return int(res.respone)
+                return float(res.respone)
             except:
                 pass
 
         return -1
     
-    def Write(self, pin, duty_cycle):
-        if pin == 'l' or pin == 'L':
-            pin = 108
+    def PWrite(self, pin, duty_cycle):
         
-        if pin < 0 or (pin >= self.serialPort.DeviceConfig.MaxPinIO and pin != 108): # Led
-            raise ValueError('Invalid pin')
+        if pin not in self.serialPort.DeviceConfig.PWMPins: # Led
+            raise ValueError('Invalid pin. Enter a valid pwm pin.')
 
-        if duty_cycle < 0 or duty_cycle > 1000:
-            raise ValueError('Duty cycle must be in the range 0..1000')
+        if duty_cycle < 0 or duty_cycle > 1:
+            raise ValueError('Duty cycle must be in the range 0..1')
 
-        cmd = f'awrite({pin}, {duty_cycle})'
+        cmd = f'pwrite({pin}, {duty_cycle})'
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadRespone()
+
         if res.success:
             return True
 

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html>
+<head>  
+  
+</head>
+
+<body>
+	<a href="https://demo.duelink.com/index.html">Home</a>
+	
+	<button class="dropdown-btn" id="id-demoBtn">Data Bus
+		<i class="fa fa-caret-down"></i>
+	</button>
+	<div class="dropdown-container">
+		<a href="https://demo.duelink.com/p/can.html">CAN</a>
+		<a href="https://demo.duelink.com/p/i2c.html">I2C</a>
+		<a href="https://demo.duelink.com/p/spi.html">SPI</a>
+		<a href="https://demo.duelink.com/p/uart.html">UART</a>				
+	</div>
+	
+	<button class="dropdown-btn" id="id-demoBtn">Samples
+		<i class="fa fa-caret-down"></i>
+	</button>
+
+	<div class="dropdown-container">
+		<a href="https://demo.duelink.com/p/ledmatrix.html">LED Matrix</a>		
+		<a href="https://demo.duelink.com/p/piano.html">Piano</a>
+		<a href="https://demo.duelink.com/p/temperature.html">Temperature</a>
+		<a href="https://demo.duelink.com/p/temperature.html">Humidity</a>
+			
+	</div>
+	
+	<!-- <button class="dropdown-btn" id="id-demoBtn">Qwiic/STEMMA -->
+		<!-- <i class="fa fa-caret-down"></i> -->
+	<!-- </button> -->
+	<!-- <div class="dropdown-container"> -->
+		<!-- <a href="https://demo.duelink.com/p/i2c_qwiicjoystick.html">Joystick</a> -->
+		<!-- <a href="https://demo.duelink.com/p/i2c_gps.html">Gps</a> -->
+		<!-- <a href="https://demo.duelink.com/p/i2c_distance.html">Distance</a> -->
+	<!-- </div> -->
+	
+			
+	<a href="https://www.ghielectronics.com/company/" target="_blank">About</a>		
+	<script>	
+		var dropdown = document.getElementsByClassName("dropdown-btn");
+
+		var i;
+
+		for (i = 0; i < dropdown.length; i++) {
+			dropdown[i].addEventListener("click", function() {
+				this.classList.toggle("active");
+				var dropdownContent = this.nextElementSibling;
+				
+				if (dropdownContent.style.display === "block") {
+					dropdownContent.style.display = "none";
+				} else {
+					dropdownContent.style.display = "block";
+				}
+			});
+		}
+	</script>
+</body>
+</html>
