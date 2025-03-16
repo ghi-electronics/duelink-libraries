@@ -5,8 +5,13 @@
 #include "DUELinkLib.h"
 
 void DUELink::begin(DUELinkTransport &transport) {
+    char escseq[] = {0x1b, 0};
+
     m_pTransport = &transport;
     m_pTransport->begin();
+    execute(escseq);
+    execute(escseq);
+    execute(">");
     echo(0);
   }
   
