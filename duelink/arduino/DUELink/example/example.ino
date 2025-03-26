@@ -25,6 +25,7 @@ void loop() {
   Serial.println(cnt);
   cnt++;
   delay(1000);
+  Serial.println(duelink.Digital.Read(1,0));
   
  
 }

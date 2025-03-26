@@ -16,6 +16,7 @@ public:
 
 #include "DUELinkTransport.h"
 #include "Led.h"
+#include "Digital.h"
 
 
 class DUELink {
@@ -30,6 +31,7 @@ public:
     void dwrite(int pin, int state);
     */
     LedController Led ;
+    DigitalController Digital;
 
     bool Connect();
 
