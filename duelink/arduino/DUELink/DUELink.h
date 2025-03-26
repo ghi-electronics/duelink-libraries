@@ -1,58 +1,46 @@
 #pragma once
 
-#include "Arduino.h"
-#include "Wire.h"
-#include "DUELinkLib.h"
-
-class TwoWireTransport : public DUELinkTransport {
+#ifndef ARDUINO
+#include <string>
+class String : public std::string {
 public:
-    TwoWireTransport(TwoWire &link, int i2cAddress = 0x52) : m_link(link), m_i2cAddress(i2cAddress) {}
+    String() : std::string() {}
+    String(String &other) {*this = other;}
+    String(const char *s) : std::string(s) {}
 
-    virtual void begin() {
-        m_link.begin();
-    }
-    
-    virtual void beginTransmission() {
-        m_link.beginTransmission(m_i2cAddress);
-    }
+    size_t indexOf(String &s, size_t pos = 0) { return this->find(s.c_str(), pos); }
+    size_t indexOf(const char *s, size_t pos = 0) { return this->find(s, pos); }
+    String substring(size_t from, size_t to) { return this->substr(from, to-from).c_str();}
+};
+#endif
 
-    virtual void write(const char *str) {
-        m_link.write(str);
-    }
+#include "DUELinkTransport.h"
+#include "Led.h"
+#include "Digital.h"
+#include "Analog.h"
 
-    virtual void endTransmission() {
-        m_link.endTransmission();
-    }
 
-    virtual int read(char *buf, int bytes, unsigned long timeout) {
-        unsigned long startms = millis();
-        
-        uint32_t bytesToRead = 0;
-        char *p = &buf[0];
-        while ((millis() - startms) < timeout) {
-            m_link.requestFrom(m_i2cAddress, 1, true);
-            if (m_link.available()) {
-            int c = m_link.read();
-            if (c >= 0 && c <= 127) {
-                bytesToRead = bytes - 2;
-                *p++ = (uint8_t)c;
-                break;
-            }
-            }
-        }
-        if (bytesToRead && buf[0] != '>') {
-            m_link.requestFrom(m_i2cAddress, bytesToRead, true);
-            while ((millis() - startms) < timeout && m_link.available()) {
-            int c = m_link.read();
-            if (c >= 0 && c <= 127) {
-                *p++ = (uint8_t)c;
-            }      
-            }  
-        }
-        *p = '\0';
-    }
+class DUELink {
+
+
+public:
+    DUELink(DUELinkTransport &transport) ;
+    /*
+    void begin(DUELinkTransport &transport); 
+
+    bool dread(int pin, int pull);
+    void dwrite(int pin, int state);
+    */
+    LedController Led ;
+    DigitalController Digital;
+    AnalogController Analog;
+
+    bool Connect();
 
 private:
-    TwoWire &m_link;
+    
+    DUELinkTransport *m_pTransport = NULL;
     int m_i2cAddress;
+
+    
 };
