@@ -5,7 +5,7 @@
 #include "DUELink.h"
 
 
-DUELink::DUELink(DUELinkTransport &transport) : Led(transport),Digital(transport) {
+DUELink::DUELink(DUELinkTransport &transport) : Led(transport),Digital(transport),Analog(transport) {
  
   m_pTransport = &transport;
 

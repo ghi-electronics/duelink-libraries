@@ -17,6 +17,7 @@ public:
 #include "DUELinkTransport.h"
 #include "Led.h"
 #include "Digital.h"
+#include "Analog.h"
 
 
 class DUELink {
@@ -32,6 +33,7 @@ public:
     */
     LedController Led ;
     DigitalController Digital;
+    AnalogController Analog;
 
     bool Connect();
 
