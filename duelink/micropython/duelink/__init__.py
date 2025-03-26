@@ -1,2 +1,3 @@
-from duelink.duelinklib import I2CTransport
-from duelink.duelinklib import DUELink
+from duelink.transport import I2CTransportController
+from duelink.duelink import DUELinkController
+from duelink.digital import DigitalController
