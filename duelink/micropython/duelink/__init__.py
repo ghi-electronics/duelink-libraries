@@ -1,3 +1,6 @@
 from duelink.transport import I2CTransportController
-from duelink.duelink import DUELinkController
+from duelink.duelinklib import DUELinkController
 from duelink.digital import DigitalController
+from duelink.led import LedController
+from duelink.analog import AnalogController
+from duelink.button import ButtonController
