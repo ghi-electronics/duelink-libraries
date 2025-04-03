@@ -768,20 +768,6 @@ class InfraredController {
   }
 }
 
-class LedController {
-  constructor(serialPort) {
-    this.serialPort = serialPort;
-  }
-
-  async Set(highPeriod, lowPeriod, count) {
-    const cmd = `led(${highPeriod},${lowPeriod},${count})`;
-    await this.serialPort.WriteCommand(cmd);
-
-    const res = await this.serialPort.ReadResponse();
-    return res.success;
-  }
-}
-
 class EngineController {
   constructor(serialPort) {
     this.serialPort = serialPort;
@@ -1105,6 +1091,14 @@ class SystemController {
     return -1;
 
   }
+  
+    async StatLed(highPeriod, lowPeriod, count) {
+        const cmd = `statled(${highPeriod},${lowPeriod},${count})`;
+        await this.serialPort.WriteCommand(cmd);
+
+        const res = await this.serialPort.ReadResponse();
+        return res.success;
+    }
 
 }
 
@@ -1239,8 +1233,7 @@ class DUELinkController {
     this.Button = new ButtonController(this.serialPort);
     this.Distance = new DistanceSensorController(this.serialPort);
     this.Graphics = new GraphicsController(this.serialPort);
-    this.Touch = new TouchController(this.serialPort);
-    this.Led = new LedController(this.serialPort);
+    this.Touch = new TouchController(this.serialPort);    
     this.Engine = new EngineController(this.serialPort);
     this.Temperature = new TemperatureController(this.serialPort);
     this.Humidity = new HumidityController(this.serialPort);
