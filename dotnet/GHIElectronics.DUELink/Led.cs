@@ -7,23 +7,23 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
-        public class LedController {
+        //public class LedController {
 
-            SerialInterface serialPort;
+        //    SerialInterface serialPort;
 
-            public LedController(SerialInterface serialPort) => this.serialPort = serialPort;
+        //    public LedController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public bool Set(int highPeriod, int lowPeriod, int count) {
+        //    public bool Set(int highPeriod, int lowPeriod, int count) {
 
-                var cmd = string.Format("led({0},{1},{2})", highPeriod, lowPeriod, count);
+        //        var cmd = string.Format("led({0},{1},{2})", highPeriod, lowPeriod, count);
 
-                this.serialPort.WriteCommand(cmd);
+        //        this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadResponse();
+        //        var res = this.serialPort.ReadResponse();
 
-                return res.success;
+        //        return res.success;
 
-            }            
-        }
+        //    }            
+        //}
     }
 }

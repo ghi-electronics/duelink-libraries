@@ -146,6 +146,18 @@ namespace GHIElectronics.DUELink {
 
             private Version _version;
 
+            public bool StatLed(int highPeriod, int lowPeriod, int count) {
+
+                var cmd = string.Format("statled({0},{1},{2})", highPeriod, lowPeriod, count);
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadResponse();
+
+                return res.success;
+
+            }
+
         }
     }
 }
