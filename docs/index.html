@@ -679,7 +679,7 @@ $(document).ready(function(){
 		var low = $("#ledLow").val()/1;
 		var count = $("#ledCount").val()/1;
 		
-        await duelink.Led.Set(high, low, count);
+        await duelink.System.StatLed(high, low, count);
     }
 	
 
