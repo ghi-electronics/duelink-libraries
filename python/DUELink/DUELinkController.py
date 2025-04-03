@@ -12,7 +12,6 @@ from DUELink.SerialInterface import SerialInterface
 from DUELink.Servo import ServoController
 from DUELink.Spi import SpiController
 from DUELink.Touch import TouchController
-from DUELink.Led import LedController
 from DUELink.Engine import EngineController
 from DUELink.DeviceConfiguration import DeviceConfiguration
 from DUELink.Temperature import TemperatureController
@@ -46,8 +45,7 @@ class DUELinkController:
         self.Button = ButtonController(self.serialPort)
         self.Distance = DistanceSensorController(self.serialPort)
         self.Graphics = GraphicsController(self.serialPort)
-        self.Touch = TouchController(self.serialPort)
-        self.Led = LedController(self.serialPort)
+        self.Touch = TouchController(self.serialPort)        
         self.Engine = EngineController(self.serialPort)
         self.Temperature = TemperatureController(self.serialPort)
         self.Humidity = HudimityController(self.serialPort)
