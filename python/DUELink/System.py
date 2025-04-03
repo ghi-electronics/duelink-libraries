@@ -78,6 +78,13 @@ class SystemController:
                 pass
 
         return 0
+        
+    def StatLed(self, highPeriod: int, lowPeriod: int, count: int) -> bool:
+        cmd = f"statled({highPeriod},{lowPeriod},{count})"
+        self.serialPort.WriteCommand(cmd)
+
+        res = self.serialPort.ReadRespone()
+        return res.success
 
     
 
