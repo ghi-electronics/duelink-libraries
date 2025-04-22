@@ -87,14 +87,14 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool Execute(string script) {
+            public string Execute(string script) {
                 var cmd = script;
 
                 this.serialPort.WriteCommand(cmd);
 
                 var response = this.serialPort.ReadResponse();
 
-                return response.success;
+                return response.response;
             }
 
             //public bool IsRunning() {

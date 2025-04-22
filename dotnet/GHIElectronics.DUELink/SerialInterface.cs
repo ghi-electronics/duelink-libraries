@@ -335,7 +335,7 @@ namespace GHIElectronics.DUELink {
             }
         }
 
-        int transferBlockDelay1 = 2;
+        //int transferBlockDelay1 = 2;
         int transferBlockDelay2 = 10;
         public int TransferBlockDelay {
             get {

@@ -158,6 +158,18 @@ namespace GHIElectronics.DUELink {
 
             }
 
+            public bool Sel(int dev) {
+
+                var cmd = string.Format("sel({0})", dev);
+
+                this.serialPort.WriteCommand(cmd);
+
+                var res = this.serialPort.ReadResponse();
+
+                return res.success;
+
+            }
+
         }
     }
 }

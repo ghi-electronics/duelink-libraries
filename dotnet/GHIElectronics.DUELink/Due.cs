@@ -56,7 +56,7 @@ namespace GHIElectronics.DUELink {
 
  
 
-        public EngineController Script { get; internal set; }
+        public EngineController Engine { get; internal set; }
 
 
 
@@ -67,9 +67,10 @@ namespace GHIElectronics.DUELink {
 
 
         public SoundController Sound { get; internal set; }
-      
+        public StreamController Stream { get; internal set; }
 
-       
+
+
 
         public int MaxIO { get; internal set; }
         public int MaxAnalog { get; internal set; }
@@ -102,7 +103,7 @@ namespace GHIElectronics.DUELink {
             this.Distance = new DistanceSensorController(this.serialPort);
             this.Graphics = new GraphicsController(this.serialPort);
             this.Touch = new TouchController(this.serialPort);            
-            this.Script = new EngineController(this.serialPort);
+            this.Engine = new EngineController(this.serialPort);
 
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);
@@ -111,6 +112,7 @@ namespace GHIElectronics.DUELink {
 
 
             this.Sound = new SoundController(this.serialPort);
+            this.Stream = new StreamController(this.serialPort);    
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {
