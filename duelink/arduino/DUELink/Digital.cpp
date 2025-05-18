@@ -2,7 +2,7 @@
 #include "Arduino.h"
 #endif
 
-#include "digital.h"
+#include "Digital.h"
 
   bool DigitalController::Read(int pin, int pull) {
     char cmd[32];
