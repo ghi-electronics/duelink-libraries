@@ -5,5 +5,5 @@ class LedController:
         self.transport = transport
 
     def Set(self, high, low, count):
-        self.transport.execute(f"led({high},{low},{count})")        
+        self.transport.execute(f"statled({high},{low},{count})")        
 
