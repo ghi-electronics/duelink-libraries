@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name = "mduelink",
+    name = "mDUELink",
     version = "0.0.1",
     author = "GHI Electronics",
     author_email = "support@ghielectronics.com",
