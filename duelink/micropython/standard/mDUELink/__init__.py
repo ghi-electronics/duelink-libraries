@@ -1,4 +1,4 @@
-from mduelink.duelinklib import DUELinkController
+from mDUELink.duelinklib import DUELinkController
 
 def build_bytearray(data, offset=0, count=-1):
     if count == -1:

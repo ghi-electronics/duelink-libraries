@@ -1,4 +1,4 @@
-import mduelink as DL
+import mDUELink as DL
 
 class I2cController:    
 
