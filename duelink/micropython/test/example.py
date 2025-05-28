@@ -1,16 +1,16 @@
 import time
 import machine
-import duelink
+import mduelink
 
-from duelink import transport
-from duelink.graphics import GraphicsType
+from mduelink import transport
+from mduelink.graphics import GraphicsType
 from machine import Pin, Timer
 
 def Cmd(c):
     due.I2c.Write(0x3c, [0,c])
     
 uart = transport.UartTransportController(0)
-due = duelink.DUELinkController(uart)
+due = mduelink.DUELinkController(uart)
 
 due.System.New() # Make sure all memory is available
 
