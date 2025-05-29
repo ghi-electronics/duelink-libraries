@@ -1,8 +1,8 @@
 import setuptools
 
 setuptools.setup(
-    name = "mDUELink",
-    version = "0.0.3",
+    name = "duelink-stdlib-mp",
+    version = "0.0.4",
     author = "GHI Electronics",
     author_email = "support@ghielectronics.com",
     license='MIT', 

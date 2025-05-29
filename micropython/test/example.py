@@ -1,13 +1,13 @@
 import time
 import machine
-import mDUELink  # standard lib
-import mDLDuePico #  DuePico drie
+import duelink  # standard lib
+import duepico #  DuePico drie
 
-from mDLDuePico import DuePicoController
+from duepico import DuePicoController
 
 pico = DuePicoController()
 
-pico.StatLed(100,200,10)
+pico.StatLed(100,200,20)
 
 
 

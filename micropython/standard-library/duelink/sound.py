@@ -1,4 +1,4 @@
-import mDUELink as DL
+import duelink as DL
 
 class SoundController:    
     def __init__(self, transport):

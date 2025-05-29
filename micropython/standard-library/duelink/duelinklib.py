@@ -1,16 +1,16 @@
 import machine
 import time
 
-from mDUELink.digital import DigitalController
-from mDUELink.led import LedController
-from mDUELink.analog import AnalogController
-from mDUELink.button import ButtonController
-from mDUELink.system import SystemController
-from mDUELink.sound import SoundController
-from mDUELink.graphics import GraphicsController, GraphicsType
-from mDUELink.i2c import I2cController
-from mDUELink.frequency import FrequencyController
-from mDUELink.sound import SoundController
+from duelink.digital import DigitalController
+from duelink.led import LedController
+from duelink.analog import AnalogController
+from duelink.button import ButtonController
+from duelink.system import SystemController
+from duelink.sound import SoundController
+from duelink.graphics import GraphicsController, GraphicsType
+from duelink.i2c import I2cController
+from duelink.frequency import FrequencyController
+from duelink.sound import SoundController
 
    
 class DUELinkController:
