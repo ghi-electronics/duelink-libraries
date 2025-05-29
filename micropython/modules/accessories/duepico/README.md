@@ -1,5 +1,6 @@
 GHI Electronics DUELink DuePico Library for MicroPython
 
+Example:
 ```py
 import duelink  # standard lib
 import duepico #  DuePico lib

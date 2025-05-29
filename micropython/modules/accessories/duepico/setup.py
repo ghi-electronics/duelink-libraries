@@ -21,5 +21,10 @@ setuptools.setup(
         "Programming Language :: Python :: Implementation :: MicroPython"
     ],
     long_description=long_description,
-    long_description_content_type='text/markdown'     
+    long_description_content_type='text/markdown',
+    keywords = ["due", "duelink", "ghi", "duepico", "pico"],
+    project_urls={  
+        "Bug Reports": "https://github.com/ghi-electronics/duelink-libraries/issues",
+        "Source": "https://github.com/ghi-electronics/duelink-libraries/tree/main/micropython",
+    }    
 )

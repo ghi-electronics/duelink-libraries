@@ -9,7 +9,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name = "duelink-stdlib-mp",
-    version = "0.0.5",
+    version = "0.0.6",
     author = "GHI Electronics",
     author_email = "support@ghielectronics.com",
     license='MIT', 
@@ -20,5 +20,10 @@ setuptools.setup(
         "Programming Language :: Python :: Implementation :: MicroPython"
     ],
     long_description=long_description,
-    long_description_content_type='text/markdown'    
+    long_description_content_type='text/markdown',
+    keywords = ["due", "duelink", "ghi"],
+    project_urls={  
+        "Bug Reports": "https://github.com/ghi-electronics/duelink-libraries/issues",
+        "Source": "https://github.com/ghi-electronics/duelink-libraries/tree/main/micropython",
+    }
 )
