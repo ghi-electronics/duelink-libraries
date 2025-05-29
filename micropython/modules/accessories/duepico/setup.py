@@ -6,11 +6,13 @@ setuptools.setup(
     author = "GHI Electronics",
     author_email = "support@ghielectronics.com",
     license='MIT', 
-    description = "GHI Electronics DUELink DuePico MicroPython Library",
+    description = "GHI Electronics DUELink DuePico MicroPython Library.",
     url = "https://www.duelink.com/",
     install_requires=["duelink-stdlib-mp"],
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: Implementation :: MicroPython"
-    ]    
+    ],
+    long_description="GHI Electronics DUELink DuePico MicroPython Library.",
+    long_description_content_type='text/markdown'     
 )
