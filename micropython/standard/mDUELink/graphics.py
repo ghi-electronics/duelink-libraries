@@ -1,4 +1,4 @@
-import duelink as DL
+import mDUELink as DL
 
 class GraphicsType:
     I2c = 1
