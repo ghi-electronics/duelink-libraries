@@ -73,8 +73,12 @@ class UartTransportController:
     def sync(self):
         self.uart.write(b'\x1b')
         bytes = self.uart.read(3)
-        if bytes is None or len(bytes)<3 or bytes[2] != 62:
+        if bytes is None or len(bytes)<3: # or bytes[2] != 62:
             raise Exception("DUELink not responding")
+        
+        # Sync then discard all bytes
+        if len(bytes)>3:
+            self.uart.read()
     
     def write(self, str):
         self.uart.write(str+"\n")

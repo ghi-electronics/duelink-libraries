@@ -11,6 +11,7 @@ from duelink.graphics import GraphicsController, GraphicsType
 from duelink.i2c import I2cController
 from duelink.frequency import FrequencyController
 from duelink.sound import SoundController
+from duelink.engine import EngineController
 
    
 class DUELinkController:
@@ -26,6 +27,7 @@ class DUELinkController:
         self.I2c = I2cController(self.transport)
         self.Frequency = FrequencyController(self.transport)
         self.Sound = SoundController(self.transport)
+        self.Engine = EngineController(self.transport)
     
     
     
