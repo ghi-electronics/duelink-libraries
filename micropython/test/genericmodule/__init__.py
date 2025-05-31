@@ -1,0 +1,2 @@
+from genericmodule.genericmodule import GenericModuleController
+
