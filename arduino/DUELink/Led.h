@@ -6,19 +6,22 @@
 
 #include "DUELinkTransport.h"
 
-class LedController {
+class LedController
+{
 
 public:
+    LedController(DUELinkTransport &transport)
+    {
+        m_pTransport = &transport;
+    }
 
-    LedController(DUELinkTransport &transport) {
-      m_pTransport = &transport;
-    } 
-
-    void Set(int high, int low, int count);  
+    void Set(int high, int low, int count)
+    {
+        char cmd[32];
+        sprintf(cmd, "statled(%d,%d,%d)", high, low, count);
+        m_pTransport->execute(cmd);
+    }
 
 private:
     DUELinkTransport *m_pTransport = NULL;
-
 };
-  
-  

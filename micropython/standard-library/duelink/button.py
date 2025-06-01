@@ -6,9 +6,9 @@ class ButtonController:
 
     def Enable(self, pin, state):
         if state :
-            self.transport.execute(f"btnenable({pin},1)")
+            self.transport.execute(f"btnen({pin},1)")
         else:
-            self.transport.execute(f"btnenable({pin},0)")
+            self.transport.execute(f"btnen({pin},0)")
             
     def Up(self, pin):
         r, s = self.transport.execute(f"btnup({pin})")
