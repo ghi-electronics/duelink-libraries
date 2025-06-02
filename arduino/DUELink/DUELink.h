@@ -1,49 +1,47 @@
 #pragma once
 
-#ifndef ARDUINO
-#include <string>
-class String : public std::string {
-public:
-    String() : std::string() {}
-    String(String &other) {*this = other;}
-    String(const char *s) : std::string(s) {}
 
-    size_t indexOf(String &s, size_t pos = 0) { return this->find(s.c_str(), pos); }
-    size_t indexOf(const char *s, size_t pos = 0) { return this->find(s, pos); }
-    String substring(size_t from, size_t to) { return this->substr(from, to-from).c_str();}
-};
-#endif
 
 #include "DUELinkTransport.h"
+#include "System.h"
 #include "Led.h"
 #include "Digital.h"
 #include "Analog.h"
-#include "Buzzer.h"
-#include "ButtonL.h"
+#include "Button.h"
+#include "Engine.h"
+#include "Frequency.h"
+#include "I2c.h"
+#include "Sound.h"
+#include "Graphics.h"
 
 class DUELink {
-
-
 public:
-    DUELink(DUELinkTransport &transport) ;
-    /*
-    void begin(DUELinkTransport &transport); 
+    DUELink(DUELinkTransport &transport) :
+    Analog(transport), Button(transport), Digital(transport), Engine(transport),
+    Frequency(transport), Graphics(transport), I2c(transport), Led(transport),
+    Sound(transport), System(transport) {
+        m_pTransport = &transport;
+    }
+    
+    bool Connect() {
+        char escseq[] = {0x1b, 0};  
+        m_pTransport->begin();
+        m_pTransport->sync();
+        m_pTransport->execute(">");
+        return 1;
+    }
 
-    bool dread(int pin, int pull);
-    void dwrite(int pin, int state);
-    */
-    LedController Led ;
-    DigitalController Digital;
     AnalogController Analog;
-    BuzzerController Buzzer;
-    ButtonLController ButtonL;
-
-    bool Connect();
+    ButtonController Button;
+    DigitalController Digital;
+    EngineController Engine;
+    FrequencyController Frequency;
+    GraphicsController Graphics;
+    I2cController I2c;
+    LedController Led;
+    SoundController Sound;
+    SystemController System;
 
 private:
-    
     DUELinkTransport *m_pTransport = NULL;
-    int m_i2cAddress;
-
-    
 };
