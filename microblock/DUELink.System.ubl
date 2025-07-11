@@ -1,7 +1,8 @@
 module 'DUELink.System'
-author unknown
-version 1 0 
-description ''
+author GHIElectronics
+version 0 1 
+depends DUELink 
+description 'DUELink.System'
 variables _myaa 
 
   spec ' ' 'StatLed' 'StatLed _ _ _' 'str str str' '100' '100' '10'

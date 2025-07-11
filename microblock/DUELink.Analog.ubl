@@ -1,7 +1,9 @@
 module 'DUELink.Analog'
 author GHIElectronics
 version 0 1 
-description 'DUELink.Analog'
+depends DUELink 
+description 'DUELink.Analog
+'
 
   spec ' ' 'due_pwrite' 'pwrite pin _ pwm _' 'num auto' 0 '0.10'
   spec 'r' 'due_readvcc' 'readvcc'
