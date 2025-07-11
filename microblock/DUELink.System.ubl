@@ -1,0 +1,12 @@
+module 'DUELink.System'
+author unknown
+version 1 0 
+description ''
+variables _myaa 
+
+  spec ' ' 'StatLed' 'StatLed _ _ _' 'str str str' '100' '100' '10'
+
+to StatLed high low count {
+  due_run ('[data:join]' ('[data:asByteArray]' 'statled(') ('[data:asByteArray]' high) ('[data:asByteArray]' ',') ('[data:asByteArray]' low) ('[data:asByteArray]' ',') ('[data:asByteArray]' count) ('[data:asByteArray]' ')'))
+}
+
