@@ -1,0 +1,12 @@
+module 'DUELink.Humidity'
+author 'GHI Electronics'
+version 0 1 
+depends DUELink 
+description 'DUELink Humidity library'
+
+  spec 'r' 'Read humidity on pin' 'Read humidity on pin _ type _' 'auto auto' 18 4
+
+to 'Read humidity on pin' pin type {
+  return (due_runWithResult ('_due_templateWith' 'Humid(%,%)' pin type))
+}
+
