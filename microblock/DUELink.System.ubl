@@ -6,11 +6,11 @@ description 'DUELink.System'
 variables _myaa 
 
   spec ' ' 'StatLed' 'StatLed _ _ _' 'str str str' '100' '100' '10'
-  spec ' ' 'due_sel' 'sel _' 'num' 1
   spec 'r' 'due_tickms' 'GetTickMilliseconds'
   spec 'r' 'due_tickus' 'GetTickMicroseconds'
-  spec 'r' 'due_info' 'info _' 'num' 1
-  spec ' ' 'due_stop' 'stop'
+  spec 'r' 'due_info' 'Info _' 'num' 1
+  spec ' ' 'due_sel' 'Select _' 'num' 1
+  spec ' ' 'due_stop' 'Stop'
 
 to StatLed high low count {
   due_run ('[data:join]' ('[data:asByteArray]' 'statled(') ('[data:asByteArray]' high) ('[data:asByteArray]' ',') ('[data:asByteArray]' low) ('[data:asByteArray]' ',') ('[data:asByteArray]' count) ('[data:asByteArray]' ')'))

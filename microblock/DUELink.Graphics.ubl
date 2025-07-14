@@ -3,10 +3,23 @@ author 'GHI Electronics'
 version 0 1 
 depends DUELink 
 description ''
+variables x 
 
   spec ' ' 'Show' 'Show'
   spec ' ' 'Clear' 'Clear _' 'auto' 0
   spec ' ' 'Configuration' 'Configuration _ _ _ _ _' 'auto auto auto auto auto' 1 '{0x3c}' 128 64 1
+  spec ' ' 'Circle' 'Circle _ _ _ _' 'auto auto auto auto' 1 20 20 '10'
+  spec ' ' 'Rect' 'Rect _ _ _ _ _' 'auto auto auto auto auto' 1 0 0 '10' '10'
+  spec ' ' 'Fill' 'Fill _ _ _ _ _' 'auto auto auto auto auto' '10' '10' '10' '10' '10'
+  spec ' ' 'Text' 'Line _ _ _ _ _' 'auto auto auto auto auto' 1 '10' '10' '10' '10'
+  spec ' ' 'DrawImage' 'DrawImage _ _ _ _ _ _ _ _' 'auto auto auto auto auto auto auto auto' '1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1' '10' '10' 4 4 1 1 0
+  spec ' ' 'Text2' 'Text _ _ _ _' 'str auto auto auto' 'DUELink' '10' '10' '10'
+  spec ' ' 'TextT' 'Text Tiny _ _ _ _' 'auto auto auto auto' 'DUELink' 1 '10' '10'
+  spec ' ' 'TextS' 'Text Scale _ _ _ _ _ _' 'auto auto auto auto auto auto' 'DUELink' 1 '10' '10' '10' '10'
+
+to Circle color x y radius {
+  due_run ('[data:join]' ('[data:asByteArray]' 'circle(') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ',') ('[data:asByteArray]' radius) ('[data:asByteArray]' ')'))
+}
 
 to Clear color {
   due_run 'clear('
@@ -17,7 +30,35 @@ to Configuration type cfg width height mode {
   due_run ('[data:join]' ('[data:asByteArray]' 'gfxcfg(') ('[data:asByteArray]' type) ('[data:asByteArray]' ',') ('[data:asByteArray]' cfg) ('[data:asByteArray]' ',') ('[data:asByteArray]' width) ('[data:asByteArray]' ',') ('[data:asByteArray]' height) ('[data:asByteArray]' ',') ('[data:asByteArray]' mode) ('[data:asByteArray]' ')'))
 }
 
+to DrawImage img x y width height 'scale witdh' 'scale height' transform {
+  due_run ('[data:join]' ('[data:asByteArray]' 'imgs([') ('[data:asByteArray]' img) ('[data:asByteArray]' '],') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ',') ('[data:asByteArray]' width) ('[data:asByteArray]' ',') ('[data:asByteArray]' height) ('[data:asByteArray]' ',') ('[data:asByteArray]' (v 'scale witdh')) ('[data:asByteArray]' ',') ('[data:asByteArray]' (v 'scale height')) ('[data:asByteArray]' ',') ('[data:asByteArray]' transform) ('[data:asByteArray]' ')'))
+}
+
+to Fill color x y width height {
+  due_run ('[data:join]' ('[data:asByteArray]' 'fill(') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ',') ('[data:asByteArray]' width) ('[data:asByteArray]' ',') ('[data:asByteArray]' height) ('[data:asByteArray]' ')'))
+}
+
+to Rect color x y width height {
+  due_run ('[data:join]' ('[data:asByteArray]' 'rect(') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ',') ('[data:asByteArray]' width) ('[data:asByteArray]' ',') ('[data:asByteArray]' height) ('[data:asByteArray]' ')'))
+}
+
 to Show {
   due_run 'show()'
+}
+
+to Text color x1 x2 y1 y2 {
+  due_run ('[data:join]' ('[data:asByteArray]' 'line(') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x1) ('[data:asByteArray]' ',') ('[data:asByteArray]' x2) ('[data:asByteArray]' ',') ('[data:asByteArray]' y1) ('[data:asByteArray]' ',') ('[data:asByteArray]' y2) ('[data:asByteArray]' ')'))
+}
+
+to Text2 text color x y {
+  due_run ('[data:join]' ('[data:asByteArray]' 'text("') ('[data:asByteArray]' text) ('[data:asByteArray]' '",') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ')'))
+}
+
+to TextS text color x y 'scale width' 'scale height' {
+  due_run ('[data:join]' ('[data:asByteArray]' 'texts("') ('[data:asByteArray]' text) ('[data:asByteArray]' '",') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ',') ('[data:asByteArray]' (v 'scale width')) ('[data:asByteArray]' ',') ('[data:asByteArray]' (v 'scale height')) ('[data:asByteArray]' ')'))
+}
+
+to TextT text color baz y {
+  due_run ('[data:join]' ('[data:asByteArray]' 'textT("') ('[data:asByteArray]' text) ('[data:asByteArray]' '",') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ')'))
 }
 
