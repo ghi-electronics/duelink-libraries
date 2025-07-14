@@ -14,14 +14,14 @@ variables _dueUseI2C
   space
   space
   space
-  spec ' ' 'due_run' 'WriteCommand _' 'str' 'statled(100,100,5)'
+  spec ' ' 'due_run' 'Write command _' 'str' 'statled(100,100,5)'
   space
   spec ' ' '_due_send' '_due send _' 'str'
   spec 'r' '_due_awaitResultI2C' '_due await result (I2C)'
   spec 'r' '_due_endsWithPrompt' '_due byte array ends with prompt _' 'str'
   spec 'r' '_due_templateWith' '_due_template _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'test(%)' 123
   spec 'r' '_due_awaitResult' '_due await result'
-  spec 'r' 'due_runWithResult' 'WriteCommand _ with result' 'str' 'version()'
+  spec 'r' 'due_runWithResult' 'Write command _ with result' 'str' 'version()'
 
 to '_due_awaitResult' {
   if _dueUseI2C {return ('_due_awaitResultI2C')}

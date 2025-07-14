@@ -9,6 +9,11 @@ variables _myaa
   spec 'r' 'due_tickms' 'GetTickMilliseconds'
   spec 'r' 'due_tickus' 'GetTickMicroseconds'
   spec 'r' 'due_info' 'Info _' 'num' 1
+  spec ' ' 'Reset' 'Reset _' 'auto' 0
+
+to Reset type {
+  due_run ('_due_templateWith' 'reset(%)' type)
+}
 
 to StatLed high low count {
   due_run ('[data:join]' ('[data:asByteArray]' 'statled(') ('[data:asByteArray]' high) ('[data:asByteArray]' ',') ('[data:asByteArray]' low) ('[data:asByteArray]' ',') ('[data:asByteArray]' count) ('[data:asByteArray]' ')'))
