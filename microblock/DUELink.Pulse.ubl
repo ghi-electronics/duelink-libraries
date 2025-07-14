@@ -1,0 +1,12 @@
+module 'DUELink.Pulse'
+author 'GHI Electronics'
+version 0 1 
+depends DUELink 
+description 'DUELink.Pulse'
+
+  spec ' ' 'Read pulse' 'Read pulse  _ _ _' 'auto auto auto' 1 1 1000
+
+to 'Read pulse' pin state 'timeout in millisecond' {
+  return (due_runWithResult ('_due_templateWith' 'PulseIn(%,%,%)' pin state (v 'timeout in millisecond')))
+}
+
