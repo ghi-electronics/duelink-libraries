@@ -4,9 +4,9 @@ version 0 1
 depends DUELink 
 description 'DUELink.Touch'
 
-  spec ' ' 'Touch' 'Touch on pin _ _ _ _' 'auto auto auto auto' 1 1 100 1000
+  spec ' ' 'Touch' 'Touch on pin _ charge state _ charge time _ timeout _ ms' 'auto bool auto auto' 1 true 10 '10'
 
-to Touch pin 'charge state' 'charge time' timeout {
-  due_run ('_due_templateWith' 'Touch(%,%,%,%)' pin (v 'charge state') (v 'charge time') timeout)
+to Touch pin state time timeout {
+  due_run ('_due_templateWith' 'Touch(%,%,%,%)' pin state time timeout)
 }
 
