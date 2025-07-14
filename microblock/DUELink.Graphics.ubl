@@ -13,9 +13,9 @@ variables x
   spec ' ' 'Rect' 'Rect color _ x _ y _ width _ height _' 'auto auto auto auto auto' 1 0 0 '10' '10'
   spec ' ' 'Fill' 'Fill color _ x _ y _ width _ height _' 'auto auto auto auto auto' '10' '10' '10' '10' '10'
   spec ' ' 'DrawImage' 'DrawImage array _ x _ y _ width _ height _ scale width _ scale height _ transform _' 'auto auto auto auto auto auto auto auto' '1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1' '10' '10' 4 4 1 1 0
-  spec ' ' 'Configuration' 'Configuration type _ array _ width _ height _ mode _' 'auto auto auto auto auto' 1 '0x3c' 128 64 1
   spec ' ' 'Clear' 'Clear color _' 'auto' 0
   spec ' ' 'Circle' 'Circle color _ x _ y _ radius _' 'auto auto auto auto' 1 20 20 '10'
+  spec ' ' 'Configuration' 'Graphics config type _ array _ width _ height _ mode _' 'auto auto auto auto auto' 1 '0x3c' 128 64 1
 
 to Circle color x y radius {
   due_run ('_due_templateWith' 'circle(%,%,%,%)' color x y radius)
@@ -27,7 +27,7 @@ to Clear color {
 
 to Configuration type cfg width height mode {
   comment 'Default values come from OLED 096'
-  due_run ('_due_templateWith' 'gfxcfg(%,%,%,%,%)' type cfg width height mode)
+  due_run ('_due_templateWith' 'gfxcfg(%,{%},%,%,%)' type cfg width height mode)
 }
 
 to DrawImage img x y width height 'scale witdh' 'scale height' transform {

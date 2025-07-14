@@ -4,8 +4,8 @@ version 0 1
 depends DUELink 
 description ''
 
-  spec ' ' 'Configuration2' 'I2c set speed  _ KHz' 'auto' 100
   spec ' ' 'I2C Write' 'I2c writeread address _ write array _ read array _' 'auto auto auto' '0x38' '1,2,3' 0
+  spec ' ' 'Configuration2' 'I2c set speed  _ KHz' 'auto' 100
 
 to Configuration2 speed {
   due_run ('_due_templateWith' 'i2ccfg(%)' speed)
