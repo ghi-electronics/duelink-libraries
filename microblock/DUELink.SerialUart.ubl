@@ -4,13 +4,13 @@ version 1 0
 depends DUELink 
 description 'DUELink.SerialUart'
 
-  spec ' ' 'Uart Configuration' 'Uart Configuration baudrate _ rx buffer size _' 'auto auto' 115200 128
-  spec 'r' 'Read byte' 'Read byte'
-  spec ' ' 'Write byte' 'Write byte _' 'auto' 'A'
-  spec 'r' 'Read bytes' 'Read bytes to array _ timeout _' 'auto auto' '0,0,0,0' 1000
-  spec 'r' 'Byte to read' 'Byte to read'
-  spec ' ' 'Discard Rx buffer' 'Discard Rx buffer'
-  spec ' ' 'Write bytes' 'Write bytes _' 'auto' 'DUELink'
+  spec ' ' 'Uart Configuration' 'Serial open _ baudrate rx buffer size _' 'auto auto' 115200 128
+  spec 'r' 'Read byte' 'Serial read single byte'
+  spec ' ' 'Write byte' 'Serial write single byte _' 'auto' 'A'
+  spec 'r' 'Read bytes' 'Serial read bytes to array _ timeout _' 'auto auto' '0,0,0,0' 1000
+  spec 'r' 'Byte to read' 'Serial byte to read'
+  spec ' ' 'Discard Rx buffer' 'Serial discard buffers'
+  spec ' ' 'Write bytes' 'Serial write bytes _' 'auto' 'DUELink'
 
 to 'Byte to read' {
   return (due_runWithResult 'SerB2R()')

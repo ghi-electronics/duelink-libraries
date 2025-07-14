@@ -4,9 +4,9 @@ version 0 1
 depends DUELink 
 description 'DUELink.Button'
 
-  spec 'r' 'due_btndown' 'btndown pin _' 'num' 20
-  spec 'r' 'due_btnup' 'btnup pin _' 'num' 20
-  spec ' ' 'due_btnen' 'btnen pin _ enable _ pull _' 'num bool num' 20 true 2
+  spec 'r' 'due_btndown' 'Button down on pin _' 'num' 20
+  spec 'r' 'due_btnup' 'Button up on pin _' 'num' 20
+  spec ' ' 'due_btnen' 'Button enable on pin _ enable _ pull _' 'num bool num' 20 true 2
 
 to due_btndown pin {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'btndown(%)' pin)) 'number')
