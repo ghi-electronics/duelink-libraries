@@ -1,0 +1,12 @@
+module 'DUELink.Touch'
+author 'GHI Electronics'
+version 0 1 
+depends DUELink 
+description 'DUELink.Touch'
+
+  spec ' ' 'Touch' 'Touch on pin _ _ _ _' 'auto auto auto auto' 1 1 100 1000
+
+to Touch pin 'charge state' 'charge time' timeout {
+  due_run ('_due_templateWith' 'Touch(%,%,%,%)' pin (v 'charge state') (v 'charge time') timeout)
+}
+
