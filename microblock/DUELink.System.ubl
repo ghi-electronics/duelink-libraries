@@ -5,7 +5,7 @@ depends DUELink
 description 'DUELink.System'
 variables _myaa 
 
-  spec ' ' 'StatLed' 'StatLed _ _ _' 'str str str' '100' '100' '10'
+  spec ' ' 'StatLed' 'StatLed high _ low _ count _' 'str str str' '100' '100' '10'
   spec 'r' 'due_tickms' 'GetTickMilliseconds'
   spec 'r' 'due_tickus' 'GetTickMicroseconds'
   spec 'r' 'due_info' 'Info _' 'num' 1

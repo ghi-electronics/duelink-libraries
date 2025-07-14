@@ -1,0 +1,12 @@
+module 'DUELink.DistanceSensor'
+author 'GHI Electronics'
+version 0 1 
+depends DUELink 
+description 'DUELink.Distance'
+
+  spec ' ' 'Read' 'Read distance pulse pin _ echo pin _' 'auto auto' 1 '10'
+
+to Read pulse echo {
+  return (due_runWithResult ('_due_templateWith' 'dist(%,%)' pulse echo))
+}
+
