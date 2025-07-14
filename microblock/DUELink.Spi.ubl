@@ -1,0 +1,21 @@
+module 'DUELink.Spi'
+author 'GHI Electronics'
+version 0 1 
+description ''
+
+  spec ' ' 'Spi Configuration' 'Spi Configuration _ _' 'auto auto' 0 8000
+  spec ' ' 'Spi Write' 'Spi Write _' 'auto' 10
+  spec ' ' 'Spi WriteRead' 'Spi WriteRead _ _' 'auto auto' '[10]' 0
+
+to 'Spi Configuration' mode 'frequency in KHz' {
+  due_run ('_due_templateWith' 'SpiCfg(%,%)' mode (v 'frequency in KHz'))
+}
+
+to 'Spi Write' data {
+  due_run ('_due_templateWith' 'SpiWr(%)' data)
+}
+
+to 'Spi WriteRead' 'write array' 'read array' {
+  due_run ('_due_templateWith' 'SpiWrs(%,%)' (v 'write array') (v 'read array'))
+}
+

@@ -1,0 +1,17 @@
+module 'DUELink.I2c'
+author 'GHI Electronics'
+version 0 1 
+depends DUELink 
+description ''
+
+  spec ' ' 'Configuration2' 'I2c Configuration _' 'auto' 100
+  spec ' ' 'I2C Write' 'I2c WriteRead _ _ _' 'auto auto auto' '0x38' '[0]' 0
+
+to Configuration2 'speed in KHz' {
+  due_run ('_due_templateWith' 'i2ccfg(%)' (v 'speed in KHz'))
+}
+
+to 'I2C Write' address 'write array' 'read array' {
+  return (due_runWithResult ('_due_templateWith' 'I2cWr(%,%,%)' address (v 'write array') (v 'read array')))
+}
+
