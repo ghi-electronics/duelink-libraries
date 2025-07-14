@@ -1,0 +1,23 @@
+module 'DUELink.Graphics'
+author 'GHI Electronics'
+version 0 1 
+depends DUELink 
+description ''
+
+  spec ' ' 'Show' 'Show'
+  spec ' ' 'Clear' 'Clear _' 'auto' 0
+  spec ' ' 'Configuration' 'Configuration _ _ _ _ _' 'auto auto auto auto auto' 1 '{0x3c}' 128 64 1
+
+to Clear color {
+  due_run 'clear('
+}
+
+to Configuration type cfg width height mode {
+  comment 'Default values come from OLED 096'
+  due_run ('[data:join]' ('[data:asByteArray]' 'gfxcfg(') ('[data:asByteArray]' type) ('[data:asByteArray]' ',') ('[data:asByteArray]' cfg) ('[data:asByteArray]' ',') ('[data:asByteArray]' width) ('[data:asByteArray]' ',') ('[data:asByteArray]' height) ('[data:asByteArray]' ',') ('[data:asByteArray]' mode) ('[data:asByteArray]' ')'))
+}
+
+to Show {
+  due_run 'show()'
+}
+
