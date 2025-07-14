@@ -6,28 +6,28 @@ description ''
 variables x 
 
   spec ' ' 'Show' 'Show'
-  spec ' ' 'Clear' 'Clear _' 'auto' 0
-  spec ' ' 'Configuration' 'Configuration _ _ _ _ _' 'auto auto auto auto auto' 1 '{0x3c}' 128 64 1
-  spec ' ' 'Circle' 'Circle _ _ _ _' 'auto auto auto auto' 1 20 20 '10'
-  spec ' ' 'Rect' 'Rect _ _ _ _ _' 'auto auto auto auto auto' 1 0 0 '10' '10'
-  spec ' ' 'Fill' 'Fill _ _ _ _ _' 'auto auto auto auto auto' '10' '10' '10' '10' '10'
-  spec ' ' 'Text' 'Line _ _ _ _ _' 'auto auto auto auto auto' 1 '10' '10' '10' '10'
-  spec ' ' 'DrawImage' 'DrawImage _ _ _ _ _ _ _ _' 'auto auto auto auto auto auto auto auto' '1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1' '10' '10' 4 4 1 1 0
-  spec ' ' 'Text2' 'Text _ _ _ _' 'str auto auto auto' 'DUELink' '10' '10' '10'
-  spec ' ' 'TextT' 'Text Tiny _ _ _ _' 'auto auto auto auto' 'DUELink' 1 '10' '10'
-  spec ' ' 'TextS' 'Text Scale _ _ _ _ _ _' 'auto auto auto auto auto auto' 'DUELink' 1 '10' '10' '10' '10'
+  spec ' ' 'TextT' 'Text Tiny _ color _ x _ y _' 'auto auto auto auto' 'DUELink' 1 '10' '10'
+  spec ' ' 'TextS' 'Text Scale _ color _ x _ y _ scale width _ scale height _' 'auto auto auto auto auto auto' 'DUELink' 1 '10' '10' '10' '10'
+  spec ' ' 'Text2' 'Text _ color _ x _ y _' 'str auto auto auto' 'DUELink' '1' '10' '10'
+  spec ' ' 'Text' 'Line color _ x1 _ y1 _ x2 _ y2 _' 'auto auto auto auto auto' 1 '10' '10' '10' '10'
+  spec ' ' 'Rect' 'Rect color _ x _ y _ width _ height _' 'auto auto auto auto auto' 1 0 0 '10' '10'
+  spec ' ' 'Fill' 'Fill color _ x _ y _ width _ height _' 'auto auto auto auto auto' '10' '10' '10' '10' '10'
+  spec ' ' 'DrawImage' 'DrawImage array _ x _ y _ width _ height _ scale width _ scale height _ transform _' 'auto auto auto auto auto auto auto auto' '1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1' '10' '10' 4 4 1 1 0
+  spec ' ' 'Configuration' 'Configuration type _ array _ width _ height _ mode _' 'auto auto auto auto auto' 1 '0x3c' 128 64 1
+  spec ' ' 'Clear' 'Clear color _' 'auto' 0
+  spec ' ' 'Circle' 'Circle color _ x _ y _ radius _' 'auto auto auto auto' 1 20 20 '10'
 
 to Circle color x y radius {
-  due_run ('[data:join]' ('[data:asByteArray]' 'circle(') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ',') ('[data:asByteArray]' radius) ('[data:asByteArray]' ')'))
+  due_run ('_due_templateWith' 'circle(%,%,%,%)' color x y radius)
 }
 
 to Clear color {
-  due_run 'clear('
+  due_run ('_due_templateWith' 'clear(%)' color)
 }
 
 to Configuration type cfg width height mode {
   comment 'Default values come from OLED 096'
-  due_run ('[data:join]' ('[data:asByteArray]' 'gfxcfg(') ('[data:asByteArray]' type) ('[data:asByteArray]' ',') ('[data:asByteArray]' cfg) ('[data:asByteArray]' ',') ('[data:asByteArray]' width) ('[data:asByteArray]' ',') ('[data:asByteArray]' height) ('[data:asByteArray]' ',') ('[data:asByteArray]' mode) ('[data:asByteArray]' ')'))
+  due_run ('_due_templateWith' 'gfxcfg(%,%,%,%,%)' type cfg width height mode)
 }
 
 to DrawImage img x y width height 'scale witdh' 'scale height' transform {
@@ -35,11 +35,11 @@ to DrawImage img x y width height 'scale witdh' 'scale height' transform {
 }
 
 to Fill color x y width height {
-  due_run ('[data:join]' ('[data:asByteArray]' 'fill(') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ',') ('[data:asByteArray]' width) ('[data:asByteArray]' ',') ('[data:asByteArray]' height) ('[data:asByteArray]' ')'))
+  due_run ('_due_templateWith' 'fill(%,%,%,%,%)' color x y width height)
 }
 
 to Rect color x y width height {
-  due_run ('[data:join]' ('[data:asByteArray]' 'rect(') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ',') ('[data:asByteArray]' width) ('[data:asByteArray]' ',') ('[data:asByteArray]' height) ('[data:asByteArray]' ')'))
+  due_run ('_due_templateWith' 'rect(%,%,%,%,%)' color x y width height)
 }
 
 to Show {
@@ -47,18 +47,18 @@ to Show {
 }
 
 to Text color x1 x2 y1 y2 {
-  due_run ('[data:join]' ('[data:asByteArray]' 'line(') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x1) ('[data:asByteArray]' ',') ('[data:asByteArray]' x2) ('[data:asByteArray]' ',') ('[data:asByteArray]' y1) ('[data:asByteArray]' ',') ('[data:asByteArray]' y2) ('[data:asByteArray]' ')'))
+  due_run ('_due_templateWith' 'line(%,%,%,%,%)' color x1 x2 y1 y2)
 }
 
 to Text2 text color x y {
-  due_run ('[data:join]' ('[data:asByteArray]' 'text("') ('[data:asByteArray]' text) ('[data:asByteArray]' '",') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ')'))
+  due_run ('_due_templateWith' 'text("%",%,%,%)' text color x y)
 }
 
 to TextS text color x y 'scale width' 'scale height' {
   due_run ('[data:join]' ('[data:asByteArray]' 'texts("') ('[data:asByteArray]' text) ('[data:asByteArray]' '",') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ',') ('[data:asByteArray]' (v 'scale width')) ('[data:asByteArray]' ',') ('[data:asByteArray]' (v 'scale height')) ('[data:asByteArray]' ')'))
 }
 
-to TextT text color baz y {
+to TextT text color x y {
   due_run ('[data:join]' ('[data:asByteArray]' 'textT("') ('[data:asByteArray]' text) ('[data:asByteArray]' '",') ('[data:asByteArray]' color) ('[data:asByteArray]' ',') ('[data:asByteArray]' x) ('[data:asByteArray]' ',') ('[data:asByteArray]' y) ('[data:asByteArray]' ')'))
 }
 
