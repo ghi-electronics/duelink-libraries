@@ -1,0 +1,37 @@
+module 'DUELink.Engine'
+author 'GHI Electronics'
+version 0 1 
+description 'DUELink Engine library'
+
+  spec ' ' 'due_sel' 'Select _' 'num' 1
+  spec ' ' 'due_stop' 'Stop'
+  spec ' ' 'due_run' 'Run _' 'str' 'statled(100,100,5)'
+  spec ' ' 'Record' 'Record script _' 'auto' 'statled(100,100,10)'
+  spec 'r' 'Read script' 'Read script'
+
+to 'Read script' {
+  return (due_runWithResult 'list')
+}
+
+to Record script {
+  due_run 'new'
+  due_run 'pgmbrst()'
+  '[sensors:i2cWrite]' 82 ('[data:asByteArray]' script)
+}
+
+to due_run cmd {
+  '_due_send' cmd
+  local 'ignore' ('_due_awaitResult')
+}
+
+to due_sel n {
+  due_run ('_due_templateWith' 'sel(%)' n)
+}
+
+to due_stop {
+  comment 'Send escape to stop any running scripts'
+  due_run ('[data:unicodeString]' 27)
+  comment 'Ensure that we are in Immediate mode'
+  due_run '>'
+}
+
