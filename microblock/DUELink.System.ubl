@@ -6,8 +6,36 @@ description 'DUELink.System'
 variables _myaa 
 
   spec ' ' 'StatLed' 'StatLed _ _ _' 'str str str' '100' '100' '10'
+  spec ' ' 'due_sel' 'sel _' 'num' 1
+  spec 'r' 'due_tickms' 'GetTickMilliseconds'
+  spec 'r' 'due_tickus' 'GetTickMicroseconds'
+  spec 'r' 'due_info' 'info _' 'num' 1
+  spec ' ' 'due_stop' 'stop'
 
 to StatLed high low count {
   due_run ('[data:join]' ('[data:asByteArray]' 'statled(') ('[data:asByteArray]' high) ('[data:asByteArray]' ',') ('[data:asByteArray]' low) ('[data:asByteArray]' ',') ('[data:asByteArray]' count) ('[data:asByteArray]' ')'))
+}
+
+to due_info type {
+  return (due_runWithResult ('_due_templateWith' 'info(%)' type))
+}
+
+to due_sel n {
+  due_run ('_due_templateWith' 'sel(%)' n)
+}
+
+to due_stop {
+  comment 'Send escape to stop any running scripts'
+  due_run ('[data:unicodeString]' 27)
+  comment 'Ensure that we are in Immediate mode'
+  due_run '>'
+}
+
+to due_tickms {
+  return (due_runWithResult 'tickms()')
+}
+
+to due_tickus {
+  return (due_runWithResult 'tickus()')
 }
 
