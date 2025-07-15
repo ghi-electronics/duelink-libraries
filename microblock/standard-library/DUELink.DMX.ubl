@@ -1,0 +1,27 @@
+module 'DUELink.DMX'
+author 'GHI Electronics'
+version 0 1 
+depends DUELink 
+description 'DUELink DMX library'
+
+  spec ' ' 'DMX Update' 'DMX update'
+  spec ' ' 'Write data' 'DMX write _' 'auto' '128,255,0,0,0,0,0,0'
+  spec 'r' 'DMX ready' 'DMX ready?'
+  spec 'r' 'DMX Read' 'DMX read channel _' 'auto' 1
+
+to 'DMX Read' channel {
+  return (due_runWithResult ('_due_templateWith' 'DmxR(%)' channel))
+}
+
+to 'DMX Update' {
+  due_run 'DmxU()'
+}
+
+to 'DMX ready' {
+  return (due_runWithResult 'DmxRdy()')
+}
+
+to 'Write data' data {
+  due_run ('_due_templateWith' 'DmxW(%)' data)
+}
+

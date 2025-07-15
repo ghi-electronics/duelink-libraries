@@ -1,0 +1,42 @@
+module 'DUELink.SerialUart'
+author 'GHI Electronics'
+version 1 0 
+depends DUELink 
+description 'DUELink.SerialUart'
+
+  spec ' ' 'Uart Configuration' 'Serial open _ baudrate rx buffer size _' 'auto auto' 115200 128
+  spec 'r' 'Read byte' 'Serial read single byte'
+  spec ' ' 'Write byte' 'Serial write single byte _' 'auto' 'A'
+  spec 'r' 'Byte to read' 'Serial byte to read'
+  spec ' ' 'Discard Rx buffer' 'Serial discard buffers'
+  spec ' ' 'Write bytes' 'Serial write bytes _' 'auto' 'DUELink'
+  spec 'r' 'Read bytes' 'Serial read bytes to array _ timeout _ ms' 'auto auto' '0,0,0,0' 1000
+
+to 'Byte to read' {
+  return (due_runWithResult 'SerB2R()')
+}
+
+to 'Discard Rx buffer' {
+  due_run 'SerDisc()'
+}
+
+to 'Read byte' {
+  return (due_runWithResult 'SerRd()')
+}
+
+to 'Read bytes' data timeout {
+  return (due_runWithResult ('_due_templateWith' 'SerRds([%],%)' data timeout))
+}
+
+to 'Uart Configuration' speed size {
+  due_run ('_due_templateWith' 'SerCfg(%,%)' speed size)
+}
+
+to 'Write byte' byte {
+  due_run ('_due_templateWith' 'SerWr(%)' byte)
+}
+
+to 'Write bytes' bytes {
+  due_run ('_due_templateWith' 'SerWrs(%)' bytes)
+}
+
