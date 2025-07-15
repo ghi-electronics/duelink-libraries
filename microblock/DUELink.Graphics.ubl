@@ -7,16 +7,16 @@ variables x
 
   spec ' ' 'Show' 'Show'
   spec ' ' 'Text2' 'Text _ color _ x _ y _' 'str auto auto auto' 'DUELink' '1' '10' '10'
-  spec ' ' 'Text' 'Line color _ x1 _ y1 _ x2 _ y2 _' 'auto auto auto auto auto' 1 '10' '10' '10' '10'
   spec ' ' 'Rect' 'Rect color _ x _ y _ width _ height _' 'auto auto auto auto auto' 1 0 0 '10' '10'
-  spec ' ' 'Fill' 'Fill color _ x _ y _ width _ height _' 'auto auto auto auto auto' '10' '10' '10' '10' '10'
   spec ' ' 'Clear' 'Clear color _' 'auto' 0
   spec ' ' 'Circle' 'Circle color _ x _ y _ radius _' 'auto auto auto auto' 1 20 20 '10'
   spec ' ' 'TextS' 'Text Scale _ color _ x _ y _ scale width _ scale height _' 'auto str str str str str' 'DUELink' '1' '10' '10' '10' '10'
   spec ' ' 'TextT' 'Text Tiny _ color _ x _ y _' 'auto auto auto auto' 'DUELink' 1 '10' '10'
   spec ' ' 'Configuration' 'Graphics config type _ array _ width _ height _ mode _' 'auto auto auto auto auto' 1 '0x3c' 128 64 1
   spec ' ' 'DrawImageB' 'DrawImageB _ color _ x _ y _ width _ height _' 'auto auto auto auto auto auto' '0,1,255,255' 1 '10' '10' 2 2
-  spec ' ' 'DrawImage' 'DrawImage array _ x _ y _ width _ height _ scale width _ scale height _ transform _' 'auto auto auto auto auto auto auto auto' '1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1' '10' '10' 4 4 1 1 0
+  spec ' ' 'Fill' 'Fill color _ x _ y _ width _ height _' 'auto auto auto auto auto' 1 '10' '10' '10' '10'
+  spec ' ' 'Text' 'Line color _ x1 _ y1 _ x2 _ y2 _' 'auto auto auto auto auto' 1 '10' '10' 20 20
+  spec ' ' 'DrawImage' 'DrawImage array _ x _ y _ width _ height _ transform _ scale width _ scale height _' 'auto auto auto auto auto auto auto auto' '1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1' '10' '10' 4 4 0 1 1
 
 to Circle color x y radius {
   due_run ('_due_templateWith' 'circle(%,%,%,%)' color x y radius)
@@ -31,8 +31,8 @@ to Configuration type cfg width height mode {
   due_run ('_due_templateWith' 'gfxcfg(%,{%},%,%,%)' type cfg width height mode)
 }
 
-to DrawImage img x y width height 'scale width' 'scale height' transform {
-  due_run ('_due_templateWith' 'imgs({%},%,%,%,%,%,%,%)' img x y width height (v 'scale width') (v 'scale height') transform)
+to DrawImage img x y width height transform 'scale width' 'scale height' {
+  due_run ('_due_templateWith' 'imgs({%},%,%,%,%,%,%,%)' img x y width height transform (v 'scale width') (v 'scale height'))
 }
 
 to DrawImageB array color x y width height {
