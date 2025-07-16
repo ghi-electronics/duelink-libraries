@@ -39,20 +39,22 @@ public:
 
     virtual int read(char *buf, int bytes, unsigned long timeout) = 0;
     
-    virtual Response execute(const char *command);
+    virtual Response execute(const char *command) = 0;
+    
+    virtual void sync() = 0;
 
-    virtual void sync() {
-        char buf[128] = {0};
+    // virtual void sync() {
+        // char buf[128] = {0};
 
-        beginTransmission();
-        write("\x1b");
-        endTransmission();
-        read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
-        getResponse("", buf);
-    }
+        // beginTransmission();
+        // write("\x1b");
+        // endTransmission();
+        // read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
+        // getResponse("", buf);
+    // }
     
 private:
-    virtual Response getResponse(String command, String response);    
+    virtual Response getResponse(String command, String response) = 0;    
 
 protected:
     const static unsigned long DUELINK_TIMEOUT = 1000;
@@ -104,7 +106,7 @@ public:
         uint32_t bytesToRead = 0;
         char *p = &buf[0];
         while ((millis() - startms) < timeout) {
-            m_link.requestFrom(m_i2cAddress, 1, true);
+            m_link.requestFrom(m_i2cAddress, 1, 1);
             if (m_link.available()) {
                 int c = m_link.read();
                 if (c >= 0 && c <= 127) {
@@ -115,7 +117,7 @@ public:
             }
         }
         if (bytesToRead && buf[0] != '>') {
-            m_link.requestFrom(m_i2cAddress, bytesToRead, true);
+            m_link.requestFrom(m_i2cAddress, bytesToRead, 1);
             while ((millis() - startms) < timeout && m_link.available()) {
                 int c = m_link.read();
                 if (c >= 0 && c <= 127) {
@@ -139,6 +141,16 @@ public:
         read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
 
         return getResponse(command, buf);
+    }
+    
+    virtual void sync() {
+        char buf[128] = {0};
+
+        beginTransmission();
+        write("\x1b");
+        endTransmission();
+        read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
+        getResponse("", buf);
     }
     
     virtual Response getResponse(String command, String response) {
@@ -243,6 +255,17 @@ public:
         return getResponse("", buf);
     }
     
+    
+    virtual void sync() {
+        char buf[128] = {0};
+
+        beginTransmission();
+        write("\x1b");
+        endTransmission();
+        read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
+        getResponse("", buf);
+    }
+    
     virtual Response getResponse(String command, String response) {
         int cmdIdx = response.indexOf(command);
         if (cmdIdx == -1) {
@@ -263,7 +286,7 @@ public:
         }
       
         return {.result = "", .success = success};
-      }
+    }
 
 private:
     Stream &m_link;

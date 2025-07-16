@@ -1,20 +1,14 @@
-#include "DUELink.h"
+#include <DUELink.h>
 
-// This example runs on Arduino UNO 4 WIFI
-// Device 1 is Display OLDE 0.96 
-// Device 2 is button
-// device 3 is buzzer
+// This example runs on DueDuino
 
-TwoWireTransport transport(Wire1);
-
+SerialTransport transport(Serial2);
 DUELink duelink(transport);
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
-  Wire1.begin();
 
-
+  Serial2.begin(115200);
   duelink.Connect();
   duelink.Engine.Select(1);
 
@@ -27,10 +21,11 @@ void setup() {
 
   duelink.Engine.Select(2);  
   duelink.Button.Enable(1, 1, 1);
-  
+
 }
 
 void loop() {
+  
   delay(100);
 
   duelink.Engine.Select(2);   
@@ -39,5 +34,5 @@ void loop() {
     duelink.Frequency.Write(7, 1000, 50, 0.5);
      
   }
-   
+              
 }
