@@ -13,9 +13,9 @@ public:
          m_pTransport = &transport;
     } 
 
-    void Enable(int pin, int state) {
+    void Enable(int pin, int state, int pull) {
       char cmd[64];
-      sprintf(cmd, "btnen(%d,%d)", pin, state);
+      sprintf(cmd, "btnen(%d,%d,%d)", pin, state,pull);
       m_pTransport->execute(cmd);  
     }
 
