@@ -1,3 +1,5 @@
+# This example runs on Rasberry Pi Pico 2020. Hold Bootsel and reset the board and upload this example to RPP
+
 #include <DUELink.h>
 
 SerialTransport transport(Serial1);
