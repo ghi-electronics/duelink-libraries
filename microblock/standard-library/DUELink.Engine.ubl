@@ -6,8 +6,8 @@ description 'DUELink Engine library'
   spec ' ' 'due_sel' 'Select _' 'num' 1
   spec ' ' 'due_stop' 'Stop'
   spec ' ' 'due_exec' 'Run _' 'str' 'statled(100,100,5)'
-  spec ' ' 'Record' 'Record script _' 'auto' 'statled(100,100,10)'
   spec 'r' 'Read script' 'Read script'
+  spec ' ' 'Record' 'Record script _' 'auto' 'statled(100,100,10)'
 
 to 'Read script' {
   return (due_runWithResult 'list')
@@ -16,7 +16,7 @@ to 'Read script' {
 to Record script {
   due_exec 'new'
   due_exec 'pgmbrst()'
-  '[sensors:i2cWrite]' 82 ('[data:asByteArray]' script)
+  '_due send raw' script
 }
 
 to due_exec cmd {

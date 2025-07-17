@@ -23,6 +23,29 @@ variables _dueUseI2C
   spec 'r' '_due_awaitResult' '_due await result'
   spec 'r' 'due_runWithResult' 'Write command _ with result' 'str' 'version()'
   spec ' ' '_due_send' '_due send _' 'str'
+  spec ' ' '_due send raw' '_due send raw _' 'auto' '10'
+
+to '_due send raw' s {
+  comment 'Clear receive buffer.'
+  if _dueUseI2C {
+    '[sensors:i2cRead]' 82 ('[data:newByteArray]' 64)
+  } else {
+    local 'trash' ('[serial:dueRecv]')
+  }
+  if _dueUseI2C {
+    comment 'Assume command is < 64 bytes for now.'
+    '[sensors:i2cWrite]' 82 ('[data:asByteArray]' s)
+  } else {
+    s = ('[data:convertType]' s 'string')
+    local 'i' 1
+    repeatUntil (i > (size s)) {
+      local 'sent' ('[serial:dueSend]' s i)
+      i += sent
+      waitMillis ((sent / 10) + 1)
+    }
+    waitMillis 2
+  }
+}
 
 to '_due_awaitResult' {
   if _dueUseI2C {return ('_due_awaitResultI2C')}
