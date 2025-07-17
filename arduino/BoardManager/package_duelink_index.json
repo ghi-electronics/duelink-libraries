@@ -1,0 +1,58 @@
+{
+  "packages": [
+    {
+      "name": "DUELink",
+      "websiteURL": "https://github.com/ghi-electronics/duelinkduino",
+      "maintainer": "GHI Electronics",
+      "email": "support@ghielectronics.com",
+      "help": {
+        "online": "http://duelink.com/"
+      },
+      "platforms": [          
+        {
+          "name": "DUELink",
+          "architecture": "stm32",
+          "version": "0.0.1",
+          "category": "Contributed",
+          "url": "https://github.com/ghi-electronics/duelinkduino/raw/main/DUELink.zip",
+          "archiveFileName": "DUELink.zip",
+          "checksum": "SHA-256:65552B89741022B63DC0482DB0C0A687F5FA9AC2C4B91266C4F47B5FE1ADA115",
+          "size": "71840517",
+          "boards": [
+            {"name": "DUELink"}            
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "7-2017q4"
+            },
+            {
+              "packager": "arduino",
+              "name": "bossac",
+              "version": "1.8.0-48-gb176eee"
+            },
+            {
+              "packager": "arduino",
+              "name": "openocd",
+              "version": "0.10.0-arduino9"
+            },
+            {
+              "packager": "arduino",
+              "name": "CMSIS",
+              "version": "4.5.0"
+            },
+            {
+              "packager": "arduino",
+              "name": "CMSIS-Atmel",
+              "version": "1.2.0"
+            }          
+          ]
+        }
+      ],
+      "tools": [
+        
+      ]
+    }
+  ]
+}
