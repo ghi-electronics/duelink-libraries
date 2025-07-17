@@ -14,7 +14,7 @@
           "architecture": "stm32",
           "version": "0.0.1",
           "category": "Contributed",
-          "url": "https://github.com/ghi-electronics/duelinkduino/raw/main/DUELink.zip",
+          "url": "https://github.com/ghi-electronics/duelink-libraries/raw/main/arduino/BoardManager/DUELink.zip",
           "archiveFileName": "DUELink.zip",
           "checksum": "SHA-256:65552B89741022B63DC0482DB0C0A687F5FA9AC2C4B91266C4F47B5FE1ADA115",
           "size": "71840517",
