@@ -57,6 +57,10 @@ namespace GHIElectronics.DUELink {
         public StreamController Stream { get; internal set; }
         public DMXController DMX { get; internal set; }
         public PulseController Pulse { get; internal set; }
+        public RtcController Rtc { get; internal set; }
+        public CoProcessorController CoProcessor { get; internal set; }
+        public OtpController Otp { get; internal set; }
+        public FSController FileSystem { get; internal set; }
 
         public DUELinkController(string comPort) {
             if (comPort == null)
@@ -94,6 +98,10 @@ namespace GHIElectronics.DUELink {
             this.Stream = new StreamController(this.serialPort);
             this.DMX = new DMXController(this.serialPort);
             this.Pulse = new PulseController(this.serialPort);
+            this.Rtc = new RtcController(this.serialPort);
+            this.Otp = new OtpController(this.serialPort);
+            this.CoProcessor = new CoProcessorController(this.serialPort);
+            this.FileSystem = new FSController(this.serialPort);
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {

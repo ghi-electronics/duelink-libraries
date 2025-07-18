@@ -59,7 +59,7 @@ namespace GHIElectronics.DUELink {
                 return timedate;
             }
 
-            void Show() {
+            public void Show() {
                 this.serialPort.WriteCommand("OtpR(0)");
 
                 this.serialPort.ReadResponse();
