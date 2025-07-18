@@ -32,13 +32,16 @@ namespace GHIElectronics.DUELink {
 
             }
 
+            public void Write(byte data) {
+                var cmd = string.Format("IrWrite({0})", data);
+                this.serialPort.WriteCommand(cmd);
 
+                this.serialPort.ReadResponse();
+            }
 
-            public bool Enable(int pin, bool enable) {
-                if (pin != 0)
-                    throw new Exception("IR is only available on pin 0");
+            public bool Enable(int txpin, int rxpin, bool enable) {
 
-                var cmd = string.Format("iren({0}, {1})", pin, enable?1:0);
+                var cmd = string.Format("iren({0}, {1}, {2})", txpin, rxpin, enable ? 1:0);
 
                 this.serialPort.WriteCommand(cmd);
 

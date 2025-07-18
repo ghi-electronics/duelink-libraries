@@ -16,9 +16,9 @@ namespace GHIElectronics.DUELink {
             public ButtonController(SerialInterface serialPort) => this.serialPort = serialPort;
 
 
-            public bool Enable(int pin, bool enable) {
+            public bool Enable(int pin, bool enable, int pull) {
   
-                var cmd = string.Format("btnen({0},{1})", pin, enable==true? 1:0);
+                var cmd = string.Format("btnen({0},{1},{2})", pin, enable==true? 1:0, pull);
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -27,8 +27,6 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
-
-            public bool Enable(char pin, bool enable) => this.Enable((int)pin, enable);
 
             public bool Down(int pin) {
         

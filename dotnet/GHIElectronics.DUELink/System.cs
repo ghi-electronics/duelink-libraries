@@ -13,18 +13,8 @@ namespace GHIElectronics.DUELink {
 
         public enum ResetOption {
             SystemReset = 0,
-            Bootloader = 1,
-            STBootloader = 2,
-            EraseAll = 3,
-
-
+            EraseAll = 1,
         }
-
-        //public class Version {
-        //    public string Firmware;
-        //    public string ProductId;
-        //    public string Bootloader;
-        //}
         public class SystemController {
 
             SerialInterface serialPort;
@@ -39,7 +29,12 @@ namespace GHIElectronics.DUELink {
             public void Reset(ResetOption option) {
 
                 var cmd = $"reset({option.ToString()})";
+
                 this.serialPort.WriteCommand(cmd);
+
+                // Erase all send reset twice
+                if (option == ResetOption.EraseAll) 
+                    this.serialPort.WriteCommand(cmd);
 
                 // The device will reset in bootloader or system reset
                 this.serialPort.Disconnect();
@@ -157,19 +152,15 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
+            public void Shtdn(int wkpin) {
 
-            public bool Sel(int dev) {
-
-                var cmd = string.Format("sel({0})", dev);
+                var cmd = string.Format("shtdn({0})", wkpin);
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadResponse();
-
-                return res.success;
+                this.serialPort.ReadResponse();
 
             }
-
         }
     }
 }

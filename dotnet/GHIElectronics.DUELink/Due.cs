@@ -43,37 +43,20 @@ namespace GHIElectronics.DUELink {
 
         public InfraredController Infrared { get; internal set; }
 
-
-
         public SystemController System { get; internal set; }
 
         public UartController Uart { get; internal set; }
         public ButtonController Button { get; internal set; }
         public DistanceSensorController Distance { get; internal set; }
         public GraphicsController Graphics { get; internal set; }
-
         public TouchController Touch { get; internal set; }
-
- 
-
         public EngineController Engine { get; internal set; }
-
-
-
         public TemperatureController Temperature { get; internal set; }
-
         public HumidityController Humidity { get; internal set; }
-
-
-
         public SoundController Sound { get; internal set; }
         public StreamController Stream { get; internal set; }
-
-
-
-
-        public int MaxIO { get; internal set; }
-        public int MaxAnalog { get; internal set; }
+        public DMXController DMX { get; internal set; }
+        public PulseController Pulse { get; internal set; }
 
         public DUELinkController(string comPort) {
             if (comPort == null)
@@ -104,15 +87,13 @@ namespace GHIElectronics.DUELink {
             this.Graphics = new GraphicsController(this.serialPort);
             this.Touch = new TouchController(this.serialPort);            
             this.Engine = new EngineController(this.serialPort);
-
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);
             this.System = new SystemController(this.serialPort);
-
-
-
             this.Sound = new SoundController(this.serialPort);
-            this.Stream = new StreamController(this.serialPort);    
+            this.Stream = new StreamController(this.serialPort);
+            this.DMX = new DMXController(this.serialPort);
+            this.Pulse = new PulseController(this.serialPort);
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {
@@ -220,6 +201,11 @@ namespace GHIElectronics.DUELink {
 
         public void Disconnect() => this.serialPort.Disconnect();
 
+        public TimeSpan ReadTimeout {
+            get => this.serialPort.ReadTimeout;
+            set => this.serialPort.ReadTimeout = value;
+
+        }
 
     }
 }

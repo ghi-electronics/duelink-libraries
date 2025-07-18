@@ -11,20 +11,27 @@ namespace GHIElectronics.DUELink {
 
             public PulseController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public bool Set(int pin, int pulseCount, int pulseDuration) {
+            public int PulseIn(int pin, int state, TimeSpan timeout) {
                 if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
-
-                //var delay_us = (int)delay.TotalMicroseconds;
-
-;               var cmd = string.Format("pulse({0},{1},{2})", pin.ToString(), pulseCount.ToString(), pulseDuration.ToString());
+;               var cmd = string.Format("PulseIn({0},{1},{2})", pin, state, timeout.TotalMinutes.ToString());
 
                 this.serialPort.WriteCommand(cmd);
 
-                var response = this.serialPort.ReadRespone();
+                var response = this.serialPort.ReadResponse();
 
-                return response.success;
+                if (response.success) {
+                    try {
+                        var value = int.Parse(response.response);
+
+                        return value;
+                    }
+                    catch {
+
+                    }
+                }
+                return 0;
             }
         }
     }

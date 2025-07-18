@@ -21,10 +21,8 @@ namespace GHIElectronics.DUELink {
 
                 var response = this.serialPort.ReadResponse();
 
-                if (response.success)
-                    return response.response.ToString();
-
-                throw new Exception("Run failed");                
+                
+                return response.response.ToString();                            
 
             }
 

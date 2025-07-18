@@ -62,6 +62,28 @@ namespace GHIElectronics.DUELink {
                 return false;
             }
 
+            public double ReadVCC() {
+
+                this.serialPort.WriteCommand("ReadVCC()");
+
+                var response = this.serialPort.ReadResponse();
+
+                if (response.success) {
+                    try {
+                        var value = double.Parse(response.response);
+
+                        return value;
+                    }
+                    catch {
+
+                    }
+
+
+                }
+
+                return 0;
+            }
+
         }
     }
 }

@@ -16,7 +16,7 @@ namespace GHIElectronics.DUELink {
 
         protected SerialPort port;
 
-        private string leftOver;
+        //private string leftOver;
 
         protected const int DefaultBaudRate = 115200;
 
@@ -32,7 +32,7 @@ namespace GHIElectronics.DUELink {
         //private bool isPulseFamily = false;
         public SerialInterface(string portName) {
 
-            this.leftOver = string.Empty;
+            //this.leftOver = string.Empty;
 
             this.objlock = new object();
             this.PortName = portName;
@@ -41,7 +41,7 @@ namespace GHIElectronics.DUELink {
 
         public virtual void Connect() {
             this.port = new SerialPort(this.PortName, DefaultBaudRate, Parity.None, 8, StopBits.One);
-            this.leftOver = "";
+            //this.leftOver = "";
 
             this.port.Open();
 
@@ -73,20 +73,30 @@ namespace GHIElectronics.DUELink {
 
         public void Synchronize() {
 
-            // Send 127 code to exit running mode 
-            this.WriteRawData(new byte[] { 127 }, 0, 1);
+            // Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
+            // We jusr send \n as first commands for chain enumeration
+
+            this.WriteRawData(new byte[] { 10 }, 0, 1);
 
             Thread.Sleep(300);
-           
-            this.port.DiscardInBuffer();
-            this.port.DiscardOutBuffer();
-
-            this.TurnEchoOff();
-
-            this.leftOver = "";
 
             this.port.DiscardInBuffer();
             this.port.DiscardOutBuffer();
+
+            // Send 127 code to exit running mode 
+            //this.WriteRawData(new byte[] { 127 }, 0, 1);
+
+            //Thread.Sleep(300);
+
+            //this.port.DiscardInBuffer();
+            //this.port.DiscardOutBuffer();
+
+            //this.TurnEchoOff();
+
+            //this.leftOver = "";
+
+            //this.port.DiscardInBuffer();
+            //this.port.DiscardOutBuffer();
 
 
             //var orig = this.ReadTimeout;
@@ -186,75 +196,118 @@ namespace GHIElectronics.DUELink {
 
 
         public CmdResponse ReadResponse() {
-            var str = this.leftOver;
+            var str = string.Empty;// this.leftOver;
             var end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks;
 
             var response = new CmdResponse();
-
+            var responseValid = true;
+            var dump = 0;
+            var total_receviced = 0;
 
             lock (this.objlock) {
-
-
-                while (end > DateTime.UtcNow.Ticks) {
+                while (end > DateTime.UtcNow.Ticks || this.port.BytesToRead > 0) {
 
                     if (this.port.BytesToRead > 0) {
+                       
                         var data = this.port.ReadByte();
-
-
 
                         str += (char)data;
 
-                        str = str.Replace("\n", string.Empty);
-                        str = str.Replace("\r", string.Empty);
+                        if (data == '\n') {
+                            if (this.port.BytesToRead == 0) {
+                                Thread.Sleep(1); // wait 1ms for sure
+                            }
 
-                        var idx1 = str.IndexOf(">");
-                        var idx2 = str.IndexOf("&");
+                            // next byte can be >, &, !, $
+                            if (this.port.BytesToRead > 0) {
+                                dump = this.port.ReadByte();
 
-                        if (idx1 == -1)
-                            idx1 = str.IndexOf("$");
+                                if (dump == '>' || dump == '!' || dump == '$') {
+                                    // valid data         
+                                    Thread.Sleep(1); // wait 1ms for sure next byte
 
-                        if (idx1 == -1 && idx2 == -1) {
-                            //Thread.Sleep(1);
+                                    if (this.port.BytesToRead > 0) {
+                                        responseValid = false; // still data, this is bad response, there is no \r\n>xxxx
+                                    }
+                                }
+                                else if (dump == '\r') {
+                                    // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
+                                    Thread.Sleep(1); // wait 1ms for sure next byte
 
+                                    dump = this.port.ReadByte();
+                                    if (dump == '\n') {
+                                        dump = this.port.ReadByte();
 
-                            continue;
+                                    }
+                                    else {
+                                        responseValid = false;
+                                    }
+                                }
+                                else {
+                                    // bad data
+                                    // One cmd send suppose one response, there is no 1234\r\n5678.... this will consider invalid response
+                                    responseValid = false;
+                                }
+                            }
+
+                            // once bad response \r\nxxx... or \r\n>xxxx, mean next \r\n is comming, wait timeout to clear them to clean the bus if possible        
+                            if (!responseValid) {
+                                dump = 0;
+
+                                // \r\n must be comming because \r\nxxxx....\r\n         
+                                while (dump != '\n' && end > DateTime.UtcNow.Ticks) {
+                                    if (this.port.BytesToRead > 0) {
+                                        dump = this.port.ReadByte();
+                                    }
+                                    else {
+                                        Thread.Sleep(1);
+                                    }
+
+                                    if (dump == '\n') {
+                                        if (this.port.BytesToRead > 0) { // still bad data, repeat clean up
+                                            dump = 0; // reset to repeat the condition while loop
+                                        }
+                                    }
+                                }
+                            }
+
+                            // reponse valid has to be xxx\r\n or \r\n, mean idx >=2
+                            if (str == string.Empty || str.Length < 2) {
+                                responseValid = false;
+                            }
+                            else if (responseValid) {
+                                if (str[str.Length - 2] != '\r') {
+                                    responseValid = false;
+                                }
+                                else {
+                                    // valid response, remove \r\n
+                                    str = str.Replace("\n", string.Empty);
+                                    str = str.Replace("\r", string.Empty);
+                                }
+                            }
+
+                            break;
                         }
 
-                        var idx = idx1 == -1 ? idx2 : idx1;
 
-                        this.leftOver = str.Substring(idx + 1);
-
-                        response.success = true;
-                        response.response = str.Substring(0, idx);
-
-                        //return str.Substring(0, idx);
-                        var idx3 = str.IndexOf("!");
-
-                        if (idx3 != -1) {
-                            //respone.respone = respone.respone.Substring(0, respone.respone);
-                            response.success = false;
-                        }
-
-
-                        return response;
+                        end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks; // reset timeout when new data come
+                        total_receviced++;
                     }
-
                 }
 
-                this.leftOver = string.Empty;
-
+                //this.leftOver = string.Empty;
                 this.port.DiscardInBuffer();
                 this.port.DiscardOutBuffer();
             }
 
-            response.success = false;
-            response.response = string.Empty;
+            response.success = total_receviced > 0 && responseValid;
+            response.response = str;
 
             return response;
         }
 
-        public CmdResponse ReadResponse2() {
-            var str = this.leftOver;
+        public CmdResponse ReadResponse2() { // this for read "list" command so read as is
+            var str = string.Empty;// this.leftOver;
             var end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks;
 
             var response = new CmdResponse();
@@ -262,54 +315,18 @@ namespace GHIElectronics.DUELink {
 
             lock (this.objlock) {
 
-
                 while (end > DateTime.UtcNow.Ticks) {
 
                     if (this.port.BytesToRead > 0) {
                         var data = this.port.ReadByte();
 
-
-
                         str += (char)data;
 
-                        //str = str.Replace("\n", string.Empty);
-                        //str = str.Replace("\r", string.Empty);
-
-                        var idx1 = str.IndexOf(">");
-                        var idx2 = str.IndexOf("&");
-
-                        if (idx1 == -1)
-                            idx1 = str.IndexOf("$");
-
-                        if (idx1 == -1 && idx2 == -1) {
-                            //Thread.Sleep(1);
+                        end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks; // reset timeout
 
 
-                            continue;
-                        }
-
-                        var idx = idx1 == -1 ? idx2 : idx1;
-
-                        this.leftOver = str.Substring(idx + 1);
-
-                        response.success = true;
-                        response.response = str.Substring(0, idx);
-
-                        //return str.Substring(0, idx);
-                        var idx3 = str.IndexOf("!");
-
-                        if (idx3 != -1 && (response.response.Contains("error") || response.response.Contains("unknown"))) {
-                            //respone.respone = respone.respone.Substring(0, respone.respone);
-                            response.success = false;
-                        }
-
-
-                        return response;
-                    }
-
+                    }                                        
                 }
-
-                this.leftOver = string.Empty;
 
                 this.port.DiscardInBuffer();
                 this.port.DiscardOutBuffer();
@@ -377,12 +394,12 @@ namespace GHIElectronics.DUELink {
         public int ReadRawData(byte[] buffer, int offset, int count) {
             var end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks;
 
-            if (this.leftOver.Length > 0) {
-                // this should not be happened
+            //if (this.leftOver.Length > 0) {
+            //    // this should not be happened
 
-                throw new InvalidOperationException("LeftOver size is different zero: " + this.leftOver.Length);
+            //    throw new InvalidOperationException("LeftOver size is different zero: " + this.leftOver.Length);
 
-            }
+            //}
 
 
             var countleft = count;
