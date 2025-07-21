@@ -310,7 +310,9 @@ namespace GHIElectronics.DUELink {
             return response;
         }
 
-        public CmdResponse ReadResponse2() { // this for read "list" command so read as is
+        // this for read "list" command so read as is
+        // when call list, there can be \n, > &.... so can not parse with ReadResponse
+        public CmdResponse ReadResponse2() { 
             var str = string.Empty;// this.leftOver;
             var end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks;
 
@@ -336,8 +338,15 @@ namespace GHIElectronics.DUELink {
                 this.port.DiscardOutBuffer();
             }
 
-            response.success = false;
-            response.response = string.Empty;
+            if (str != string.Empty) {
+                if (str.Length >= 3) {
+                    response.response = str.Substring(0, str.Length-3);
+                }
+
+                response.success = true;
+            }
+
+                       
 
             return response;
         }
@@ -432,6 +441,7 @@ namespace GHIElectronics.DUELink {
             return totalRead;
         }
 
+        public byte ReadByte() => (byte)this.port.ReadByte();
 
 
         //public string ReadLine()
@@ -468,29 +478,9 @@ namespace GHIElectronics.DUELink {
         //}
 
         public class CmdResponse {
-            public string response;
-            public bool success;
+            public string response = string.Empty;
+            public bool success = false;
         };
 
-        //public class UnexpectedResultException : Exception
-        //{
-        //    internal UnexpectedResultException() { }
-        //    internal UnexpectedResultException(string message) : base(message) { }
-        //    internal UnexpectedResultException(string message, Exception innerException) : base(message, innerException) { }
-        //}
-
-        //public class UploadProgressEventArgs : EventArgs
-        //{
-        //    public int BytesSent { get; set; }
-        //    public int BytesRemaining { get; set; }
-        //    public string Status { get; set; }
-
-        //    public UploadProgressEventArgs(int sent, int remaining, string status)
-        //    {
-        //        this.BytesSent = sent;
-        //        this.BytesRemaining = remaining;
-        //        this.Status = status;
-        //    }
-        //}
     }
 }
