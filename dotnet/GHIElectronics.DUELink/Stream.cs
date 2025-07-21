@@ -60,11 +60,11 @@ namespace GHIElectronics.DUELink {
                 var prompt = this.serialPort.ReadByte();
 
                 if (prompt != '&') {
-                    throw new Exception("Wrong response package");
+                    throw new Exception("Invalid response package");
                 }
 
                 // ready write data
-                this.serialPort.WriteRawData(data, 0, data.Length);
+                this.serialPort.WriteRawData(data, 0, count);
 
                 // read x\r\n> (asio(1) not return this)
                 var ret = this.serialPort.ReadResponse();
@@ -96,7 +96,7 @@ namespace GHIElectronics.DUELink {
                 var prompt = this.serialPort.ReadByte();
 
                 if (prompt != '&') {
-                    throw new Exception("Wrong response package");
+                    throw new Exception("Invalid response package");
                 }
 
                 // ready write data
@@ -135,11 +135,11 @@ namespace GHIElectronics.DUELink {
                 var prompt = this.serialPort.ReadByte();
 
                 if (prompt != '&') {
-                    throw new Exception("Wrong response package");
+                    throw new Exception("Invalid response package");
                 }
 
                 // ready to read data
-                this.serialPort.ReadRawData(data, 0, data.Length);
+                this.serialPort.ReadRawData(data, 0, count);
 
                 // read x\r\n> (asio(1) not return this)
                 var ret = this.serialPort.ReadResponse();
@@ -172,7 +172,7 @@ namespace GHIElectronics.DUELink {
                 var prompt = this.serialPort.ReadByte();
 
                 if (prompt != '&') {
-                    throw new Exception("Wrong response package");
+                    throw new Exception("Invalid response package");
                 }
 
                 this.serialPort.ReadRawData(data_bytes, 0, data_bytes.Length);
