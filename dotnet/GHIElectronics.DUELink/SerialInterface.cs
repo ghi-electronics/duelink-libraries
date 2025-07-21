@@ -304,7 +304,7 @@ namespace GHIElectronics.DUELink {
                 this.port.DiscardOutBuffer();
             }
 
-            response.success = total_receviced > 2 && responseValid;
+            response.success = total_receviced > 1 && responseValid;
             response.response = str;
 
             return response;
