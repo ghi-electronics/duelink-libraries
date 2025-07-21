@@ -134,6 +134,14 @@ class DUELinkController:
                         return port.device
 
         return ""
+    
+    def __get_ReadTimeout(self):
+        return self.serialPort.ReadTimeout
+
+    def __set_ReadTimeout(self, value: int):
+        self.serialPort.ReadTimeout = value 
+
+    ReadTimeout = property(__get_ReadTimeout, __set_ReadTimeout)
    
          
 
