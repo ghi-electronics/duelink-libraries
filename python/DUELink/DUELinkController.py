@@ -108,14 +108,7 @@ class DUELinkController:
         cmd = f'shtdn({pin})'
         self.serialPort.WriteCommand(cmd)
         response = self.serialPort.ReadResponse()
-        return response.success
-
-    def GetVCC(self):
-        cmd = f"readvcc()"
-        self.serialPort.WriteCommand(cmd)
-        response = self.serialPort.ReadResponse()
-
-        return response.response if response.success else -1
+        return response.success    
 
     def GetConnectionPort():
         try:

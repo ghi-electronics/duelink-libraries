@@ -41,3 +41,10 @@ class AnalogController:
             return True
 
         return False
+    
+    def ReadVCC(self):
+        cmd = f"readvcc()"
+        self.serialPort.WriteCommand(cmd)
+        response = self.serialPort.ReadResponse()
+
+        return response.response if response.success else -1
