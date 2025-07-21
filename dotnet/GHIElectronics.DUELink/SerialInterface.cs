@@ -151,18 +151,18 @@ namespace GHIElectronics.DUELink {
 
 
 
-        public void TurnEchoOff() {
-            if (!this.Echo)
-                return;
+        //public void TurnEchoOff() {
+        //    if (!this.Echo)
+        //        return;
 
-            this.WriteCommand("echo(0)");
+        //    this.WriteCommand("echo(0)");
 
-            this.ReadResponse();
+        //    this.ReadResponse();
 
-            this.Echo = false;
+        //    this.Echo = false;
 
 
-        }
+        //}
 
         //internal string RemoveEchoRespone(string respone, string cmd) {
 
@@ -213,6 +213,8 @@ namespace GHIElectronics.DUELink {
 
                         str += (char)data;
 
+                        total_receviced++;
+
                         if (data == '\n') {
                             if (this.port.BytesToRead == 0) {
                                 Thread.Sleep(1); // wait 1ms for sure
@@ -232,11 +234,14 @@ namespace GHIElectronics.DUELink {
                                 }
                                 else if (dump == '\r') {
                                     // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
-                                    Thread.Sleep(1); // wait 1ms for sure next byte
+                                    if (this.port.BytesToRead == 0)
+                                        Thread.Sleep(1); // wait 1ms for sure next byte
 
                                     dump = this.port.ReadByte();
+
                                     if (dump == '\n') {
-                                        dump = this.port.ReadByte();
+                                        if (this.port.BytesToRead > 0)
+                                            dump = this.port.ReadByte();
 
                                     }
                                     else {
@@ -290,8 +295,7 @@ namespace GHIElectronics.DUELink {
                         }
 
 
-                        end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks; // reset timeout when new data come
-                        total_receviced++;
+                        end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks; // reset timeout when new data come                        
                     }
                 }
 
@@ -300,7 +304,7 @@ namespace GHIElectronics.DUELink {
                 this.port.DiscardOutBuffer();
             }
 
-            response.success = total_receviced > 0 && responseValid;
+            response.success = total_receviced > 2 && responseValid;
             response.response = str;
 
             return response;
