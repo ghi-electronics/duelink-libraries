@@ -23,7 +23,7 @@ class ButtonController:
 
         return res.success
     
-    def Up(self, pin: int) -> bool:
+    def Down(self, pin: int) -> bool:
 
         if self.IsButtonValid(pin) == False:
             raise ValueError("Invalid pin")
@@ -41,7 +41,7 @@ class ButtonController:
 
         return False
     
-    def Down(self, pin: int) -> bool:
+    def Up(self, pin: int) -> bool:
 
         if self.IsButtonValid(pin) == False:
             raise ValueError("Invalid pin")
