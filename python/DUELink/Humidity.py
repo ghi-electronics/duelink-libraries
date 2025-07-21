@@ -33,6 +33,6 @@ class HudimityController:
 
         res = self.serialPort.ReadResponse()
 
-        return float(res.respone)
+        return float(res.response)
     
     

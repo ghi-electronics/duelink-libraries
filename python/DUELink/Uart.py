@@ -20,7 +20,7 @@ class UartController:
         res = self.serialport.ReadResponse()
         if res.success:
             try:
-                ready = int(res.respone)
+                ready = int(res.response)
                 return ready
             except:
                 pass
@@ -32,7 +32,7 @@ class UartController:
         res = self.serialport.ReadResponse()
         if res.success:
             try:
-                data = int(res.respone)
+                data = int(res.response)
                 return data
             except:
                 pass

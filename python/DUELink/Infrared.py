@@ -9,7 +9,7 @@ class InfraredController:
 
         if res.success:
             try:
-                return int(res.respone)
+                return int(res.response)
             except:
                 pass
         return -1

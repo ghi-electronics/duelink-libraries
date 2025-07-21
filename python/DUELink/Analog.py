@@ -18,7 +18,7 @@ class AnalogController:
 
         if res.success:
             try:
-                return float(res.respone)
+                return float(res.response)
             except:
                 pass
 

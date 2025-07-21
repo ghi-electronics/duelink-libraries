@@ -35,7 +35,7 @@ class ButtonController:
 
         if res.success:
             try:
-                return int(res.respone) == 1
+                return int(res.response) == 1
             except:
                 pass
 
@@ -53,7 +53,7 @@ class ButtonController:
 
         if res.success:
             try:
-                return int(res.respone) == 1
+                return int(res.response) == 1
             except:
                 pass
 

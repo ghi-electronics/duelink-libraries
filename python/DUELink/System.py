@@ -24,7 +24,7 @@ class SystemController:
         res = self.serialPort.ReadResponse()
         if res.success:
             try:
-                return int(res.respone)
+                return int(res.response)
             except:
                 pass
         return -1
@@ -35,7 +35,7 @@ class SystemController:
         res = self.serialPort.ReadResponse()
         if res.success:
             try:
-                return int(res.respone)
+                return int(res.response)
             except:
                 pass
         return -1
@@ -48,14 +48,14 @@ class SystemController:
 
         
 
-        # match = re.match(r"^([\w\s]+).*?(v[\d\.].*)", version.respone)
+        # match = re.match(r"^([\w\s]+).*?(v[\d\.].*)", version.response)
 
 
         # if version.success:
             # self.serialPort.TurnEchoOff()
             # self.serialPort.portName.reset_input_buffer()
             # self.serialPort.portName.reset_output_buffer()
-            # version.respone = version.respone[len(command):]
+            # version.response = version.response[len(command):]
 
         # version_firmware = match.group(2).split(":")[0]
         # prod_id = match.group(2).split(":")[1]
@@ -68,11 +68,11 @@ class SystemController:
         cmd = f"info({code})"
         self.serialPort.WriteCommand(cmd)
 
-        respone = self.serialPort.ReadResponse()
+        response = self.serialPort.ReadResponse()
 
-        if respone.success:            
+        if response.success:            
             try:
-                value = int(respone.respone)
+                value = int(response.response)
                 return value
             except:
                 pass

@@ -31,5 +31,5 @@ class TemperatureController:
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadResponse()
-        return float(res.respone)
+        return float(res.response)
         

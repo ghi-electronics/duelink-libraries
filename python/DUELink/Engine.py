@@ -43,7 +43,7 @@ class EngineController:
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadResponse2()
 
-        return res.respone
+        return res.response
     
     def Run(self, script : str) -> bool:
         cmd = script
@@ -51,7 +51,7 @@ class EngineController:
 
         res = self.serialPort.ReadResponse()
 
-        return res.respone
+        return res.response
 
     def Select(self, num):
         cmd = f"sel({num})"
@@ -60,6 +60,6 @@ class EngineController:
 
         res = self.serialPort.ReadResponse()
 
-        return res.respone
+        return res.response
 
        

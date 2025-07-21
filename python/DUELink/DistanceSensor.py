@@ -19,7 +19,7 @@ class DistanceSensorController:
 
         if res.success:
             try:
-                return float(res.respone)
+                return float(res.response)
             except ValueError:
                 pass
 

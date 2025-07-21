@@ -43,11 +43,11 @@ class SerialInterface:
         self.portName.reset_output_buffer() 
         
         
-    def RemoveEchoRespone(self, respone, cmd):
-        if cmd in respone:
-            respone = respone[len(cmd):]
+    def RemoveEchoRespone(self, response, cmd):
+        if cmd in response:
+            response = response[len(cmd):]
 
-        return respone
+        return response
 
     # def CheckResult(self, actual, expected):
     #     if actual != expected:
@@ -73,7 +73,7 @@ class SerialInterface:
         str = ""
         end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
-        respone = CmdRespone()
+        response = CmdRespone()
 
         responseValid = True
         dump = 0
@@ -147,16 +147,16 @@ class SerialInterface:
         self.portName.reset_input_buffer()
         self.portName.reset_output_buffer()
 
-        respone.success = (total_receviced > 2) and (responseValid == True)
-        respone.respone = str
+        response.success = (total_receviced > 2) and (responseValid == True)
+        response.response = str
 
-        return respone
+        return response
     
     def ReadResponse2(self):
         str = self.leftOver
         end = datetime.utcnow() + timedelta(seconds=self.ReadTimeout)
 
-        respone = CmdRespone()
+        response = CmdRespone()
 
         while datetime.utcnow() < end:
             data = self.portName.read()
@@ -178,28 +178,28 @@ class SerialInterface:
             idx = idx2 if idx1 == -1 else idx1
 
             self.leftOver = str[idx + 1:]
-            respone.success = True
-            respone.respone = str[:idx]
-            # print(respone.respone)
+            response.success = True
+            response.response = str[:idx]
+            # print(response.response)
             idx3 = str.find("!")
-            if idx3 != -1 and 'error' in respone.respone:
-                respone.success = False
+            if idx3 != -1 and 'error' in response.response:
+                response.success = False
 
-            if idx3 != -1 and 'unknown' in respone.respone:
-                respone.success = False
+            if idx3 != -1 and 'unknown' in response.response:
+                response.success = False
 
 
-            return respone
+            return response
 
         self.leftOver = ""
 
         self.portName.reset_input_buffer()
         self.portName.reset_output_buffer()
 
-        respone.success = False
-        respone.respone = ""
+        response.success = False
+        response.response = ""
 
-        return respone
+        return response
 
     TransferBlockSizeMax = 512
     TransferBlockDelay = 0.005
@@ -256,7 +256,7 @@ class SerialInterface:
 
 class CmdRespone:
     def __init__(self):
-        self.respone = ""
+        self.response = ""
         self.success = False
     ######################################## OLD VERSION #####################################################
     # def CmdResponse(self):
@@ -314,18 +314,18 @@ class CmdRespone:
     #     version = self.ReadResponse()
     #     self.ReadCommandComplete()
     #     if version["success"]:
-    #         if self.echo and command in version["respone"]:
+    #         if self.echo and command in version["response"]:
     #             # echo is on => need to turn off
     #             self.TurnEchoOff()
     #             self.portName.reset_input_buffer()
     #             self.portName.reset_output_buffer()
-    #             version["respone"] = version["respone"][len(command):]
-    #     return version["respone"]
+    #             version["response"] = version["response"][len(command):]
+    #     return version["response"]
     #
-    # def RemoveEchoRespone(self, respone, cmd):
-    #     if cmd in respone:
-    #         respone = respone[len(cmd):]
-    #     return respone
+    # def RemoveEchoRespone(self, response, cmd):
+    #     if cmd in response:
+    #         response = response[len(cmd):]
+    #     return response
     #
     # def WriteCommand(self, command):
     #     self.WriteCommand(command)

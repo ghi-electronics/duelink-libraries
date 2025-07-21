@@ -115,7 +115,7 @@ class DUELinkController:
         self.serialPort.WriteCommand(cmd)
         response = self.serialPort.ReadResponse()
 
-        return response.respone if response.success else -1
+        return response.response if response.success else -1
 
     def GetConnectionPort():
         try:
