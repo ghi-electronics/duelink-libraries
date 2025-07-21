@@ -152,7 +152,7 @@ class SerialInterface:
 
         return respone
     
-    def ReadRespone2(self):
+    def ReadResponse2(self):
         str = self.leftOver
         end = datetime.utcnow() + timedelta(seconds=self.ReadTimeout)
 
