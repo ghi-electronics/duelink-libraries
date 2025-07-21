@@ -205,7 +205,7 @@ namespace GHIElectronics.DUELink {
             var total_receviced = 0;
 
             lock (this.objlock) {
-                while (end > DateTime.UtcNow.Ticks || this.port.BytesToRead > 0) {
+                while (end > DateTime.UtcNow.Ticks) {
 
                     if (this.port.BytesToRead > 0) {
                        
