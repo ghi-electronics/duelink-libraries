@@ -70,53 +70,85 @@ class SerialInterface:
         self.portName.write(bytes(string, 'utf-8'))
 
     def ReadResponse(self):
-        str = self.leftOver
+        str = ""
         end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
         respone = CmdRespone()
 
-        while datetime.now() < end:
-            data = self.portName.read(1)
-            str += data.decode()
+        responseValid = True
+        dump = 0
+        total_receviced = 0
 
-            str = str.replace("\n", "")
-            str = str.replace("\r", "")
-            # print(str)
-            idx1 = str.find(">")
-            idx2 = str.find("&")
+        while datetime.now() < end or self.portName.in_waiting > 0:
+            if self.portName.in_waiting > 0:
+                data = self.portName.read(1)
+                str += data.decode()
+                
+                total_receviced = total_receviced + 1
+                
+                if data.decode()[0] == '\n':
+                    if (self.portName.in_waiting == 0):
+                        time.sleep(0.001) # wait 1ms for sure
+                    
+                    # next byte can be >, &, !, $
+                    if (self.portName.in_waiting > 0):
+                        dump = self.portName.read(1)
 
-            if idx1 == -1:
-                idx1 = str.find("$")
+                        if (dump.decode()[0] == '>' or dump.decode()[0] == '!' or dump.decode()[0] == '$'):
+                            #valid data      
+                            time.sleep(0.001) # wait 1ms for sure
 
-            if idx1 == -1 and idx2 == -1:
-                continue
+                            if (self.portName.in_waiting > 0):
+                                responseValid = False
+                        elif (dump.decode()[0] == '\r'): #there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
+                            if (self.portName.in_waiting == 0):
+                                time.sleep(0.001) 
 
-            idx = idx2 if idx1 == -1 else idx1
+                            dump = self.portName.read(1)
 
-            self.leftOver = str[idx + 1:]
-            respone.success = True
-            respone.respone = str[:idx]
-            # print(respone.respone)
-            idx3 = str.find("!")
-            #if idx3 != -1 and 'error' in respone.respone:
-            #    respone.success = False
+                            if (dump.decode()[0] == '\n'):
+                                if (self.portName.in_waiting > 0):
+                                    dump = self.portName.read(1)
+                            else:
+                                responseValid = False
+                        else:
+                            # bad data
+                            # One cmd send suppose one response, there is no 1234\r\n5678.... this will consider invalid response
+                            responseValid = False
+                    
+                    if responseValid == False:
+                        dump = 0
 
-            #if idx3 != -1 and 'unknown' in respone.respone:
-            #    respone.success = False
+                        while dump != '\n' and datetime.now() < end:
+                            if (self.portName.in_waiting > 0):
+                                dump = self.portName.read(1)
+                            else:
+                                time.sleep(0.001) 
+                            
+                            if dump.decode()[0] == '\n':
+                                if (self.portName.in_waiting > 0): # still bad data, repeat clean up
+                                    dump = 0 #reset to repeat the condition while loop
 
-            if idx3 != -1:
-                respone.success = False
+                    if str == "" or len(str) < 2: #reponse valid has to be xxx\r\n or \r\n, mean idx >=2
+                        responseValid = False
+                    elif responseValid == True:
+                        if str[len(str)-2] != '\r':
+                            responseValid = False
+                        else:
+                            str = str.replace("\n", "")
+                            str = str.replace("\r", "")
 
+                    break
 
-            return respone
+                end = datetime.now() + timedelta(seconds=self.ReadTimeout) #reset timeout after valid data 
 
-        self.leftOver = ""
+                
 
         self.portName.reset_input_buffer()
         self.portName.reset_output_buffer()
 
-        respone.success = False
-        respone.respone = ""
+        respone.success = (total_receviced > 2) and (responseValid == True)
+        respone.respone = str
 
         return respone
     
