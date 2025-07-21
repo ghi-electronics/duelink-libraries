@@ -11,7 +11,7 @@ namespace GHIElectronics.DUELink {
 
             public StreamController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public int Spi(byte[] data) {
+            public int WriteSpi(byte[] data) {
 
                 var cmd = string.Format("strmspi({0})", data.Length);
 
