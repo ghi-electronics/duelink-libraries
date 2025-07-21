@@ -11,21 +11,42 @@ namespace GHIElectronics.DUELink {
 
             public StreamController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public bool Spi(byte[] data) {
+            public int Spi(byte[] data) {
 
                 var cmd = string.Format("strmspi({0})", data.Length);
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadResponse();
-
-                if (res.success) {
-                    this.serialPort.WriteRawData(data, 0, data.Length);
+                // wait for prompt &
+                while (this.serialPort.BytesToRead() == 0) {
+                    Thread.Sleep(1);
                 }
 
-                return res.success;
+                var prompt = this.serialPort.ReadByte();
+
+                if (prompt != '&') {
+                    throw new Exception("Wrong response package");
+                }
+
+                // ready write data
+                this.serialPort.WriteRawData(data, 0, data.Length);
+
+                // read x\r\n> (asio(1) not return this)
+                var ret = this.serialPort.ReadResponse();
+
+                if (ret.success) {
+                    try {
+                        var written = int.Parse(ret.response);
+                        return written;
+                    }
+                    catch {
+
+                    }
+                }
+                return 0;
             }
-            public int WriteBytes(string array, byte[] data, int count) {
+            public int WriteBytes(string array, byte[] data) {
+                var count = data.Length;
 
                 var cmd = string.Format("strmwr({0}, {1})", array, count);
 
@@ -60,8 +81,9 @@ namespace GHIElectronics.DUELink {
                 return 0;
             }
 
-            public int WriteFloats(string array, float[] data, int count) {
+            public int WriteFloats(string array, float[] data) {
 
+                var count = data.Length;
                 var cmd = string.Format("strmwr({0}, {1})", array, count);
 
                 this.serialPort.WriteCommand(cmd);
@@ -98,8 +120,9 @@ namespace GHIElectronics.DUELink {
                 return 0;
             }
 
-            public int ReadBytes(string array, byte[] data, int count) {
+            public int ReadBytes(string array, byte[] data) {
 
+                var count = data.Length;
                 var cmd = string.Format("strmrd({0}, {1})", array, count);
 
                 this.serialPort.WriteCommand(cmd);
@@ -132,7 +155,9 @@ namespace GHIElectronics.DUELink {
                 }
                 return 0;
             }
-            public int ReadFloats(string array, float[] data, int count) {
+            public int ReadFloats(string array, float[] data) {
+                var count = data.Length;
+
                 var data_bytes = new byte[count * 4];
 
                 var cmd = string.Format("strmrd({0}, {1})", array, count);
