@@ -15,6 +15,11 @@ class SystemController:
     def Reset(self, option : int):
         cmd = "reset({0})".format(1 if option == 1 else 0)
         self.serialPort.WriteCommand(cmd)
+
+        #Erase all send reset twice
+        if (option == 1):
+            self.serialPort.WriteCommand(cmd)
+
         # The device will reset in bootloader or system reset
         self.serialPort.Disconnect()
 
