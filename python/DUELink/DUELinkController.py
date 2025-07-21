@@ -19,6 +19,7 @@ from DUELink.Humidity import HudimityController
 from DUELink.Sound import SoundController
 from DUELink.Temperature import TemperatureSensorType
 from DUELink.Humidity import HumiditySensorType
+from DUELink.Stream import StreamController
 
 from enum import Enum
 import platform
@@ -55,7 +56,7 @@ class DUELinkController:
 
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()
-        
+        self.Stream = StreamController(self.serialPort)
 
         
     
