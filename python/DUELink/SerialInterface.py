@@ -147,18 +147,18 @@ class SerialInterface:
         self.portName.reset_input_buffer()
         self.portName.reset_output_buffer()
 
-        response.success = (total_receviced > 2) and (responseValid == True)
+        response.success = (total_receviced > 1) and (responseValid == True)
         response.response = str
 
         return response
     
     def ReadResponse2(self):
         str = self.leftOver
-        end = datetime.utcnow() + timedelta(seconds=self.ReadTimeout)
+        end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
         response = CmdRespone()
 
-        while datetime.utcnow() < end:
+        while datetime.now() < end:
             data = self.portName.read()
 
             str += data.decode()
@@ -222,7 +222,7 @@ class SerialInterface:
             #time.sleep(self.TransferBlockDelay)
 
     def ReadRawData(self, buffer, offset, count):
-        end = datetime.utcnow() + timedelta(seconds=self.ReadTimeout)
+        end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
         if len(self.leftOver) > 0:
             raise ValueError("LeftOver size is different zero: " + str(len(self.leftOver)))
@@ -231,12 +231,12 @@ class SerialInterface:
         totalRead = 0
 
         
-        #while end > datetime.utcnow():
+        #while end > datetime.now():
             #read = self.portName.readinto(buffer[offset + totalRead:offset + count])
             #totalRead += read
 
             #if read > 0:
-            #    end = datetime.utcnow() + timedelta(seconds=self.ReadTimeout)
+            #    end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
             #if totalRead == count:
             #    break
@@ -253,6 +253,13 @@ class SerialInterface:
 
 
         return count
+    
+    def BytesToRead(self):
+        return self.portName.in_waiting
+    
+    def ReadByte(self):
+        data = self.portName.read(1)
+        return data.decode()[0]
 
 class CmdRespone:
     def __init__(self):
@@ -265,11 +272,11 @@ class CmdRespone:
     #
     # def ReadResponse(self) -> CmdResponse:
     #     str = self.leftOver
-    #     end = datetime.utcnow() + timedelta(seconds=self.ReadTimeout)
+    #     end = datetime.now() + timedelta(seconds=self.ReadTimeout)
     #
     #     response = SerialInterface.CmdResponse
     #
-    #     while end > datetime.utcnow():
+    #     while end > datetime.now():
     #         data = self.portName.read()
     #
     #         str += data.decode('utf-8')
