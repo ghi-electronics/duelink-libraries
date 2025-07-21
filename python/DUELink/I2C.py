@@ -26,7 +26,7 @@ class I2cController:
 
         cmd = f"i2ccfg({baudrate})"
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         return res.success
 
     def WriteRead(self, address: int, dataWrite: Optional[bytes], countWrite: int, dataRead: Optional[bytearray], countRead: int) -> bool:
@@ -47,5 +47,5 @@ class I2cController:
         
         cmd = f"i2cwr({address},{dataWrite},{countWrite},{dataRead},{countRead})"
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         return res.success

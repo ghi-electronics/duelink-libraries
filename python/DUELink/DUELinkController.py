@@ -107,13 +107,13 @@ class DUELinkController:
     def Shutdown(self, pin: int):
         cmd = f'shtdn({pin})'
         self.serialPort.WriteCommand(cmd)
-        response = self.serialPort.ReadRespone()
+        response = self.serialPort.ReadResponse()
         return response.success
 
     def GetVCC(self):
         cmd = f"readvcc()"
         self.serialPort.WriteCommand(cmd)
-        response = self.serialPort.ReadRespone()
+        response = self.serialPort.ReadResponse()
 
         return response.respone if response.success else -1
 

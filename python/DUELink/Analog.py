@@ -14,7 +14,7 @@ class AnalogController:
 
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         if res.success:
             try:
@@ -35,7 +35,7 @@ class AnalogController:
         cmd = f'pwrite({pin}, {duty_cycle})'
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         if res.success:
             return True

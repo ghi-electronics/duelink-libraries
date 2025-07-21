@@ -15,7 +15,7 @@ class DistanceSensorController:
         cmd = f'dist({trigPin},{echoPin})'
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         if res.success:
             try:

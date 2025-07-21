@@ -10,7 +10,7 @@ class EngineController:
     def Record(self, script) -> bool:
         self.serialPort.WriteCommand("new")
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         if not res.success:
             raise ValueError("Unable to erase the chip memory.")
 
@@ -26,14 +26,14 @@ class EngineController:
 
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         if (res.success == False) :
             return False
         
         self.serialPort.WriteRawData(data, 0, len(data))
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         return res.success
             
@@ -49,7 +49,7 @@ class EngineController:
         cmd = script
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         return res.respone
 
@@ -58,7 +58,7 @@ class EngineController:
 
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         return res.respone
 

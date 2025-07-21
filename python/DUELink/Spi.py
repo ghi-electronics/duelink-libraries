@@ -23,7 +23,7 @@ class SpiController:
     
         cmd = f"spicfg({mode}, {frequency})"
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         return res.success
     
     def WriteByte(self, data: int):
@@ -33,7 +33,7 @@ class SpiController:
     
         cmd = f"spiwr({data})"
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         return res.success
 
     # def Read(self, dataRead: bytearray, offset: int = 0, length: Optional[int] = None, chipselect: int = -1) -> bool:
@@ -50,7 +50,7 @@ class SpiController:
         cmd = f"spiwrs({dataWrite},{dataRead})"
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         # while countWrite > 0 or countRead > 0:
         #     num = countRead
@@ -92,7 +92,7 @@ class SpiController:
 
     #     self.serialPort.WriteCommand(cmd)
 
-    #     res = self.serialPort.ReadRespone()
+    #     res = self.serialPort.ReadResponse()
     #     return res.success
     
 

@@ -10,7 +10,7 @@ class FrequencyController:
 
 
 
-        if dutycyle < 0 or dutycyle > 0.1:
+        if dutycyle < 0 or dutycyle > 1:
             raise ValueError("dutycyle must be in range 0..100")
         
         if pin not in self.serialPort.DeviceConfig.PWMPins:
@@ -19,6 +19,6 @@ class FrequencyController:
         cmd = "freq({}, {}, {}, {})".format(pin, frequency, duration_ms, dutycyle)
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         return res.success

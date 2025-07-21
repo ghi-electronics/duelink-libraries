@@ -11,15 +11,15 @@ class ButtonController:
         #     return False
         # return True
         
-    def Enable(self, pin: int, enable: bool) -> bool:
+    def Enable(self, pin: int, enable: bool, pull: int) -> bool:
 
         if self.IsButtonValid(pin) == False:
             raise ValueError("Invalid pin")
     
-        cmd = f"btnen({pin}, {int(enable)})"
+        cmd = f"btnen({pin}, {int(enable)}, {pull})"
 
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         return res.success
     
@@ -31,7 +31,7 @@ class ButtonController:
         cmd = f"btndown({pin})"
 
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         if res.success:
             try:
@@ -49,7 +49,7 @@ class ButtonController:
         cmd = f"btnup({pin})"
 
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
 
         if res.success:
             try:

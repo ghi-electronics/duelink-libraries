@@ -6,7 +6,7 @@ class TouchController:
         cmd = "touch({0}, {1}, {2}, {3})".format(pin, charge_t, charge_s, timeout)
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         
         val = False
         if res.success:

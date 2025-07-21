@@ -30,6 +30,6 @@ class TemperatureController:
         cmd = f"temp({pin},{sensortype})"
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         return float(res.respone)
         

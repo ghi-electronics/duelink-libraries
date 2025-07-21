@@ -13,6 +13,6 @@ class ServoController:
         cmd = 'servost({}, {})'.format(pin, position)
         self.serialPort.WriteCommand(cmd)
 
-        response = self.serialPort.ReadRespone()
+        response = self.serialPort.ReadResponse()
 
         return response.success

@@ -5,19 +5,19 @@ class UartController:
     def Enable(self, baudrate):
         cmd = "uartinit({})".format(baudrate)
         self.serialport.WriteCommand(cmd)
-        res = self.serialport.ReadRespone()
+        res = self.serialport.ReadResponse()
         return res.success
 
     def Write(self, data):
         cmd = "uartwrite({})".format(data)
         self.serialport.WriteCommand(cmd)
-        res = self.serialport.ReadRespone()
+        res = self.serialport.ReadResponse()
         return res.success
 
     def BytesToRead(self):
         cmd = "x=uartcount():print(x)"
         self.serialport.WriteCommand(cmd)
-        res = self.serialport.ReadRespone()
+        res = self.serialport.ReadResponse()
         if res.success:
             try:
                 ready = int(res.respone)
@@ -29,7 +29,7 @@ class UartController:
     def Read(self):
         cmd = "x=uartread():print(x)"
         self.serialport.WriteCommand(cmd)
-        res = self.serialport.ReadRespone()
+        res = self.serialport.ReadResponse()
         if res.success:
             try:
                 data = int(res.respone)

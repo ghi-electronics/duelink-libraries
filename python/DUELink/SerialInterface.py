@@ -33,7 +33,7 @@ class SerialInterface:
 
     def Synchronize(self):
         cmd = bytearray(1)
-        cmd[0] = 127
+        cmd[0] = 10 # do not terminal loop since we support asio(1) host runs
 
         self.WriteRawData(cmd, 0, 1)
         
@@ -42,22 +42,7 @@ class SerialInterface:
         self.portName.reset_input_buffer()
         self.portName.reset_output_buffer() 
         
-        self.TurnEchoOff()
         
-        self.leftOver = ""
-        self.portName.reset_input_buffer()
-        self.portName.reset_output_buffer() 
-    
-
-    def TurnEchoOff(self):
-        if not self.echo:
-            return
-        self.WriteCommand("echo(0)")
-        self.ReadRespone()
-        self.echo = False
-
-
-
     def RemoveEchoRespone(self, respone, cmd):
         if cmd in respone:
             respone = respone[len(cmd):]
@@ -84,13 +69,13 @@ class SerialInterface:
         # print(string)
         self.portName.write(bytes(string, 'utf-8'))
 
-    def ReadRespone(self):
+    def ReadResponse(self):
         str = self.leftOver
-        end = datetime.utcnow() + timedelta(seconds=self.ReadTimeout)
+        end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
         respone = CmdRespone()
 
-        while datetime.utcnow() < end:
+        while datetime.now() < end:
             data = self.portName.read(1)
             str += data.decode()
 
@@ -246,7 +231,7 @@ class CmdRespone:
     #     self.response = ""
     #     self.success = False
     #
-    # def ReadRespone(self) -> CmdResponse:
+    # def ReadResponse(self) -> CmdResponse:
     #     str = self.leftOver
     #     end = datetime.utcnow() + timedelta(seconds=self.ReadTimeout)
     #
@@ -294,7 +279,7 @@ class CmdRespone:
     # def GetVersion(self):
     #     command = "version()"
     #     self.WriteCommand(command)
-    #     version = self.ReadRespone()
+    #     version = self.ReadResponse()
     #     self.ReadCommandComplete()
     #     if version["success"]:
     #         if self.echo and command in version["respone"]:
@@ -319,7 +304,7 @@ class CmdRespone:
     #     self.portName.write(bytes(string, 'utf-8'))
     #
     # def ReadCommandComplete(self):
-    #     self.check_result(str(self.ReadRespone()), self.CommandCompleteText)
+    #     self.check_result(str(self.ReadResponse()), self.CommandCompleteText)
 
 
     ############################### This Function delay the process too much ###########################################

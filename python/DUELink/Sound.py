@@ -16,7 +16,7 @@ class SoundController:
         
         cmd = "beep({0}, {1}, {2})".format(pin, frequency, duration)
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         return res.success
     
     def MelodyPlay(self, pin: int, notes: List[float]) -> bool:
@@ -32,7 +32,7 @@ class SoundController:
         
         cmd = "MelodyP({0}, {{{1}}})".format(pin, ", ".join(map(str, notes)))
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         
         return res.success
 
@@ -43,6 +43,6 @@ class SoundController:
         
         cmd = "MelodyS({0})".format(pin)
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         return res.success
         

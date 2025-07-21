@@ -21,7 +21,7 @@ class SystemController:
     def GetTickMicroseconds(self):
         cmd = "tickus()"
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         if res.success:
             try:
                 return int(res.respone)
@@ -32,7 +32,7 @@ class SystemController:
     def GetTickMilliseconds(self):
         cmd = "tickms()"
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         if res.success:
             try:
                 return int(res.respone)
@@ -44,7 +44,7 @@ class SystemController:
         # command = "version()"
         # self.serialPort.WriteCommand(command)
 
-        # version = self.serialPort.ReadRespone()
+        # version = self.serialPort.ReadResponse()
 
         
 
@@ -68,7 +68,7 @@ class SystemController:
         cmd = f"info({code})"
         self.serialPort.WriteCommand(cmd)
 
-        respone = self.serialPort.ReadRespone()
+        respone = self.serialPort.ReadResponse()
 
         if respone.success:            
             try:
@@ -83,7 +83,7 @@ class SystemController:
         cmd = f"statled({highPeriod},{lowPeriod},{count})"
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadRespone()
+        res = self.serialPort.ReadResponse()
         return res.success
 
     
