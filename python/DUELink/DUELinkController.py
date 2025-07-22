@@ -23,6 +23,7 @@ from DUELink.Stream import StreamController
 from DUELink.CoProcessor import CoProcessorController
 from DUELink.DMX import DMXController
 from DUELink.FileSystem import FileSystemController
+from DUELink.Otp import OtpController
 
 from enum import Enum
 import platform
@@ -63,6 +64,7 @@ class DUELinkController:
         self.CoProcessor = CoProcessorController(self.serialPort,self.Stream)
         self.DMX = DMXController(self.serialPort,self.Stream)
         self.FileSystem = FileSystemController(self.serialPort,self.Stream)
+        self.Otp = OtpController(self.serialPort,self.Stream)
 
         
     
