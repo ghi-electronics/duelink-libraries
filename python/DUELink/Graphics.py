@@ -105,13 +105,13 @@ class GraphicsController:
         if width <= 0 or height <= 0 or len(img) < width * height:
             raise Exception("Invalid arguments")
 
-        cmd = f"dim b1[{len(img)}]"
+        cmd = f"dim b9[{len(img)}]"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadResponse()
 
         for i in range(len(img)):
-            cmd = f"b1[{(i)}] = {img[i]}"
+            cmd = f"b9[{(i)}] = {img[i]}"
             self.serialPort.WriteCommand(cmd)
             res = self.serialPort.ReadResponse()
 
@@ -119,12 +119,12 @@ class GraphicsController:
                 break
 
         if (res.success == True):
-            cmd = f"imgs(b1, {x}, {y}, {width}, {height}, {scaleWidth}, {scaleHeight}, {transform})"
+            cmd = f"imgs(b9, {x}, {y}, {width}, {height}, {scaleWidth}, {scaleHeight}, {transform})"
 
             self.serialPort.WriteCommand(cmd)
             res = self.serialPort.ReadResponse()
 
-        cmd = "dim b1[0]"
+        cmd = "dim b9[0]"
 
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadResponse()

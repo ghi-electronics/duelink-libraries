@@ -6,6 +6,23 @@ class EngineController:
         self.serialPort = serialPort
         self.loadscript = ""    
 
+    # run("version()/list") return version string, so need to return a string
+    def Run(self, script : str) -> str:
+        cmd = script
+        self.serialPort.WriteCommand(cmd)
+
+        res = self.serialPort.ReadResponse()
+
+        return res.response
+    
+    def Select(self, num):
+        cmd = f"sel({num})"
+
+        self.serialPort.WriteCommand(cmd)
+
+        res = self.serialPort.ReadResponse()
+
+        return res.success
     
     def Record(self, script) -> bool:
         self.serialPort.WriteCommand("new")
@@ -43,23 +60,8 @@ class EngineController:
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadResponse2()
 
-        return res.response
+        return res.response    
+
     
-    def Run(self, script : str) -> bool:
-        cmd = script
-        self.serialPort.WriteCommand(cmd)
-
-        res = self.serialPort.ReadResponse()
-
-        return res.response
-
-    def Select(self, num):
-        cmd = f"sel({num})"
-
-        self.serialPort.WriteCommand(cmd)
-
-        res = self.serialPort.ReadResponse()
-
-        return res.response
 
        

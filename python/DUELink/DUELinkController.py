@@ -21,6 +21,7 @@ from DUELink.Temperature import TemperatureSensorType
 from DUELink.Humidity import HumiditySensorType
 from DUELink.Stream import StreamController
 from DUELink.CoProcessor import CoProcessorController
+from DUELink.DMX import DMXController
 
 from enum import Enum
 import platform
@@ -59,6 +60,7 @@ class DUELinkController:
         self.HumiditySensorType = HumiditySensorType()
         self.Stream = StreamController(self.serialPort)
         self.CoProcessor = CoProcessorController(self.serialPort,self.Stream)
+        self.DMX = DMXController(self.serialPort,self.Stream)
 
         
     
