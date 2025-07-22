@@ -15,6 +15,7 @@ namespace GHIElectronics.DUELink {
         protected const string CommandCompleteText = ">";
 
         protected SerialPort port;
+        public bool EnabledAsio {  get; set; }
 
         //private string leftOver;
 
@@ -185,7 +186,32 @@ namespace GHIElectronics.DUELink {
             this.DiscardInBuffer();
             this.DiscardOutBuffer();
 
-            this.WriteLine(command);
+            
+            command = command.ToLower();
+            // these commands - statement can't use with println
+            if (command.IndexOf("print") == 0                
+                || command.IndexOf("dim") == 0
+                || command.IndexOf("run") == 0
+                || command.IndexOf("list") == 0
+                || command.IndexOf("new") == 0
+                || command.IndexOf("echo") == 0
+                || command.IndexOf("sel") == 0
+                || command.IndexOf("version") == 0
+                || command.IndexOf("region") == 0
+                || command.IndexOf("alias") == 0
+                || command.IndexOf("sprintf") == 0
+                ) {
+                this.WriteLine(command);
+            }
+
+            else if (this.EnabledAsio) {
+                var newcmd = string.Format("println({0})", command);
+
+                this.WriteLine(newcmd);
+            }
+            else {
+                this.WriteLine(command);
+            }
         }
 
         private void WriteLine(string str) {

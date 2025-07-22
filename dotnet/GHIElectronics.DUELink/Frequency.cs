@@ -13,13 +13,13 @@ namespace GHIElectronics.DUELink {
 
             public FrequencyController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public int MaxFrequency { get; } = 10000000;
+            public int MaxFrequency { get; } = 24000000;
             public int MinFrequency { get; } = 16;
 
 
             public bool Write(int pin, int frequency, long duration_ms = 0, double dc = 0.5 ) {
                 if (frequency < this.MinFrequency || frequency > this.MaxFrequency) {
-                    throw new Exception("Frequency must be in range 15Hz..10000000Hz");
+                    throw new Exception("Frequency must be in range 16Hz..10000000Hz");
                 } 
 
                 if (dc < 0 || dc > 1.0) {

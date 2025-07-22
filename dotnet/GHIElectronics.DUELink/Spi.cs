@@ -14,17 +14,21 @@ namespace GHIElectronics.DUELink {
         public class SpiController {
 
             SerialInterface serialPort;
-            public SpiController(SerialInterface serialPort) => this.serialPort = serialPort;
+            StreamController stream;
+            public SpiController(SerialInterface serialPort, StreamController stream) {
+                this.serialPort = serialPort;
+                this.stream = stream;
+            }
 
-            public bool Write(byte[] dataWrite) => this.WriteRead(dataWrite, 0, dataWrite.Length, null, 0, 0);
+            //public bool Write(byte[] dataWrite) => this.WriteRead(dataWrite, 0, dataWrite.Length, null, 0, 0);
 
-            public bool Write(byte[] dataWrite, int offset, int count) => this.WriteRead(dataWrite, offset, count, null, 0, 0);
-            public bool Read(byte[] dataRead) => this.WriteRead(null, 0, 0, dataRead, 0, dataRead.Length);
+            //public bool Write(byte[] dataWrite, int offset, int count) => this.WriteRead(dataWrite, offset, count, null, 0, 0);
+            //public bool Read(byte[] dataRead) => this.WriteRead(null, 0, 0, dataRead, 0, dataRead.Length);
 
-            public bool Read(byte[] dataRead, int offset, int count) => this.WriteRead(null, 0, 0, dataRead, offset, count);
+            //public bool Read(byte[] dataRead, int offset, int count) => this.WriteRead(null, 0, 0, dataRead, offset, count);
             public bool WriteRead(byte[] dataWrite, byte[] dataRead) => this.WriteRead(dataWrite, 0, dataWrite.Length, dataRead, 0, dataRead.Length);
 
-            public bool WriteRead(byte[]? dataWrite, int offsetWrite, int countWrite, byte[]? dataRead, int offsetRead, int countRead) {
+            private bool WriteRead(byte[]? dataWrite, int offsetWrite, int countWrite, byte[]? dataRead, int offsetRead, int countRead) {
                 
                 if ((dataWrite == null && dataRead == null) || (countWrite == 0 && countRead == 0))
                     throw new ArgumentNullException();
@@ -36,26 +40,55 @@ namespace GHIElectronics.DUELink {
                     throw new ArgumentOutOfRangeException();
 
 
-                var write_array = string.Empty;
+                //var write_array = string.Empty;
 
-                write_array = "[";
+                //write_array = "[";
 
-                for (var i = 0; i < countWrite; i++) {
-                    write_array += dataRead[i];
+                //for (var i = 0; i < countWrite; i++) {
+                //    write_array += dataRead[i];
 
-                    if (i < countWrite - 1)
-                        write_array += ",";
-                }
+                //    if (i < countWrite - 1)
+                //        write_array += ",";
+                //}
 
-                write_array += "]";
+                //write_array += "]";
 
-                var cmd = $"spiwrs({write_array},0)";
+                //var cmd = $"spiwrs({write_array},0)";
 
+                //this.serialPort.WriteCommand(cmd);
+
+                //var res = this.serialPort.ReadResponse();
+
+                //return res.success;
+
+                // using stream to do Spi writeread
+
+                // declare b9 to write
+                var cmd = $"dim b9[{countWrite}]";
                 this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
 
-                var res = this.serialPort.ReadResponse();
+                // declare b8 to write
+                cmd = $"dim b8[{countRead}]";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
 
-                return res.success;
+                // write data to b9 by stream
+                var write_array = new byte[countWrite];
+                Array.Copy(dataWrite, offsetWrite, write_array, 0, countWrite);
+                var written = this.stream.WriteBytes("b9", write_array);
+
+                // i2c wr cmd
+                cmd = $"spiwrs(b9,b8)";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
+
+                // use stream to read data to b8
+                var read_array = new byte[countRead];
+                var read = this.stream.ReadBytes("b8", read_array);
+
+                Array.Copy(read_array, 0, dataRead, offsetRead, countRead);
+                return (written == countWrite) && (read == countRead);
 
             }
           
@@ -92,7 +125,7 @@ namespace GHIElectronics.DUELink {
                     }
                 }
 
-                return -1;
+                return 0;
             }
         }
     }

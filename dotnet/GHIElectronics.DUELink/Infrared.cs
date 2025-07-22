@@ -32,11 +32,15 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public void Write(byte data) {
+            public bool Write(byte data) {
                 var cmd = string.Format("IrWrite({0})", data);
                 this.serialPort.WriteCommand(cmd);
 
-                this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
+
+
             }
 
             public bool Enable(int txpin, int rxpin, bool enable) {
@@ -47,11 +51,7 @@ namespace GHIElectronics.DUELink {
 
                 var res = this.serialPort.ReadResponse();
 
-                if (res.success) {
-                    return true;
-                }
-
-                return false;
+                return res.success;
             }
 
         }

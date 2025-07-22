@@ -20,6 +20,7 @@ namespace GHIElectronics.DUELink {
 
 
         SerialInterface serialPort = default!;
+        bool enabledAsio = false;
 
         public int TransferBlockDelay {
             get => this.serialPort.TransferBlockDelay;
@@ -29,6 +30,11 @@ namespace GHIElectronics.DUELink {
         public int TransferBlockSizeMax {
             get => this.serialPort.TransferBlockSizeMax;
             set => this.serialPort.TransferBlockSizeMax = value;
+        }
+
+        public bool EnabledAsio {
+            get => this.serialPort.EnabledAsio;
+            set => this.serialPort.EnabledAsio = value;
         }
 
         public DeviceConfiguration DeviceConfig { get; set; }
@@ -77,15 +83,12 @@ namespace GHIElectronics.DUELink {
                 throw new ArgumentNullException("serialPort is null");
             }
 
+            this.Stream = new StreamController(this.serialPort);
             this.Analog = new AnalogController(this.serialPort);
-            this.Digital = new DigitalController(this.serialPort);
-            this.I2c = new I2cController(this.serialPort);
+            this.Digital = new DigitalController(this.serialPort);            
             this.Servo = new ServoController(this.serialPort);
-            this.Frequency = new FrequencyController(this.serialPort);
-            this.Spi = new SpiController(this.serialPort);
-            this.Infrared = new InfraredController(this.serialPort);
- 
-            this.Uart = new UartController(this.serialPort);
+            this.Frequency = new FrequencyController(this.serialPort);            
+            this.Infrared = new InfraredController(this.serialPort);             
             this.Button = new ButtonController(this.serialPort);
             this.Distance = new DistanceSensorController(this.serialPort);
             this.Graphics = new GraphicsController(this.serialPort);
@@ -94,14 +97,17 @@ namespace GHIElectronics.DUELink {
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);
             this.System = new SystemController(this.serialPort);
-            this.Sound = new SoundController(this.serialPort);
-            this.Stream = new StreamController(this.serialPort);
-            this.DMX = new DMXController(this.serialPort);
+            this.Sound = new SoundController(this.serialPort);                        
             this.Pulse = new PulseController(this.serialPort);
-            this.Rtc = new RtcController(this.serialPort);
+            
             this.Otp = new OtpController(this.serialPort);
-            this.CoProcessor = new CoProcessorController(this.serialPort);
-            this.FileSystem = new FSController(this.serialPort);
+            this.DMX = new DMXController(this.serialPort);
+            this.Uart = new UartController(this.serialPort, this.Stream);
+            this.Spi = new SpiController(this.serialPort, this.Stream);
+            this.Rtc = new RtcController(this.serialPort, this.Stream);
+            this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
+            this.FileSystem = new FSController(this.serialPort, this.Stream);
+            this.I2c = new I2cController(this.serialPort, this.Stream);
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {

@@ -12,6 +12,8 @@ namespace GHIElectronics.DUELink {
             public StreamController(SerialInterface serialPort) => this.serialPort = serialPort;
 
             public int WriteSpi(byte[] data) {
+                if (data == null || data.Length == 0)
+                    return 0;
 
                 var cmd = string.Format("strmspi({0})", data.Length);
 
@@ -46,6 +48,9 @@ namespace GHIElectronics.DUELink {
                 return 0;
             }
             public int WriteBytes(string array, byte[] data) {
+                if (data == null || data.Length == 0)
+                    return 0;
+
                 var count = data.Length;
 
                 var cmd = string.Format("strmwr({0}, {1})", array, count);
@@ -82,6 +87,8 @@ namespace GHIElectronics.DUELink {
             }
 
             public int WriteFloats(string array, float[] data) {
+                if (data == null || data.Length == 0)
+                    return 0;
 
                 var count = data.Length;
                 var cmd = string.Format("strmwr({0}, {1})", array, count);
@@ -122,6 +129,9 @@ namespace GHIElectronics.DUELink {
 
             public int ReadBytes(string array, byte[] data) {
 
+                if (data == null || data.Length == 0)
+                    return 0;
+
                 var count = data.Length;
                 var cmd = string.Format("strmrd({0}, {1})", array, count);
 
@@ -156,6 +166,9 @@ namespace GHIElectronics.DUELink {
                 return 0;
             }
             public int ReadFloats(string array, float[] data) {
+                if (data == null || data.Length == 0)
+                    return 0;
+
                 var count = data.Length;
 
                 var data_bytes = new byte[count * 4];

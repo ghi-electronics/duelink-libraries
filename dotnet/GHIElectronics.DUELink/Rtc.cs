@@ -10,10 +10,14 @@ namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
         public class RtcController {
             SerialInterface serialPort = null;
+            StreamController stream;
 
-            public RtcController(SerialInterface port) => this.serialPort = port;
+            public RtcController(SerialInterface serialPort, StreamController stream) {
+                this.serialPort = serialPort;
+                this.stream = stream;
+            }
 
-            public void RtcW(byte[] timedate) {
+            public bool RtcW(byte[] timedate) {
 
                 var write_array = string.Empty;
 
@@ -32,37 +36,36 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
                                
             }
 
-            public byte[] RtcR() {
+            public int RtcR(byte[] rtc_timedate) {
 
-                // we can't check response as Asio(1) there will be no response                
-                var timedate = new byte[6];
-
-                this.serialPort.WriteCommand("dim b1[6]");
+                // we can't check response as Asio(1) there will be no response                                
+                this.serialPort.WriteCommand("dim b9[6]");
 
                 this.serialPort.ReadResponse();                
 
-                this.serialPort.WriteCommand("OtpR(b1)");
+                this.serialPort.WriteCommand("RtcR(b9)");
 
                 this.serialPort.ReadResponse();
 
-                // use stream to read b1
-                this.serialPort.WriteCommand("strmrd(b1, 6)");
+                // use stream to read b9
+                var ret = this.stream.ReadBytes("b9", rtc_timedate);
 
-                this.serialPort.ReadResponse();
-
-                this.serialPort.ReadRawData(timedate, 0, timedate.Length);
-
-                return timedate;
+                return ret;
             }
 
-            public void Show() {
+            public bool RtcShow() {
                 this.serialPort.WriteCommand("OtpR(0)");
 
-                this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
+
             }
             
         }

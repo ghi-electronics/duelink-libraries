@@ -14,6 +14,7 @@ namespace GHIElectronics.DUELink {
 
             public EngineController(SerialInterface serialPort) => this.serialPort = serialPort;
 
+            // run("version()/list") return version string, so need to return a string
             public string Run(string script) {
                 var cmd = script;
 
@@ -85,15 +86,15 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public string Execute(string script) {
-                var cmd = script;
+            //public string Execute(string script) {
+            //    var cmd = script;
 
-                this.serialPort.WriteCommand(cmd);
+            //    this.serialPort.WriteCommand(cmd);
 
-                var response = this.serialPort.ReadResponse();
+            //    var response = this.serialPort.ReadResponse();
 
-                return response.response;
-            }
+            //    return response.response;
+            //}
 
             //public bool IsRunning() {
             //    this.serialPort.DiscardInBuffer();

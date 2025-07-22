@@ -10,31 +10,37 @@ namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
         public class CoProcessorController {
             SerialInterface serialPort;
+            StreamController stream;
+            public CoProcessorController(SerialInterface serialPort, StreamController stream) {
+                this.serialPort = serialPort;
+                this.stream = stream;
+            }
 
-            public CoProcessorController(SerialInterface port) => this.serialPort = port;
 
-            
-
-            public void CoprocE() {
+            public bool CoprocE() {
 
                 // we can't check response as Asio(1) there will be no response                                
 
                 this.serialPort.WriteCommand("CoprocE()");
 
-                this.serialPort.ReadResponse();                                
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
             }
 
-            public void CoprocP() {
+            public bool CoprocP() {
 
                 // need Xmodem 1K, TODO
                 // 
                 throw new NotImplementedException(); ;
             }
 
-            public void CoprocS() {
+            public bool CoprocS() {
                 this.serialPort.WriteCommand("CoprocS()");
 
-                this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
             }
 
             public string CoprocV() {
@@ -45,7 +51,7 @@ namespace GHIElectronics.DUELink {
                 return ret.response;
             }
 
-            public void CoprocW(byte[] data) {
+            public int CoprocW(byte[] data) {
 
                 var write_array = string.Empty;
 
@@ -64,32 +70,34 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
 
+                if (ret.success)
+                    return write_array.Length;
+
+                return 0;
             }
 
-            public byte[] CoprocR(int count) {
-                var data = new byte[count];
+            public int CoprocR(byte[] data) {
+                var count = data.Length;
                 // we can't check response as Asio(1) there will be no response                
-                var cmd = string.Format("dim b1[{0}])", count);
+                var cmd = string.Format("dim b9[{0}])", count);
 
                 this.serialPort.WriteCommand(cmd);
 
                 this.serialPort.ReadResponse();
 
-                this.serialPort.WriteCommand("CoprocR(b1)");
+                this.serialPort.WriteCommand("CoprocR(b9)");
 
-                this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
 
-                // use stream to read b1
-                cmd = string.Format("strmrd(b1, {0})", count);
-                this.serialPort.WriteCommand(cmd);
+                // use stream to read b9
+                var read = this.stream.ReadBytes("b9", data);
 
-                this.serialPort.ReadResponse();
+                if (ret.success)
+                    return read;
 
-                this.serialPort.ReadRawData(data, 0, data.Length);
-
-                return data;
+                return 0;
             }
 
         }

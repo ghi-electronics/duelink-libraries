@@ -10,54 +10,13 @@ namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
         public class FSController {
             SerialInterface serialPort = null;
+            StreamController stream;
 
-            public FSController(SerialInterface port) => this.serialPort = port;
-
-            public void RtcW(byte[] timedate) {
-
-                var write_array = string.Empty;
-
-                write_array = "[";
-
-                for (var i = 0; i < timedate.Length; i++) {
-                    write_array += timedate[i];
-
-                    if (i < timedate.Length - 1)
-                        write_array += ",";
-                }
-
-                write_array += "]";
-
-                var cmd = string.Format("RtcW({0})", write_array);
-
-                this.serialPort.WriteCommand(cmd);
-
-                this.serialPort.ReadResponse();
-
-            }
-
-            public byte[] RtcR() {
-
-                // we can't check response as Asio(1) there will be no response                
-                var timedate = new byte[6];
-
-                this.serialPort.WriteCommand("dim b1[6]");
-
-                this.serialPort.ReadResponse();
-
-                this.serialPort.WriteCommand("OtpR(b1)");
-
-                this.serialPort.ReadResponse();
-
-                // use stream to read b1
-                this.serialPort.WriteCommand("strmrd(b1, 6)");
-
-                this.serialPort.ReadResponse();
-
-                this.serialPort.ReadRawData(timedate, 0, timedate.Length);
-
-                return timedate;
-            }
+            public FSController(SerialInterface port, StreamController stream) {
+                this.serialPort = port;
+                this.stream = stream;   
+            } 
+           
 
             int ParseReturn() {
                 var ret = this.serialPort.ReadResponse();
@@ -72,7 +31,7 @@ namespace GHIElectronics.DUELink {
 
                     }
                 }
-                return 0;
+                return -1;
             }
             public int FsMnt(int type, int cs, int baud, int max_handle) {
 
@@ -118,50 +77,52 @@ namespace GHIElectronics.DUELink {
 
             public int FsWrite(int handle, byte[] data) {
 
-                var write_array = string.Empty;
+                //var write_array = string.Empty;
 
-                write_array = "[";
+                //write_array = "[";
 
-                for (var i = 0; i < data.Length; i++) {
-                    write_array += data[i];
+                //for (var i = 0; i < data.Length; i++) {
+                //    write_array += data[i];
 
-                    if (i < data.Length - 1)
-                        write_array += ",";
-                }
+                //    if (i < data.Length - 1)
+                //        write_array += ",";
+                //}
 
-                write_array += "]";
+                //write_array += "]";
 
-                var cmd = string.Format("FsWrite({0}, {1})", handle, write_array);
+                //var cmd = string.Format("FsWrite({0}, {1})", handle, write_array);
 
+                //this.serialPort.WriteCommand(cmd);
+
+                //return this.ParseReturn();
+
+                // declare b9 to write
+                var cmd = $"dim b9[{data.Length}]";
                 this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
 
+                var ret = this.stream.WriteBytes("b9", data);
+
+                cmd = string.Format("FsWrite({0}, b9)", handle);
+                this.serialPort.WriteCommand(cmd);
                 return this.ParseReturn();
             }
 
-            public byte[] FsRead(int handle, int count) {
-                var data = new byte[count];
+            public int FsRead(int handle, byte[] data) {
+                var count = data.Length;                
 
-                var cmd = string.Format("dim b1[{0}]", data.Length);
-
+                var cmd = string.Format("dim b9[{0}]", data.Length);
                 this.serialPort.WriteCommand(cmd);
-
                 this.serialPort.ReadResponse();
 
-                cmd = string.Format("FsRead({0}, b1)", handle);
-
+                cmd = string.Format("FsRead({0}, b9)", handle);
                 this.serialPort.WriteCommand(cmd);
-
                 this.serialPort.ReadResponse();
 
-                // use stream to read b1
-                cmd = string.Format("strmrd(b1, {0})", data.Length);
-                this.serialPort.WriteCommand(cmd);
+                // use stream to read b9
+                var ret = this.stream.ReadBytes("b9", data);
 
-                this.serialPort.ReadResponse();
-
-                this.serialPort.ReadRawData(data, 0, data.Length);
-
-                return data;
+                return ret;
             }
 
             public int FsSync(int handle) {

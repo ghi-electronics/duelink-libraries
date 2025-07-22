@@ -11,7 +11,7 @@ namespace GHIElectronics.DUELink {
 
             public DMXController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public void DmxW(byte[] channel_data) {
+            public bool DmxW(byte[] channel_data) {
 
                 var write_array = string.Empty;
 
@@ -30,8 +30,13 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                this.serialPort.ReadResponse();
-                               
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
+
+
+
+
             }
 
             public int DmxR(int channel) {
@@ -41,11 +46,11 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var response = this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
 
-                if (response.success) {
+                if (ret.success) {
                     try {
-                        var value = int.Parse(response.response);
+                        var value = int.Parse(ret.response);
 
                         return value;
                     }
@@ -59,11 +64,11 @@ namespace GHIElectronics.DUELink {
             public int DmxRdy() {
                 this.serialPort.WriteCommand("DmxRdy()");
 
-                var response = this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
 
-                if (response.success) {
+                if (ret.success) {
                     try {
-                        var value = int.Parse(response.response);
+                        var value = int.Parse(ret.response);
 
                         return value;
                     }
@@ -74,10 +79,14 @@ namespace GHIElectronics.DUELink {
                 return 0;
             }
 
-            public void DmxU() {
+            public bool DmxU() {
                 this.serialPort.WriteCommand("DmxU()");
 
-                this.serialPort.ReadResponse();                
+                this.serialPort.ReadResponse();
+
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
             }
         }
     }

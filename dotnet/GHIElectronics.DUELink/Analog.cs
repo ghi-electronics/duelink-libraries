@@ -55,11 +55,7 @@ namespace GHIElectronics.DUELink {
 
                 var res = this.serialPort.ReadResponse();
 
-                if (res.success) {
-                    return true;
-                }
-
-                return false;
+                return res.success;
             }
 
             public double ReadVCC() {

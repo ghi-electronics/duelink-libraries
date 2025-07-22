@@ -11,7 +11,7 @@ namespace GHIElectronics.DUELink {
 
             public OtpController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public void OtpW(int address, byte[] data) {
+            public bool OtpW(int address, byte[] data) {
 
                 var write_array = string.Empty;
 
@@ -30,11 +30,13 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
                                
             }
 
-            public int Read(int address) {
+            public int OtpR(int address) {
 
                 var cmd = string.Format("OtpR({0})", address);
 

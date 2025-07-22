@@ -21,16 +21,16 @@ namespace GHIElectronics.DUELink {
                 
             }
 
-            public void Configuration(DisplayType type, byte[] config, int width, int height, int mode) {
+            public bool Configuration(int type, float[] config, int width, int height, int mode) {
 
-                //var cmd_dim_array = string.Format("dim b1[{0}]", config.Length);
+                //var cmd_dim_array = string.Format("dim b9[{0}]", config.Length);
 
                 //this.serialPort.WriteCommand(cmd_dim_array);
 
                 //var res = this.serialPort.ReadRespone();
 
                 //for (var i = 0; i < config.Length; i++) {
-                //    cmd_dim_array = string.Format("b1[{0}] = {1}", (i), config[i]);
+                //    cmd_dim_array = string.Format("b9[{0}] = {1}", (i), config[i]);
 
                 //    this.serialPort.WriteCommand(cmd_dim_array);
 
@@ -41,7 +41,7 @@ namespace GHIElectronics.DUELink {
                 //    }
                 //}
 
-                //cmd_dim_array = string.Format("dim b1[0]");
+                //cmd_dim_array = string.Format("dim b9[0]");
 
                 //this.serialPort.WriteCommand(cmd_dim_array);
 
@@ -61,6 +61,12 @@ namespace GHIElectronics.DUELink {
                 config_array += "}";
 
                 var cmd = string.Format($"gfxcfg({type.ToString()}, {config_array}, {width}, {height}, {mode})");
+
+                this.serialPort.WriteCommand(cmd);
+
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
 
             }
 
@@ -189,14 +195,14 @@ namespace GHIElectronics.DUELink {
                     throw new ArgumentException("Invalid argument.");
                 }
 
-                //var cmd = string.Format("dim b1[{0}]", img.Length);
+                //var cmd = string.Format("dim b9[{0}]", img.Length);
 
                 //this.serialPort.WriteCommand(cmd);
 
                 //var res = this.serialPort.ReadRespone();
 
                 //for (var i = 0; i < img.Length; i++) {
-                //    cmd = string.Format("b1[{0}] = {1}", (i), img[i]);
+                //    cmd = string.Format("b9[{0}] = {1}", (i), img[i]);
 
                 //    this.serialPort.WriteCommand(cmd);
 
@@ -240,13 +246,7 @@ namespace GHIElectronics.DUELink {
         }
     }
 
-    public enum DisplayType {
-        I2C = 1,
-        SPI = 2,
-        Neo = 3,
-        Matrix5x5 = 4,
-    }
-   
+
 
 
 

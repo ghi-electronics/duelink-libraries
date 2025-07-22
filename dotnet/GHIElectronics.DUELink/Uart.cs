@@ -10,71 +10,118 @@ namespace GHIElectronics.DUELink {
         public class UartController {
 
             SerialInterface serialPort;
+            StreamController stream;
 
-            public UartController(SerialInterface serialPort) => this.serialPort = serialPort;
+            public UartController(SerialInterface serialPort, StreamController stream) {
+                this.serialPort = serialPort;
+                this.stream = stream;
+            }
 
-//            public bool Enable(int baurdate) {
 
-//                var cmd = string.Format("uartinit({0})", baurdate);
+            public bool Configuration(int baurdate, int rx_buffer_size) {
 
-//                this.serialPort.WriteCommand(cmd);
+                var cmd = string.Format("SerCfg({0}, {1})", baurdate, rx_buffer_size);
 
-//                var res = this.serialPort.ReadRespone();
+                this.serialPort.WriteCommand(cmd);
 
-//                return res.success;
-//            }
+                var ret = this.serialPort.ReadResponse();
 
-//            public bool Write(byte data) {
-//                var cmd = string.Format("uartwrite({0})", data);
+                return ret.success;
+            }
 
-//                this.serialPort.WriteCommand(cmd);
+            public bool WriteByte(byte data) {
+                var cmd = string.Format("SerWr({0})", data);
 
-//                var res = this.serialPort.ReadRespone();
+                this.serialPort.WriteCommand(cmd);
 
-//                return res.success;
-//            }
+                var res = this.serialPort.ReadResponse();
 
-//            public int BytesToRead() {
-//                var cmd = string.Format("log(uartcount())");
+                return res.success;
+            }
 
-//                this.serialPort.WriteCommand(cmd);
+            public int WriteBytes(byte[] data) {
 
-//                var res = this.serialPort.ReadRespone();
+                var cmd = $"dim b9[{data.Length}]";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
 
-//                if (res.success) {
-//                    try {
-//                        var ready = int.Parse(res.respone);
-//                        return ready;
-//                    }
-//                    catch {
-//                        goto error;
-//                    }
+                var written = this.stream.WriteBytes("b9", data);
 
-//                }
-//error:
-//                throw new Exception("BytesToRead error!");
-//            }
+                cmd = string.Format("SerWrs(b9)");
+                this.serialPort.WriteCommand(cmd);
+                var ret = this.serialPort.ReadResponse();
 
-//            public byte Read() {
-//                var cmd = string.Format("log(uartread())");
+                if (ret.success)
+                    return written;
 
-//                this.serialPort.WriteCommand(cmd);
+                return 0;
+            }
 
-//                var res = this.serialPort.ReadRespone();
+            
+            public byte ReadByte() {                
 
-//                if (res.success) {
-//                    try {
-//                        var data = (byte)int.Parse(res.respone);
-//                        return data;
-//                    }
-//                    catch {
-//                        goto error;
-//                    }
-                   
-//                }
-//error:
-//                throw new Exception("Uart receving error!");
-//            }
+                this.serialPort.WriteCommand("SerRd()");
+
+                var res = this.serialPort.ReadResponse();
+
+                if (res.success) {
+                    try {
+                        var data = (byte)int.Parse(res.response);
+                        return data;
+                    }
+                    catch {
+                        
+                    }
+
+                }
+
+                return 0;
+            }
+
+            public int ReadBytes(byte[] data, TimeSpan timeout) {
+
+                var cmd = $"dim b9[{data.Length}]";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
+
+
+                cmd = string.Format("SerRds(b9, {0})", timeout.TotalMilliseconds);
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
+
+                var ret = this.stream.ReadBytes("b9", data);
+
+                return ret;
+            }
+
+            public int BytesToRead() {
+                this.serialPort.WriteCommand("SerB2R()");
+
+                var res = this.serialPort.ReadResponse();
+
+                if (res.success) {
+                    try {
+                        var ready = int.Parse(res.response);
+                        return ready;
+                    }
+                    catch {
+
+                    }
+
+                }
+                return 0;
+            }
+
+            public bool Discard() {
+                this.serialPort.WriteCommand("SerDisc()");
+
+                var res = this.serialPort.ReadResponse();
+
+                return res.success;
+            }
+
+
+
         }
     }
 }

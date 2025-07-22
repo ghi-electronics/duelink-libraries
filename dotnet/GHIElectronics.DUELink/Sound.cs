@@ -70,7 +70,7 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            void MelodyStop(int pin) {
+            public bool MelodyStop(int pin) {
                 if (pin < 0 || Array.IndexOf(this.serialPort.DeviceConfig.PWMPins, pin) == -1)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
@@ -79,7 +79,9 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var res = this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
             }
         }
     }

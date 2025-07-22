@@ -152,13 +152,15 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
-            public void Shtdn(int wkpin) {
+            public bool Shtdn(int wkpin) {
 
                 var cmd = string.Format("shtdn({0})", wkpin);
 
                 this.serialPort.WriteCommand(cmd);
 
-                this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
+                return ret.success;
+
 
             }
         }
