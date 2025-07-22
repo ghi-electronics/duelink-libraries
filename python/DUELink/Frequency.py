@@ -1,12 +1,12 @@
 class FrequencyController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
-        self.MaxFrequency = 1000000
+        self.MaxFrequency = 24000000
         self.MinFrequency = 16
 
     def Write(self, pin: int, frequency, duration_ms=0, dutycyle=50):
         if frequency < self.MinFrequency or frequency > self.MaxFrequency:
-            raise ValueError("Frequency must be in range 15Hz..10000000Hz")
+            raise ValueError("Frequency must be in range 16Hz...24000000Hz")
 
 
 

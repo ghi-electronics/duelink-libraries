@@ -1,21 +1,12 @@
 from typing import Optional
+from DUELink.SerialInterface import SerialInterface
+from DUELink.Stream import StreamController
 
 class I2cController:
-    def __init__(self, serialPort) -> None:
+    def __init__(self, serialPort:SerialInterface, stream:StreamController):
         self.serialPort = serialPort
+        self.stream = stream
         self.baudrate = 400
-
-    def Write(self, address: int, data: bytes, offset: Optional[int] = 0, length: int = None) -> bool:
-        if length is None:
-            length = len(data)
-        
-        return self.WriteRead(address, data, length, None, 0, 0)
-
-    def Read(self, address: int, data: bytearray, offset: Optional[int] = 0, length: int = None) -> bool:
-        if length is None:
-            length = len(data)
-
-        return self.WriteRead(address, None, 0, 0, data, offset, length)
 
     def Configuration(self, baudrate):
 
@@ -29,23 +20,31 @@ class I2cController:
         res = self.serialPort.ReadResponse()
         return res.success
 
-    def WriteRead(self, address: int, dataWrite: Optional[bytes], countWrite: int, dataRead: Optional[bytearray], countRead: int) -> bool:
-        if (dataWrite is None and dataRead is None) or (countWrite == 0 and countRead == 0):
-            raise ValueError("At least one of dataWrite or dataRead must be specified")
+    def WriteRead(self, address: int, dataWrite: bytes, dataRead: bytearray) -> bool:
+        countWrite = len(dataWrite)
+        countRead = len(dataRead)
         
-        if dataWrite is None and countWrite != 0:
-            raise Exception("dataWrite null but countWrite not zero")
 
-        if dataRead is None and countRead != 0:
-            raise Exception("dataRead null but countRead not zero")
-        
-        if dataRead is None:
-            dataRead = 0
-        
-        if dataWrite is None:
-            dataWrite = 0
-        
-        cmd = f"i2cwr({address},{dataWrite},{countWrite},{dataRead},{countRead})"
+        # declare b9 to write    
+        cmd = f"dim b9[{countWrite}]"
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
-        return res.success
+        self.serialPort.ReadResponse()
+
+        # declare b8 to read
+        cmd = f"dim b8[{countRead}]"
+        self.serialPort.WriteCommand(cmd)
+        self.serialPort.ReadResponse()
+
+        # write data to b9 by stream
+        self.stream.WriteBytes("b9", dataWrite)
+
+        # issue i2cwr cmd
+        cmd = f"i2cwr({address}, b9, b8)"
+        self.serialPort.WriteCommand(cmd)
+        self.serialPort.ReadResponse()
+
+        # use stream to read data to b8
+        self.stream.ReadBytes("b8", dataRead)
+
+        # return true since we can't check status if Asio(1)
+        return True

@@ -13,18 +13,16 @@ class InfraredController:
             except:
                 pass
         return -1
+    
+    def Write(self, command: int)->bool:
+        cmd = f"IrWrite({command})"
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadResponse()
+        return res.success
 
-    def Enable(self, pin:int, enable: bool):
-        
-        if pin != 0:
-            raise ValueError("IR is only available on pin 0")
-        
-        cmd = f"iren({pin}, {int(enable)})"
+    def Enable(self, txpin:int, rxpin: int, enable: bool):
+        cmd = f"iren({txpin}, {rxpin}, {int(enable)})"
         self.serialPort.WriteCommand(cmd)
 
         res = self.serialPort.ReadResponse()
-
-        if res.success:
-            return True
-
-        return False
+        return res.success

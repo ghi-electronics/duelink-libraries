@@ -22,6 +22,7 @@ from DUELink.Humidity import HumiditySensorType
 from DUELink.Stream import StreamController
 from DUELink.CoProcessor import CoProcessorController
 from DUELink.DMX import DMXController
+from DUELink.FileSystem import FileSystemController
 
 from enum import Enum
 import platform
@@ -61,6 +62,7 @@ class DUELinkController:
         self.Stream = StreamController(self.serialPort)
         self.CoProcessor = CoProcessorController(self.serialPort,self.Stream)
         self.DMX = DMXController(self.serialPort,self.Stream)
+        self.FileSystem = FileSystemController(self.serialPort,self.Stream)
 
         
     

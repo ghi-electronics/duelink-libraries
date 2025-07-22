@@ -16,6 +16,9 @@ class StreamController:
         self.serialPort.WriteCommand(cmd)
 
     def WriteBytes(self, arr: str, dataWrite: bytes):
+        if dataWrite is None or dataWrite == 0:
+            return 0
+
         count = len(dataWrite)
 
         # declare b1 array
@@ -46,6 +49,8 @@ class StreamController:
         return 0
     
     def WriteFloats(self, arr: str, dataWrite: float):
+        if dataWrite is None or dataWrite == 0:
+            return 0
         count = len(dataWrite)
 
         # declare b1 array
@@ -79,6 +84,8 @@ class StreamController:
         return 0
     
     def ReadBytes(self, arr: str, dataRead: bytes):
+        if dataRead is None or dataRead == 0:
+            return 0
         count = len(dataRead)
 
         # declare b1 array
@@ -109,6 +116,8 @@ class StreamController:
         return 0
     
     def ReadFloats(self, arr: str, dataRead: float):
+        if dataRead is None or dataRead == 0:
+            return 0
         count = len(dataRead)
 
         # declare b1 array
