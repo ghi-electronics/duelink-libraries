@@ -7,10 +7,13 @@ class EngineController:
         self.loadscript = ""    
 
     # run("version()/list") return version string, so need to return a string
-    def Run(self, script : str) -> str:
-        cmd = script
-        self.serialPort.WriteCommand(cmd)
-
+    def Run(self, script : str) -> str:        
+        self.serialPort.DiscardInBuffer()
+        self.serialPort.DiscardOutBuffer()
+        
+        cmd = script + "\n"
+        self.serialPort.WriteRawData(bytes(cmd, 'utf-8'), 0, len(cmd))
+        
         res = self.serialPort.ReadResponse()
 
         return res.response

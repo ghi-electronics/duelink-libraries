@@ -130,11 +130,14 @@ class SerialInterface:
                             if (self.portName.in_waiting == 0):
                                 time.sleep(0.001) 
 
-                            dump = self.portName.read(1)
+                            if (self.portName.in_waiting > 0):
+                                dump = self.portName.read(1)
 
-                            if (dump.decode()[0] == '\n'):
-                                if (self.portName.in_waiting > 0):
-                                    dump = self.portName.read(1)
+                                if (dump.decode()[0] == '\n'):
+                                    if (self.portName.in_waiting > 0):
+                                        dump = self.portName.read(1)
+                                else:
+                                    responseValid = False
                             else:
                                 responseValid = False
                         else:
