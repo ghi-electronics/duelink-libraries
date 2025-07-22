@@ -16,9 +16,13 @@ namespace GHIElectronics.DUELink {
 
             // run("version()/list") return version string, so need to return a string
             public string Run(string script) {
-                var cmd = script;
+                var cmd = Encoding.UTF8.GetBytes(script + "\n");
 
-                this.serialPort.WriteCommand(cmd);
+                this.serialPort.DiscardInBuffer();
+                this.serialPort.DiscardOutBuffer();
+
+
+                this.serialPort.WriteRawData(cmd, 0, cmd.Length);
 
                 var response = this.serialPort.ReadResponse();
 

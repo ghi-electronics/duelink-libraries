@@ -15,7 +15,7 @@ namespace GHIElectronics.DUELink {
         protected const string CommandCompleteText = ">";
 
         protected SerialPort port;
-        public bool EnabledAsio {  get; set; }
+        public bool EnabledAsio { get; set; } = true;
 
         //private string leftOver;
 
@@ -180,16 +180,16 @@ namespace GHIElectronics.DUELink {
         //    if (actual != expected)
         //        throw new UnexpectedResultException($"Expected {expected}, got {actual}.");
         //}
-        //public void WriteCommand(char command) => this.WriteLine(new string(command, 1));
+        //public void WriteCommand(char command) => this.WriteLine(new string(command, 1));        
         public void WriteCommand(string command) {
 
             this.DiscardInBuffer();
             this.DiscardOutBuffer();
 
-            
+
             command = command.ToLower();
             // these commands - statement can't use with println
-            if (command.IndexOf("print") == 0                
+            if (command.IndexOf("print") == 0
                 || command.IndexOf("dim") == 0
                 || command.IndexOf("run") == 0
                 || command.IndexOf("list") == 0
@@ -234,7 +234,7 @@ namespace GHIElectronics.DUELink {
                 while (end > DateTime.UtcNow.Ticks) {
 
                     if (this.port.BytesToRead > 0) {
-                       
+
                         var data = this.port.ReadByte();
 
                         str += (char)data;
@@ -263,12 +263,17 @@ namespace GHIElectronics.DUELink {
                                     if (this.port.BytesToRead == 0)
                                         Thread.Sleep(1); // wait 1ms for sure next byte
 
-                                    dump = this.port.ReadByte();
+                                    if (this.port.BytesToRead > 0) {
+                                        dump = this.port.ReadByte();
 
-                                    if (dump == '\n') {
-                                        if (this.port.BytesToRead > 0)
-                                            dump = this.port.ReadByte();
+                                        if (dump == '\n') {
+                                            if (this.port.BytesToRead > 0)
+                                                dump = this.port.ReadByte();
 
+                                        }
+                                        else {
+                                            responseValid = false;
+                                        }
                                     }
                                     else {
                                         responseValid = false;
@@ -338,7 +343,7 @@ namespace GHIElectronics.DUELink {
 
         // this for read "list" command so read as is
         // when call list, there can be \n, > &.... so can not parse with ReadResponse
-        public CmdResponse ReadResponse2() { 
+        public CmdResponse ReadResponse2() {
             var str = string.Empty;// this.leftOver;
             var end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks;
 
@@ -357,7 +362,7 @@ namespace GHIElectronics.DUELink {
                         end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks; // reset timeout
 
 
-                    }                                        
+                    }
                 }
 
                 this.port.DiscardInBuffer();
@@ -366,13 +371,13 @@ namespace GHIElectronics.DUELink {
 
             if (str != string.Empty) {
                 if (str.Length >= 3) {
-                    response.response = str.Substring(0, str.Length-3);
+                    response.response = str.Substring(0, str.Length - 3);
                 }
 
                 response.success = true;
             }
 
-                       
+
 
             return response;
         }
