@@ -17,11 +17,11 @@ class DigitalController:
         cmd = f"dread({pin},{inputType})"
         self.serialPort.WriteCommand(cmd)
 
-        response = self.serialPort.ReadResponse()
+        ret = self.serialPort.ReadResponse()
 
-        if response.success:            
+        if ret.success:            
             try:
-                value = int(response.response)
+                value = int(ret.response)
                 return value == 1
             except:
                 pass
@@ -36,6 +36,6 @@ class DigitalController:
         cmd = f"dwrite({pin},{1 if value else 0})"
         self.serialPort.WriteCommand(cmd)
 
-        response = self.serialPort.ReadResponse()
+        ret = self.serialPort.ReadResponse()
 
-        return response.success
+        return ret.success

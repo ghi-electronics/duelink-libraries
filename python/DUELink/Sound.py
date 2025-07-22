@@ -36,7 +36,7 @@ class SoundController:
         
         return res.success
 
-    def MelodyStop(self, pin: int):
+    def MelodyStop(self, pin: int)->bool:
 
         if pin < 0 or pin not in self.serialPort.DeviceConfig.PWMPins:
             raise ValueError("Invalid pin")

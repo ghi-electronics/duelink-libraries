@@ -26,6 +26,7 @@ from DUELink.FileSystem import FileSystemController
 from DUELink.Otp import OtpController
 from DUELink.Pulse import PulseController
 from DUELink.Rtc import RtcController
+from DUELink.Uart import UartController
 
 from enum import Enum
 import platform
@@ -41,13 +42,12 @@ class DUELinkController:
         
         if self.serialPort is None:
             raise Exception(f"serialPort is null")
-
+        
+        self.Stream = StreamController(self.serialPort)
         self.Analog = AnalogController(self.serialPort)
-        self.Digital = DigitalController(self.serialPort)
-        self.I2c = I2cController(self.serialPort)
+        self.Digital = DigitalController(self.serialPort)        
         self.Servo = ServoController(self.serialPort)
-        self.Frequency = FrequencyController(self.serialPort)
-        self.Spi = SpiController(self.serialPort)
+        self.Frequency = FrequencyController(self.serialPort)        
         self.Infrared = InfraredController(self.serialPort)
         self.Button = ButtonController(self.serialPort)
         self.Distance = DistanceSensorController(self.serialPort)
@@ -59,16 +59,18 @@ class DUELinkController:
         self.System = SystemController(self.serialPort)        
         self.GraphicsType = GraphicsTypeController()        
         self.Sound = SoundController(self.serialPort)
-
         self.TemperatureSensorType = TemperatureSensorType()
-        self.HumiditySensorType = HumiditySensorType()
-        self.Stream = StreamController(self.serialPort)
+        self.HumiditySensorType = HumiditySensorType()       
+        self.Pulse = PulseController(self.serialPort)
+
         self.CoProcessor = CoProcessorController(self.serialPort,self.Stream)
         self.DMX = DMXController(self.serialPort,self.Stream)
         self.FileSystem = FileSystemController(self.serialPort,self.Stream)
-        self.Otp = OtpController(self.serialPort,self.Stream)
-        self.Pulse = PulseController(self.serialPort)
+        self.Otp = OtpController(self.serialPort,self.Stream)        
         self.Rtc = RtcController(self.serialPort,self.Stream)
+        self.I2c = I2cController(self.serialPort,self.Stream)
+        self.Spi = SpiController(self.serialPort,self.Stream)
+        self.Uart = UartController(self.serialPort,self.Stream)
         
     
     def __Connect(self, comPort: str):
@@ -147,6 +149,14 @@ class DUELinkController:
         self.serialPort.ReadTimeout = value 
 
     ReadTimeout = property(__get_ReadTimeout, __set_ReadTimeout)
+
+    def __get_EnabledAsio(self):
+        return self.serialPort.EnabledAsio
+
+    def __set_EnabledAsio(self, value: int):
+        self.serialPort.EnabledAsio = value 
+
+    EnabledAsio = property(__get_EnabledAsio, __set_EnabledAsio)
    
          
 

@@ -8,7 +8,7 @@ class DMXController:
         self.serialPort = serialPort
         self.stream = stream
 
-    def DmxW(self, channel_data: bytes):
+    def DmxW(self, channel_data: bytes)->bool:
         count = len(channel_data)
         # declare b9 array
         cmd = f"dim b9[{count}]"
@@ -20,7 +20,10 @@ class DMXController:
 
         # write b9 to dmx
         self.serialPort.WriteCommand("DmxW(b9)")
-        self.serialPort.ReadResponse()
+        ret = self.serialPort.ReadResponse()
+
+        return ret.success
+
 
     def DmxR(self, channel: int)->int:
         cmd = f"DmxR({channel})"
@@ -50,10 +53,12 @@ class DMXController:
 
         return 0
     
-    def DmxU(self):
+    def DmxU(self)->bool:
         cmd = f"DmxU()"
         self.serialPort.WriteCommand(cmd)
         ret = self.serialPort.ReadResponse()
+
+        return ret.success
         
 
 

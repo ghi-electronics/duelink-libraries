@@ -4,7 +4,7 @@ class ServoController:
     def __init__(self, serialPort:SerialInterface):
         self.serialPort = serialPort
 
-    def Set(self, pin, position):
+    def Set(self, pin, position)->bool:
         if pin < 0 or pin >= self.serialPort.DeviceConfig.MaxPinIO or pin not in self.serialPort.DeviceConfig.PWMPins:
             raise ValueError('Invalid pin. Enter a valid PWM pin.')
         if position < 0 or position > 180:

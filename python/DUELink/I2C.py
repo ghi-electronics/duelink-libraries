@@ -8,7 +8,7 @@ class I2cController:
         self.stream = stream
         self.baudrate = 400
 
-    def Configuration(self, baudrate):
+    def Configuration(self, baudrate)->bool:
 
         if not isinstance(baudrate, int):
             raise ValueError("Enter an integer for the baudrate.")

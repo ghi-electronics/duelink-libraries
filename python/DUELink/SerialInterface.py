@@ -10,16 +10,15 @@ class SerialInterface:
 
     DeviceConfig : DeviceConfiguration
 
-    def __init__(self, portName):
-        self.leftOver = ""        
+    def __init__(self, portName):        
         self.ReadTimeout = 3
         self.portName = portName
-        self.echo = True        
+        self.echo = True 
+        self.EnabledAsio = False       
 
     def Connect(self):
         self.portName = serial.Serial(self.portName, self.DefaultBaudRate, parity=serial.PARITY_NONE, bytesize=8, stopbits=serial.STOPBITS_ONE)
-        self.portName.timeout = self.ReadTimeout
-        self.leftOver = ""
+        self.portName.timeout = self.ReadTimeout        
         time.sleep(0.1)
         self.Synchronize()
 
@@ -43,11 +42,11 @@ class SerialInterface:
         self.portName.reset_output_buffer() 
         
         
-    def RemoveEchoRespone(self, response, cmd):
-        if cmd in response:
-            response = response[len(cmd):]
-
-        return response
+    #def RemoveEchoRespone(self, response, cmd):
+    #    if cmd in response:
+    #        response = response[len(cmd):]
+    #
+    #    return response
 
     # def CheckResult(self, actual, expected):
     #     if actual != expected:
@@ -59,10 +58,37 @@ class SerialInterface:
     def DiscardOutBuffer(self):
         self.portName.reset_output_buffer()
 
-    def WriteCommand(self, command):
+    def WriteCommand(self, cmd):
         self.DiscardInBuffer()
         self.DiscardOutBuffer()
-        self.__WriteLine(command)
+
+        command = cmd.lower()
+        # these commands - statement can't use with println        
+        #statement_list = ["print", "dim", "run"]
+        #for statement in statement_list:
+        #    i = command.index(statement)
+        #    if i == 0:
+        #        break
+
+
+        if (
+            command.find('print') == 0 or 
+            command.find('dim') == 0 or
+            command.find('run') == 0 or
+            command.find('list') == 0 or
+            command.find('new') == 0 or
+            command.find('echo') == 0 or
+            command.find('sel') == 0 or
+            command.find('version') == 0 or
+            command.find('alias') == 0 or            
+            command.find('sprintf') == 0 
+        ):
+            self.__WriteLine(command)
+        elif self.EnabledAsio == True:
+            newcmd = f"println({command})"
+            self.__WriteLine(newcmd)
+        else:
+            self.__WriteLine(command)
 
     def __WriteLine(self, string):
         string += "\n"
@@ -153,51 +179,25 @@ class SerialInterface:
         return response
     
     def ReadResponse2(self):
-        str = self.leftOver
+        str = ""
         end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
         response = CmdRespone()
 
         while datetime.now() < end:
-            data = self.portName.read()
-
-            str += data.decode()
-
-            #str = str.replace("\n", "")
-            #str = str.replace("\r", "")
-            # print(str)
-            idx1 = str.find(">")
-            idx2 = str.find("&")
-
-            if idx1 == -1:
-                idx1 = str.find("$")
-
-            if idx1 == -1 and idx2 == -1:
-                continue
-
-            idx = idx2 if idx1 == -1 else idx1
-
-            self.leftOver = str[idx + 1:]
-            response.success = True
-            response.response = str[:idx]
-            # print(response.response)
-            idx3 = str.find("!")
-            if idx3 != -1 and 'error' in response.response:
-                response.success = False
-
-            if idx3 != -1 and 'unknown' in response.response:
-                response.success = False
-
-
-            return response
-
-        self.leftOver = ""
+            if self.portName.in_waiting > 0:
+                data = self.portName.read()
+                str += data.decode()
+                end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
         self.portName.reset_input_buffer()
         self.portName.reset_output_buffer()
 
-        response.success = False
-        response.response = ""
+        if str != "":
+            if len(str) >= 3:
+                response.response= str[0:len(str)-3]
+
+            response.success = True
 
         return response
 
@@ -224,8 +224,6 @@ class SerialInterface:
     def ReadRawData(self, buffer, offset, count):
         end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
-        if len(self.leftOver) > 0:
-            raise ValueError("LeftOver size is different zero: " + str(len(self.leftOver)))
 
         countleft = count
         totalRead = 0

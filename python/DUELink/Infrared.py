@@ -2,7 +2,7 @@ class InfraredController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
 
-    def Read(self):
+    def Read(self)->int:
         cmd = "irread()"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadResponse()
@@ -20,7 +20,7 @@ class InfraredController:
         res = self.serialPort.ReadResponse()
         return res.success
 
-    def Enable(self, txpin:int, rxpin: int, enable: bool):
+    def Enable(self, txpin:int, rxpin: int, enable: bool)->bool:
         cmd = f"iren({txpin}, {rxpin}, {int(enable)})"
         self.serialPort.WriteCommand(cmd)
 

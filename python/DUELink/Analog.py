@@ -14,11 +14,11 @@ class AnalogController:
 
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadResponse()
+        ret = self.serialPort.ReadResponse()
 
-        if res.success:
+        if ret.success:
             try:
-                return float(res.response)
+                return float(ret.response)
             except:
                 pass
 
@@ -35,16 +35,19 @@ class AnalogController:
         cmd = f'pwrite({pin}, {duty_cycle})'
         self.serialPort.WriteCommand(cmd)
 
-        res = self.serialPort.ReadResponse()
+        ret = self.serialPort.ReadResponse()
 
-        if res.success:
-            return True
-
-        return False
+        return ret.success
     
     def ReadVCC(self):
         cmd = f"readvcc()"
         self.serialPort.WriteCommand(cmd)
-        response = self.serialPort.ReadResponse()
+        ret = self.serialPort.ReadResponse()
 
-        return response.response if response.success else -1
+        if ret.success:
+            try:
+                return float(ret.response)
+            except:
+                pass
+
+        return -1

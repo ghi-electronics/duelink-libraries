@@ -4,12 +4,6 @@ class ButtonController:
 
     def __init__(self, serialPort):
         self.serialPort = serialPort
-
-    def IsButtonValid(self, pin: int) ->bool:
-        pass
-        # if pin < 0 or (pin > 7 and pin != 12):
-        #     return False
-        # return True
         
     def Enable(self, pin: int, enable: bool, pull: int) -> bool:
 

@@ -1,34 +1,41 @@
+from DUELink.SerialInterface import SerialInterface
+from DUELink.Stream import StreamController
+
 class UartController:
-    def __init__(self, serialport):
-        self.serialport = serialport
+    def __init__(self, serialPort:SerialInterface, stream:StreamController):
+        self.serialPort = serialPort
+        self.stream = stream
 
-    def Enable(self, baudrate):
-        cmd = "uartinit({})".format(baudrate)
+    def Configuration(self, baudrate: int, rx_buf_size: int)->bool:
+        cmd = "SerCfg({0}, {1})".format(baudrate, rx_buf_size)
         self.serialport.WriteCommand(cmd)
-        res = self.serialport.ReadResponse()
-        return res.success
+        ret = self.serialport.ReadResponse()
+        return ret.success
 
-    def Write(self, data):
-        cmd = "uartwrite({})".format(data)
+    def WriteByte(self, data: int)->bool:
+        cmd = "SerWr({})".format(data)
         self.serialport.WriteCommand(cmd)
-        res = self.serialport.ReadResponse()
-        return res.success
+        ret = self.serialport.ReadResponse()
+        return ret.success        
+    
+    def WriteBytes(self, data: bytes)->int:
+        count = len(data)
+        cmd = f"dim b9[{count}]"
+        self.serialPort.WriteCommand(cmd)
+        self.serialPort.ReadResponse()
 
-    def BytesToRead(self):
-        cmd = "x=uartcount():print(x)"
-        self.serialport.WriteCommand(cmd)
-        res = self.serialport.ReadResponse()
-        if res.success:
-            try:
-                ready = int(res.response)
-                return ready
-            except:
-                pass
-        raise Exception("BytesToRead error!")
+        written = self.stream.WriteBytes("b9", data)
 
-    def Read(self):
-        cmd = "x=uartread():print(x)"
-        self.serialport.WriteCommand(cmd)
+        self.serialport.WriteCommand("SerWrs(b9)")
+        ret = self.serialPort.ReadResponse()
+
+        if (ret.success):
+            return written
+
+        return 0
+    
+    def ReadByte(self):        
+        self.serialport.WriteCommand("SerRd()")
         res = self.serialport.ReadResponse()
         if res.success:
             try:
@@ -36,4 +43,41 @@ class UartController:
                 return data
             except:
                 pass
-        raise Exception("Uart receving error!")
+        return 0
+    
+    def ReadBytes(self, data: bytearray, timeout_ms: int)->int:
+        count = len(data)
+        cmd = f"dim b9[{count}]"
+        self.serialPort.WriteCommand(cmd)
+        self.serialPort.ReadResponse()
+
+        cmd = f"SerRds(b9, {timeout_ms})"
+        self.serialport.WriteCommand(cmd)
+        ret = self.serialPort.ReadResponse()
+
+        read = self.stream.ReadBytes("b9",data )
+
+        if (ret.success):
+            return read
+
+        return 0
+
+    def BytesToRead(self)->int:        
+        self.serialport.WriteCommand("SerB2R()")
+        ret = self.serialport.ReadResponse()
+        if ret.success:
+            try:
+                ready = int(ret.response)
+                return ready
+            except:
+                pass
+        return 0
+    
+    def Discard(self)->bool:        
+        self.serialport.WriteCommand("SerDisc()")
+        ret = self.serialport.ReadResponse()
+        
+        return ret.success
+    
+
+    

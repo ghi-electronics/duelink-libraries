@@ -8,19 +8,21 @@ class CoProcessorController:
         self.serialPort = serialPort
         self.stream = stream
 
-    def CoprocE(self):
+    def CoprocE(self)->bool:
         cmd = "CoprocE()"
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        ret = self.serialPort.ReadResponse()
+        return ret.success
 
-    def CoprocP(self):
+    def CoprocP(self)->bool:
         # need Xmodem 1K, TODO
         raise Exception("Not implemented")
             
-    def CoprocE(self):
+    def CoprocE(self)->bool:
         cmd = "CoprocS()"
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        ret = self.serialPort.ReadResponse()
+        return ret.success
 
     def CoprocV(self) -> str:
         cmd = "CoprocV()"
@@ -29,7 +31,7 @@ class CoProcessorController:
 
         return res.response
     
-    def CoprocW(self, dataWrite: bytes):
+    def CoprocW(self, dataWrite: bytes) -> int:
         count = len(dataWrite)
 
         # declare b9 array
@@ -38,17 +40,17 @@ class CoProcessorController:
         self.serialPort.ReadResponse()
 
         # write data to b9
-        ret = self.stream.WriteBytes("b9",dataWrite)
+        written = self.stream.WriteBytes("b9",dataWrite)
 
         # write b9 to co-pro
-        if ret == len(dataWrite):            
-            self.serialPort.WriteCommand("CoprocW(b9)")
-            self.serialPort.ReadResponse()
-
-            return ret
+        self.serialPort.WriteCommand("CoprocW(b9)")
+        ret = self.serialPort.ReadResponse()
+        
+        if written == len(dataWrite):            
+            return written
         return 0        
     
-    def CoprocR(self, dataRead: bytes):
+    def CoprocR(self, dataRead: bytes)-> int:
         count = len(dataRead)
 
         # declare b9 array
@@ -58,10 +60,12 @@ class CoProcessorController:
 
         # read data to b9
         self.serialPort.WriteCommand("CoprocR(b9)")
-        self.serialPort.ReadResponse()
+        ret = self.serialPort.ReadResponse()
 
         # read b9 by stream
-        ret = self.stream.ReadBytes("b9",dataRead )
+        read = self.stream.ReadBytes("b9",dataRead )
 
-        return ret
+        if ret.success:
+            return read
+        return 0 
 

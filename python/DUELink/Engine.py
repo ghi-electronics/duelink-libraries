@@ -15,7 +15,7 @@ class EngineController:
 
         return res.response
     
-    def Select(self, num):
+    def Select(self, num)->bool:
         cmd = f"sel({num})"
 
         self.serialPort.WriteCommand(cmd)
