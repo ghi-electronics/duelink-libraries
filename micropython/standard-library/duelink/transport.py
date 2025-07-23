@@ -6,6 +6,28 @@ class I2CTransportController:
     def __init__(self, sda, scl, i2ccontroller=1, freq=400000, addr=0x52):
         self.i2c = machine.I2C(i2ccontroller, sda = sda, scl = scl, freq=freq)
         self.addr = addr
+        self.ReadTimeout = 3000
+        self.sync()
+        
+        
+    def sync(self):
+        # Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
+        # We jusr send \n as first commands for chain enumeration
+        self.i2c.writeto(self.addr, "\n")
+        
+        time.sleep(0.3)
+        
+        # dump all sync
+        buf = bytearray(3)
+        self.read(buf,self.ReadTimeout)
+        
+        #bytes = self.uart.read(3)
+        #if bytes is None or len(bytes)<3: # or bytes[2] != 62:
+        #    raise Exception("DUELink not responding")
+        
+        # Sync then discard all bytes
+        #if len(bytes)>3:
+        #    self.uart.read()
     
     def writeBytes(self, bytes):
         self.i2c.writeto(self.addr, array.array(bytes))
@@ -67,7 +89,7 @@ class UartTransportController:
     def __init__(self, id):
         self.ReadTimeout = 3000
         self.uart = machine.UART(id,115200)
-        self.uart.init(115200, bits=8, parity=None, stop=1, timeout=1000)
+        self.uart.init(115200, bits=8, parity=None, stop=1, timeout=self.ReadTimeout)
         time.sleep(0.2)
         self.sync()
         
