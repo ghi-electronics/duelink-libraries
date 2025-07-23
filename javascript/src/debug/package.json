@@ -1,0 +1,22 @@
+{
+  "name": "due-nodejs",
+  "version": "1.0.0",
+  "description": "due-link driver",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "due",
+    "duelink",
+    "driver"
+  ],
+  "author": "Fadhil",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "delay": "^6.0.0",
+    "serialport": "^11.0.1"
+  }
+}
