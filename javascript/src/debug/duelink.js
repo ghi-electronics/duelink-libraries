@@ -11,9 +11,10 @@ class SerialInterface {
         this.DeviceConfig = null;
         this.portName = serial;
         this.leftOver = "";
-        this.ReadTimeout = 3;
+        this.ReadTimeout = 3000;
         this.echo = true;
-        this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";;
+        this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
+        
     }
 
     async Connect() {
@@ -38,21 +39,23 @@ class SerialInterface {
     }
 
     async Synchronize() {
-        const cmd = new Uint8Array(1);
-        cmd[0] = 0x7f;
-    
-        await this.WriteRawData(cmd, 0, 1);
-		
-		await Util.sleep(300);
-	
-		this.portName.resetInputBuffer();
-		this.portName.resetOutputBuffer();
-		
-		await this.TurnEchoOff();
+      const cmd = new Uint8Array(1);
+      // Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
+      // We jusr send \n as first commands for chain enumeration
+      cmd[0] = 10; 
 
-		this.leftOver = "";
-		this.portName.resetInputBuffer();
-		this.portName.resetOutputBuffer();
+      await this.WriteRawData(cmd, 0, 1);
+
+      await Util.sleep(300);
+
+      this.portName.resetInputBuffer();
+      this.portName.resetOutputBuffer();
+
+      //await this.TurnEchoOff();
+
+      //this.leftOver = "";
+      //this.portName.resetInputBuffer();
+      //this.portName.resetOutputBuffer();
     }
 
     async TurnEchoOff() {
@@ -84,68 +87,119 @@ class SerialInterface {
     }
 
     async ReadResponse() {
-        let str = this.leftOver;
-        const response = new Cmdresponse();
-        const end = new Date(Date.now() + this.ReadTimeout * 1000);
+      let str = "";
+      let total_receviced = 0;
+      let dump = 0;
+      let responseValid = true;
+      const response = new Cmdresponse();
+      let end = new Date(Date.now() + this.ReadTimeout);
 
-        while (!this.portName.hasData() && new Date() <= end) {
-            await Util.pumpAsync();
-        }
-        if (!this.portName.hasData()) {
-            console.log("No Response");
-        }
 
-        while (new Date() <= end) {
-            const data = await this.portName.read();
-			
-            if (data) 
-			{
+      while (!this.portName.hasData() && new Date() <= end) {
+          await Util.pumpAsync();
+      }
+      if (!this.portName.hasData()) {
+          console.log("No Response");
+      }
+
+      while (new Date() <= end || this.portName.hasData()) {
+          if (this.portName.hasData()) {
+            const data = await this.portName.readbyte();
+            str += SerialInterface.Decoder.decode(data);
+            total_receviced++;
+            
+            if (SerialInterface.Decoder.decode(data)[0] == '\n') { //'\n'
+              if (!this.portName.hasData()) {
+                await Util.sleep(1);
+              }
+
+              // next byte can be >, &, !, $
+              if (this.portName.hasData()) {
+                await Util.sleep(1);                  
+                dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+                if (dump == '>' || dump == '!' || dump == '$') {
+                    // valid data 
+                    await Util.sleep(1); // wait 1ms for sure next byte
+
+                    if (this.portName.hasData()) {
+                    responseValid = false; // still data, this is bad response, there is no \r\n>xxxx
+                    }
+                }
+                else if (dump == '\r') {
+                  // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
+                  if (!this.portName.hasData()) {
+                    await Util.sleep(1); // wait 1ms for sure next byte   
+                  }
+
+                  if (this.portName.hasData()) {
+                    dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+
+                    if (dump == '\n') {
+                        if (this.portName.hasData()) 
+                            dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+                    }
+                    else {
+                        responseValid = false;
+                    }
+                  }
+                  else {
+                      responseValid = false;
+                  }
+                } 
+                else {
+                    responseValid = false;
+                }
 
                 
+              }
+              // once bad response \r\nxxx... or \r\n>xxxx, mean next \r\n is comming, wait timeout to clear them to clean the bus if possible        
+              if (!this.portName.hasData()) {
+                dump = 0;
+                while (dump != '\n' && new Date() <= end) {
+                  if (this.portName.hasData()) {
+                    dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+                  }
+                  else
+                  {
+                    await Util.sleep(1); // wait 1ms for sure next byte   
+                  }
 
-                str += SerialInterface.Decoder.decode(data);
-				
-                if (str.length > 0) {
-                    let idx1 = str.indexOf(">");
-                    let idx2 = str.indexOf("&");
-
-                    if (idx1 == -1) {
-                        idx1 = str.indexOf("$");
+                  if (dump == '\n') {
+                    if (this.portName.hasData()) // // still bad data, repeat clean up
+                    {
+                      dump = 0; // reset to repeat the condition while loop
                     }
-
-                    if (idx1 == -1 && idx2 == -1) {
-                        continue;
-                    }
-
-                    const idx = idx1 == -1 ? idx2 : idx1;
-
-                    this.leftOver = str.slice(idx + 1);
-                    response.success = true;
-                    response.response = str.slice(0, idx);
-
-                    const idx3 = str.indexOf("!");
-
-                    if (idx3 != -1) {
-                        response.success = false;
-                    }
-
-                    return response;
+                  }
+                
                 }
+              }
+              
+              // reponse valid has to be xxx\r\n or \r\n, or xxx\r\n> or \r\n> mean idx >=2
+              if (str == "" || str.length < 2 ) {
+                if (str[str.length - 2] != '\r') {
+                  responseValid = false;
+                }
+                else {
+                  // valid response, remove \r\n
+                  str = str.slice(0, str.length - 1 - 2);
+                }
+              }
+
+              break;
+
             }
 
-            
-        }
-		
-		this.leftOver = "";
+            end = new Date(Date.now() + this.ReadTimeout);
+          }            
+      }		      
+      this.portName.resetInputBuffer();
+      this.portName.resetOutputBuffer();
 
-		this.portName.resetInputBuffer();
-		this.portName.resetOutputBuffer();
-			
-        //debugger;
-        response.success = false;
-        response.response = "";
+      //debugger;
+      response.success = response.success = total_receviced > 1 && responseValid;
+      response.response = str;
 
-        return response;
+      return response;
     }
 
     static TransferBlockSizeMax = 512;
@@ -279,16 +333,15 @@ class ButtonController {
       this.serialPort = serialPort;
     }
   
-    async Enable(pin, enable) {
+    async Enable(pin, enable, pull) {
       if (
         typeof pin !== "number" ||
-        pin < 0 ||
-        (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+        pin < 0 
       ) {
         throw new Error("Invalid pin");
       }
   
-      const cmd = `btnen(${pin}, ${Number(enable)})`;
+       const cmd = `btnen(${pin}, ${Number(enable)},${pull})`;
   
       await this.serialPort.WriteCommand(cmd);
       const res = await this.serialPort.ReadResponse();
@@ -299,8 +352,7 @@ class ButtonController {
     async Down(pin) {
       if (
         typeof pin !== "number" ||
-        pin < 0 ||
-        (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+        pin < 0 
       ) {
         throw new Error("Invalid pin");
       }
@@ -324,8 +376,7 @@ class ButtonController {
   
       if (
         typeof pin !== "number" ||
-        pin < 0 ||
-        (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+        pin < 0 
       ) {
         throw new Error("Invalid pin");
       }
@@ -756,6 +807,27 @@ class EngineController {
   
     }
   
+    async Run(script) {
+      const data = new TextEncoder().encode(script + "\n");
+
+      this.serialPort.DiscardInBuffer();
+      this.serialPort.DiscardOutBuffer();
+
+      await this.serialPort.WriteRawData(data, 0, data.length);      
+  
+      const ret = await this.serialPort.ReadResponse();
+  
+      return ret.response;
+    }
+
+    async Select(num) {
+      const cmd = `sel(${num})`;
+      await this.serialPort.WriteCommand(cmd);
+
+      const ret = await this.serialPort.ReadResponse();
+      return ret.response;
+    }
+
     async Record(script) {
   
       await this.serialPort.WriteCommand("new");
@@ -797,16 +869,7 @@ class EngineController {
       const res = await this.serialPort.ReadResponse();
   
       return res.response;
-    }
-  
-    async Execute(script) {
-      const cmd = script;
-      await this.serialPort.WriteCommand(cmd);
-  
-      const res = await this.serialPort.ReadResponse();
-  
-      return res.response;
-    }
+    }  
 }
   
 
@@ -1177,6 +1240,14 @@ class UartController {
 class DUELinkController {
     constructor(serial) {
       this.serialPort = new SerialInterface(serial);
+    }
+
+    get ReadTimeout() {
+      return this.serialPort.ReadTimeout;
+    }
+
+    set ReadTimeout(value) {
+      this.serialPort.ReadTimeout = value;
     }
   
     async InitDevice() {
