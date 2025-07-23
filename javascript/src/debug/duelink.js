@@ -122,7 +122,7 @@ class SerialInterface {
                     await Util.sleep(1); // wait 1ms for sure next byte
 
                     if (this.portName.hasData()) {
-                    responseValid = false; // still data, this is bad response, there is no \r\n>xxxx
+                      responseValid = false; // still data, this is bad response, there is no \r\n>xxxx
                     }
                 }
                 else if (dump == '\r') {
@@ -153,7 +153,7 @@ class SerialInterface {
                 
               }
               // once bad response \r\nxxx... or \r\n>xxxx, mean next \r\n is comming, wait timeout to clear them to clean the bus if possible        
-              if (!this.portName.hasData()) {
+              if (!responseValid) {
                 dump = 0;
                 while (dump != '\n' && new Date() <= end) {
                   if (this.portName.hasData()) {
@@ -179,11 +179,12 @@ class SerialInterface {
                 if (str[str.length - 2] != '\r') {
                   responseValid = false;
                 }
-                else {
-                  // valid response, remove \r\n
-                  str = str.slice(0, str.length - 1 - 2);
-                }
               }
+              else {
+                // valid response, remove \r\n
+                str = str.slice(0, str.length -2);
+              }
+              
 
               break;
 
