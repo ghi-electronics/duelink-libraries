@@ -4,11 +4,11 @@ class ButtonController:
     def __init__(self, transport):
         self.transport = transport
 
-    def Enable(self, pin, state):
+    def Enable(self, pin, state, pull):
         if state :
-            self.transport.execute(f"btnen({pin},1)")
+            self.transport.execute(f"btnen({pin},1,{pull})")
         else:
-            self.transport.execute(f"btnen({pin},0)")
+            self.transport.execute(f"btnen({pin},0,{pull})")
             
     def Up(self, pin):
         r, s = self.transport.execute(f"btnup({pin})")
