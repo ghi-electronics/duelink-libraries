@@ -14,6 +14,7 @@ class SerialInterface {
         this.ReadTimeout = 3000;
         this.echo = true;
         this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
+        this.EnabledAsio = true
         
     }
 
@@ -78,7 +79,30 @@ class SerialInterface {
     async WriteCommand(command) {
         this.DiscardInBuffer();
         this.DiscardOutBuffer();
-        await this.__WriteLine(command);
+
+        const cmd_lowcase = command.toLowerCase();
+
+        if (cmd_lowcase.indexOf("print") == 0
+            || cmd_lowcase.indexOf("dim") == 0
+            || cmd_lowcase.indexOf("run") == 0
+            || cmd_lowcase.indexOf("list") == 0
+            || cmd_lowcase.indexOf("new") == 0
+            || cmd_lowcase.indexOf("echo") == 0
+            || cmd_lowcase.indexOf("sel") == 0
+            || cmd_lowcase.indexOf("version") == 0
+            || cmd_lowcase.indexOf("region") == 0
+            || cmd_lowcase.indexOf("alias") == 0
+            || cmd_lowcase.indexOf("sprintf") == 0
+            ) {
+            await this.__WriteLine(command);
+        }
+        else if (this.EnabledAsio) {
+          const newCmd = `println(${command})`;
+          await this.__WriteLine(newCmd);
+        }
+        else {
+          await this.__WriteLine(command);
+        }
     }
 
     async __WriteLine(string) {
@@ -1486,6 +1510,14 @@ class DUELinkController {
 
     set ReadTimeout(value) {
       this.serialPort.ReadTimeout = value;
+    }
+
+    get EnabledAsio() {
+      return this.serialPort.EnabledAsio;
+    }
+
+    set EnabledAsio(value) {
+      this.serialPort.EnabledAsio = value;
     }
   
     async InitDevice() {
