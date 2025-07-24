@@ -1498,7 +1498,7 @@ class StreamController {
   }
 }
 
-class CoProcessor {
+class CoProcessorController {
   constructor(serialPort, stream) {
     this.serialPort = serialPort
     this.stream = stream
@@ -1565,6 +1565,70 @@ class CoProcessor {
   }
 }
 
+class DMXController {
+  constructor(serialPort, stream) {
+    this.serialPort = serialPort
+    this.stream = stream
+  }
+
+  async Write(data) {
+    count = data.length
+
+    // declare b9 array
+    const cmd = `dim b9[${count}]`;
+    await this.serialPort.WriteCommand(cmd);  
+    await this.serialPort.ReadResponse();
+
+    // write data to b9
+    const written = await this.stream.WriteBytes("b9",data)
+
+     // write b9 to dmx
+    await this.serialPort.WriteCommand("DmxW(b9)"); 
+    
+    const ret = await this.serialPort.ReadResponse();  
+    
+    return ret.success
+  }
+
+  async Read(channel) {        
+    const cmd = `DmxR(${channel})`;
+    await this.serialPort.WriteCommand(cmd);      
+    const ret = await this.serialPort.ReadResponse();  
+    
+    if (ret.success) {
+      try {
+        const read = parseInt(ret.response);
+        return read;
+      } catch {
+
+      }
+    }
+    return 0;
+  }
+
+  async Ready() {            
+    await this.serialPort.WriteCommand("DmxRdy()");      
+    const ret = await this.serialPort.ReadResponse();  
+    
+    if (ret.success) {
+      try {
+        const read = parseInt(ret.response);
+        return read;
+      } catch {
+
+      }
+    }
+    return 0;
+  }
+
+  async Update() {            
+    await this.serialPort.WriteCommand("DmxU()");      
+    const ret = await this.serialPort.ReadResponse();  
+    
+    return ret.success;
+  }
+}
+
 
 class DUELinkController {
     constructor(serial) {
@@ -1612,6 +1676,9 @@ class DUELinkController {
 
       this.Sound = new SoundController(this.serialPort);
       this.Stream = new StreamController(this.serialPort);
+      this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
+      this.DMX = new DMXController(this.serialPort, this.Stream);
+
   
   
     }
