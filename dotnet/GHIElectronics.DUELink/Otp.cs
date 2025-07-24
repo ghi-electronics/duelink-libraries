@@ -8,26 +8,36 @@ namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
         public class OtpController {
             SerialInterface serialPort;
-
-            public OtpController(SerialInterface serialPort) => this.serialPort = serialPort;
+            StreamController stream;
+            public OtpController(SerialInterface serialPort, StreamController stream) {
+                this.serialPort = serialPort;
+                this.stream = stream;
+            }
 
             public bool OtpW(int address, byte[] data) {
 
-                var write_array = string.Empty;
+                //var write_array = string.Empty;
 
-                write_array = "[";
+                //write_array = "[";
 
-                for (var i = 0; i < data.Length; i++) {
-                    write_array += data[i];
+                //for (var i = 0; i < data.Length; i++) {
+                //    write_array += data[i];
 
-                    if (i < data.Length - 1)
-                        write_array += ",";
-                }
+                //    if (i < data.Length - 1)
+                //        write_array += ",";
+                //}
 
-                write_array += "]";
+                //write_array += "]";
 
-                var cmd = string.Format("OtpR({0})", write_array);
+                //var cmd = string.Format("OtpW({0},{1})", address,write_array);
 
+                var cmd = $"dim b9[{data.Length}]";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
+
+                var written = this.stream.WriteBytes("b9", data);
+
+                cmd = $"OtpW({address},b9)";
                 this.serialPort.WriteCommand(cmd);
 
                 var ret = this.serialPort.ReadResponse();

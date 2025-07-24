@@ -31,6 +31,19 @@ namespace GHIElectronics.DUELink {
 
             }
 
+            public bool Stop() {
+                this.serialPort.DiscardInBuffer();
+                this.serialPort.DiscardOutBuffer();
+
+                this.serialPort.WriteRawData(new byte[] {27}, 0, 1);
+
+                var response = this.serialPort.ReadResponse();
+
+
+                return response.success;
+
+            }
+
             public bool Select(int num) {
                 var cmd = $"sel({num})";
 

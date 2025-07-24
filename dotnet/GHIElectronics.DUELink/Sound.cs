@@ -8,8 +8,12 @@ namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
         public class SoundController {
             SerialInterface serialPort;
+            StreamController stream;
 
-            public SoundController(SerialInterface serialPort) => this.serialPort = serialPort;
+            public SoundController(SerialInterface serialPort, StreamController stream) {
+                this.serialPort = serialPort;
+                this.stream = stream;
+            }
 
             public bool Beep(int pin, uint frequency, uint duration_ms) {               
 
@@ -27,46 +31,40 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool MelodyPlay(int pin, uint[] notes) {
+            public bool MelodyPlay(int pin, float[] notes) {
                 if (pin < 0 || Array.IndexOf(this.serialPort.DeviceConfig.PWMPins, pin) == -1)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
-                var cmd_dim_array = string.Format("dim a1[{0}]", notes.Length);
+                //var cmd_dim_array = string.Format("dim a1[{0}]", notes.Length);
 
-                this.serialPort.WriteCommand(cmd_dim_array);
+                //this.serialPort.WriteCommand(cmd_dim_array);
 
-                var res = this.serialPort.ReadResponse();
+                //var res = this.serialPort.ReadResponse();
 
-                for (var i = 0; i < notes.Length; i++) {
-                    cmd_dim_array = string.Format("a1[{0}] = {1}", (i), notes[i]);
+                //for (var i = 0; i < notes.Length; i++) {
+                //    cmd_dim_array = string.Format("a1[{0}] = {1}", (i), notes[i]);
 
-                    this.serialPort.WriteCommand(cmd_dim_array);
+                //    this.serialPort.WriteCommand(cmd_dim_array);
 
-                    res = this.serialPort.ReadResponse();
+                //    res = this.serialPort.ReadResponse();
 
-                    if (!res.success) {
-                        break;
-                    }
-                }
+                //    if (!res.success) {
+                //        break;
+                //    }
+                //}
 
-                if (res.success) {
-                    var cmd = $"MelodyP({pin},a1)";
+                var cmd = $"dim a9[{notes.Length}]";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
 
+                var written = this.stream.WriteFloats("a9", notes);
 
-                    this.serialPort.WriteCommand(cmd);
+                cmd = $"MelodyP({pin},a9)";
+                this.serialPort.WriteCommand(cmd);
 
-                    res = this.serialPort.ReadResponse();
+                var ret = this.serialPort.ReadResponse();
 
-                  
-                }
-
-                cmd_dim_array = string.Format("dim a1[0]");
-
-                this.serialPort.WriteCommand(cmd_dim_array);
-
-                res = this.serialPort.ReadResponse();
-
-                return res.success;
+                return ret.success;                
 
             }
 
