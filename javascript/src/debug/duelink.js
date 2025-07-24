@@ -1556,7 +1556,7 @@ class CoProcessorController {
 
     // read data to b9
     await this.serialPort.WriteCommand("CoprocR(b9)");     
-    const ret = await this.serialPort.ReadResponse();  
+    await this.serialPort.ReadResponse();  
     
     // read b9 by stream
     const read = await this.stream.ReadBytes("b9",data)
@@ -1629,6 +1629,149 @@ class DMXController {
   }
 }
 
+class FileSystemController {
+  constructor(serialPort, stream) {
+    this.serialPort = serialPort
+    this.stream = stream
+  }
+
+  async ParseReturn() {
+    const ret = await this.serialPort.ReadResponse();  
+    if (ret.success) {
+      try {
+        const read = parseInt(ret.response);
+        return read;
+      } catch {
+
+      }
+    }
+    return 0;
+
+  }
+
+  async Mount(type, cs, baud, max_handle) {
+    const cmd = `FsMnt(${type},${cs},${baud},${max_handle})`;
+
+    await this.serialPort.WriteCommand(cmd); 
+
+    return await this.ParseReturn();
+  }
+
+  async Unmount() {
+    await this.serialPort.WriteCommand("FsUnMnt()"); 
+
+    return await this.ParseReturn();
+  }
+
+  async Format(type, cs, baud) {
+    const cmd = `FsFmt(${type},${cs},${baud})`;
+
+    await this.serialPort.WriteCommand(cmd); 
+
+    return await this.ParseReturn();
+  }
+
+  async Open(path, mode) {
+    const cmd = `FsFmt("${path}",${mode})`;
+
+    await this.serialPort.WriteCommand(cmd); 
+
+    return await this.ParseReturn();
+  }
+
+  async Close(handle) {
+    const cmd = `FsClose(${handle})`;
+
+    await this.serialPort.WriteCommand(cmd); 
+
+    return await this.ParseReturn();
+  }
+
+  async Write(handle, data) {
+    count = data.length
+
+    // declare b9 array
+    const cmd = `dim b9[${count}]`;
+    await this.serialPort.WriteCommand(cmd);  
+    await this.serialPort.ReadResponse();
+
+    // write data to b9
+    const written = await this.stream.WriteBytes("b9",data)
+
+    // write b9 to file
+    await this.serialPort.WriteCommand(`FsWrite(${handle}, b9)`); 
+    
+    return await this.ParseReturn();
+  }
+
+  async Read(handle, data) {
+    count = data.length
+
+    // declare b9 array
+    const cmd = `dim b9[${count}]`;
+    await this.serialPort.WriteCommand(cmd);  
+    await this.serialPort.ReadResponse();
+
+    await this.serialPort.WriteCommand(`FsRead(${handle}, b9)`); 
+
+    const ret = await this.stream.ReadBytes("b9",data)
+
+    return ret
+
+  }
+
+  async Sync(handle) {
+    const cmd = `FsSync(${handle})`;
+
+    await this.serialPort.WriteCommand(cmd); 
+
+    return await this.ParseReturn();
+  }
+
+  async Seek(handle, offset) {
+    const cmd = `FsSeek(${handle}, ${offset})`;
+
+    await this.serialPort.WriteCommand(cmd); 
+
+    return await this.ParseReturn();
+  }
+
+  async Tell(handle) {
+    const cmd = `FsTell(${handle})`;
+
+    await this.serialPort.WriteCommand(cmd); 
+
+    return await this.ParseReturn();
+  }
+
+  async Delete(path) {
+    const cmd = `FsDel("${path}")`;
+
+    await this.serialPort.WriteCommand(cmd); 
+
+    return await this.ParseReturn();
+  }
+
+  async Find(path) {
+    const cmd = `FsFind("${path}")`;
+
+    await this.serialPort.WriteCommand(cmd); 
+
+    return await this.ParseReturn();
+  }
+
+  async FileSize(path) {
+    const cmd = `fsfsz("${path}")`;
+
+    await this.serialPort.WriteCommand(cmd); 
+
+    return await this.ParseReturn();
+  }
+
+
+
+}
+
 
 class DUELinkController {
     constructor(serial) {
@@ -1678,6 +1821,7 @@ class DUELinkController {
       this.Stream = new StreamController(this.serialPort);
       this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
       this.DMX = new DMXController(this.serialPort, this.Stream);
+      this.FileSystem = new FileSystemController(this.serialPort, this.Stream);
 
   
   
