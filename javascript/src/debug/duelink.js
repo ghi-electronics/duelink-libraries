@@ -1809,9 +1809,47 @@ class FileSystemController {
 
     return await this.ParseReturn();
   }
+}
 
+class OtpController {
+  constructor(serialPort, stream) {
+    this.serialPort = serialPort
+    this.stream = stream
+  }
 
+  async Write(address, data) {
+    count = data.length
 
+    // declare b9 array
+    let cmd = `dim b9[${count}]`;
+    await this.serialPort.WriteCommand(cmd);  
+    await this.serialPort.ReadResponse();
+
+    // write data to b9
+    const written = await this.stream.WriteBytes("b9",data)
+
+    // write b9 to otp
+    await this.serialPort.WriteCommand(`OtpW(${address},b9)`); 
+    const ret = await this.serialPort.ReadResponse();
+    
+    return ret.success;
+  }
+
+  async Read(address) {
+    const cmd = `OtpR(${address})`;
+    await this.serialPort.WriteCommand(cmd);  
+     
+    const ret = await this.serialPort.ReadResponse();  
+    if (ret.success) {
+      try {
+        const read = parseInt(ret.response);
+        return read;
+      } catch {
+
+      }
+    }
+    return 0;
+  }
 }
 
 
@@ -1864,6 +1902,7 @@ class DUELinkController {
       this.DMX = new DMXController(this.serialPort, this.Stream);
       this.FileSystem = new FileSystemController(this.serialPort, this.Stream);
       this.I2c = new I2cController(this.serialPort, this.Stream);
+      this.Otp = new OtpController(this.serialPort, this.Stream);
 
   
   
