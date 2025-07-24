@@ -905,6 +905,19 @@ class EngineController {
       return ret.response;
     }
 
+    async Stop() {
+      this.serialPort.DiscardInBuffer();
+      this.serialPort.DiscardOutBuffer();
+
+      const data = new Uint8Array(1);
+      data[0] = 27
+      await this.serialPort.WriteRawData(data, 0, 1);   
+      
+      const ret = await this.serialPort.ReadResponse();
+  
+      return ret.response;
+    }
+
     async Select(num) {
       const cmd = `sel(${num})`;
       await this.serialPort.WriteCommand(cmd);
@@ -985,8 +998,9 @@ class ServoController {
   }
   
   class SoundController {
-    constructor(serialPort) {
-      this.serialPort = serialPort;
+      constructor(serialPort, stream) {
+      this.serialPort = serialPort
+      this.stream = stream
     }
   
     async Beep(pin, frequency, duration) {
@@ -1016,35 +1030,47 @@ class ServoController {
     }
   
     async MelodyPlay(pin, notes) {
-      if (
-        !Array.isArray(notes) ||
-        !notes.every((item) => Number.isInteger(item))
-      ) {
-        throw new Error("Please enter an array of integers as notes.");
-      }
+      //if (
+      //  !Array.isArray(notes) ||
+      //  !notes.every((item) => Number.isInteger(item))
+      //) {
+      //  throw new Error("Please enter an array of integers as notes.");
+      //}
   
-      if (
-        !Number.isInteger(pin) ||
-        pin < 0 ||
-        !this.DeviceConfig.PWMPins.has(pin)
-      ) {
-        throw new Error("Please enter a valid PWM pin as an integer.");
-      }
+      //if (
+      //  !Number.isInteger(pin) ||
+      //  pin < 0 ||
+      //  !this.DeviceConfig.PWMPins.has(pin)
+      //) {
+      //  throw new Error("Please enter a valid PWM pin as an integer.");
+      //}
   
-      cmd = `melodyp(${pin}, ${notes})`;
-      await this.serialPort.WriteCommand(cmd);
-      let res = await this.serialPort.ReadResponse();
-      return res.success;
+      count = notes.length
+
+      // declare a9 array
+      let cmd = `dim a9[${count}]`;
+      await this.serialPort.WriteCommand(cmd);  
+      await this.serialPort.ReadResponse();
+
+      // write data to a9
+      const written = await this.stream.WriteFloats("a9",notes)
+
+      // play a9
+      cmd = `melodyp(${pin}, a9)`
+      await this.serialPort.WriteCommand(cmd); 
+      const ret = await this.serialPort.ReadResponse();
+      
+      return ret.success;      
     }
   
     async MelodyStop(pin) {
-      if (
-        !Number.isInteger(pin) ||
-        pin < 0 ||
-        !this.DeviceConfig.PWMPins.has(pin)
-      ) {
-        throw new Error("Please enter a valid PWM pin as an integer.");
-      }
+      //if (
+      //  !Number.isInteger(pin) ||
+      //  pin < 0 ||
+      //  !this.DeviceConfig.PWMPins.has(pin)
+      //) {
+      //  throw new Error("Please enter a valid PWM pin as an integer.");
+      //}
   
       cmd = `MelodyS(${pin})`;
   
@@ -1057,37 +1083,38 @@ class ServoController {
 
 
 class SpiController {
-    constructor(serialPort) {
-      this.serialPort = serialPort;
+    constructor(serialPort, stream) {
+      this.serialPort = serialPort
+      this.stream = stream
     }
   
-    async Write(dataWrite, offset = 0, length = -1, chipselect = -1) {
-      if (length === -1) length = dataWrite.length;
+    //async Write(dataWrite, offset = 0, length = -1, chipselect = -1) {
+    //  if (length === -1) length = dataWrite.length;
+    //
+    //  return await this.WriteRead(
+    //    dataWrite,
+    //    offset,
+    //    length,
+    //    null,
+    //    0,
+    //    0,
+    //    chipselect
+    //  );
+    //}
   
-      return await this.WriteRead(
-        dataWrite,
-        offset,
-        length,
-        null,
-        0,
-        0,
-        chipselect
-      );
-    }
+    //async Read(dataRead, offset = 0, length = -1, chipselect = -1) {
+    //  if (length === -1) length = dataRead.length;
   
-    async Read(dataRead, offset = 0, length = -1, chipselect = -1) {
-      if (length === -1) length = dataRead.length;
-  
-      return await this.WriteRead(
-        null,
-        0,
-        0,
-        dataRead,
-        offset,
-        length,
-        chipselect
-      );
-    }
+    //  return await this.WriteRead(
+    //    null,
+    //    0,
+    //    0,
+    //    dataRead,
+    //    offset,
+    //    length,
+    //    chipselect
+    //  );
+    //}
   
     async WriteRead(
       dataWrite,
@@ -1113,23 +1140,66 @@ class SpiController {
         throw new Error("Invalid arguments");
       }
   
-      let write_array = "[";
+      //let write_array = "[";
   
-      for (let i = 0; i < countWrite; i++) {
-        write_array += dataWrite[i];
+      //for (let i = 0; i < countWrite; i++) {
+      //  write_array += dataWrite[i];
     
-        if (i < countWrite - 1)
-            write_array += ",";
+      //  if (i < countWrite - 1)
+      //      write_array += ",";
+      //}
+  
+      //write_array += "]";
+      let cmd = ""
+      let written = 0;
+      let read = 0; 
+
+      if (countWrite > 0) {
+          // declare b9 to write
+          cmd = `dim b9[${countWrite}]`;
+          this.serialPort.WriteCommand(cmd);
+          this.serialPort.ReadResponse();
       }
+
+      if (countRead > 0) {
+          // declare b9 to write
+          cmd = `dim b8[${countRead}]`;
+          this.serialPort.WriteCommand(cmd);
+          this.serialPort.ReadResponse();
+      }
+
+      if (countWrite > 0) {
+        // write data to b9 by stream      
+        let write_array = dataWrite.slice(offsetWrite, offsetWrite + countWrite-1);      
+        written = this.stream.WriteBytes("b9", write_array);
+      }
+
+      // issue i2cwr cmd
+      if (countWrite > 0 && countRead > 0) {
+        cmd = `spiwrs(b9,b8)`;
+      }
+      else if (countWrite > 0) {
+        cmd = `spiwrs(b9,0)`;
+      }
+      else {
+        cmd = `spiwrs(0, b8)`;
+      }
+
+      // issue SPI writeread     
+      await this.serialPort.WriteCommand(cmd);
+      this.serialPort.ReadResponse();    
   
-      write_array += "]";
-  
-      // SPI write only
-      const cmd = `spiwrs(${write_array},0)`;
-      await this.serialPort.WriteCommand(cmd);    
-  
-      const res = await this.serialPort.ReadResponse();
-      return res.success;
+      if (countRead > 0) {
+        // use stream to read data to b8
+        let read_array = dataRead.slice(offsetRead, offsetRead + countRead-1);  
+        read = this.stream.ReadBytes("b8", read_array); 
+        
+        for (let i = 0; i < countRead; i++) {
+          dataRead[offsetRead + i] = read_array[i]
+        }
+      }
+
+      return (written == countWrite) && (read == countRead);
     }
   
     async WriteByte(data) {   
@@ -1178,6 +1248,13 @@ class SystemController {
     async Reset(option) {
       let cmd = `reset(${option.value})`;
       await this.serialPort.WriteCommand(cmd);
+
+      // Erase all send reset twice
+      if (option == 1) {
+        await this.serialPort.ReadResponse();
+        await this.serialPort.WriteCommand(cmd);
+      }
+
       this.serialPort.Disconnect();
     }
   
@@ -1211,7 +1288,7 @@ class SystemController {
       let res = await this.serialPort.ReadResponse();
       if (res.success) {
         try {
-			if (code == 0) {
+			if (code != 1 ) { // 1 is firmware is float
 				return parseInt(res.response);
 			}
 			else {
@@ -1227,6 +1304,15 @@ class SystemController {
       const cmd = `statled(${highPeriod},${lowPeriod},${count})`;
       await this.serialPort.WriteCommand(cmd);
   
+      const res = await this.serialPort.ReadResponse();
+      return res.success;
+    }
+
+    async Shutdown(wkpin) {
+      const cmd = `shtdn(${wkpin})`;
+      await this.serialPort.WriteCommand(cmd);
+      
+      // does system response?
       const res = await this.serialPort.ReadResponse();
       return res.success;
     }
@@ -1277,23 +1363,93 @@ class TemperatureController {
 }
 
 class UartController {
-    constructor(serialPort) {
-      this.serialPort = serialPort;
+    constructor(serialPort, stream) {
+      this.serialPort = serialPort
+      this.stream = stream
     }
   
-    // async Enable(baudrate) {
-    //   let cmd = `uartinit(${baudrate})`;
-    //   await this.serialPort.WriteCommand(cmd);
-    //   let res = await this.serialPort.ReadResponse();
-    //   return res.success;
-    // }
+    async Configuration(baudrate, rx_buffer_size) {
+      let cmd = `SerCfg(${baudrate},${rx_buffer_size})`;
+      await this.serialPort.WriteCommand(cmd);
+      let res = await this.serialPort.ReadResponse();
+      return res.success;
+    }
   
-    // async Write(data) {
-    //   let cmd = `uartwrite(${data})`;
-    //   await this.serialPort.WriteCommand(cmd);
-    //   let res = await this.serialPort.ReadResponse();
-    //   return res.success;
-    // }
+    async WriteByte(data) {
+      let cmd = `SerWr(${data})`;
+      await this.serialPort.WriteCommand(cmd);
+      let res = await this.serialPort.ReadResponse();
+      return res.success;
+    }
+
+    async WriteBytes(data) {
+      count = data.length
+      // declare b9 array
+      const cmd = `dim b9[${count}]`;
+      await this.serialPort.WriteCommand(cmd);  
+      await this.serialPort.ReadResponse();  
+
+      // write data to b9
+      const written = await this.stream.WriteBytes("b9",data)
+
+      // write b9 out
+      await this.serialPort.WriteCommand("SerWrs(b9)"); 
+      
+      const ret = await this.serialPort.ReadResponse();    
+          
+      return written == count;
+    }
+
+    async ReadByte() {
+      
+      await this.serialPort.WriteCommand(`SerRd()`);
+      const res = await this.serialPort.ReadResponse();
+      let val = 0;
+      if (res.success) {
+        try {
+          val = parseInt(res.response);
+          return val;
+        } catch {}
+      }
+      return val;
+    }
+
+    async ReadBytes(data, timeout) {
+      count = data.length
+      // declare b9 array
+      let cmd = `dim b9[${count}]`;
+      await this.serialPort.WriteCommand(cmd);  
+      await this.serialPort.ReadResponse();
+
+      cmd = `SerRds(b9,${timeout})`;
+      await this.serialPort.WriteCommand(cmd); 
+      await this.serialPort.ReadResponse();
+
+      const ret = this.stream.ReadBytes("b9", data)
+
+      return ret
+    
+    }
+
+    async BytesToRead() {
+      
+      await this.serialPort.WriteCommand(`SerB2R()`);
+      const res = await this.serialPort.ReadResponse();
+      let val = 0;
+      if (res.success) {
+        try {
+          val = parseInt(res.response);
+          return val;
+        } catch {}
+      }
+      return val;
+    }
+
+    async Discard() {      
+      await this.serialPort.WriteCommand(`SerDisc()`);
+      const ret = await this.serialPort.ReadResponse();
+      return ret.success
+    }
   
     // async BytesToRead() {
     //   let cmd = "uartcount()";
@@ -1874,6 +2030,45 @@ class PulseController {
   }
 }
 
+class RtcController {
+  constructor(serialPort, stream) {
+    this.serialPort = serialPort
+    this.stream = stream
+  }
+
+  async Write(rtc_timedate) {
+    count = rtc_timedate.length
+
+    // declare b9 array
+    let cmd = `dim b9[${count}]`;
+    await this.serialPort.WriteCommand(cmd);  
+    await this.serialPort.ReadResponse();
+
+    // write data to b9
+    const written = await this.stream.WriteBytes("b9",rtc_timedate)
+
+    // write b9 to otp
+    await this.serialPort.WriteCommand(`RtcW(b9)`); 
+    const ret = await this.serialPort.ReadResponse();
+    
+    return ret.success;
+  }
+
+  async Read(rtc_timedate) {
+    // declare b9 array
+    let cmd = `dim b9[${count}]`;
+    await this.serialPort.WriteCommand(cmd);  
+    await this.serialPort.ReadResponse();
+
+    await this.serialPort.WriteCommand(`RtcR(b9)`); 
+    await this.serialPort.ReadResponse();
+
+    const ret = this.stream.ReadBytes("b9", rtc_timedate)
+
+    return ret
+    
+  }
+}
 
 class DUELinkController {
     constructor(serial) {
@@ -1901,12 +2096,13 @@ class DUELinkController {
         throw `Not connected to the device.`;
       }
   
+      this.Stream = new StreamController(this.serialPort);
       this.System = new SystemController(this.serialPort);
       this.Analog = new AnalogController(this.serialPort);
       this.Digital = new DigitalController(this.serialPort);      
       this.Servo = new ServoController(this.serialPort);
       this.Frequency = new FrequencyController(this.serialPort);
-      this.Spi = new SpiController(this.serialPort);
+      
       this.Infrared = new InfraredController(this.serialPort);
       this.Uart = new UartController(this.serialPort);
       this.Button = new ButtonController(this.serialPort);
@@ -1918,13 +2114,14 @@ class DUELinkController {
       this.Humidity = new HumidityController(this.serialPort);
 
       this.Pulse = new PulseController(this.serialPort);
-      this.Sound = new SoundController(this.serialPort);
-      this.Stream = new StreamController(this.serialPort);
+      this.Sound = new SoundController(this.serialPort, this.Stream);
+      this.Spi = new SpiController(this.serialPort,this.Stream, this.Stream);
       this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
       this.DMX = new DMXController(this.serialPort, this.Stream);
       this.FileSystem = new FileSystemController(this.serialPort, this.Stream);
       this.I2c = new I2cController(this.serialPort, this.Stream);
       this.Otp = new OtpController(this.serialPort, this.Stream);
+      this.Rtc = new RtcController(this.serialPort, this.Stream);
       
 
   
