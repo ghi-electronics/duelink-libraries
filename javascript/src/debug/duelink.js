@@ -1498,6 +1498,73 @@ class StreamController {
   }
 }
 
+class CoProcessor {
+  constructor(serialPort, stream) {
+    this.serialPort = serialPort
+    this.stream = stream
+  }
+
+  async CoprocE() {
+    await this.serialPort.WriteCommand("CoprocE()");  
+    const ret = await this.serialPort.ReadResponse();  
+
+    return ret.success;
+  }
+
+  async CoprocP() {
+    throw new Error("Not implemented");
+  }
+
+  async CoprocS() {
+    await this.serialPort.WriteCommand("CoprocS()");  
+    const ret = await this.serialPort.ReadResponse();  
+
+    return ret.success;
+  }
+
+  async CoprocV() {
+    await this.serialPort.WriteCommand("CoprocV()");  
+    const ret = await this.serialPort.ReadResponse();  
+
+    return ret.success;
+  }
+
+  async CoprocW(data) {
+    count = data.length
+    // declare b9 array
+    const cmd = `dim b9[${count}]`;
+    await this.serialPort.WriteCommand(cmd);  
+    await this.serialPort.ReadResponse();  
+
+    // write data to b9
+    const written = await this.stream.WriteBytes("b9",data)
+
+    // write b9 to co-pro
+    await this.serialPort.WriteCommand("CoprocW(b9)"); 
+    
+    const ret = await this.serialPort.ReadResponse();    
+        
+    return written == count;
+  }
+
+  async CoprocR(data) {
+    count = data.length
+    // declare b9 array
+    const cmd = `dim b9[${count}]`;
+    await this.serialPort.WriteCommand(cmd);  
+    await this.serialPort.ReadResponse();      
+
+    // read data to b9
+    await this.serialPort.WriteCommand("CoprocR(b9)");     
+    const ret = await this.serialPort.ReadResponse();  
+    
+    // read b9 by stream
+    const read = await this.stream.ReadBytes("b9",data)
+        
+    return read == count;
+  }
+}
+
 
 class DUELinkController {
     constructor(serial) {
