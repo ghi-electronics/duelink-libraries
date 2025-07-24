@@ -83,12 +83,12 @@ class SerialInterface:
             command.find('alias') == 0 or            
             command.find('sprintf') == 0 
         ):
-            self.__WriteLine(command)
+            self.__WriteLine(cmd)
         elif self.EnabledAsio == True:
-            newcmd = f"println({command})"
+            newcmd = f"println({cmd})"
             self.__WriteLine(newcmd)
         else:
-            self.__WriteLine(command)
+            self.__WriteLine(cmd)
 
     def __WriteLine(self, string):
         string += "\n"
@@ -146,17 +146,18 @@ class SerialInterface:
                             responseValid = False
                     
                     if responseValid == False:
-                        dump = 0
+                        d = 0
 
-                        while dump != '\n' and datetime.now() < end:
+                        while d != '\n' and datetime.now() < end:
                             if (self.portName.in_waiting > 0):
                                 dump = self.portName.read(1)
+                                d = dump.decode()[0]
                             else:
                                 time.sleep(0.001) 
                             
-                            if dump.decode()[0] == '\n':
+                            if d == '\n':
                                 if (self.portName.in_waiting > 0): # still bad data, repeat clean up
-                                    dump = 0 #reset to repeat the condition while loop
+                                    d = 0 #reset to repeat the condition while loop
 
                     if str == "" or len(str) < 2: #reponse valid has to be xxx\r\n or \r\n, mean idx >=2
                         responseValid = False
