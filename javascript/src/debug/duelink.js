@@ -683,21 +683,19 @@ class DistanceSensorController {
 class FrequencyController {
     constructor(serialPort) {
       this.serialPort = serialPort;
-      this.MaxFrequency = 10000000;
+      this.MaxFrequency = 24000000;
       this.MinFrequency = 15;
     }
   
     async Write(pin, frequency, duration_ms = 0, dc = 0.5) {
       if (
-        typeof pin !== "number" ||
-        pin < 0 ||
-        (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+        typeof pin !== "number" || pin < 0 
       ) {
         throw new Error("Invalid pin");
       }
   
       if (frequency < this.MinFrequency || frequency > this.MaxFrequency) {
-        throw new Error("Frequency must be in range 15Hz...10000000Hz");
+        throw new Error("Frequency must be in range 15Hz...24000000Hz");
       }
      
   
@@ -723,8 +721,7 @@ class FrequencyController {
     async Read(pin, sensortype) {
       if (
         typeof pin !== "number" ||
-        pin < 0 ||
-        (pin >= this.serialPort.DeviceConfig.MaxPinIO)
+        pin < 0 
       ) {
         throw new Error("Invalid pin");
       }
@@ -738,22 +735,20 @@ class FrequencyController {
   }
 
   class I2cController {
-    constructor(serialPort) {
-      this.serialPort = serialPort;
+    constructor(serialPort, stream) {
+      this.serialPort = serialPort
+      this.stream = stream
     }
+      
+    async Configuartion(speed) {
+      const cmd = `i2ccfg(${speed})`;
+
+      await this.serialPort.WriteCommand(cmd);
   
-    async Write(address, data, offset = 0, length = -1) {
-      if (length == -1) length = data.length;
-  
-      return await this.WriteRead(address, data, offset, length, null, 0, 0);
+      let res = await this.serialPort.ReadResponse();
+      return res.success;
     }
-  
-    async Read(address, data, offset = 0, length = -1) {
-      if (length == -1) length = data.length;
-  
-      return await this.WriteRead(address, null, 0, 0, data, offset, length);
-    }
-  
+
     async WriteRead(
       address,
       dataWrite,
@@ -788,24 +783,67 @@ class FrequencyController {
         throw new Error("Invalid range for dataRead");
       }
   
-      let write_array = "[";
+      //let write_array = "[";
   
-      for (let i = 0; i < countWrite; i++) {
-        write_array += dataWrite[i];
+      //for (let i = 0; i < countWrite; i++) {
+      //  write_array += dataWrite[i];
     
-        if (i < countWrite - 1)
-            write_array += ",";
-      }
+      //  if (i < countWrite - 1)
+      //      write_array += ",";
+      //}
   
-      write_array += "]";
-  
-      // I2C write only
-      const cmd = `i2cwr(${address},${write_array},0)`;
-      await this.serialPort.WriteCommand(cmd);    
-  
-      const res = await this.serialPort.ReadResponse();
-      return res.success;
+     // write_array += "]";
+
+    let cmd = ""
+    let written = 0;
+    let read = 0; 
+
+    if (countWrite > 0) {
+        // declare b9 to write
+        cmd = `dim b9[${countWrite}]`;
+        this.serialPort.WriteCommand(cmd);
+        this.serialPort.ReadResponse();
     }
+
+    if (countRead > 0) {
+        // declare b9 to write
+        cmd = `dim b8[${countRead}]`;
+        this.serialPort.WriteCommand(cmd);
+        this.serialPort.ReadResponse();
+    }
+
+    if (countWrite > 0) {
+      // write data to b9 by stream      
+      let write_array = dataWrite.slice(offsetWrite, offsetWrite + countWrite-1);      
+      written = this.stream.WriteBytes("b9", write_array);
+    }
+
+    // issue i2cwr cmd
+    if (countWrite > 0 && countRead > 0) {
+      cmd = `i2cwr(${address},b9,b8)`;
+    }
+    else if (countWrite > 0) {
+       cmd = `i2cwr(${address},b9,0)`;
+    }
+    else {
+      cmd = `i2cwr(${address},0, b8)`;
+    }
+
+    this.serialPort.WriteCommand(cmd);
+    this.serialPort.ReadResponse();
+
+    if (countRead > 0) {
+      // use stream to read data to b8
+      let read_array = dataRead.slice(offsetRead, offsetRead + countRead-1);  
+      read = this.stream.ReadBytes("b8", read_array); 
+      
+      for (let i = 0; i < countRead; i++) {
+        dataRead[offsetRead + i] = read_array[i]
+      }
+    }
+
+    return (written == countWrite) && (read == countRead);
+  }
 }
 
 class InfraredController {
@@ -1800,8 +1838,7 @@ class DUELinkController {
       }
   
       this.Analog = new AnalogController(this.serialPort);
-      this.Digital = new DigitalController(this.serialPort);
-      this.I2c = new I2cController(this.serialPort);
+      this.Digital = new DigitalController(this.serialPort);      
       this.Servo = new ServoController(this.serialPort);
       this.Frequency = new FrequencyController(this.serialPort);
       this.Spi = new SpiController(this.serialPort);
@@ -1822,6 +1859,7 @@ class DUELinkController {
       this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
       this.DMX = new DMXController(this.serialPort, this.Stream);
       this.FileSystem = new FileSystemController(this.serialPort, this.Stream);
+      this.I2c = new I2cController(this.serialPort, this.Stream);
 
   
   
