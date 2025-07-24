@@ -1852,6 +1852,28 @@ class OtpController {
   }
 }
 
+class PulseController {
+  constructor(serialPort) {
+    this.serialPort = serialPort    
+  }
+
+  async PulseIn(pin, state, timeout) {
+    const cmd = `PulseIn(${pin},${state},${timeout})`;
+    await this.serialPort.WriteCommand(cmd);  
+
+    const ret = await this.serialPort.ReadResponse();  
+    if (ret.success) {
+      try {
+        const read = parseInt(ret.response);
+        return read;
+      } catch {
+
+      }
+    }
+    return 0;    
+  }
+}
+
 
 class DUELinkController {
     constructor(serial) {
@@ -1879,6 +1901,7 @@ class DUELinkController {
         throw `Not connected to the device.`;
       }
   
+      this.System = new SystemController(this.serialPort);
       this.Analog = new AnalogController(this.serialPort);
       this.Digital = new DigitalController(this.serialPort);      
       this.Servo = new ServoController(this.serialPort);
@@ -1893,9 +1916,8 @@ class DUELinkController {
       this.Engine = new EngineController(this.serialPort);
       this.Temperature = new TemperatureController(this.serialPort);
       this.Humidity = new HumidityController(this.serialPort);
-      this.System = new SystemController(this.serialPort);
-  
 
+      this.Pulse = new PulseController(this.serialPort);
       this.Sound = new SoundController(this.serialPort);
       this.Stream = new StreamController(this.serialPort);
       this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
@@ -1903,6 +1925,7 @@ class DUELinkController {
       this.FileSystem = new FileSystemController(this.serialPort, this.Stream);
       this.I2c = new I2cController(this.serialPort, this.Stream);
       this.Otp = new OtpController(this.serialPort, this.Stream);
+      
 
   
   
