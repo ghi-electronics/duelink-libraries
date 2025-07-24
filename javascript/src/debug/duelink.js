@@ -864,12 +864,16 @@ class InfraredController {
       }
       return -1;
     }
+
+    async Write(data) {
+      const cmd = `IrWrite(${data})`;
+      await this.serialPort.WriteCommand(cmd);
+      const res = await this.serialPort.ReadResponse();
+      return res.success
+    }
   
-    async Enable(pin, enable) {        
-      if (pin != 0)
-        throw new Error("IR is only available on pin 0");
-  
-      const cmd = `iren(${pin}, ${Number(enable)})`;
+    async Enable(txpin, rxpin, enable) {          
+      const cmd = `iren(${txpin},${rxpin},${Number(enable)})`;
       await this.serialPort.WriteCommand(cmd);
   
       const res = await this.serialPort.ReadResponse();
