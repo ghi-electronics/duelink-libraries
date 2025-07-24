@@ -187,19 +187,19 @@ namespace GHIElectronics.DUELink {
             this.DiscardOutBuffer();
 
 
-            command = command.ToLower();
+            var cmd_lowcase = command.ToLower();
             // these commands - statement can't use with println
-            if (command.IndexOf("print") == 0
-                || command.IndexOf("dim") == 0
-                || command.IndexOf("run") == 0
-                || command.IndexOf("list") == 0
-                || command.IndexOf("new") == 0
-                || command.IndexOf("echo") == 0
-                || command.IndexOf("sel") == 0
-                || command.IndexOf("version") == 0
-                || command.IndexOf("region") == 0
-                || command.IndexOf("alias") == 0
-                || command.IndexOf("sprintf") == 0
+            if (cmd_lowcase.IndexOf("print") == 0
+                || cmd_lowcase.IndexOf("dim") == 0
+                || cmd_lowcase.IndexOf("run") == 0
+                || cmd_lowcase.IndexOf("list") == 0
+                || cmd_lowcase.IndexOf("new") == 0
+                || cmd_lowcase.IndexOf("echo") == 0
+                || cmd_lowcase.IndexOf("sel") == 0
+                || cmd_lowcase.IndexOf("version") == 0
+                || cmd_lowcase.IndexOf("region") == 0
+                || cmd_lowcase.IndexOf("alias") == 0
+                || cmd_lowcase.IndexOf("sprintf") == 0
                 ) {
                 this.WriteLine(command);
             }
