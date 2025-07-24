@@ -18,6 +18,7 @@ class SystemController:
 
         #Erase all send reset twice
         if (option == 1):
+            self.serialPort.ReadResponse()
             self.serialPort.WriteCommand(cmd)
 
         # The device will reset in bootloader or system reset

@@ -18,6 +18,18 @@ class EngineController:
 
         return res.response
     
+    def Stop(self) -> str:        
+        self.serialPort.DiscardInBuffer()
+        self.serialPort.DiscardOutBuffer()
+        
+        data = bytearray(1)
+        data[0] = 27
+        self.serialPort.WriteRawData(data, 0, len(data))
+        
+        res = self.serialPort.ReadResponse()
+
+        return res.response
+    
     def Select(self, num)->bool:
         cmd = f"sel({num})"
 

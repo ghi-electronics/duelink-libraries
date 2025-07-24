@@ -19,7 +19,8 @@ class OtpController:
         ret = self.stream.WriteBytes("b9",data)
 
         # write b9 to dmx
-        self.serialPort.WriteCommand("OtpR(b9)")
+        cmd = f"OtpW({address},b9)"
+        self.serialPort.WriteCommand(cmd)
         ret = self.serialPort.ReadResponse()
 
         return ret.success
