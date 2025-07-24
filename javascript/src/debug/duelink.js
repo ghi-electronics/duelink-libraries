@@ -86,6 +86,24 @@ class SerialInterface {
         await this.portName.sendString(string);
     }
 
+    async ReadChar() {      
+      const data = await this.portName.readbyte()
+      return SerialInterface.Decoder.decode(data)[0];
+    }
+
+    async ReadByte() {
+      const data = await this.portName.readbyte()
+      return data[0];
+
+    }
+
+    async Available() {      
+      if (!this.portName.hasData())
+        await Util.pumpAsync();
+      
+      return this.portName.hasData();
+    }
+
     async ReadResponse() {
       let str = "";
       let total_receviced = 0;
@@ -1238,6 +1256,225 @@ class UartController {
     // }
 }
 
+class StreamController {
+  constructor(serialPort) {
+    this.serialPort = serialPort;
+  }
+
+  async WriteSpi(data) {
+    if (data === null||data.length==0)
+      return 0
+    const count = data.length
+    const cmd = `strmspi(${count})`;
+
+    await this.serialPort.WriteCommand(cmd);  
+    await this.serialPort.ReadResponse();
+
+    while (!this.serialPort.hasData()) {
+      await Util.sleep(1)
+    }
+
+    const prompt = await this.serialPort.ReadChar();
+
+    if (prompt != '&') {
+        throw new Error("Wrong response package");          
+    }
+
+    // ready write data
+    await this.serialPort.WriteRawData(data, 0, data.Length);
+
+    // read x\r\n> (asio(1) not return this)
+    const ret = await this.serialPort.ReadResponse();    
+    
+    if (ret.success) {
+      try {
+        const written = parseInt(ret.response);
+        return written;
+      } catch {
+
+      }
+    }
+    return 0;
+  }
+  
+  async WriteBytes(array_name, data) {
+    if (data === null||data.length==0)
+      return 0
+
+    const count = data.length
+    const cmd = `strmwr(${array_name},${count})`;
+
+    await this.serialPort.WriteCommand(cmd);  
+    
+    // wait for prompt & 
+    while (!await this.serialPort.Available()) {
+      await Util.sleep(1)
+    }
+
+    const prompt = await this.serialPort.ReadChar();
+
+    if (prompt != '&') {
+        throw new Error("Wrong response package");          
+    }
+
+    // ready write data
+    await this.serialPort.WriteRawData(data, 0, data.length);
+
+    // read x\r\n> (asio(1) not return this)
+    const ret = await this.serialPort.ReadResponse();    
+    
+    if (ret.success) {
+      try {
+        const written = parseInt(ret.response);
+        return written;
+      } catch {
+
+      }
+    }
+    return 0;
+  }
+
+  async WriteFloats(array_name, data) {
+    if (data === null||data.length==0)
+      return 0
+
+    const count = data.length
+    const cmd = `strmwr(${array_name},${count})`;
+
+    await this.serialPort.WriteCommand(cmd);  
+    
+    // wait for prompt & 
+    while (!await this.serialPort.Available()) {
+      await Util.sleep(1)
+    }
+
+    const prompt = await this.serialPort.ReadChar();
+
+    if (prompt != '&') {
+        throw new Error("Wrong response package");          
+    }
+
+    // convert float to byte array
+    for (let i = 0; i < count; i++) {
+      const floatArray = new Float32Array(1);
+      floatArray[0] = data[i];
+      const byteArray = new Int8Array(floatArray.buffer);
+
+      const float2bytes = Array.from(byteArray);
+
+      // ready write data
+      await this.serialPort.WriteRawData(float2bytes, 0, float2bytes.length);
+
+    }
+
+    // ready write data
+    //await this.serialPort.WriteRawData(data, 0, data.length);
+
+    // read x\r\n> (asio(1) not return this)
+    const ret = await this.serialPort.ReadResponse();    
+    
+    if (ret.success) {
+      try {
+        const written = parseInt(ret.response);
+        return written;
+      } catch {
+
+      }
+    }
+    return 0;
+  }
+
+  async ReadBytes(array_name, data) {
+    if (data === null||data.length==0)
+      return 0
+
+    const count = data.length
+    const cmd = `strmrd(${array_name},${count})`;
+
+    await this.serialPort.WriteCommand(cmd);  
+    // wait for prompt &
+
+    while (!await this.serialPort.Available()) {
+      await Util.sleep(1)
+    }
+
+    const prompt = await this.serialPort.ReadChar();
+
+    if (prompt != '&') {
+        throw new Error("Wrong response package");          
+    }
+
+    // ready write data
+    await this.serialPort.ReadRawData(data, 0, data.length);
+
+    // read x\r\n> (asio(1) not return this)
+    const ret = await this.serialPort.ReadResponse();    
+    
+    if (ret.success) {
+      try {
+        const read = parseInt(ret.response);
+        return read;
+      } catch {
+
+      }
+    }
+    return 0;
+  }
+
+  async ReadFloats(array_name, data) {
+    if (data === null||data.length==0)
+      return 0
+
+    const count = data.length
+    const cmd = `strmrd(${array_name},${count})`;
+
+    await this.serialPort.WriteCommand(cmd);  
+    // wait for prompt &
+
+    while (!await this.serialPort.Available()) {
+      await Util.sleep(1)
+    }
+
+    const prompt = await this.serialPort.ReadChar();
+
+    if (prompt != '&') {
+        throw new Error("Wrong response package");          
+    }
+
+    // ready write data
+    let data_bytes_x4 = new Uint8Array(data.length * 4);
+
+    await this.serialPort.ReadRawData(data_bytes_x4, 0, data_bytes_x4.length);
+
+    for (let i = 0; i < data.length; i++) {
+      const buffer = new ArrayBuffer(4);
+      const bytes = new Uint8Array(buffer);
+      bytes[0] = data_bytes_x4[i*4 + 3]; 
+      bytes[1] = data_bytes_x4[i*4 + 2]; 
+      bytes[2] = data_bytes_x4[i*4 + 1]; 
+      bytes[3] = data_bytes_x4[i*4 + 0]; 
+
+      const view = new DataView(buffer);
+      data[i] = view.getFloat32(0, false);
+
+    }
+
+    // read x\r\n> (asio(1) not return this)
+    const ret = await this.serialPort.ReadResponse();    
+    
+    if (ret.success) {
+      try {
+        const read = parseInt(ret.response);
+        return read;
+      } catch {
+
+      }
+    }
+    return 0;
+  }
+}
+
+
 class DUELinkController {
     constructor(serial) {
       this.serialPort = new SerialInterface(serial);
@@ -1275,6 +1512,7 @@ class DUELinkController {
   
 
       this.Sound = new SoundController(this.serialPort);
+      this.Stream = new StreamController(this.serialPort);
   
   
     }
