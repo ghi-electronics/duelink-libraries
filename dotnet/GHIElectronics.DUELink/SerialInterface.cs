@@ -258,27 +258,28 @@ namespace GHIElectronics.DUELink {
                                         responseValid = false; // still data, this is bad response, there is no \r\n>xxxx
                                     }
                                 }
-                                else if (dump == '\r') {
-                                    // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
-                                    if (this.port.BytesToRead == 0)
-                                        Thread.Sleep(1); // wait 1ms for sure next byte
+                                //else if (dump == '\r') {
+                                //    // from v036, this case not happened any more. We change Asio(1) to return
+                                //    // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
+                                //    if (this.port.BytesToRead == 0)
+                                //        Thread.Sleep(1); // wait 1ms for sure next byte
 
-                                    if (this.port.BytesToRead > 0) {
-                                        dump = this.port.ReadByte();
+                                //    if (this.port.BytesToRead > 0) {
+                                //        dump = this.port.ReadByte();
 
-                                        if (dump == '\n') {
-                                            if (this.port.BytesToRead > 0)
-                                                dump = this.port.ReadByte();
+                                //        if (dump == '\n') {
+                                //            if (this.port.BytesToRead > 0)
+                                //                dump = this.port.ReadByte();
 
-                                        }
-                                        else {
-                                            responseValid = false;
-                                        }
-                                    }
-                                    else {
-                                        responseValid = false;
-                                    }
-                                }
+                                //        }
+                                //        else {
+                                //            responseValid = false;
+                                //        }
+                                //    }
+                                //    else {
+                                //        responseValid = false;
+                                //    }
+                                //}
                                 else {
                                     // bad data
                                     // One cmd send suppose one response, there is no 1234\r\n5678.... this will consider invalid response
