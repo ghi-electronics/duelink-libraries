@@ -12,11 +12,13 @@ from duelink.i2c import I2cController
 from duelink.frequency import FrequencyController
 from duelink.sound import SoundController
 from duelink.engine import EngineController
+from duelink.stream import StreamController
 
    
 class DUELinkController:
     def __init__(self, transport):
         self.transport = transport
+        self.Stream = StreamController(self.transport)
         self.Digital = DigitalController(self.transport)
         self.Led = LedController(self.transport)
         self.Analog = AnalogController(self.transport)
@@ -28,6 +30,15 @@ class DUELinkController:
         self.Frequency = FrequencyController(self.transport)
         self.Sound = SoundController(self.transport)
         self.Engine = EngineController(self.transport)
+        
+    
+    def __get_ReadTimeout(self):
+        return self.transport.ReadTimeout
+
+    def __set_ReadTimeout(self, value: int):
+        self.transport.ReadTimeout = value 
+
+    ReadTimeout = property(__get_ReadTimeout, __set_ReadTimeout)
     
     
     

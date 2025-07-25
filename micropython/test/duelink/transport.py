@@ -6,7 +6,9 @@ class I2CTransportController:
     def __init__(self, sda, scl, i2ccontroller=1, freq=400000, addr=0x52):
         self.i2c = machine.I2C(i2ccontroller, sda = sda, scl = scl, freq=freq)
         self.addr = addr
-        self.ReadTimeout = 3000
+        self.ReadTimeout = 3000 #ms
+        self.TransferBlockSizeMax = 512
+        self.TransferBlockDelay = 5 #ms
         #time.sleep(0.2)
         self.sync()
         
@@ -19,9 +21,9 @@ class I2CTransportController:
         time.sleep(0.3)
         
         # dump all sync        
-        self.__readchar()
-        self.__readchar()
-        self.__readchar()
+        self.ReadByte()
+        self.ReadByte()
+        self.ReadByte()
         
         #bytes = self.uart.read(3)
         #if bytes is None or len(bytes)<3: # or bytes[2] != 62:
@@ -31,14 +33,16 @@ class I2CTransportController:
         #if len(bytes)>3:
         #    self.uart.read()
     
-    def writeBytes(self, bytes):
-        self.i2c.writeto(self.addr, array.array(bytes))
+    def WriteBytes(self, data):
+        self.i2c.writeto(self.addr, data)
         
-    def write(self, str):
-        self.i2c.writeto(self.addr, str+"\n")
+    def WriteByte(self, b):
+        data = bytearray(1)
+        data[0] = b
+        self.i2c.writeto(self.addr, data)
         
-    def read(self, buf, timeout):
-        pass
+    #def read(self, buf, timeout):
+    #    pass
         #startms = time.ticks_ms()
         #bytesToRead = 0;
         #i=0
@@ -62,23 +66,19 @@ class I2CTransportController:
         #                if bytesToRead == 0:
         #                   break
     
-    def __readchar(self):
+    def ReadByte(self):
         data = self.i2c.readfrom(self.addr, 1)
         if data is not None and len(data) > 0:
             return data
         else:
             data = bytearray(1)
             data[0] = 255 # no data        
-            return data 
-            
+            return data                    
         
-    def execute(self, command):
-        buf = bytearray(128)
-        self.write(command)
-        self.read(buf, 1000)
-        return self.__getResponse(command, buf.decode("utf-8"))
+    def WriteCommand(self, command):        
+        self.WriteBytes(command + "\n")
         
-    def __getResponse(self, command, response):
+    def ReadResponse(self):
         startms = time.ticks_ms()
         str_arr = ""
         total_receviced = 0
@@ -86,7 +86,7 @@ class I2CTransportController:
         dump = 0
         
         while (time.ticks_ms() - startms < self.ReadTimeout):            
-            data = self.__readchar()
+            data = self.ReadByte()
                
             if data[0] > 127:
                 time.sleep(0.001) # no data available, it is 255 - No data in i2c
@@ -97,13 +97,13 @@ class I2CTransportController:
             
             if data[0] == ord('\n'):
                 time.sleep(0.001) # wait 1ms for sure
-                dump = self.__readchar()                
+                dump = self.ReadByte()                
                 
                 # next byte can be >, &, !, $
                 if dump[0] < 255:
                     if dump[0] == ord('>') or dump[0] == ord('!') or dump[0] == ord('$'):
                         time.sleep(0.001) # wait 1ms for sure                        
-                        dump = self.__readchar() # read again
+                        dump = self.ReadByte() # read again
                         if dump[0] < 255:
                             responseValid = False
                     else:
@@ -115,18 +115,18 @@ class I2CTransportController:
                     # dump = 0 # no reset because last dump was read. This is different uart
                     while dump[0] != ord('\n') and time.ticks_ms() - startms < self.ReadTimeout:
                         time.sleep(0.001) # wait 1ms for sure
-                        dump = self.__readchar()
+                        dump = self.ReadByte()
                        
                         if dump[0] == ord('\n'): # \n detected, check next byte
                             time.sleep(0.001) # wait 1ms for sure
-                            dump = self.__readchar()
+                            dump = self.ReadByte()
                             
                             if dump[0] == 255: # after \n if there is no data stop
                                 break
                             
                             if dump[0] == ord('>') or dump[0] == ord('!') or dump[0] == ord('$'):
                                 time.sleep(0.001) # wait 1ms for sure
-                                dump = self.__readchar()
+                                dump = self.ReadByte()
                                 if dump[0] == 255: # after > if there is no data stop
                                     break
                 
@@ -143,7 +143,7 @@ class I2CTransportController:
             startms = time.ticks_ms() #reset timeout after valid data
     
         success = total_receviced > 1 and responseValid == True
-        return (str_arr, success)
+        return (success,str_arr)
                     
                     
                     
@@ -169,6 +169,38 @@ class I2CTransportController:
         #    return (response[cmdIdx:endIdx], success)
         
         #return ("", success)
+               
+    def WriteRawData(self, buffer, offset, count):
+        block = int(count / self.TransferBlockSizeMax)
+        remain = int(count % self.TransferBlockSizeMax)
+
+        idx = offset        
+        
+        while block > 0:
+            self.WriteBytes(buffer[idx:idx + self.TransferBlockSizeMax])
+            idx += self.TransferBlockSizeMax
+            block -= 1
+            time.sleep(self.TransferBlockDelay/1000.0)
+
+        if remain > 0:
+            self.WriteBytes(buffer[idx:idx + remain])
+    
+    def ReadRawData(self, buffer, offset, count):
+        end = time.ticks_ms() + self.ReadTimeout
+        totalRead = 0
+        i = offset
+        
+        while time.ticks_ms() < end and totalRead < count:
+            time.sleep(0.001) # make sure we have data
+            rev = self.ReadByte()
+            buffer[i] = rev[0]
+            i = i + 1
+            totalRead = totalRead + 1
+
+            
+        return totalRead
+        
+            
         
         
     

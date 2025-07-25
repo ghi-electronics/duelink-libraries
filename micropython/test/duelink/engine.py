@@ -13,13 +13,21 @@ class EngineController:
         # TODO
         return ""
     
-    def Run(self, script : str) -> bool:
-        cmd = script
-        self.transport.execute(cmd)
+    def Run(self, script : str) -> bool:        
+        self.transport.WriteCommand(script)        
+        r,s = self.transport.ReadResponse()        
+        return r
+        
+        
+        
 
     def Select(self, num):
         cmd = f"sel({num})"
-        self.transport.execute(cmd)
+        self.transport.WriteCommand(cmd)
+        
+        r,s = self.transport.ReadResponse()
+        
+        return r
         
 
 
