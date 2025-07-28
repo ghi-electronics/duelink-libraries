@@ -202,85 +202,99 @@ class I2CTransportController:
             i = i + 1
             totalRead = totalRead + 1
 
-            
         return totalRead
-        
-            
-        
-        
+
     
 class UartTransportController:
     def __init__(self, id):
-        self.ReadTimeout = 3000
+        self.ReadTimeout = 3000 #ms
         self.uart = machine.UART(id,115200)
-        self.uart.init(115200, bits=8, parity=None, stop=1, timeout=self.ReadTimeout)
-        time.sleep(0.2)
-        self.sync()
+        self.uart.init(115200, bits=8, parity=None, stop=1)        
+        self.TransferBlockSizeMax = 512
+        self.TransferBlockDelay = 5 #ms
         
     def sync(self):
         # Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
         # We jusr send \n as first commands for chain enumeration
         self.uart.write('\n')
         
-        time.sleep(0.3)
+        time.sleep(0.4)
         
         # dump all sync
-        self.uart.read()
-        
-        #bytes = self.uart.read(3)
-        #if bytes is None or len(bytes)<3: # or bytes[2] != 62:
-        #    raise Exception("DUELink not responding")
-        
-        # Sync then discard all bytes
-        #if len(bytes)>3:
-        #    self.uart.read()
+        self.uart.read()        
     
-    def write(self, str):
-        self.uart.write(str+"\n")
-        
-    def read(self, buf, timeout):
-        pass           
+    #def write(self, str):
+    #    self.uart.write(str+"\n")
+    #    
+    #def read(self, buf, timeout):
+    #    pass           
     
-    def execute(self, command):
-        buf = bytearray(128)
-        self.write(command)
-        #self.read(buf, 100000)
-        return self.__getResponse(command, buf.decode("utf-8"))
+    #def execute(self, command):
+    #    buf = bytearray(128)
+    #    self.write(command)
+    #    #self.read(buf, 100000)
+    #    return self.__getResponse(command, buf.decode("utf-8"))
     
-    def streamOutBytes(self, bytes):
-        buf = bytearray(128)
-        self.uart.write(bytearray(bytes))
-        self.read(buf, 1000)
-        return self.__getResponse("", buf.decode("utf-8"))
+    #def streamOutBytes(self, bytes):
+    #    buf = bytearray(128)
+    #    self.uart.write(bytearray(bytes))
+    #    self.read(buf, 1000)
+    #    return self.__getResponse("", buf.decode("utf-8"))
     
-    def streamOutFloats(self, floats):
-        buf = bytearray(128)
-        for f in floats:
-            bf = struct.pack("<f",f)            
-            self.uart.write(bf)   
-        self.read(buf, 1000)
-        return self.__getResponse("", buf.decode("utf-8"))
+    #def streamOutFloats(self, floats):
+    #    buf = bytearray(128)
+    #   for f in floats:
+    #       bf = struct.pack("<f",f)            
+    #        self.uart.write(bf)   
+    #    self.read(buf, 1000)
+    #    return self.__getResponse("", buf.decode("utf-8"))
+    
+    def WriteBytes(self, data):
+        self.uart.write(data)
         
-    def __getResponse(self, command, response):
-        #cmdIdx = response.find(command)
-        #if cmdIdx == -1:
-        #    cmdIdx = 0
-        #else:
-        #    cmdIdx = len(command)+2 # +2 skip \r\n
+    def WriteByte(self, b):
+        data = bytearray(1)
+        data[0] = b
+        self.uart.write(data)        
+    
+    def ReadByte(self):
+        data = self.uart.read(1) 
+        return data
+    
+    def WriteRawData(self, buffer, offset, count):
+        block = int(count / self.TransferBlockSizeMax)
+        remain = int(count % self.TransferBlockSizeMax)
+
+        idx = offset        
         
-        #success = response[cmdIdx] != '!'
-        #if not success:
-        #    cmdIdx = cmdIdx + 1
+        while block > 0:
+            self.WriteBytes(buffer[idx:idx + self.TransferBlockSizeMax])
+            idx += self.TransferBlockSizeMax
+            block -= 1
+            time.sleep(self.TransferBlockDelay/1000.0)
+
+        if remain > 0:
+            self.WriteBytes(buffer[idx:idx + remain])
+    
+    def ReadRawData(self, buffer, offset, count):
+        end = time.ticks_ms() + self.ReadTimeout
+        totalRead = 0
+        i = offset
+        
+        while time.ticks_ms() < end and totalRead < count:
+            time.sleep(0.001) # make sure we have data
+            rev = self.ReadByte()
+            buffer[i] = rev[0]
+            i = i + 1
+            totalRead = totalRead + 1
+
             
-        #if response[cmdIdx] == '>' or response[cmdIdx] == '&':
-        #    return ("", success)
+        return totalRead
         
-        #endIdx = response.find("\r\n>", cmdIdx)
-        #if endIdx >= cmdIdx:
-        #    return (response[cmdIdx:endIdx], success)
+    def WriteCommand(self, command):        
+        self.WriteBytes(command + "\n")
         
-        #return ("", success)
-        
+    def ReadResponse(self):        
         startms = time.ticks_ms()
         str_arr = ""
         total_receviced = 0
@@ -306,20 +320,20 @@ class UartTransportController:
                             
                             if self.uart.any() > 0:
                                 responseValid = False
-                        elif dump[0] == ord('\r'):#there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
-                            if self.uart.any() == 0:
-                                time.sleep(0.001) # wait 1ms for sure
-                                
-                            if self.uart.any() > 0:
-                                dump = self.uart.read(1)
-                                
-                                if dump[0] == ord('\n'):
-                                    if self.uart.any() > 0:
-                                        dump = self.uart.read(1)
-                                else:
-                                    responseValid = False
-                            else:
-                                responseValid = False
+                        #elif dump[0] == ord('\r'):#there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
+                        #    if self.uart.any() == 0:
+                        #        time.sleep(0.001) # wait 1ms for sure
+                        #        
+                        #    if self.uart.any() > 0:
+                        #        dump = self.uart.read(1)
+                        #        
+                        #        if dump[0] == ord('\n'):
+                        #            if self.uart.any() > 0:
+                        #                dump = self.uart.read(1)
+                        #        else:
+                        #            responseValid = False
+                        #    else:
+                        #        responseValid = False
                         else:
                             # bad data
                             # One cmd send suppose one response, there is no 1234\r\n5678.... this will consider invalid response
@@ -351,8 +365,8 @@ class UartTransportController:
                 
         success = total_receviced > 1 and responseValid == True
                 
-        return (str_arr, success)
-        
+        return (success,str_arr)
+
                 
         
     
