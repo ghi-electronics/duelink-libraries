@@ -11,9 +11,31 @@ class StreamController:
     def WriteSpi(self, dataWrite: bytes):
         count = len(dataWrite)
 
-        # declare b1 array
         cmd = f"strmspi({count})"
         self.serialPort.WriteCommand(cmd)
+
+        # wait for prompt &
+        while self.serialPort.BytesToRead() == 0:
+            time.sleep(0.001)
+        
+        prompt = self.serialPort.ReadByte()
+
+        if prompt != '&':
+            raise Exception("Invalid or no responses")
+        
+        # ready to write data
+        self.serialPort.WriteRawData(dataWrite,0, count)
+
+        # read x\r\n> (asio(1) not return this)
+        ret = self.serialPort.ReadResponse()
+
+        if ret.success:
+            try:
+                return int(ret.response)
+            except:
+                return 0                
+        
+        return 0
 
     def WriteBytes(self, arr: str, dataWrite: bytes):
         if dataWrite is None or dataWrite == 0:
@@ -32,7 +54,7 @@ class StreamController:
         prompt = self.serialPort.ReadByte()
 
         if prompt != '&':
-            raise Exception("Invalid response package")
+            raise Exception("Invalid or no responses")
         
         # ready to write data
         self.serialPort.WriteRawData(dataWrite,0, count)
@@ -64,7 +86,7 @@ class StreamController:
         prompt = self.serialPort.ReadByte()
 
         if prompt != '&':
-            raise Exception("Invalid response package")
+            raise Exception("Invalid or no responses")
         
         # ready to write data
         for i in range (0, count):
@@ -99,7 +121,7 @@ class StreamController:
         prompt = self.serialPort.ReadByte()
 
         if prompt != '&':
-            raise Exception("Invalid response package")
+            raise Exception("Invalid or no responses")
         
         # ready to read data
         self.serialPort.ReadRawData(dataRead,0, count)
@@ -131,7 +153,7 @@ class StreamController:
         prompt = self.serialPort.ReadByte()
 
         if prompt != '&':
-            raise Exception("Invalid response package")
+            raise Exception("Invalid or no responses")
         
         # ready to read data
         raw_bytes = bytearray(4)

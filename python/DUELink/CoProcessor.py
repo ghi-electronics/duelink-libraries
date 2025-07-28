@@ -18,7 +18,7 @@ class CoProcessorController:
         # need Xmodem 1K, TODO
         raise Exception("Not implemented")
             
-    def CoprocE(self)->bool:
+    def CoprocS(self)->bool:
         cmd = "CoprocS()"
         self.serialPort.WriteCommand(cmd)
         ret = self.serialPort.ReadResponse()

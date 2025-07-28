@@ -105,7 +105,6 @@ class SpiController:
         #         offsetRead += num
         #         countRead -= num            
 
-        return res.success
     
     
     

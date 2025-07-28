@@ -14,7 +14,7 @@ class SerialInterface:
         self.ReadTimeout = 3
         self.portName = portName
         self.echo = True 
-        self.EnabledAsio = False       
+    
 
     def Connect(self):
         self.portName = serial.Serial(self.portName, self.DefaultBaudRate, parity=serial.PARITY_NONE, bytesize=8, stopbits=serial.STOPBITS_ONE)
@@ -62,7 +62,7 @@ class SerialInterface:
         self.DiscardInBuffer()
         self.DiscardOutBuffer()
 
-        command = cmd.lower()
+        #command = cmd.lower()
         # these commands - statement can't use with println        
         #statement_list = ["print", "dim", "run"]
         #for statement in statement_list:
@@ -71,24 +71,25 @@ class SerialInterface:
         #        break
 
 
-        if (
-            command.find('print') == 0 or 
-            command.find('dim') == 0 or
-            command.find('run') == 0 or
-            command.find('list') == 0 or
-            command.find('new') == 0 or
-            command.find('echo') == 0 or
-            command.find('sel') == 0 or
-            command.find('version') == 0 or
-            command.find('alias') == 0 or            
-            command.find('sprintf') == 0 
-        ):
-            self.__WriteLine(cmd)
-        elif self.EnabledAsio == True:
-            newcmd = f"println({cmd})"
-            self.__WriteLine(newcmd)
-        else:
-            self.__WriteLine(cmd)
+        #if (
+        #    command.find('print') == 0 or 
+        #    command.find('dim') == 0 or
+        #    command.find('run') == 0 or
+        #    command.find('list') == 0 or
+        #    command.find('new') == 0 or
+        #    command.find('echo') == 0 or
+        #    command.find('sel') == 0 or
+        #    command.find('version') == 0 or
+        #    command.find('alias') == 0 or            
+        #    command.find('sprintf') == 0 
+        #):
+        #    self.__WriteLine(cmd)
+        #elif self.EnabledAsio == True:
+        #    newcmd = f"println({cmd})"
+        #    self.__WriteLine(newcmd)
+        #else:
+        #    self.__WriteLine(cmd)
+        self.__WriteLine(cmd)
 
     def __WriteLine(self, string):
         string += "\n"
@@ -209,8 +210,8 @@ class SerialInterface:
     TransferBlockDelay = 0.005
 
     def WriteRawData(self, buffer, offset, count):
-        block = count / self.TransferBlockSizeMax
-        remain = count % self.TransferBlockSizeMax
+        block = int(count / self.TransferBlockSizeMax)
+        remain = int(count % self.TransferBlockSizeMax)
 
         idx = offset
 

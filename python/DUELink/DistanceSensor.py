@@ -5,13 +5,6 @@ class DistanceSensorController:
         self.serialPort = serialPort
 
     def Read(self, trigPin, echoPin)->float:
-
-        if trigPin < 0 or trigPin > self.serialPort.DeviceConfig.MaxPinIO:
-            raise ValueError('Invalid pin')
-
-        if echoPin < 0 or echoPin > self.serialPort.DeviceConfig.MaxPinIO:
-            raise ValueError('Invalid pin')
-
         cmd = f'dist({trigPin},{echoPin})'
         self.serialPort.WriteCommand(cmd)
 
@@ -23,4 +16,4 @@ class DistanceSensorController:
             except ValueError:
                 pass
 
-        return -1
+        return 0
