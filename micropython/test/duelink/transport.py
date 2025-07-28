@@ -19,9 +19,14 @@ class I2CTransportController:
         self.i2c.writeto(self.addr, "\n")
         
         time.sleep(0.3)
-        
+        end = time.ticks_ms() + self.ReadTimeout
         # dump all sync        
-        self.ReadByte()
+        r = self.ReadByte()
+        
+        if r[0] == 255 and time.ticks_ms() <  end:
+            r = self.ReadByte()
+            time.sleep(0.001)
+            
         self.ReadByte()
         self.ReadByte()
         
