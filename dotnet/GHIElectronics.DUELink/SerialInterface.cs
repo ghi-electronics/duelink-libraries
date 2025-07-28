@@ -15,7 +15,6 @@ namespace GHIElectronics.DUELink {
         protected const string CommandCompleteText = ">";
 
         protected SerialPort port;
-        public bool EnabledAsio { get; set; } = true;
 
         //private string leftOver;
 
@@ -79,73 +78,10 @@ namespace GHIElectronics.DUELink {
 
             this.WriteRawData(new byte[] { 10 }, 0, 1);
 
-            Thread.Sleep(300);
+            Thread.Sleep(400);
 
             this.port.DiscardInBuffer();
             this.port.DiscardOutBuffer();
-
-            // Send 127 code to exit running mode 
-            //this.WriteRawData(new byte[] { 127 }, 0, 1);
-
-            //Thread.Sleep(300);
-
-            //this.port.DiscardInBuffer();
-            //this.port.DiscardOutBuffer();
-
-            //this.TurnEchoOff();
-
-            //this.leftOver = "";
-
-            //this.port.DiscardInBuffer();
-            //this.port.DiscardOutBuffer();
-
-
-            //var orig = this.ReadTimeout;
-
-            //this.ReadTimeout = TimeSpan.FromSeconds(1);
-
-            //this.port.ReadTimeout = (int)this.ReadTimeout.TotalMilliseconds;
-
-            //var tryCount = 3;
-
-            //while (tryCount-- > 0) {
-            //    Thread.Sleep(10);
-
-            //    this.leftOver = "";
-
-            //    this.port.DiscardInBuffer();
-            //    this.port.DiscardOutBuffer();
-
-            //    try {
-            //        //var version = this.GetVersion();
-
-            //        var command = "version()";
-
-
-            //        this.WriteCommand(command);
-
-
-            //        var version = this.ReadResponse();
-
-
-            //        if (version.success) {
-
-            //            if (version.response != string.Empty && version.response.Contains(command)) {
-            //                this.TurnEchoOff();
-
-            //            }
-            //            if (version.response != string.Empty && version.response.Contains("GHI Electronics")) {
-            //                break;
-            //            }
-            //        }
-            //    }
-            //    catch {
-
-            //    }
-            //}
-
-            //this.ReadTimeout = orig;
-            //this.port.ReadTimeout = (int)this.ReadTimeout.TotalMilliseconds;
         }
 
         private bool Echo { get; set; } = true;
@@ -187,31 +123,32 @@ namespace GHIElectronics.DUELink {
             this.DiscardOutBuffer();
 
 
-            var cmd_lowcase = command.ToLower();
-            // these commands - statement can't use with println
-            if (cmd_lowcase.IndexOf("print") == 0
-                || cmd_lowcase.IndexOf("dim") == 0
-                || cmd_lowcase.IndexOf("run") == 0
-                || cmd_lowcase.IndexOf("list") == 0
-                || cmd_lowcase.IndexOf("new") == 0
-                || cmd_lowcase.IndexOf("echo") == 0
-                || cmd_lowcase.IndexOf("sel") == 0
-                || cmd_lowcase.IndexOf("version") == 0
-                || cmd_lowcase.IndexOf("region") == 0
-                || cmd_lowcase.IndexOf("alias") == 0
-                || cmd_lowcase.IndexOf("sprintf") == 0
-                ) {
-                this.WriteLine(command);
-            }
+            //var cmd_lowcase = command.ToLower();
+            //// these commands - statement can't use with println
+            //if (cmd_lowcase.IndexOf("print") == 0
+            //    || cmd_lowcase.IndexOf("dim") == 0
+            //    || cmd_lowcase.IndexOf("run") == 0
+            //    || cmd_lowcase.IndexOf("list") == 0
+            //    || cmd_lowcase.IndexOf("new") == 0
+            //    || cmd_lowcase.IndexOf("echo") == 0
+            //    || cmd_lowcase.IndexOf("sel") == 0
+            //    || cmd_lowcase.IndexOf("version") == 0
+            //    || cmd_lowcase.IndexOf("region") == 0
+            //    || cmd_lowcase.IndexOf("alias") == 0
+            //    || cmd_lowcase.IndexOf("sprintf") == 0
+            //    ) {
+            //    this.WriteLine(command);
+            //}
 
-            else if (this.EnabledAsio) {
-                var newcmd = string.Format("println({0})", command);
+            //else if (this.EnabledAsio) {
+            //    var newcmd = string.Format("println({0})", command);
 
-                this.WriteLine(newcmd);
-            }
-            else {
-                this.WriteLine(command);
-            }
+            //    this.WriteLine(newcmd);
+            //}
+            //else {
+            //    this.WriteLine(command);
+            //}
+            this.WriteLine(command);
         }
 
         private void WriteLine(string str) {
@@ -259,7 +196,7 @@ namespace GHIElectronics.DUELink {
                                     }
                                 }
                                 //else if (dump == '\r') {
-                                //    // from v036, this case not happened any more. We change Asio(1) to return
+                                //    // from v036, this case not happened any more. We changed Asio(1) to return
                                 //    // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
                                 //    if (this.port.BytesToRead == 0)
                                 //        Thread.Sleep(1); // wait 1ms for sure next byte

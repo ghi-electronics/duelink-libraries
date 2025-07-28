@@ -27,7 +27,7 @@ namespace GHIElectronics.DUELink {
                 var prompt = this.serialPort.ReadByte();
 
                 if (prompt != '&') {
-                    throw new Exception("Wrong response package");
+                    throw new Exception("Invalid or no responsed");
                 }
 
                 // ready write data

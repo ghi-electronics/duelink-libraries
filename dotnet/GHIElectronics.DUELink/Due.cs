@@ -32,10 +32,6 @@ namespace GHIElectronics.DUELink {
             set => this.serialPort.TransferBlockSizeMax = value;
         }
 
-        public bool EnabledAsio {
-            get => this.serialPort.EnabledAsio;
-            set => this.serialPort.EnabledAsio = value;
-        }
 
         public DeviceConfiguration DeviceConfig { get; set; }
 
