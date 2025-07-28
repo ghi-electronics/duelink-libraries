@@ -47,7 +47,7 @@ class SerialInterface {
 
       await this.WriteRawData(cmd, 0, 1);
 
-      await Util.sleep(300);
+      await Util.sleep(400);
 
       this.portName.resetInputBuffer();
       this.portName.resetOutputBuffer();
