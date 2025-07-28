@@ -1,8 +1,8 @@
 
 
 class EngineController:
-    def __init__(self, transport):
-        self.transport = transport
+    def __init__(self, serialPort):
+        self.serialPort = serialPort
         self.loadscript = ""    
     
     def Record(self, script) -> bool:
@@ -13,19 +13,16 @@ class EngineController:
         # TODO
         return ""
     
-    def Run(self, script : str) -> bool:        
-        self.transport.WriteCommand(script)        
-        r,s = self.transport.ReadResponse()        
+    def Run(self, script : str) -> bool:
+        self.serialPort.WriteCommand(script)        
+        r,s = self.serialPort.ReadResponse()        
         return r
-        
-        
-        
 
     def Select(self, num):
         cmd = f"sel({num})"
-        self.transport.WriteCommand(cmd)
+        self.serialPort.WriteCommand(cmd)
         
-        r,s = self.transport.ReadResponse()
+        r,s = self.serialPort.ReadResponse()
         
         return r
         

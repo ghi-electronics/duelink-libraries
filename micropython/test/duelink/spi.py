@@ -1,21 +1,31 @@
 
-class I2cController:    
 
+class SpiController:
     def __init__(self, serialPort, stream):
         self.serialPort = serialPort
         self.stream = stream
-        self.baudrate = 400
 
-    def Configuration(self, baudrate)->bool:
-
-        self.baudrate = baudrate
-
-        cmd = f"i2ccfg({baudrate})"
+    def Configuration(self, mode, frequency)->bool:                    
+        cmd = f"spicfg({mode}, {frequency})"
         self.serialPort.WriteCommand(cmd)
         r,s = self.serialPort.ReadResponse()
         return r
+    
+    def WriteByte(self, data: int)->int:            
+        cmd = f"spiwr({data})"
+        self.serialPort.WriteCommand(cmd)
+        r,s = self.serialPort.ReadResponse()
+        if r:            
+            try:
+                value = int(s)
+                return value
+            except:
+                pass
 
-    def WriteRead(self, address: int, dataWrite: bytes, dataRead: bytearray) -> bool:
+        return 0
+
+
+    def WriteRead(self, dataWrite: bytes, dataRead: bytearray) -> bool:
         countWrite = len(dataWrite)
         countRead = len(dataRead)
         
@@ -31,15 +41,20 @@ class I2cController:
         self.serialPort.ReadResponse()
 
         # write data to b9 by stream
-        self.stream.WriteBytes("b9", dataWrite)
+        written = self.stream.WriteBytes("b9", dataWrite)
 
-        # issue i2cwr cmd
-        cmd = f"i2cwr({address}, b9, b8)"
+        # issue spi cmd
+        cmd = f"i2cwr(b9, b8)"
         self.serialPort.WriteCommand(cmd)
         self.serialPort.ReadResponse()
 
         # use stream to read data to b8
-        self.stream.ReadBytes("b8", dataRead)
+        read = self.stream.ReadBytes("b8", dataRead)
 
         # return true since we can't check status if Asio(1)
-        return True
+        return (written == countWrite) and (read == countRead)
+
+    
+    
+    
+

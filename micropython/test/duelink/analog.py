@@ -1,14 +1,45 @@
 
-class AnalogController:    
+class AnalogController:        
+    def __init__(self, serialPort):
+        self.serialPort = serialPort
 
-    def __init__(self, transport):
-        self.transport = transport
+    def VRead(self, pin):
+        cmd = "vread({0})".format(pin)
 
-    def VRead(self, pin, pull):
-        r, s = self.transport.execute(f"vread({pin})")
-        if s:
-            return float(r)
+        self.serialPort.WriteCommand(cmd)
+
+        r,s = self.serialPort.ReadResponse()
+
+        if r:
+            try:
+                return float(s)
+            except:
+                pass
+
         return 0
     
-    def PWrite(self, pin, power):
-        self.transport.execute(f"pwrite({pin},{power})")
+    def PWrite(self, pin, duty_cycle):
+               
+        if duty_cycle < 0 or duty_cycle > 1:
+            raise ValueError('Duty cycle must be in the range 0..1')
+
+        cmd = f'pwrite({pin}, {duty_cycle})'
+        self.serialPort.WriteCommand(cmd)
+
+        r,s = self.serialPort.ReadResponse()
+
+        return r
+    
+    def ReadVCC(self):
+        cmd = f"readvcc()"
+        self.serialPort.WriteCommand(cmd)
+        r,s = self.serialPort.ReadResponse()
+
+        if r:
+            try:
+                return float(s)
+            except:
+                pass
+
+        return 0
+    

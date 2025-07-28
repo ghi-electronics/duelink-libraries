@@ -1,23 +1,41 @@
 
 class ButtonController:    
 
-    def __init__(self, transport):
-        self.transport = transport
+    def __init__(self, serialPort):
+        self.serialPort = serialPort
 
     def Enable(self, pin, state, pull):
-        if state :
-            self.transport.execute(f"btnen({pin},1,{pull})")
-        else:
-            self.transport.execute(f"btnen({pin},0,{pull})")
+        cmd = f"btnen({pin}, {int(enable)}, {pull})"
+
+        self.serialPort.WriteCommand(cmd)
+        r,s = self.serialPort.ReadResponse()
+
+        return r
             
     def Up(self, pin):
-        r, s = self.transport.execute(f"btnup({pin})")
-        if s:
-            return r[0] == '1'
-        return 0
+        cmd = f"btnup({pin})"
+
+        self.serialPort.WriteCommand(cmd)
+        r,s = self.serialPort.ReadResponse()
+
+        if r:
+            try:
+                return int(s) == 1
+            except:
+                pass
+
+        return False   
     
     def Down(self, pin):
-        r, s = self.transport.execute(f"btndown({pin})")
-        if s:
-            return r[0] == '1'
-        return 0
+        cmd = f"btndown({pin})"
+
+        self.serialPort.WriteCommand(cmd)
+        r,s = self.serialPort.ReadResponse()
+
+        if r:
+            try:
+                return int(s) == 1
+            except:
+                pass
+
+        return False

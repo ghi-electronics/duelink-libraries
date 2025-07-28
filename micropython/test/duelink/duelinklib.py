@@ -13,30 +13,37 @@ from duelink.frequency import FrequencyController
 from duelink.sound import SoundController
 from duelink.engine import EngineController
 from duelink.stream import StreamController
+from duelink.coprocessor import CoprocessorController
+from duelink.dmx import DMXController
+from duelink.filesystem import FileSystemController
+from duelink.distancesensor import DistanceSensorController
 
    
 class DUELinkController:
-    def __init__(self, transport):
-        self.transport = transport
-        self.Stream = StreamController(self.transport)
-        self.Digital = DigitalController(self.transport)
-        self.Led = LedController(self.transport)
-        self.Analog = AnalogController(self.transport)
-        self.Button = ButtonController(self.transport)
-        self.System = SystemController(self.transport)
-        self.Sound = SoundController(self.transport)
-        self.Graphics = GraphicsController(self.transport)
-        self.I2c = I2cController(self.transport)
-        self.Frequency = FrequencyController(self.transport)
-        self.Sound = SoundController(self.transport)
-        self.Engine = EngineController(self.transport)
+    def __init__(self, serialPort):
+        self.serialPort = serialPort
+        self.Stream = StreamController(self.serialPort)
+        self.Digital = DigitalController(self.serialPort)
+        self.Analog = AnalogController(self.serialPort)
+        self.Button = ButtonController(self.serialPort)
+        self.System = SystemController(self.serialPort)
+        self.Sound = SoundController(self.serialPort)
+        self.Graphics = GraphicsController(self.serialPort)
+        self.I2c = I2cController(self.serialPort)
+        self.Frequency = FrequencyController(self.serialPort)
+        self.Sound = SoundController(self.serialPort)
+        self.Engine = EngineController(self.serialPort)
+        self.Coprocessor = CoprocessorController(self.serialPort,self.Stream)
+        self.DMX = DMXController(self.serialPort,self.Stream)
+        self.FileSystem = FileSystemController(self.serialPort,self.Stream)
+        self.DistanceSensor = DistanceSensorController(self.serialPort)
         
     
     def __get_ReadTimeout(self):
-        return self.transport.ReadTimeout
+        return self.serialPort.ReadTimeout
 
     def __set_ReadTimeout(self, value: int):
-        self.transport.ReadTimeout = value 
+        self.serialPort.ReadTimeout = value 
 
     ReadTimeout = property(__get_ReadTimeout, __set_ReadTimeout)
     

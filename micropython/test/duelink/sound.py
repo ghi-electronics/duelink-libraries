@@ -1,12 +1,15 @@
 import duelink as DL
 
 class SoundController:    
-    def __init__(self, transport):
-        self.transport = transport
+    def __init__(self, serialPort):
+        self.serialPort = serialPort
 
     def Beep(self, pin, frequency, duration_ms):
-        r, s = self.transport.execute(f"beep({pin},{frequency},{duration_ms})")
-        return s
+        cmd = "beep({0}, {1}, {2})".format(pin, frequency, duration)
+        self.serialPort.WriteCommand(cmd)
+        r,s = self.serialPort.ReadResponse()
+        return r
+        
     
     def MelodyPlay(self, pin, notes):
         arr = ""
@@ -18,14 +21,15 @@ class SoundController:
             t = type(notes)
             raise Exception("Invalid notes type '{t}'")
 
-        r, s = self.transport.execute(f"melodyp({pin},{arr})")
-        if not s:
-            raise Exception(r)
+        self.serialPort.WriteCommand(f"melodyp({pin},{arr})")
+        r,s = self.serialPort.ReadResponse()
+        return r
         
     def MelodyStop(self, pin):
-        r, s = self.transport.execute(f"melodys({pin})")
-        if not s:
-            raise Exception(r)
+        cmd = "MelodyS({0})".format(pin)
+        self.serialPort.WriteCommand(cmd)
+        r,s = self.serialPort.ReadResponse()
+        return r
         
 
 

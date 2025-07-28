@@ -1,19 +1,19 @@
 import time
 class StreamController:    
 
-    def __init__(self, transport):
-        self.transport = transport        
+    def __init__(self, serialPort):
+        self.serialPort = serialPort        
 
     def WriteSpi(self, dataWrite: bytes)->int:
         count = len(dataWrite)
 
         cmd = f"strmspi({count})"        
-        self.transport.WriteCommand(cmd)
+        self.serialPort.WriteCommand(cmd)
         
         # wait for prompt &
         prompt = 0
         while True:            
-            data = self.transport.ReadByte()
+            data = self.serialPort.ReadByte()
             if data[0] == ord('&'):
                 prompt = data[0]
                 break
@@ -22,10 +22,10 @@ class StreamController:
             raise Exception("Invalid or no responses")
         
         # ready to write data
-        self.transport.WriteRawData(dataWrite,0, count)
+        self.serialPort.WriteRawData(dataWrite,0, count)
         
         # read x\r\n>
-        r,s = self.transport.ReadResponse()
+        r,s = self.serialPort.ReadResponse()
         
         if r == True:
             try:
@@ -40,13 +40,13 @@ class StreamController:
 
         # declare b1 array
         cmd = f"strmwr({arr},{count})"       
-        self.transport.WriteCommand(cmd)
+        self.serialPort.WriteCommand(cmd)
         
         # wait for prompt &
         prompt = 0
         startms = time.ticks_ms()
-        while (time.ticks_ms() - startms < self.transport.ReadTimeout):            
-            data = self.transport.ReadByte()
+        while (time.ticks_ms() - startms < self.serialPort.ReadTimeout):            
+            data = self.serialPort.ReadByte()
             if data[0] == ord('&'):
                 prompt = data[0]
                 break
@@ -57,10 +57,10 @@ class StreamController:
             raise Exception("Invalid or no responses")
         
         # ready to write data
-        self.transport.WriteRawData(dataWrite,0, count)
+        self.serialPort.WriteRawData(dataWrite,0, count)
         
         # read x\r\n>
-        r,s = self.transport.ReadResponse()
+        r,s = self.serialPort.ReadResponse()
         if r == True:
             try:
                 return int(s)
@@ -76,12 +76,12 @@ class StreamController:
 
         # declare b1 array
         cmd = f"strmrd({arr},{count})"
-        self.transport.WriteCommand(cmd)
+        self.serialPort.WriteCommand(cmd)
 
         # wait for prompt &
         prompt = 0
         while True:            
-            data = self.transport.ReadByte()
+            data = self.serialPort.ReadByte()
             if data[0] == ord('&'):
                 prompt = data[0]
                 break
@@ -90,10 +90,10 @@ class StreamController:
             raise Exception("Invalid or no responses")
         
         # ready to read data
-        self.transport.ReadRawData(dataRead,0, count)
+        self.serialPort.ReadRawData(dataRead,0, count)
 
         # read x\r\n> (asio(1) not return this)
-        r,s = self.transport.ReadResponse()
+        r,s = self.serialPort.ReadResponse()
         
         if r == True:
             try:

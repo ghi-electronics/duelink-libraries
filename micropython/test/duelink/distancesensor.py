@@ -1,5 +1,5 @@
 # CT: 05/26/2025 - Tested
-class DigitalController:    
+class DistanceSensorController:    
 
     def __init__(self, serialPort):
         self.serialPort = serialPort

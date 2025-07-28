@@ -1,25 +1,25 @@
 
 class SystemController:    
 
-    def __init__(self, transport):
-        self.transport = transport
+    def __init__(self, serialPort):
+        self.serialPort = serialPort
 
     def Info(self, code):
-        r, s = self.transport.execute(f"info({code})")
+        r, s = self.serialPort.execute(f"info({code})")
         if s:
             return float(r)
         return 0
     
     def Reset(self, option):
-        self.transport.execute(f"reset({option})")
+        self.serialPort.execute(f"reset({option})")
         
     def StatLed(self, highPeriod, lowPeriod, count):
-        r, s = self.transport.execute(f"statled({highPeriod},{lowPeriod},{count})")
+        r, s = self.serialPort.execute(f"statled({highPeriod},{lowPeriod},{count})")
         if not s:
             raise Exception(r)
         
     def New(self):
-        r, s = self.transport.execute(f"new")
+        r, s = self.serialPort.execute(f"new")
         if not s:
             raise Exception(r)
         
@@ -35,14 +35,14 @@ class SystemController:
         ):
             raise Exception("Invalid array variable must be A0..A9 or B0..B9")
                                                                                                          
-        r, s = self.transport.execute(f"dim {var}[{count}]")
-        r, s = self.transport.execute(f"strmwr({var},{count})")
+        r, s = self.serialPort.execute(f"dim {var}[{count}]")
+        r, s = self.serialPort.execute(f"strmwr({var},{count})")
         if not s:
             raise Excpetion(r)
         if count > 0:
             if var[0] == 'b':
-                self.transport.streamOutBytes(data[offset:offset+count])
+                self.serialPort.streamOutBytes(data[offset:offset+count])
             elif var[0] == 'a':
-                self.transport.streamOutFloats(data[offset:offset+count])
+                self.serialPort.streamOutFloats(data[offset:offset+count])
         
         
