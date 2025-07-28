@@ -5,9 +5,13 @@ class DigitalController:
         self.transport = transport
 
     def Read(self, pin, pull):
-        r, s = self.transport.execute(f"dread({pin},{pull})")
-        if s:
-            return int(r, 10)        
+        self.transport.WriteCommand(f"dread({pin},{pull})")
+        r, s = self.transport.ReadResponse()        
+        if r:
+            print(s)
+            return int(s, 10)        
 
     def Write(self, pin, value):
-        self.transport.execute(f"dwrite({pin},{value})")
+        self.transport.WriteCommand(f"dwrite({pin},{value})")
+        r, s = self.transport.ReadResponse()
+        return r
