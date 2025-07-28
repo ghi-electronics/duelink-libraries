@@ -1,6 +1,3 @@
-from DUELink.SerialInterface import SerialInterface
-from DUELink.Stream import StreamController
-
 class UartController:
     def __init__(self, serialPort, stream):
         self.serialPort = serialPort

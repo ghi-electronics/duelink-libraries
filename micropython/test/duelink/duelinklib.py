@@ -5,18 +5,16 @@ from duelink.analog import AnalogController
 from duelink.button import ButtonController
 from duelink.digital import DigitalController
 from duelink.graphics import GraphicsController
-from duelink.graphicsType import GraphicsTypeController
-from duelink.distanceSensor import DistanceSensorController
+from duelink.distancesensor import DistanceSensorController
 from duelink.frequency import FrequencyController
 from duelink.i2c import I2cController
 from duelink.infrared import InfraredController
 from duelink.system import SystemController
-from duelink.serialInterface import SerialInterface
 from duelink.servo import ServoController
 from duelink.spi import SpiController
 from duelink.touch import TouchController
 from duelink.engine import EngineController
-from duelink.deviceConfiguration import DeviceConfiguration
+from duelink.deviceconfiguration import DeviceConfiguration
 from duelink.temperature import TemperatureController
 from duelink.humidity import HudimityController
 from duelink.sound import SoundController
@@ -48,8 +46,7 @@ class DUELinkController:
         self.Engine = EngineController(self.serialPort)
         self.Temperature = TemperatureController(self.serialPort)
         self.Humidity = HudimityController(self.serialPort)
-        self.System = SystemController(self.serialPort)        
-        self.GraphicsType = GraphicsTypeController()        
+        self.System = SystemController(self.serialPort)                
         self.Sound = SoundController(self.serialPort)
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()       

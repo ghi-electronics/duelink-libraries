@@ -1,5 +1,5 @@
 
-class CoprocessorController:    
+class CoProcessorController:    
 
     def __init__(self, serialPort,stream):
         self.serialPort = serialPort
