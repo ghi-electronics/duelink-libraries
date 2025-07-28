@@ -6,16 +6,60 @@ class EngineController:
         self.loadscript = ""    
     
     def Record(self, script) -> bool:
-        # TODO
-        return False
+        self.serialPort.WriteCommand("new")
+
+        r,s = self.serialPort.ReadResponse()
+        if not r:
+            raise ValueError("Unable to erase the chip memory.")
+
+        cmd = "pgmbrst()"
+
+        raw = script.encode('ASCII')
+
+        data = bytearray(len(raw) + 1)
+
+        data[len(raw)] = 0
+
+        data[0:len(raw)] = raw        
+
+        self.serialPort.WriteCommand(cmd)
+
+        r,s = self.serialPort.ReadResponse()
+
+        if (r == False) :
+            return False
+        
+        self.serialPort.WriteRawData(data, 0, len(data))
+
+        r,s = self.serialPort.ReadResponse()
+
+        return r
             
     def Read(self) -> str:
-        # TODO
-        return ""
+        cmd = "list"
+
+        self.serialPort.WriteCommand(cmd)
+        r,s = self.serialPort.ReadResponse()
+
+        return s   
     
     def Run(self, script : str) -> bool:
         self.serialPort.WriteCommand(script)        
         r,s = self.serialPort.ReadResponse()        
+        return r
+    
+    def Stop(self) -> str:                
+        data = bytearray(1)
+        data[0] = 27
+        self.serialPort.WriteRawData(data, 0, len(data))
+        
+        res = self.serialPort.ReadResponse()
+
+        return res.response
+    
+    def New(self):
+        self.serialPort.WriteCommand(f"new")        
+        r,s = self.serialPort.ReadResponse()           
         return r
 
     def Select(self, num):
