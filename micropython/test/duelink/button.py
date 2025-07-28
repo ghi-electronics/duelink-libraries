@@ -4,7 +4,7 @@ class ButtonController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
 
-    def Enable(self, pin, state, pull):
+    def Enable(self, pin: int, enable: bool, pull: int) -> bool:      
         cmd = f"btnen({pin}, {int(enable)}, {pull})"
 
         self.serialPort.WriteCommand(cmd)
