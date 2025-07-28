@@ -36,7 +36,7 @@ class SerialInterface:
 
         self.WriteRawData(cmd, 0, 1)
         
-        time.sleep(0.3)
+        time.sleep(0.4)
                 
         self.portName.reset_input_buffer()
         self.portName.reset_output_buffer() 
