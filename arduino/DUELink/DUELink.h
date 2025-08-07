@@ -15,13 +15,17 @@
 #include "Stream.h"
 #include "CoProcessor.h"
 #include "DistanceSensor.h"
+#include "DMX.h"
+#include "FileSystem.h"
+
 
 class DUELink {
 public:
     DUELink(DUELinkTransport &transport) :
     Stream(transport), Analog(transport), Button(transport), Digital(transport), Engine(transport),
     Frequency(transport), Graphics(transport), I2c(transport), Led(transport),
-    Sound(transport), System(transport), CoProcessor(transport,Stream), DistanceSensor(transport) {
+    Sound(transport), System(transport), CoProcessor(transport,Stream), DistanceSensor(transport),
+    DMX(transport,Stream), FileSystem(transport,Stream) {
         m_pTransport = &transport;
     }
     
@@ -46,6 +50,8 @@ public:
     StreamController Stream;
     CoProcessorController CoProcessor;
     DistanceSensorController DistanceSensor;
+    DMXController DMX;
+    FileSystemController FileSystem;
 
     void SetTimeout(int timeout_ms) {
         m_pTransport->ReadTimeout = timeout_ms;
