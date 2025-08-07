@@ -13,13 +13,15 @@
 #include "Sound.h"
 #include "Graphics.h"
 #include "Stream.h"
+#include "CoProcessor.h"
+#include "DistanceSensor.h"
 
 class DUELink {
 public:
     DUELink(DUELinkTransport &transport) :
-    Analog(transport), Button(transport), Digital(transport), Engine(transport),
+    Stream(transport), Analog(transport), Button(transport), Digital(transport), Engine(transport),
     Frequency(transport), Graphics(transport), I2c(transport), Led(transport),
-    Sound(transport), System(transport), Stream(transport) {
+    Sound(transport), System(transport), CoProcessor(transport,Stream), DistanceSensor(transport) {
         m_pTransport = &transport;
     }
     
@@ -42,6 +44,8 @@ public:
     SoundController Sound;
     SystemController System;
     StreamController Stream;
+    CoProcessorController CoProcessor;
+    DistanceSensorController DistanceSensor;
 
     void SetTimeout(int timeout_ms) {
         m_pTransport->ReadTimeout = timeout_ms;

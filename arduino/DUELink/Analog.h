@@ -14,7 +14,7 @@ public:
         m_pTransport = &transport;
     }
 
-    float VRead(int pin)
+    float Read(int pin)
     {
         char cmd[32];
         sprintf(cmd, "vread(%d)", pin);
@@ -25,7 +25,7 @@ public:
         return 0;
     }
 
-    bool PWrite(int pin, float power)
+    bool Write(int pin, float power)
     {
         char cmd[32];
         sprintf(cmd, "pwrite(%d,%g)", pin, power);
