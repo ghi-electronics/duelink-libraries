@@ -13,10 +13,12 @@ public:
     } 
 
     bool Write(int pin, int frequency, int duration_ms, float duty) {
-      char cmd[128];
-      sprintf(cmd, "freq(%d,%d,%d,%g)", pin, frequency, duration_ms, duty);
-      DUELinkTransport::Response result = m_pTransport->execute(cmd);
-      return result.success;
+        char cmd[128];
+        sprintf(cmd, "freq(%d,%d,%d,%g)", pin, frequency, duration_ms, duty);
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+        return result.success;
     }
 
 private:

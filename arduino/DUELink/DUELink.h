@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 #include "DUELinkTransport.h"
 #include "System.h"
 #include "Led.h"
@@ -24,10 +23,10 @@ public:
     }
     
     bool Connect() {
-        char escseq[] = {0x1b, 0};  
+        
         m_pTransport->begin();
         m_pTransport->sync();
-        m_pTransport->execute(">");
+        
         return 1;
     }
 

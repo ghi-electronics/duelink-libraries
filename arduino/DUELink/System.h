@@ -18,9 +18,10 @@ public:
   {
     char cmd[32];
     sprintf(cmd, "info(%d)", code);
-    DUELinkTransport::Response result = m_pTransport->execute(cmd);
+    m_pTransport->WriteCommand(cmd);
+    DUELinkTransport::Response result = m_pTransport->ReadResponse();
     if (result.success)
-      return atof(result.result.c_str());
+      return atof(result.response.c_str());
     return 0;
   }
 
@@ -34,39 +35,39 @@ public:
   {
     char cmd[64];
     sprintf(cmd, "statled(%d,%d,%d)", highPeriod, lowPeriod, count);
-    m_pTransport->execute(cmd);
+    m_pTransport->WriteCommand(cmd);
   }
 
   void New()
   {
-    m_pTransport->execute("new");
+    m_pTransport->WriteCommand("new");
   }
 
-  void SetArrayValue(const char *var, const void *data, int offset, int count)
-  {
-    if (strlen(var) != 2 || (var[1] < '0' && var[1] > '9'))
-      return;
+  // void SetArrayValue(const char *var, const void *data, int offset, int count)
+  // {
+    // if (strlen(var) != 2 || (var[1] < '0' && var[1] > '9'))
+      // return;
     
-    char cmd[32];
+    // char cmd[32];
 
-    sprintf(cmd, "dim %s[%d]",var,count);
-    DUELinkTransport::Response result = m_pTransport->execute(cmd);
-    if (!result.success) return;
+    // sprintf(cmd, "dim %s[%d]",var,count);
+    // DUELinkTransport::Response result = m_pTransport->WriteCommand(cmd);
+    // if (!result.success) return;
 
-    sprintf(cmd, "strmwr(%s,%d)", var, count);
-    result = m_pTransport->execute(cmd);
-    if (!result.success) return;
+    // sprintf(cmd, "strmwr(%s,%d)", var, count);
+    // result = m_pTransport->WriteCommand(cmd);
+    // if (!result.success) return;
 
-    char prefix = tolower(var[0]);
-    if (prefix == 'a')
-    {
-      m_pTransport->streamOutFloats(((const float *)data) + offset, count);
-    }
-    else if (prefix == 'b')
-    {
-      m_pTransport->streamOutBytes(((const char *)data) + offset, count);
-    }
-  }
+    // char prefix = tolower(var[0]);
+    // if (prefix == 'a')
+    // {
+      // m_pTransport->streamOutFloats(((const float *)data) + offset, count);
+    // }
+    // else if (prefix == 'b')
+    // {
+      // m_pTransport->streamOutBytes(((const char *)data) + offset, count);
+    // }
+  // }
 
 private:
   DUELinkTransport *m_pTransport = NULL;

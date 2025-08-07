@@ -19,9 +19,11 @@ public:
     {
         char cmd[32];
         sprintf(cmd, "dread(%d,%d)", pin, pull);
-        DUELinkTransport::Response result = m_pTransport->execute(cmd);
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
+        
         if (result.success)
-            return atoi(result.result.c_str());
+            return atoi(result.response.c_str());
         return false;
     }
 
@@ -29,7 +31,7 @@ public:
     {
         char cmd[32];
         sprintf(cmd, "dwrite(%d,%d)", pin, state);
-        m_pTransport->execute(cmd);
+        m_pTransport->WriteCommand(cmd);
     }
 
 private:

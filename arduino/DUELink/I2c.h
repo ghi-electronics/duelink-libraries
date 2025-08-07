@@ -15,7 +15,8 @@ public:
     bool Configuration(int speed) {
         char cmd[64];
         sprintf(cmd, "i2ccfg(%d)", speed);
-        DUELinkTransport::Response result = m_pTransport->execute(cmd);
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
         return result.success;
     }
 
@@ -35,7 +36,8 @@ public:
         String arr = build_bytearray(dataWrite, offsetWrite, countWrite);
         char *cmd = new char[32 + arr.length()];
         sprintf(cmd, "i2cwr(%d,%s,0)", address, arr.c_str());
-        DUELinkTransport::Response result = m_pTransport->execute(cmd);
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
         delete []cmd;
         return result.success;
     }

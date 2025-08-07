@@ -18,17 +18,22 @@ public:
     {
         char cmd[32];
         sprintf(cmd, "vread(%d)", pin);
-        DUELinkTransport::Response result = m_pTransport->execute(cmd);
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
         if (result.success)
-            return atof(result.result.c_str());
+            return atof(result.response.c_str());
         return 0;
     }
 
-    void PWrite(int pin, float power)
+    bool PWrite(int pin, float power)
     {
         char cmd[32];
         sprintf(cmd, "pwrite(%d,%g)", pin, power);
-        m_pTransport->execute(cmd);
+        m_pTransport->WriteCommand(cmd);
+
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+        return result.success;
     }
 
 private:

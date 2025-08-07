@@ -16,16 +16,29 @@ public:
       return false;    
     }
 
-    bool Run(const char *script) {
-      DUELinkTransport::Response result = m_pTransport->execute(script);
+    bool Run() {
+      m_pTransport->WriteCommand("run");
+      DUELinkTransport::Response result = m_pTransport->ReadResponse();
       return result.success;
     }
 
-    void Select(int num) {
+    bool Select(int num) {
       char cmd[32];
       sprintf(cmd, "sel(%d)", num);
-      m_pTransport->execute(cmd);
+      m_pTransport->WriteCommand(cmd);
+      DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+      return result.success;
     }
+
+    bool WriteCommand(char* cmd) {
+      m_pTransport->WriteCommand(cmd);
+      DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+      return result.success;
+    }
+
+
 
 private:
     DUELinkTransport *m_pTransport = NULL;
