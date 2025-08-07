@@ -19,15 +19,19 @@
 #include "FileSystem.h"
 #include "Temperature.h"
 #include "Humidity.h"
+#include "Infrared.h"
+#include "Otp.h"
 
 
 class DUELink {
 public:
     DUELink(DUELinkTransport &transport) :
     Stream(transport), Analog(transport), Button(transport), Digital(transport), Engine(transport),
-    Frequency(transport), Graphics(transport), I2c(transport), Led(transport),
+    Frequency(transport), Graphics(transport), I2c(transport,Stream), Led(transport),
     Sound(transport), System(transport), CoProcessor(transport,Stream), DistanceSensor(transport),
-    DMX(transport,Stream), FileSystem(transport,Stream),Humidity(transport), Temperature(transport ){
+    DMX(transport,Stream), FileSystem(transport,Stream),Humidity(transport), Temperature(transport ),
+    Infrared(transport), Otp(transport,Stream)
+    {
         m_pTransport = &transport;
     }
     
@@ -56,6 +60,8 @@ public:
     FileSystemController FileSystem;
     TemperatureController Temperature;
     HumidityController Humidity;
+    InfraredController Infrared;
+    OtpController Otp;
 
     void SetTimeout(int timeout_ms) {
         m_pTransport->ReadTimeout = timeout_ms;

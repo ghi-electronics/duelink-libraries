@@ -7,17 +7,17 @@
 #include "DUELinkTransport.h"
 #include "Stream.h"
 
-class DMXController
+class OtpController
 {
 public:
-    DMXController(DUELinkTransport &transport,StreamController &stream)
+    OtpController(DUELinkTransport &transport,StreamController &stream)
     {
         m_pTransport = &transport;
         m_pStream = &stream;
         
     }
 
-    bool Write(const byte* channel_data, int count)
+    bool Write(int address, const byte* data, int count)
     {
         char cmd[32];
 
@@ -27,19 +27,20 @@ public:
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
         
         //write data to b9
-        int written = m_pStream->WriteBytes("b9", channel_data, count);
+        int written = m_pStream->WriteBytes("b9", data, count);
 
-        //write b9 to dmx
-        m_pTransport->WriteCommand("DmxW(b9)");
+        //write b9 to otp
+        sprintf(cmd, "OtpW(%d,b9)", address);
+        m_pTransport->WriteCommand(cmd);
         result = m_pTransport->ReadResponse();   
 
         return result.success;
     }
 
-    int Read(int channel)
+    int Read(int address)
     {
         char cmd[32];
-        sprintf(cmd, "DmxR(%d)", channel);
+        sprintf(cmd, "OtpR(%d)", address);
         m_pTransport->WriteCommand(cmd);
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
         
@@ -47,26 +48,6 @@ public:
             return atoi(result.response.c_str());
         return 0;
     }
-
-    bool Ready()
-    {        
-        m_pTransport->WriteCommand("DmxRdy()");
-        DUELinkTransport::Response result = m_pTransport->ReadResponse();
-        
-        if (result.success)
-            return atoi(result.response.c_str()) > 0;
-        return false;
-    }
-
-    bool Update()
-    {        
-        m_pTransport->WriteCommand("DmxU()");
-        DUELinkTransport::Response result = m_pTransport->ReadResponse();
-        
-        return result.success;
-    }
-
-    
 
 private:
     DUELinkTransport *m_pTransport = NULL;
