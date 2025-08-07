@@ -17,6 +17,8 @@
 #include "DistanceSensor.h"
 #include "DMX.h"
 #include "FileSystem.h"
+#include "Temperature.h"
+#include "Humidity.h"
 
 
 class DUELink {
@@ -25,7 +27,7 @@ public:
     Stream(transport), Analog(transport), Button(transport), Digital(transport), Engine(transport),
     Frequency(transport), Graphics(transport), I2c(transport), Led(transport),
     Sound(transport), System(transport), CoProcessor(transport,Stream), DistanceSensor(transport),
-    DMX(transport,Stream), FileSystem(transport,Stream) {
+    DMX(transport,Stream), FileSystem(transport,Stream),Humidity(transport), Temperature(transport ){
         m_pTransport = &transport;
     }
     
@@ -52,6 +54,8 @@ public:
     DistanceSensorController DistanceSensor;
     DMXController DMX;
     FileSystemController FileSystem;
+    TemperatureController Temperature;
+    HumidityController Humidity;
 
     void SetTimeout(int timeout_ms) {
         m_pTransport->ReadTimeout = timeout_ms;
