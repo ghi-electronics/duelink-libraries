@@ -12,13 +12,14 @@
 #include "I2c.h"
 #include "Sound.h"
 #include "Graphics.h"
+#include "Stream.h"
 
 class DUELink {
 public:
     DUELink(DUELinkTransport &transport) :
     Analog(transport), Button(transport), Digital(transport), Engine(transport),
     Frequency(transport), Graphics(transport), I2c(transport), Led(transport),
-    Sound(transport), System(transport) {
+    Sound(transport), System(transport), Stream(transport) {
         m_pTransport = &transport;
     }
     
@@ -40,6 +41,18 @@ public:
     LedController Led;
     SoundController Sound;
     SystemController System;
+    StreamController Stream;
+
+    void SetTimeout(int timeout_ms) {
+        m_pTransport->ReadTimeout = timeout_ms;
+    }
+
+    int GetTimeout() {
+        return m_pTransport->ReadTimeout;
+    }
+
+
+
 
 private:
     DUELinkTransport *m_pTransport = NULL;

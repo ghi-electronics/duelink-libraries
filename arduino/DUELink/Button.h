@@ -25,7 +25,8 @@ public:
         sprintf(cmd, "btnup(%d)", pin); 
         m_pTransport->WriteCommand(cmd);
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
-        if (result.success) return result.response[0] == '1';
+        if (result.success) 
+            return result.response[0] == '1';
         return false;
     }
 
@@ -34,7 +35,8 @@ public:
         sprintf(cmd, "btndown(%d)", pin); 
         m_pTransport->WriteCommand(cmd);
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
-        if (result.success) return result.response[0] == '1';
+        if (result.success) 
+            return result.response[0] == '1';
         return false;
     }     
 private:

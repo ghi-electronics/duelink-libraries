@@ -30,12 +30,21 @@ public:
     
 public:
     int ReadTimeout = 3000;
+    int TransferBlockSizeMax = 512;
+    int TransferBlockDelay = 10;
+
     virtual void begin() = 0;
     virtual void beginTransmission() = 0;
     virtual void write(const char *str) = 0;    
     virtual void endTransmission() = 0;
     virtual void WriteCommand(const char *command) = 0;
     virtual Response ReadResponse() = 0;
+    virtual void WriteRawData(const byte* buffer, int offset, int count) = 0;
+    virtual int ReadRawData(byte* buffer, int offset, int count) = 0;
+    virtual void DiscardInBuffer() = 0;
+    virtual int ReadByte() = 0;
+    virtual void WriteByte(byte b);
+    virtual void WriteBytes(const byte* data, int count);
 
     // virtual Response streamOutBytes(const char *bytes, int count) = 0;
     // virtual Response streamOutFloats(const float *floats, int count) = 0;
@@ -102,8 +111,23 @@ public:
         // read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
         // return getResponse("", buf);
     // }
+    //void WriteByte(uint8_t b) {
+    //    m_link.write(b);
+    //}
 
-    int ReadByte() {
+    virtual void WriteByte(byte b) {
+        beginTransmission();
+        m_link.write(b);
+        endTransmission();
+    }
+
+    virtual void WriteBytes(const byte* data, int count) {
+        beginTransmission();
+        m_link.write(data, count);
+        endTransmission();
+    }
+
+    virtual int ReadByte() {
         m_link.requestFrom(m_i2cAddress, 1, 1);
 
         if (m_link.available()) {
@@ -313,7 +337,40 @@ public:
       
     //    return {.result = "", .success = success};
     //  }
+    virtual void WriteRawData(const byte* buffer, int offset, int count) {
+        int block = count / TransferBlockSizeMax;
+        int remain = count % TransferBlockSizeMax; 
+        int idx = offset;
 
+        while (block > 0) {
+            WriteBytes(&buffer[idx], TransferBlockSizeMax);
+            idx += TransferBlockSizeMax;
+            block--;
+            delay(TransferBlockDelay);
+        }
+
+        if (remain > 0) {
+            WriteBytes(&buffer[idx], remain);            
+        }
+    }
+    virtual int ReadRawData(byte* buffer, int offset, int count) {
+        unsigned long end = millis() + ReadTimeout;
+        int totalRead = 0;
+        int i = offset;
+        while (end > millis() && totalRead < count) {
+            delay(1); // make sure we have data
+            int read = ReadByte();
+            buffer[i] = read;
+            i++;
+            totalRead++;
+        }
+        
+        return totalRead;
+    }
+
+    virtual void DiscardInBuffer() { // i2c discard
+        while (ReadByte() != 255);
+    }
 private:
     TwoWire &m_link;
     int m_i2cAddress;

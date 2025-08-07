@@ -36,6 +36,15 @@ public:
         return result.success;
     }
 
+    float ReadVCC()
+    {       
+        m_pTransport->WriteCommand("ReadVCC()");
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
+        if (result.success)
+            return atof(result.response.c_str());
+        return 0;
+    }
+
 private:
     DUELinkTransport *m_pTransport = NULL;
 };
