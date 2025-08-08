@@ -7,12 +7,8 @@ class EngineController:
         self.loadscript = ""    
 
     # run("version()/list") return version string, so need to return a string
-    def Run(self, script : str) -> str:        
-        self.serialPort.DiscardInBuffer()
-        self.serialPort.DiscardOutBuffer()
-        
-        cmd = script + "\n"
-        self.serialPort.WriteRawData(bytes(cmd, 'utf-8'), 0, len(cmd))
+    def Run(self) -> str:        
+        self.serialPort.WriteCommand("run")
         
         res = self.serialPort.ReadResponse()
 
@@ -39,13 +35,25 @@ class EngineController:
 
         return res.success
     
-    def Record(self, script) -> bool:
-        self.serialPort.WriteCommand("new")
-
-        res = self.serialPort.ReadResponse()
-        if not res.success:
-            raise ValueError("Unable to erase the chip memory.")
-
+    def Record(self, script,region) -> bool:
+        if region == 0:
+            self.serialPort.WriteCommand("new all")  
+            res = self.serialPort.ReadResponse() 
+            if res.success == False:
+                return False
+        elif region == 1:
+            self.serialPort.WriteCommand("region(1)")  
+            res = self.serialPort.ReadResponse() 
+            if res.success == False:
+                return False
+            
+            self.serialPort.WriteCommand("new")  
+            res = self.serialPort.ReadResponse() 
+            if res.success == False:
+                return False
+        else:
+            return False
+        
         cmd = "pgmbrst()"
 
         raw = script.encode('ASCII')
@@ -75,7 +83,14 @@ class EngineController:
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadResponse2()
 
-        return res.response    
+        return res.response 
+
+    def WriteCommand(self, cmd:str) -> str:
+        self.serialPort.WriteCommand(cmd)
+        res = self.serialPort.ReadResponse()
+
+        return res.response 
+
 
     
 

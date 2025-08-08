@@ -92,7 +92,7 @@ class SystemController:
         res = self.serialPort.ReadResponse()
         return res.success
     
-    def Shtdn(self, wkpin: int)-> bool:
+    def Shutdown(self, wkpin: int)-> bool:
         cmd = f"shtdn({wkpin})"
         self.serialPort.WriteCommand(cmd)
 

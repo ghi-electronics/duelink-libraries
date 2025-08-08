@@ -8,7 +8,7 @@ class OtpController:
         self.serialPort = serialPort
         self.stream = stream
 
-    def OtpW(self, address: int, data: bytes)->bool:
+    def Write(self, address: int, data: bytes)->bool:
         count = len(data)
         # declare b9 array
         cmd = f"dim b9[{count}]"
@@ -25,7 +25,7 @@ class OtpController:
 
         return ret.success
 
-    def OtpR(self, address: int)->int:
+    def Read(self, address: int)->int:
         cmd = f"OtpR({address})"
         self.serialPort.WriteCommand(cmd)
         ret = self.serialPort.ReadResponse()
