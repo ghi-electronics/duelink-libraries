@@ -7,8 +7,8 @@ class GraphicsType:
     Matrix5x5 = 4
     
 class GraphicsController:
-    def __init__(self, transport):
-        self.transport = transport
+    def __init__(self, serialPort):
+        self.serialPort = serialPort
 
     def Configuration(self, type, config, width, height, mode):
         cfg_array = "{"
@@ -18,48 +18,91 @@ class GraphicsController:
             cfg_array = cfg_array + str(n)
         cfg_array = cfg_array + "}"
         
-        r, s = self.transport.execute(f"gfxcfg({type},{cfg_array},{width},{height},{mode})")
-        return s
+        cmd = f"gfxcfg({type},{cfg_array},{width},{height},{mode})"
+        
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
     
     def Show(self):
-        r, s = self.transport.execute("show()")
-        return s
+        cmd = "show()"
+        self.serialPort.WriteCommand(cmd)
+        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
     
     def Clear(self, color):
-        r, s = self.transport.execute(f"clear({color})")
-        return s
+        cmd =f"clear({color})"
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
     
     def Pixel(self, color, x, y):
-        r, s = self.transport.execute(f"pixel({color},{x},{y})")
-        return s
+        cmd =f"pixel({color},{x},{y})"
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
+
     
     def Circle(self, color, x, y, r):
-        r, s = self.transport.execute(f"circle({color},{x},{y},{r})")
-        return s
+        cmd =f"circle({color},{x},{y},{r})"
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
+
     
     def Rect(self, color, x, y, w, h):
-        r, s = self.transport.execute(f"rect({color},{x},{y},{w},{h})")
-        return s
+        cmd =f"rect({color},{x},{y},{w},{h})"
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
+
     
     def Fill(self, color, x, y, w, h):
-        r, s = self.transport.execute(f"fill({color},{x},{y},{w},{h})")
-        return s
+        cmd =f"fill({color},{x},{y},{w},{h})"
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
+
     
     def Line(self, color, x1, y1, x2, y2):
-        r, s = self.transport.execute(f"line({color},{x1},{y1},{x2},{y2})")
-        return s
+        cmd =f"line({color},{x1},{y1},{x2},{y2})"
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
+
         
     def Text(self, text, color, x, y):
-        r, s = self.transport.execute(f"text(\"{text}\",{color},{x},{y})")
-        return s
+        cmd =f"text(\"{text}\",{color},{x},{y})"
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
+
         
     def TextS(self, text, color, x, y, sx, sy):
-        r, s = self.transport.execute(f"texts(\"{text}\",{color},{x},{y},{sx},{sy})")
-        return s
+        cmd =f"texts(\"{text}\",{color},{x},{y},{sx},{sy})"
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
+
     
     def TextT(self, text, color, x, y):
-        r, s = self.transport.execute(f"textt(\"{text}\",{color},{x},{y})")
-        return s
+        cmd =f"textt(\"{text}\",{color},{x},{y})"
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
+
     
     def DrawImage(self, img, x, y, w, h, transform):
         return self.DrawImageScale(img, x, y, w, h, 1, 1, transform)
@@ -76,6 +119,10 @@ class GraphicsController:
             t = type(img)
             raise Exception("Invalid image type '{t}'")
         
-        r, s = self.transport.execute(f"imgs({img_arr},{x},{y},{w},{h},{sx},{sy},{transform})")
-        return s
+        cmd =f"imgs({img_arr},{x},{y},{w},{h},{sx},{sy},{transform})"
+        self.serialPort.WriteCommand(cmd)        
+        r,s = self.serialPort.ReadResponse()
+
+        return r
+
             

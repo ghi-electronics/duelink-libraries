@@ -1,13 +1,16 @@
 # CT: 05/26/2025 - Tested
 class DigitalController:    
 
-    def __init__(self, transport):
-        self.transport = transport
+    def __init__(self, serialPort):
+        self.serialPort = serialPort
 
     def Read(self, pin, pull):
-        r, s = self.transport.execute(f"dread({pin},{pull})")
-        if s:
-            return int(r, 10)        
+        self.serialPort.WriteCommand(f"dread({pin},{pull})")        
+        r, s = self.serialPort.ReadResponse()        
+        if r:
+            return int(s, 10)        
 
     def Write(self, pin, value):
-        self.transport.execute(f"dwrite({pin},{value})")
+        self.serialPort.WriteCommand(f"dwrite({pin},{value})")
+        r, s = self.serialPort.ReadResponse()
+        return r
