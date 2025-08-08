@@ -21,6 +21,9 @@
 #include "Humidity.h"
 #include "Infrared.h"
 #include "Otp.h"
+#include "Pulse.h"
+#include "Rtc.h"
+#include "Servo.h"
 
 
 class DUELink {
@@ -30,7 +33,7 @@ public:
     Frequency(transport), Graphics(transport), I2c(transport,Stream), Led(transport),
     Sound(transport), System(transport), CoProcessor(transport,Stream), DistanceSensor(transport),
     DMX(transport,Stream), FileSystem(transport,Stream),Humidity(transport), Temperature(transport ),
-    Infrared(transport), Otp(transport,Stream)
+    Infrared(transport), Otp(transport,Stream), Pulse(transport),Rtc(transport,Stream),Servo(transport)
     {
         m_pTransport = &transport;
     }
@@ -62,6 +65,9 @@ public:
     HumidityController Humidity;
     InfraredController Infrared;
     OtpController Otp;
+    PulseController Pulse;
+    RtcController Rtc;
+    ServoController Servo;
 
     void SetTimeout(int timeout_ms) {
         m_pTransport->ReadTimeout = timeout_ms;
