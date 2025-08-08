@@ -29,18 +29,52 @@ public:
   {
     char cmd[32];
     sprintf(cmd, "reset(%d)", option);
+    m_pTransport->WriteCommand(cmd);
+    if (option == 1) {
+      m_pTransport->ReadResponse();
+      m_pTransport->WriteCommand(cmd);
+    }
+    m_pTransport->Disconnect();
   }
 
-  void StatLed(int highPeriod, int lowPeriod, int count)
+  int GetTickMicroseconds() {
+    
+    m_pTransport->WriteCommand("tickus()");
+    DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+    if (result.success)
+        return atoi(result.response.c_str());
+    return false;
+  }
+
+  int GetTickMilliseconds() {
+    
+    m_pTransport->WriteCommand("tickms()");
+    DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+    if (result.success)
+        return atoi(result.response.c_str());
+    return false;
+  }
+
+  bool StatLed(int highPeriod, int lowPeriod, int count)
   {
     char cmd[64];
     sprintf(cmd, "statled(%d,%d,%d)", highPeriod, lowPeriod, count);
     m_pTransport->WriteCommand(cmd);
+
+    DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+    return result.success;
   }
 
-  void New()
-  {
-    m_pTransport->WriteCommand("new");
+  void Shutdown(int wkpin) {
+    char cmd[64];
+    sprintf(cmd, "shtdn(%d)", wkpin);
+    m_pTransport->WriteCommand(cmd);
+
+    // shutdown no response
+
   }
 
   // void SetArrayValue(const char *var, const void *data, int offset, int count)

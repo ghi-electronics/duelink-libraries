@@ -21,7 +21,11 @@ public:
     }
 
     bool MelodyPlay(int pin, const void *notes, int count) {
-        String s;
+#ifdef ARDUINO
+    String s;
+#else
+    std::string s;
+#endif        
         const char *arr;
         int extraBytes;
 

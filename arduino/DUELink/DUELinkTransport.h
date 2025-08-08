@@ -43,8 +43,9 @@ public:
     virtual int ReadRawData(byte* buffer, int offset, int count) = 0;
     virtual void DiscardInBuffer() = 0;
     virtual int ReadByte() = 0;
-    virtual void WriteByte(byte b);
-    virtual void WriteBytes(const byte* data, int count);
+    virtual void WriteByte(byte b) = 0;
+    virtual void WriteBytes(const byte* data, int count) = 0;
+    virtual void Disconnect() = 0;
 
     // virtual Response streamOutBytes(const char *bytes, int count) = 0;
     // virtual Response streamOutFloats(const float *floats, int count) = 0;
@@ -90,6 +91,10 @@ public:
 
     virtual void endTransmission() {
         m_link.endTransmission();
+    }
+
+    virtual void Disconnect() {
+        m_link.end();
     }
 
     // virtual Response streamOutBytes(const char *bytes, int count) {

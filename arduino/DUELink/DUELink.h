@@ -24,6 +24,9 @@
 #include "Pulse.h"
 #include "Rtc.h"
 #include "Servo.h"
+#include "Spi.h"
+#include "Touch.h"
+#include "Uart.h"
 
 
 class DUELink {
@@ -33,7 +36,8 @@ public:
     Frequency(transport), Graphics(transport), I2c(transport,Stream), Led(transport),
     Sound(transport), System(transport), CoProcessor(transport,Stream), DistanceSensor(transport),
     DMX(transport,Stream), FileSystem(transport,Stream),Humidity(transport), Temperature(transport ),
-    Infrared(transport), Otp(transport,Stream), Pulse(transport),Rtc(transport,Stream),Servo(transport)
+    Infrared(transport), Otp(transport,Stream), Pulse(transport),Rtc(transport,Stream),Servo(transport),
+    Spi(transport,Stream),Touch(transport),Uart(transport,Stream)
     {
         m_pTransport = &transport;
     }
@@ -68,6 +72,9 @@ public:
     PulseController Pulse;
     RtcController Rtc;
     ServoController Servo;
+    SpiController Spi;
+    TouchController Touch;
+    UartController Uart;
 
     void SetTimeout(int timeout_ms) {
         m_pTransport->ReadTimeout = timeout_ms;
