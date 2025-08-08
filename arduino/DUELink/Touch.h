@@ -15,7 +15,7 @@ public:
         m_pTransport = &transport;
     }
 
-    int Touch(int pin, int charge_time, int charge_state, int timeout)
+    int Read(int pin, int charge_time, int charge_state, int timeout)
     {
         char cmd[32];
         sprintf(cmd, "touch(%d,%d,%d,%d)", pin, charge_time,charge_state, timeout);
