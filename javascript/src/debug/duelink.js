@@ -13,9 +13,7 @@ class SerialInterface {
         this.leftOver = "";
         this.ReadTimeout = 3000;
         this.echo = true;
-        this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
-        this.EnabledAsio = true
-        
+        this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";                
     }
 
     async Connect() {
@@ -80,29 +78,30 @@ class SerialInterface {
         this.DiscardInBuffer();
         this.DiscardOutBuffer();
 
-        const cmd_lowcase = command.toLowerCase();
+        // const cmd_lowcase = command.toLowerCase();
 
-        if (cmd_lowcase.indexOf("print") == 0
-            || cmd_lowcase.indexOf("dim") == 0
-            || cmd_lowcase.indexOf("run") == 0
-            || cmd_lowcase.indexOf("list") == 0
-            || cmd_lowcase.indexOf("new") == 0
-            || cmd_lowcase.indexOf("echo") == 0
-            || cmd_lowcase.indexOf("sel") == 0
-            || cmd_lowcase.indexOf("version") == 0
-            || cmd_lowcase.indexOf("region") == 0
-            || cmd_lowcase.indexOf("alias") == 0
-            || cmd_lowcase.indexOf("sprintf") == 0
-            ) {
-            await this.__WriteLine(command);
-        }
-        else if (this.EnabledAsio) {
-          const newCmd = `println(${command})`;
-          await this.__WriteLine(newCmd);
-        }
-        else {
-          await this.__WriteLine(command);
-        }
+        // if (cmd_lowcase.indexOf("print") == 0
+            // || cmd_lowcase.indexOf("dim") == 0
+            // || cmd_lowcase.indexOf("run") == 0
+            // || cmd_lowcase.indexOf("list") == 0
+            // || cmd_lowcase.indexOf("new") == 0
+            // || cmd_lowcase.indexOf("echo") == 0
+            // || cmd_lowcase.indexOf("sel") == 0
+            // || cmd_lowcase.indexOf("version") == 0
+            // || cmd_lowcase.indexOf("region") == 0
+            // || cmd_lowcase.indexOf("alias") == 0
+            // || cmd_lowcase.indexOf("sprintf") == 0
+            // ) {
+            // await this.__WriteLine(command);
+        // }
+        // else if (this.EnabledAsio) {
+          // const newCmd = `println(${command})`;
+          // await this.__WriteLine(newCmd);
+        // }
+        // else {
+          // await this.__WriteLine(command);
+        // }
+        await this.__WriteLine(command);
     }
 
     async __WriteLine(string) {
@@ -133,7 +132,7 @@ class SerialInterface {
       let total_receviced = 0;
       let dump = 0;
       let responseValid = true;
-      const response = new Cmdresponse();
+      let response = new Cmdresponse();
       let end = new Date(Date.now() + this.ReadTimeout);
 
 
@@ -245,6 +244,40 @@ class SerialInterface {
       return response;
     }
 
+    async ReadResponseRaw() {
+      let str = "";
+      let total_receviced = 0;     
+      let end = new Date(Date.now() + this.ReadTimeout);
+      let response = new Cmdresponse();
+
+      while (!this.portName.hasData() && new Date() <= end) {
+          await Util.pumpAsync();
+      }
+      if (!this.portName.hasData()) {
+          console.log("No Response");
+      }
+
+      while (new Date() <= end || this.portName.hasData()) {
+        if (this.portName.hasData()) {
+          const data = await this.portName.readbyte();
+          str += SerialInterface.Decoder.decode(data);
+          total_receviced++;
+
+          end = new Date(Date.now() + this.ReadTimeout); // reset timeout
+        }
+      }
+
+      response.response = ""
+      response.success = false;
+
+      if (total_receviced > 3) {
+        response.success = true;
+        response.response = str.slice(0,total_receviced-3 );        
+      }
+    
+      return response; 
+    }
+
     static TransferBlockSizeMax = 512;
     static TransferBlockDelay = 5;
 
@@ -328,7 +361,7 @@ class AnalogController {
         this.serialPort = serialPort;
     }
 
-    async VRead(pin) {  
+    async Read(pin) {  
         if (!this.serialPort.DeviceConfig.AnalogPins.has(pin))
         {
           throw new Error("Invalid pin");
@@ -349,7 +382,7 @@ class AnalogController {
         return -1;
       }
     
-      async PWrite(pin, dc) {
+      async Write(pin, dc) {
         if (!this.serialPort.DeviceConfig.PWMPins.has(pin)) {
           throw new Error("Invalid pin");
         }
@@ -892,13 +925,8 @@ class EngineController {
   
     }
   
-    async Run(script) {
-      const data = new TextEncoder().encode(script + "\n");
-
-      this.serialPort.DiscardInBuffer();
-      this.serialPort.DiscardOutBuffer();
-
-      await this.serialPort.WriteRawData(data, 0, data.length);      
+    async Run() {
+      await this.serialPort.WriteCommand("run");    
   
       const ret = await this.serialPort.ReadResponse();
   
@@ -926,38 +954,57 @@ class EngineController {
       return ret.response;
     }
 
-    async Record(script) {
-  
-      await this.serialPort.WriteCommand("new");
-  
-      const response_new = await this.serialPort.ReadResponse();
-  
-      if (response_new.success) {      
-  
-        const cmd = "pgmstream()";
-  
-        const raw = new TextEncoder().encode(script);
-  
-        const data = new Uint8Array(raw.length + 1);
-  
-        data[raw.length] = 0; // stop the stream
-  
-        data.set(raw, 0);
-  
-        await this.serialPort.WriteCommand(cmd);
-  
-        const res = await this.serialPort.ReadResponse();
-  
-        if (res.success === false) {
+    async Record(script,region) {
+      if (region == 0) {
+        await this.serialPort.WriteCommand("new all");
+        const ret = await this.serialPort.ReadResponse();
+
+        if (ret.success == false)
           return false;
-        }
-  
-        this.serialPort.WriteRawData(data, 0, data.length);
-  
-        const res2 = await this.serialPort.ReadResponse();
-  
-        return res2.success;
       }
+      else if (region == 1) {
+        await this.serialPort.WriteCommand("Region(1)");
+        const ret = await this.serialPort.ReadResponse();
+
+        if (ret.success == false)
+          return false;
+
+        await this.serialPort.WriteCommand("new");
+        ret = await this.serialPort.ReadResponse();
+
+        if (ret.success == false)
+          return false;
+      }
+      else {
+        return false;
+      }
+      
+        
+  
+      const cmd = "pgmstream()";
+
+      const raw = new TextEncoder().encode(script);
+
+      const data = new Uint8Array(raw.length + 1);
+
+      data[raw.length] = 0; // stop the stream
+
+      data.set(raw, 0);
+
+      await this.serialPort.WriteCommand(cmd);
+
+      const res = await this.serialPort.ReadResponse();
+
+      if (res.success === false) {
+        return false;
+      }
+
+      this.serialPort.WriteRawData(data, 0, data.length);
+
+      const res2 = await this.serialPort.ReadResponse();
+
+      return res2.success;
+      
     }
     
     async Read() {
@@ -967,7 +1014,14 @@ class EngineController {
       const res = await this.serialPort.ReadResponse();
   
       return res.response;
-    }  
+    }
+    
+    async WriteCommand(cmd) {
+      await this.serialPort.WriteCommand(cmd);
+      const res = await this.serialPort.ReadResponseRaw();
+  
+      return res.response;
+    }
 }
   
 
@@ -1346,7 +1400,7 @@ class TemperatureController {
       this.serialPort = serialPort;
     }
   
-    async Touch(pin, charge_t, charge_s, timeout) {
+    async Read(pin, charge_t, charge_s, timeout) {
       const cmd = `touch(${pin}, ${charge_t}, ${charge_s}, ${timeout})`;
       await this.serialPort.WriteCommand(cmd);
   
@@ -1702,32 +1756,32 @@ class CoProcessorController {
     this.stream = stream
   }
 
-  async CoprocE() {
+  async Erase() {
     await this.serialPort.WriteCommand("CoprocE()");  
     const ret = await this.serialPort.ReadResponse();  
 
     return ret.success;
   }
 
-  async CoprocP() {
+  async Program() {
     throw new Error("Not implemented");
   }
 
-  async CoprocS() {
+  async Reset() {
     await this.serialPort.WriteCommand("CoprocS()");  
     const ret = await this.serialPort.ReadResponse();  
 
     return ret.success;
   }
 
-  async CoprocV() {
+  async Version() {
     await this.serialPort.WriteCommand("CoprocV()");  
     const ret = await this.serialPort.ReadResponse();  
 
     return ret.success;
   }
 
-  async CoprocW(data) {
+  async Write(data) {
     count = data.length
     // declare b9 array
     const cmd = `dim b9[${count}]`;
@@ -1745,7 +1799,7 @@ class CoProcessorController {
     return written == count;
   }
 
-  async CoprocR(data) {
+  async Read(data) {
     count = data.length
     // declare b9 array
     const cmd = `dim b9[${count}]`;
@@ -1855,7 +1909,7 @@ class FileSystemController {
     return await this.ParseReturn();
   }
 
-  async Unmount() {
+  async UnMount() {
     await this.serialPort.WriteCommand("FsUnMnt()"); 
 
     return await this.ParseReturn();
@@ -1958,7 +2012,7 @@ class FileSystemController {
     return await this.ParseReturn();
   }
 
-  async FileSize(path) {
+  async Size(path) {
     const cmd = `fsfsz("${path}")`;
 
     await this.serialPort.WriteCommand(cmd); 
@@ -2013,7 +2067,7 @@ class PulseController {
     this.serialPort = serialPort    
   }
 
-  async PulseIn(pin, state, timeout) {
+  async Read(pin, state, timeout) {
     const cmd = `PulseIn(${pin},${state},${timeout})`;
     await this.serialPort.WriteCommand(cmd);  
 
@@ -2068,6 +2122,15 @@ class RtcController {
     return ret
     
   }
+
+  async Show() {    
+
+    await this.serialPort.WriteCommand("OtpR(0)"); 
+
+    const ret = await this.serialPort.ReadResponse();
+
+     return ret.success
+  }
 }
 
 class DUELinkController {
@@ -2081,14 +2144,6 @@ class DUELinkController {
 
     set ReadTimeout(value) {
       this.serialPort.ReadTimeout = value;
-    }
-
-    get EnabledAsio() {
-      return this.serialPort.EnabledAsio;
-    }
-
-    set EnabledAsio(value) {
-      this.serialPort.EnabledAsio = value;
     }
   
     async InitDevice() {
