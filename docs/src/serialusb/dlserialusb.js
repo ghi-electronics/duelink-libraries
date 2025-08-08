@@ -67,6 +67,11 @@ class SerialUSB {
 
         return buffer;
     }
+    
+    async readbyte() {
+		let result = await this.ring.dequeueN(1);
+        return result;
+	}
 
     async read() {
         let result = await this.ring.dequeueAll();
