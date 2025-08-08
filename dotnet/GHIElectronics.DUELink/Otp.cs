@@ -14,7 +14,7 @@ namespace GHIElectronics.DUELink {
                 this.stream = stream;
             }
 
-            public bool OtpW(int address, byte[] data) {
+            public bool Write(int address, byte[] data) {
 
                 //var write_array = string.Empty;
 
@@ -46,7 +46,7 @@ namespace GHIElectronics.DUELink {
                                
             }
 
-            public int OtpR(int address) {
+            public int Read(int address) {
 
                 var cmd = string.Format("OtpR({0})", address);
 

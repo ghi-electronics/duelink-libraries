@@ -11,7 +11,7 @@ namespace GHIElectronics.DUELink {
 
             public PulseController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public int PulseIn(int pin, int state, TimeSpan timeout) {
+            public int Read(int pin, int state, TimeSpan timeout) {
                 if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 

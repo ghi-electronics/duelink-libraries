@@ -13,7 +13,7 @@ namespace GHIElectronics.DUELink {
 
             public AnalogController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public double VRead(int pin) {
+            public double Read(int pin) {
                 if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinAnalog)
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 
@@ -40,7 +40,7 @@ namespace GHIElectronics.DUELink {
                 return 0;
             }
 
-            public bool PWrite(int pin, double dc) {
+            public bool Write(int pin, double dc) {
                 if (pin < 0 || (pin >= this.serialPort.DeviceConfig.MaxPinIO ) ) 
                     throw new ArgumentOutOfRangeException("Invalid pin.");
 

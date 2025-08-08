@@ -14,20 +14,13 @@ namespace GHIElectronics.DUELink {
 
             public EngineController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            // run("version()/list") return version string, so need to return a string
-            public string Run(string script) {
-                var cmd = Encoding.UTF8.GetBytes(script + "\n");
+            
+            public bool Run() {
 
-                this.serialPort.DiscardInBuffer();
-                this.serialPort.DiscardOutBuffer();
-
-
-                this.serialPort.WriteRawData(cmd, 0, cmd.Length);
-
+                this.serialPort.WriteCommand("run");                
                 var response = this.serialPort.ReadResponse();
-
                 
-                return response.response.ToString();                            
+                return response.success;                            
 
             }
 
@@ -55,17 +48,39 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool Record(string script) {
+            public bool Record(string script, int region) {
+                var cmd = string.Empty;
+                CmdResponse response;
 
-                var cmd = string.Format("new");
+                if (region == 0) {
+                    cmd = string.Format("new all");
+                    this.serialPort.WriteCommand(cmd);
+                    response = this.serialPort.ReadResponse();
 
-                this.serialPort.WriteCommand(cmd);
+                    if (!response.success) {
+                        return false;
+                    }
+                }
+                else if (region == 1) {
+                    cmd = string.Format("Region(1)");
+                    this.serialPort.WriteCommand(cmd);
+                    response = this.serialPort.ReadResponse();
 
-                var response = this.serialPort.ReadResponse();
+                    if (!response.success) {
+                        return false;
+                    }
 
-                if (!response.success)
-                    throw new Exception("Unable to erase the chip memory.");
+                    cmd = string.Format("new");
+                    this.serialPort.WriteCommand(cmd);
+                    response = this.serialPort.ReadResponse();
 
+                    if (!response.success) {
+                        return false;
+                    }
+                }
+                else {
+                    return false;
+                }
 
                 cmd = "pgmbrst()";
 
@@ -96,11 +111,20 @@ namespace GHIElectronics.DUELink {
 
                 this.serialPort.WriteCommand(cmd);
 
-                var response = this.serialPort.ReadResponse2();
+                var response = this.serialPort.ReadResponseRaw();
 
 
                 return response.response;
 
+            }
+
+            public string WriteCommand(string cmd) {
+                this.serialPort.WriteCommand(cmd);
+
+                var response = this.serialPort.ReadResponse();
+
+
+                return response.response;
             }
 
             //public string Execute(string script) {

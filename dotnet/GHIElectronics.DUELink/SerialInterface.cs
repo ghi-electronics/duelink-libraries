@@ -80,6 +80,10 @@ namespace GHIElectronics.DUELink {
 
             Thread.Sleep(400);
 
+            // \n first command:
+            // immediately mode: response \r\n>
+            // Aiso(1) and while loop: no response
+            // just dump all
             this.port.DiscardInBuffer();
             this.port.DiscardOutBuffer();
         }
@@ -195,28 +199,28 @@ namespace GHIElectronics.DUELink {
                                         responseValid = false; // still data, this is bad response, there is no \r\n>xxxx
                                     }
                                 }
-                                //else if (dump == '\r') {
-                                //    // from v036, this case not happened any more. We changed Asio(1) to return
-                                //    // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
-                                //    if (this.port.BytesToRead == 0)
-                                //        Thread.Sleep(1); // wait 1ms for sure next byte
+                                else if (dump == '\r') {
+                                    // from v036, this case not happened any more. We changed Asio(1) to return
+                                    // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
+                                    if (this.port.BytesToRead == 0)
+                                        Thread.Sleep(1); // wait 1ms for sure next byte
 
-                                //    if (this.port.BytesToRead > 0) {
-                                //        dump = this.port.ReadByte();
+                                    if (this.port.BytesToRead > 0) {
+                                        dump = this.port.ReadByte();
 
-                                //        if (dump == '\n') {
-                                //            if (this.port.BytesToRead > 0)
-                                //                dump = this.port.ReadByte();
+                                        if (dump == '\n') {
+                                            if (this.port.BytesToRead > 0)
+                                                dump = this.port.ReadByte();
 
-                                //        }
-                                //        else {
-                                //            responseValid = false;
-                                //        }
-                                //    }
-                                //    else {
-                                //        responseValid = false;
-                                //    }
-                                //}
+                                        }
+                                        else {
+                                            responseValid = false;
+                                        }
+                                    }
+                                    else {
+                                        responseValid = false; // after \r must be something, and \n is expected
+                                    }
+                                }
                                 else {
                                     // bad data
                                     // One cmd send suppose one response, there is no 1234\r\n5678.... this will consider invalid response
@@ -260,7 +264,7 @@ namespace GHIElectronics.DUELink {
                                 }
                             }
 
-                            break;
+                            break; // \n found, 
                         }
 
 
@@ -281,7 +285,7 @@ namespace GHIElectronics.DUELink {
 
         // this for read "list" command so read as is
         // when call list, there can be \n, > &.... so can not parse with ReadResponse
-        public CmdResponse ReadResponse2() {
+        public CmdResponse ReadResponseRaw() {
             var str = string.Empty;// this.leftOver;
             var end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks;
 
@@ -307,11 +311,8 @@ namespace GHIElectronics.DUELink {
                 this.port.DiscardOutBuffer();
             }
 
-            if (str != string.Empty) {
-                if (str.Length >= 3) {
-                    response.response = str.Substring(0, str.Length - 3);
-                }
-
+            if (str != string.Empty && str.Length >= 3) {
+                response.response = str.Substring(0, str.Length - 3);
                 response.success = true;
             }
 

@@ -29,7 +29,7 @@ namespace GHIElectronics.DUELink {
             public bool WriteRead(byte[] dataWrite, byte[] dataRead) => this.WriteRead(dataWrite, 0, dataWrite.Length, dataRead, 0, dataRead.Length);
 
             private bool WriteRead(byte[]? dataWrite, int offsetWrite, int countWrite, byte[]? dataRead, int offsetRead, int countRead) {
-                
+
                 if ((dataWrite == null && dataRead == null) || (countWrite == 0 && countRead == 0))
                     throw new ArgumentNullException();
 
@@ -64,14 +64,20 @@ namespace GHIElectronics.DUELink {
                 // using stream to do Spi writeread
 
                 // declare b9 to write
-                var cmd = $"dim b9[{countWrite}]";
-                this.serialPort.WriteCommand(cmd);
-                this.serialPort.ReadResponse();
+                var cmd = string.Empty;
+
+                if (countWrite > 0) {
+                    cmd = $"dim b9[{countWrite}]";
+                    this.serialPort.WriteCommand(cmd);
+                    this.serialPort.ReadResponse();
+                }
 
                 // declare b8 to write
-                cmd = $"dim b8[{countRead}]";
-                this.serialPort.WriteCommand(cmd);
-                this.serialPort.ReadResponse();
+                if (countRead > 0) {
+                    cmd = $"dim b8[{countRead}]";
+                    this.serialPort.WriteCommand(cmd);
+                    this.serialPort.ReadResponse();
+                }
 
                 // write data to b9 by stream
                 var write_array = new byte[countWrite];
@@ -79,21 +85,34 @@ namespace GHIElectronics.DUELink {
                 var written = this.stream.WriteBytes("b9", write_array);
 
                 // i2c wr cmd
-                cmd = $"spiwrs(b9,b8)";
+                if (countWrite > 0 && countRead > 0) {
+                    cmd = $"spiwrs(b9,b8)";
+                }
+                else if (countRead > 0) {
+                    cmd = $"spiwrs(0,b8)";
+                }
+                else {
+                    cmd = $"spiwrs(b9,0)";
+                }
+
                 this.serialPort.WriteCommand(cmd);
                 this.serialPort.ReadResponse();
 
-                // use stream to read data to b8
-                var read_array = new byte[countRead];
-                var read = this.stream.ReadBytes("b8", read_array);
+                // use stream to read data to b8               
+                var read = 0;
+                if (countRead > 0) {
+                    var read_array = new byte[countRead];
+                    read = this.stream.ReadBytes("b8", read_array);
+                    Array.Copy(read_array, 0, dataRead, offsetRead, countRead);
+                }
 
-                Array.Copy(read_array, 0, dataRead, offsetRead, countRead);
+                
                 return (written == countWrite) && (read == countRead);
 
             }
-          
-            public bool Configuration(uint mode, uint frequencyKHz ) {
-                if (mode > 3 )
+
+            public bool Configuration(uint mode, uint frequencyKHz) {
+                if (mode > 3)
                     throw new ArgumentOutOfRangeException("Mode must be in range 0...3.");
 
                 if (frequencyKHz < 200 || frequencyKHz > 24000)
@@ -114,7 +133,7 @@ namespace GHIElectronics.DUELink {
 
                 var response = this.serialPort.ReadResponse();
 
-                if (response.success) {                    
+                if (response.success) {
                     try {
                         var value = int.Parse(response.response);
 
@@ -125,7 +144,7 @@ namespace GHIElectronics.DUELink {
                     }
                 }
 
-                return 0;
+                return -1;
             }
         }
     }

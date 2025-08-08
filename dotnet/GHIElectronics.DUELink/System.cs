@@ -44,7 +44,7 @@ namespace GHIElectronics.DUELink {
             }
 
             public int GetTickMicroseconds() {
-                var cmd = string.Format("tickus())=");
+                var cmd = string.Format("tickus()");
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -148,8 +148,6 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            private Version _version;
-
             public bool StatLed(int highPeriod, int lowPeriod, int count) {
 
                 var cmd = string.Format("statled({0},{1},{2})", highPeriod, lowPeriod, count);
@@ -161,15 +159,15 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
-            public bool Shtdn(int wkpin) {
+            public void Shutdown(int wkpin) {
 
                 var cmd = string.Format("shtdn({0})", wkpin);
 
                 this.serialPort.WriteCommand(cmd);
 
                 // does system response?
-                var ret = this.serialPort.ReadResponse();
-                return ret.success;
+                //var ret = this.serialPort.ReadResponse();
+                //return ret.success;
 
 
             }

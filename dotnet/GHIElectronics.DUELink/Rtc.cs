@@ -17,7 +17,7 @@ namespace GHIElectronics.DUELink {
                 this.stream = stream;
             }
 
-            public bool RtcW(byte[] rtc_timedate) {
+            public bool Write(byte[] rtc_timedate) {
 
                 //var write_array = string.Empty;
 
@@ -49,7 +49,7 @@ namespace GHIElectronics.DUELink {
                                
             }
 
-            public int RtcR(byte[] rtc_timedate) {
+            public int Read(byte[] rtc_timedate) {
                 var cmd = $"dim b9[{rtc_timedate.Length}]";
                 this.serialPort.WriteCommand(cmd);
                 this.serialPort.ReadResponse();
@@ -65,7 +65,7 @@ namespace GHIElectronics.DUELink {
                 return ret;
             }
 
-            public bool RtcShow() {
+            public bool Show() {
                 this.serialPort.WriteCommand("OtpR(0)");
 
                 var ret = this.serialPort.ReadResponse();

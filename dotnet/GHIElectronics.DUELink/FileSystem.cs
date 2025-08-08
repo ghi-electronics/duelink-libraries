@@ -33,7 +33,7 @@ namespace GHIElectronics.DUELink {
                 }
                 return -1;
             }
-            public int FsMnt(int type, int cs, int baud, int max_handle) {
+            public int Mount(int type, int cs, int baud, int max_handle) {
 
                 var cmd = string.Format("FsMnt({0},{1}, {2}, {3})", type, cs, baud, max_handle);
 
@@ -42,13 +42,13 @@ namespace GHIElectronics.DUELink {
                 return this.ParseReturn();
             }
 
-            public int FsUnMnt() {
+            public int UnMount() {
                 this.serialPort.WriteCommand("FsUnMnt()");
 
                 return this.ParseReturn();
             }
 
-            public int FsFmt(int type, int cs, int baud) {
+            public int Format(int type, int cs, int baud) {
 
                 var cmd = string.Format("FsFmt({0},{1}, {2})", type, cs, baud);
 
@@ -57,7 +57,7 @@ namespace GHIElectronics.DUELink {
                 return this.ParseReturn();
             }
 
-            public int FsOpen(string path, int mode) {
+            public int Open(string path, int mode) {
 
                 var cmd = string.Format("FsOpen(\"{0}\",{1})", path, mode);
 
@@ -66,7 +66,7 @@ namespace GHIElectronics.DUELink {
                 return this.ParseReturn();
             }
 
-            public int FsClose(int handle) {
+            public int Close(int handle) {
 
                 var cmd = string.Format("FsClose({0})", handle);
 
@@ -75,7 +75,7 @@ namespace GHIElectronics.DUELink {
                 return this.ParseReturn();
             }
 
-            public int FsWrite(int handle, byte[] data) {
+            public int Write(int handle, byte[] data) {
 
                 //var write_array = string.Empty;
 
@@ -108,7 +108,7 @@ namespace GHIElectronics.DUELink {
                 return this.ParseReturn();
             }
 
-            public int FsRead(int handle, byte[] data) {
+            public int Read(int handle, byte[] data) {
                 var count = data.Length;                
 
                 var cmd = string.Format("dim b9[{0}]", data.Length);
@@ -125,7 +125,7 @@ namespace GHIElectronics.DUELink {
                 return ret;
             }
 
-            public int FsSync(int handle) {
+            public int Sync(int handle) {
 
                 var cmd = string.Format("FsSync({0})", handle);
 
@@ -134,7 +134,7 @@ namespace GHIElectronics.DUELink {
                 return this.ParseReturn();
             }
 
-            public int FsSeek(int handle, int offset) {
+            public int Seek(int handle, int offset) {
 
                 var cmd = string.Format("FsSeek({0},{1})", handle, offset);
 
@@ -143,7 +143,7 @@ namespace GHIElectronics.DUELink {
                 return this.ParseReturn();
             }
 
-            public int FsTell(int handle) {
+            public int Tell(int handle) {
 
                 var cmd = string.Format("FsTell({0})", handle);
 
@@ -152,7 +152,7 @@ namespace GHIElectronics.DUELink {
                 return this.ParseReturn();
             }
 
-            public int FsDel(string path) {
+            public int Delete(string path) {
 
                 var cmd = string.Format("FsDel(\"{0}\")", path);
 
@@ -161,7 +161,7 @@ namespace GHIElectronics.DUELink {
                 return this.ParseReturn();
             }
 
-            public int FsFind(string path) {
+            public int Find(string path) {
 
                 var cmd = string.Format("FsFind(\"{0}\")", path);
 
@@ -170,7 +170,7 @@ namespace GHIElectronics.DUELink {
                 return this.ParseReturn();
             }
 
-            public int Fsfsz(string path) {
+            public int Size(string path) {
 
                 var cmd = string.Format("fsfsz(\"{0}\")", path);
 
