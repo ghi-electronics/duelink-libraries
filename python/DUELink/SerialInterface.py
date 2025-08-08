@@ -183,7 +183,7 @@ class SerialInterface:
 
         return response
     
-    def ReadResponse2(self):
+    def ReadResponseRaw(self):
         str = ""
         end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 

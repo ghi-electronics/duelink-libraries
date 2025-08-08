@@ -81,7 +81,7 @@ class EngineController:
         cmd = "list"
 
         self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse2()
+        res = self.serialPort.ReadResponseRaw()
 
         return res.response 
 
