@@ -17,38 +17,44 @@ namespace GHIElectronics.DUELink {
                 this.stream = stream;
             }
 
-            public bool RtcW(byte[] timedate) {
+            public bool Write(byte[] rtc_timedate) {
 
-                var write_array = string.Empty;
+                //var write_array = string.Empty;
 
-                write_array = "[";
+                //write_array = "[";
 
-                for (var i = 0; i < timedate.Length; i++) {
-                    write_array += timedate[i];
+                //for (var i = 0; i < timedate.Length; i++) {
+                //    write_array += timedate[i];
 
-                    if (i < timedate.Length - 1)
-                        write_array += ",";
-                }
+                //    if (i < timedate.Length - 1)
+                //        write_array += ",";
+                //}
 
-                write_array += "]";
+                //write_array += "]";
 
-                var cmd = string.Format("RtcW({0})", write_array);
+                //var cmd = string.Format("RtcW({0})", write_array);
 
+                var cmd = $"dim b9[{rtc_timedate.Length}]";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
+
+                var written = this.stream.WriteBytes("b9", rtc_timedate);
+
+                cmd = "RtcW(b9)";
                 this.serialPort.WriteCommand(cmd);
 
                 var ret = this.serialPort.ReadResponse();
 
-                return ret.success;
+                return ret.success;                
                                
             }
 
-            public int RtcR(byte[] rtc_timedate) {
+            public int Read(byte[] rtc_timedate) {
+                var cmd = $"dim b9[{rtc_timedate.Length}]";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
 
-                // we can't check response as Asio(1) there will be no response                                
-                this.serialPort.WriteCommand("dim b9[6]");
-
-                this.serialPort.ReadResponse();                
-
+                // we can't check response as Asio(1) there will be no response                                              
                 this.serialPort.WriteCommand("RtcR(b9)");
 
                 this.serialPort.ReadResponse();
@@ -59,7 +65,7 @@ namespace GHIElectronics.DUELink {
                 return ret;
             }
 
-            public bool RtcShow() {
+            public bool Show() {
                 this.serialPort.WriteCommand("OtpR(0)");
 
                 var ret = this.serialPort.ReadResponse();

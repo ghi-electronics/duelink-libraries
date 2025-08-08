@@ -33,8 +33,10 @@ namespace GHIElectronics.DUELink {
                 this.serialPort.WriteCommand(cmd);
 
                 // Erase all send reset twice
-                if (option == ResetOption.EraseAll) 
+                if (option == ResetOption.EraseAll) {
+                    this.serialPort.ReadResponse();
                     this.serialPort.WriteCommand(cmd);
+                }
 
                 // The device will reset in bootloader or system reset
                 this.serialPort.Disconnect();
@@ -42,7 +44,7 @@ namespace GHIElectronics.DUELink {
             }
 
             public int GetTickMicroseconds() {
-                var cmd = string.Format("tickus())=");
+                var cmd = string.Format("tickus()");
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -115,7 +117,7 @@ namespace GHIElectronics.DUELink {
             //    return this._version;
             //}
 
-            public int Info(int code) {
+            public float Info(int code) {
                 var cmd = string.Format("info({0})", code.ToString());
 
                 this.serialPort.WriteCommand(cmd);
@@ -126,9 +128,16 @@ namespace GHIElectronics.DUELink {
 
 
                     try {
-                        var value = int.Parse(response.response);
+                        if (code == 1) {
+                            var value = float.Parse(response.response);
 
-                        return value;
+                            return value;
+                        }
+                        else {
+                            var value = int.Parse(response.response);
+
+                            return value;
+                        }
                     }
                     catch { }
 
@@ -138,8 +147,6 @@ namespace GHIElectronics.DUELink {
                 return 0;
 
             }
-
-            private Version _version;
 
             public bool StatLed(int highPeriod, int lowPeriod, int count) {
 
@@ -152,14 +159,15 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
-            public bool Shtdn(int wkpin) {
+            public void Shutdown(int wkpin) {
 
                 var cmd = string.Format("shtdn({0})", wkpin);
 
                 this.serialPort.WriteCommand(cmd);
 
-                var ret = this.serialPort.ReadResponse();
-                return ret.success;
+                // does system response?
+                //var ret = this.serialPort.ReadResponse();
+                //return ret.success;
 
 
             }

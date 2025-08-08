@@ -18,6 +18,7 @@ class SystemController:
 
         #Erase all send reset twice
         if (option == 1):
+            self.serialPort.ReadResponse()
             self.serialPort.WriteCommand(cmd)
 
         # The device will reset in bootloader or system reset
@@ -91,7 +92,7 @@ class SystemController:
         res = self.serialPort.ReadResponse()
         return res.success
     
-    def Shtdn(self, wkpin: int)-> bool:
+    def Shutdown(self, wkpin: int)-> bool:
         cmd = f"shtdn({wkpin})"
         self.serialPort.WriteCommand(cmd)
 

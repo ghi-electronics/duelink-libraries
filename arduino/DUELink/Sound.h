@@ -15,12 +15,17 @@ public:
     bool Beep(int pin, int frequency, int duration_ms) {
         char cmd[64];
         sprintf(cmd, "beep(%d,%d,%d)", pin, frequency, duration_ms);
-        DUELinkTransport::Response result = m_pTransport->execute(cmd);
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
         return result.success;
     }
 
     bool MelodyPlay(int pin, const void *notes, int count) {
-        String s;
+#ifdef ARDUINO
+    String s;
+#else
+    std::string s;
+#endif        
         const char *arr;
         int extraBytes;
 
@@ -34,7 +39,8 @@ public:
         }
         char *cmd = new char[32+extraBytes];
         sprintf(cmd, "melodyp(%d,%s)", pin, arr);
-        DUELinkTransport::Response result = m_pTransport->execute(cmd);
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
         delete []cmd;
         return result.success;
     }
@@ -42,7 +48,8 @@ public:
     bool MelodyStop(int pin) {
         char cmd[32];
         sprintf(cmd, "melodys(%d)", pin);
-        DUELinkTransport::Response result = m_pTransport->execute(cmd);        
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();     
         return result.success;
     }
 

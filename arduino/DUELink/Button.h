@@ -14,24 +14,29 @@ public:
     } 
 
     void Enable(int pin, int state, int pull) {
-      char cmd[64];
-      sprintf(cmd, "btnen(%d,%d,%d)", pin, state,pull);
-      m_pTransport->execute(cmd);  
+        char cmd[64];
+        sprintf(cmd, "btnen(%d,%d,%d)", pin, state,pull);
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();  
     }
 
     bool Up(int pin){
         char cmd[32];
         sprintf(cmd, "btnup(%d)", pin); 
-        DUELinkTransport::Response result = m_pTransport->execute(cmd);  
-        if (result.success) return result.result[0] == '1';
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
+        if (result.success) 
+            return result.response[0] == '1';
         return false;
     }
 
     bool Down(int pin){
         char cmd[32];
         sprintf(cmd, "btndown(%d)", pin); 
-        DUELinkTransport::Response result = m_pTransport->execute(cmd);  
-        if (result.success) return result.result[0] == '1';
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
+        if (result.success) 
+            return result.response[0] == '1';
         return false;
     }     
 private:

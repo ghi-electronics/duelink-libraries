@@ -14,7 +14,7 @@ class SerialInterface:
         self.ReadTimeout = 3
         self.portName = portName
         self.echo = True 
-        self.EnabledAsio = False       
+    
 
     def Connect(self):
         self.portName = serial.Serial(self.portName, self.DefaultBaudRate, parity=serial.PARITY_NONE, bytesize=8, stopbits=serial.STOPBITS_ONE)
@@ -36,7 +36,7 @@ class SerialInterface:
 
         self.WriteRawData(cmd, 0, 1)
         
-        time.sleep(0.3)
+        time.sleep(0.4)
                 
         self.portName.reset_input_buffer()
         self.portName.reset_output_buffer() 
@@ -62,7 +62,7 @@ class SerialInterface:
         self.DiscardInBuffer()
         self.DiscardOutBuffer()
 
-        command = cmd.lower()
+        #command = cmd.lower()
         # these commands - statement can't use with println        
         #statement_list = ["print", "dim", "run"]
         #for statement in statement_list:
@@ -71,24 +71,25 @@ class SerialInterface:
         #        break
 
 
-        if (
-            command.find('print') == 0 or 
-            command.find('dim') == 0 or
-            command.find('run') == 0 or
-            command.find('list') == 0 or
-            command.find('new') == 0 or
-            command.find('echo') == 0 or
-            command.find('sel') == 0 or
-            command.find('version') == 0 or
-            command.find('alias') == 0 or            
-            command.find('sprintf') == 0 
-        ):
-            self.__WriteLine(command)
-        elif self.EnabledAsio == True:
-            newcmd = f"println({command})"
-            self.__WriteLine(newcmd)
-        else:
-            self.__WriteLine(command)
+        #if (
+        #    command.find('print') == 0 or 
+        #    command.find('dim') == 0 or
+        #    command.find('run') == 0 or
+        #    command.find('list') == 0 or
+        #    command.find('new') == 0 or
+        #    command.find('echo') == 0 or
+        #    command.find('sel') == 0 or
+        #    command.find('version') == 0 or
+        #    command.find('alias') == 0 or            
+        #    command.find('sprintf') == 0 
+        #):
+        #    self.__WriteLine(cmd)
+        #elif self.EnabledAsio == True:
+        #    newcmd = f"println({cmd})"
+        #    self.__WriteLine(newcmd)
+        #else:
+        #    self.__WriteLine(cmd)
+        self.__WriteLine(cmd)
 
     def __WriteLine(self, string):
         string += "\n"
@@ -146,17 +147,18 @@ class SerialInterface:
                             responseValid = False
                     
                     if responseValid == False:
-                        dump = 0
+                        d = 0
 
-                        while dump != '\n' and datetime.now() < end:
+                        while d != '\n' and datetime.now() < end:
                             if (self.portName.in_waiting > 0):
                                 dump = self.portName.read(1)
+                                d = dump.decode()[0]
                             else:
                                 time.sleep(0.001) 
                             
-                            if dump.decode()[0] == '\n':
+                            if d == '\n':
                                 if (self.portName.in_waiting > 0): # still bad data, repeat clean up
-                                    dump = 0 #reset to repeat the condition while loop
+                                    d = 0 #reset to repeat the condition while loop
 
                     if str == "" or len(str) < 2: #reponse valid has to be xxx\r\n or \r\n, mean idx >=2
                         responseValid = False
@@ -181,7 +183,7 @@ class SerialInterface:
 
         return response
     
-    def ReadResponse2(self):
+    def ReadResponseRaw(self):
         str = ""
         end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
@@ -208,8 +210,8 @@ class SerialInterface:
     TransferBlockDelay = 0.005
 
     def WriteRawData(self, buffer, offset, count):
-        block = count / self.TransferBlockSizeMax
-        remain = count % self.TransferBlockSizeMax
+        block = int(count / self.TransferBlockSizeMax)
+        remain = int(count % self.TransferBlockSizeMax)
 
         idx = offset
 

@@ -8,30 +8,30 @@ class CoProcessorController:
         self.serialPort = serialPort
         self.stream = stream
 
-    def CoprocE(self)->bool:
+    def Erase(self)->bool:
         cmd = "CoprocE()"
         self.serialPort.WriteCommand(cmd)
         ret = self.serialPort.ReadResponse()
         return ret.success
 
-    def CoprocP(self)->bool:
+    def Program(self)->bool:
         # need Xmodem 1K, TODO
         raise Exception("Not implemented")
             
-    def CoprocE(self)->bool:
+    def Reset(self)->bool:
         cmd = "CoprocS()"
         self.serialPort.WriteCommand(cmd)
         ret = self.serialPort.ReadResponse()
         return ret.success
 
-    def CoprocV(self) -> str:
+    def Version(self) -> str:
         cmd = "CoprocV()"
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadResponse()
 
         return res.response
     
-    def CoprocW(self, dataWrite: bytes) -> int:
+    def Write(self, dataWrite: bytes) -> int:
         count = len(dataWrite)
 
         # declare b9 array
@@ -50,7 +50,7 @@ class CoProcessorController:
             return written
         return 0        
     
-    def CoprocR(self, dataRead: bytes)-> int:
+    def Read(self, dataRead: bytes)-> int:
         count = len(dataRead)
 
         # declare b9 array

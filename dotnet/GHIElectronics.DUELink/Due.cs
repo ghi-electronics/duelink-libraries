@@ -32,10 +32,6 @@ namespace GHIElectronics.DUELink {
             set => this.serialPort.TransferBlockSizeMax = value;
         }
 
-        public bool EnabledAsio {
-            get => this.serialPort.EnabledAsio;
-            set => this.serialPort.EnabledAsio = value;
-        }
 
         public DeviceConfiguration DeviceConfig { get; set; }
 
@@ -97,11 +93,13 @@ namespace GHIElectronics.DUELink {
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);
             this.System = new SystemController(this.serialPort);
-            this.Sound = new SoundController(this.serialPort);                        
+                              
             this.Pulse = new PulseController(this.serialPort);
             
-            this.Otp = new OtpController(this.serialPort);
+            
             this.DMX = new DMXController(this.serialPort);
+            this.Sound = new SoundController(this.serialPort, this.Stream);
+            this.Otp = new OtpController(this.serialPort, this.Stream);
             this.Uart = new UartController(this.serialPort, this.Stream);
             this.Spi = new SpiController(this.serialPort, this.Stream);
             this.Rtc = new RtcController(this.serialPort, this.Stream);

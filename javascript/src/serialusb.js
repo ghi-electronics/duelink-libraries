@@ -17,6 +17,11 @@ class SerialUSB {
             {
                 this.portname = await this.detectPort();
             }
+            // debug
+            //if(this.portname === '') 
+            //    this.portname = "COM7"
+            //
+            //
             if(this.portname === '') throw new Error("Device not found.");
             
             this.port = new SerialPort({ path: this.portname, baudRate: this.baudRate });
@@ -67,6 +72,11 @@ class SerialUSB {
 
         return buffer;
     }
+    
+    async readbyte() {
+		let result = await this.ring.dequeueN(1);
+        return result;
+	}
 
     async read() {
         let result = await this.ring.dequeueAll();

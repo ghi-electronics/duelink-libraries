@@ -67,31 +67,51 @@ namespace GHIElectronics.DUELink {
 
                 // using stream to do write/read
 
-                // declare b9 to write
-                var cmd = $"dim b9[{countWrite}]";
-                this.serialPort.WriteCommand(cmd);
-                this.serialPort.ReadResponse();
+                var cmd = string.Empty;
+                var written = 0;
+                var read = 0;
 
-                // declare b8 to write
-                cmd = $"dim b8[{countRead}]";
-                this.serialPort.WriteCommand(cmd);
-                this.serialPort.ReadResponse();
+                if (countWrite > 0) {
+                    // declare b9 to write
+                    cmd = $"dim b9[{countWrite}]";
+                    this.serialPort.WriteCommand(cmd);
+                    this.serialPort.ReadResponse();
+                }
 
-                // write data to b9 by stream
-                var write_array = new byte[countWrite];
-                Array.Copy(dataWrite, offsetWrite, write_array, 0, countWrite);
-                var written = this.stream.WriteBytes("b9", write_array);
+                if (countRead > 0) {
+                    // declare b8 to write
+                    cmd = $"dim b8[{countRead}]";
+                    this.serialPort.WriteCommand(cmd);
+                    this.serialPort.ReadResponse();
+                }
+
+                if (countWrite > 0) {
+                    // write data to b9 by stream
+                    var write_array = new byte[countWrite];
+                    Array.Copy(dataWrite, offsetWrite, write_array, 0, countWrite);
+                    written = this.stream.WriteBytes("b9", write_array);
+                }
 
                 // issue i2cwr cmd
-                cmd = $"i2cwr({address},b9,b8)";
+                if (countWrite > 0 && countRead>0)
+                    cmd = $"i2cwr({address},b9,b8)";
+                else if (countWrite > 0) {
+                    cmd = $"i2cwr({address},b9,0)";
+                }
+                else {
+                    cmd = $"i2cwr({address},0,b8)";
+                }
                 this.serialPort.WriteCommand(cmd);
                 this.serialPort.ReadResponse();
 
-                // use stream to read data to b8
-                var read_array = new byte[countRead];
-                var read = this.stream.ReadBytes("b8", read_array);
+                if (countRead > 0) {
+                    // use stream to read data to b8
+                    var read_array = new byte[countRead];
+                    read = this.stream.ReadBytes("b8", read_array);
+                    Array.Copy(read_array, 0, dataRead, offsetRead, countRead);
+                }
 
-                Array.Copy(read_array, 0, dataRead, offsetRead, countRead);
+                
                 return (written == countWrite) && (read == countRead);
             }
 

@@ -12,20 +12,96 @@ public:
         m_pTransport = &transport;
     } 
 
-    bool Record(const char *script) {
-      return false;    
-    }
-
-    bool Run(const char *script) {
-      DUELinkTransport::Response result = m_pTransport->execute(script);
+    bool Run() {
+      m_pTransport->WriteCommand("run");
+      DUELinkTransport::Response result = m_pTransport->ReadResponse();
       return result.success;
     }
 
-    void Select(int num) {
+    bool Stop() {
+      byte rawdata[1] = {27};
+
+      m_pTransport->DiscardInBuffer();
+      m_pTransport->WriteRawData(rawdata, 0, 1);
+      
+      DUELinkTransport::Response result = m_pTransport->ReadResponse();
+      
+      return result.success;
+    }
+
+    bool Record(const char *script, int region) {
+        DUELinkTransport::Response result;
+      if (region == 0) {
+        m_pTransport->WriteCommand("new all");
+        result = m_pTransport->ReadResponse();
+        
+        if (!result.success)
+            return false;
+      }
+      else if (region == 1) {
+        m_pTransport->WriteCommand("Region(1)");
+        result = m_pTransport->ReadResponse();
+        
+        if (!result.success)
+            return false;
+        
+        m_pTransport->WriteCommand("new");
+        result = m_pTransport->ReadResponse();
+        
+        if (!result.success)
+            return false;
+          
+      }
+      else  {
+          return false;   
+      }
+      
+      byte* data = new byte[strlen(script) + 1];
+      
+      memcpy(data, script, strlen(script));
+      
+      data[strlen(script)] = 0;// stop the stream
+      
+      m_pTransport->WriteCommand("pgmbrst()");
+        result = m_pTransport->ReadResponse();
+        
+        if (!result.success)
+            return false;
+        
+        m_pTransport->WriteRawData((const byte*)data, 0 , strlen(script));
+        result = m_pTransport->ReadResponse();
+        
+        return result.success;
+      
+    }
+  
+    bool Select(int num) {
       char cmd[32];
       sprintf(cmd, "sel(%d)", num);
-      m_pTransport->execute(cmd);
+      m_pTransport->WriteCommand(cmd);
+      DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+      return result.success;
     }
+
+    bool WriteCommand(const char* cmd) {
+      m_pTransport->WriteCommand(cmd);
+      DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+      return result.success;
+    }
+
+#ifdef ARDUINO
+      String Read()
+#else
+      std::string Read()
+#endif
+    {
+      //TODO
+      return "";
+    }
+
+
 
 private:
     DUELinkTransport *m_pTransport = NULL;

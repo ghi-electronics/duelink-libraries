@@ -17,7 +17,7 @@ namespace GHIElectronics.DUELink {
             }
 
 
-            public bool CoprocE() {
+            public bool Erase() {
 
                 // we can't check response as Asio(1) there will be no response                                
 
@@ -28,14 +28,14 @@ namespace GHIElectronics.DUELink {
                 return ret.success;
             }
 
-            public bool CoprocP() {
+            public bool Program() {
 
                 // need Xmodem 1K, TODO
                 // 
                 throw new NotImplementedException(); ;
             }
 
-            public bool CoprocS() {
+            public bool Reset() {
                 this.serialPort.WriteCommand("CoprocS()");
 
                 var ret = this.serialPort.ReadResponse();
@@ -43,7 +43,7 @@ namespace GHIElectronics.DUELink {
                 return ret.success;
             }
 
-            public string CoprocV() {
+            public string Version() {
                 this.serialPort.WriteCommand("CoprocV()");
 
                 var ret = this.serialPort.ReadResponse();
@@ -51,7 +51,7 @@ namespace GHIElectronics.DUELink {
                 return ret.response;
             }
 
-            public int CoprocW(byte[] data) {
+            public int Write(byte[] data) {
 
                 var write_array = string.Empty;
 
@@ -78,7 +78,7 @@ namespace GHIElectronics.DUELink {
                 return 0;
             }
 
-            public int CoprocR(byte[] data) {
+            public int Read(byte[] data) {
                 var count = data.Length;
                 // we can't check response as Asio(1) there will be no response                
                 var cmd = string.Format("dim b9[{0}])", count);

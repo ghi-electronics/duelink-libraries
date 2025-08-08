@@ -19,7 +19,7 @@ public:
     {
         char cmd[32];
         sprintf(cmd, "statled(%d,%d,%d)", high, low, count);
-        m_pTransport->execute(cmd);
+        m_pTransport->WriteCommand(cmd);
     }
 
 private:

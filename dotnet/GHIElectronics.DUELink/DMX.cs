@@ -11,7 +11,7 @@ namespace GHIElectronics.DUELink {
 
             public DMXController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public bool DmxW(byte[] channel_data) {
+            public bool Write(byte[] channel_data) {
 
                 var write_array = string.Empty;
 
@@ -39,7 +39,7 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public int DmxR(int channel) {
+            public int Read(int channel) {
 
 
                 var cmd = string.Format("DmxR({0})", channel);
@@ -61,7 +61,7 @@ namespace GHIElectronics.DUELink {
                 return 0;
             }
 
-            public int DmxRdy() {
+            public int Ready() {
                 this.serialPort.WriteCommand("DmxRdy()");
 
                 var ret = this.serialPort.ReadResponse();
@@ -79,7 +79,7 @@ namespace GHIElectronics.DUELink {
                 return 0;
             }
 
-            public bool DmxU() {
+            public bool Update() {
                 this.serialPort.WriteCommand("DmxU()");
 
                 this.serialPort.ReadResponse();
