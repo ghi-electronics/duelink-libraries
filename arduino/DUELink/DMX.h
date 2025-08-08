@@ -5,7 +5,7 @@
 #endif
 
 #include "DUELinkTransport.h"
-#include "Stream.h"
+#include "DlStream.h"
 
 class DMXController
 {

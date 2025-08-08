@@ -12,7 +12,7 @@
 #include "I2c.h"
 #include "Sound.h"
 #include "Graphics.h"
-#include "Stream.h"
+#include "DlStream.h"
 #include "CoProcessor.h"
 #include "DistanceSensor.h"
 #include "DMX.h"
