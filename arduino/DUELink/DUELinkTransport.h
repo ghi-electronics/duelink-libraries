@@ -37,40 +37,72 @@ public:
     virtual void beginTransmission() = 0;
     virtual void write(const char *str) = 0;    
     virtual void endTransmission() = 0;
-    virtual void WriteCommand(const char *command) = 0;
     virtual Response ReadResponse() = 0;
-    virtual void WriteRawData(const byte* buffer, int offset, int count) = 0;
-    virtual int ReadRawData(byte* buffer, int offset, int count) = 0;
-    virtual void DiscardInBuffer() = 0;
     virtual int ReadByte() = 0;
     virtual void WriteByte(byte b) = 0;
     virtual void WriteBytes(const byte* data, int count) = 0;
     virtual void Disconnect() = 0;
-
-    // virtual Response streamOutBytes(const char *bytes, int count) = 0;
-    // virtual Response streamOutFloats(const float *floats, int count) = 0;
-
-    //virtual int read(char *buf, int bytes, unsigned long timeout) = 0;
+    virtual void sync() {
     
-    //virtual Response execute(const char *command) = 0;
+        beginTransmission();
+        write("\n");
+        endTransmission();
+
+        delay(300); 
+        // devive will response 3 byte \r\n>
+        unsigned long startms = millis() + ReadTimeout;
+        int dump = ReadByte();
+
+        if (dump == 255 && millis() < startms) {
+            delay(1); 
+            dump = ReadByte();
+        }
+
+        dump = ReadByte();
+        dump = ReadByte();
+    }
     
-    virtual void sync() = 0;
-
-    // virtual void sync() {
-        // char buf[128] = {0};
-
-        // beginTransmission();
-        // write("\x1b");
-        // endTransmission();
-        // read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
-        // getResponse("", buf);
-    // }
+    virtual void WriteCommand(const char *command) {
+        beginTransmission();
+        write(command);
+        write("\n");
+        endTransmission();
+    }
     
-//private:
-    //virtual Response getResponse(String command, String response) = 0;    
+    virtual void WriteRawData(const byte* buffer, int offset, int count) {
+        int block = count / TransferBlockSizeMax;
+        int remain = count % TransferBlockSizeMax; 
+        int idx = offset;
 
-//protected:
-    //const static unsigned long DUELINK_TIMEOUT = 1000;
+        while (block > 0) {
+            WriteBytes(&buffer[idx], TransferBlockSizeMax);
+            idx += TransferBlockSizeMax;
+            block--;
+            delay(TransferBlockDelay);
+        }
+
+        if (remain > 0) {
+            WriteBytes(&buffer[idx], remain);            
+        }
+    }
+    virtual int ReadRawData(byte* buffer, int offset, int count) {
+        unsigned long end = millis() + ReadTimeout;
+        int totalRead = 0;
+        int i = offset;
+        while (end > millis() && totalRead < count) {
+            delay(1); // make sure we have data
+            int read = ReadByte();
+            buffer[i] = read;
+            i++;
+            totalRead++;
+        }
+        
+        return totalRead;
+    }
+
+    virtual void DiscardInBuffer() { // i2c discard
+        while (ReadByte() != 255);
+    }
 };
 
 class TwoWireTransport : public DUELinkTransport {
@@ -92,33 +124,10 @@ public:
     virtual void endTransmission() {
         m_link.endTransmission();
     }
-
+    
     virtual void Disconnect() {
         m_link.end();
     }
-
-    // virtual Response streamOutBytes(const char *bytes, int count) {
-        // char buf[128] = {0};
-        // beginTransmission();
-        // m_link.write(bytes, count);
-        // endTransmission();
-        // read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
-        // return getResponse("", buf);
-    // }
-
-    // virtual Response streamOutFloats(const float *floats, int count) {
-        // char buf[128] = {0};
-        // beginTransmission();
-        // for(int i=0; i<count; ++i) {
-            // m_link.write((const char *)&floats[i], 4);
-        // }
-        // endTransmission();
-        // read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
-        // return getResponse("", buf);
-    // }
-    //void WriteByte(uint8_t b) {
-    //    m_link.write(b);
-    //}
 
     virtual void WriteByte(byte b) {
         beginTransmission();
@@ -146,6 +155,8 @@ public:
         }
         return 255;
     }
+    
+
 
     virtual Response ReadResponse() {
         unsigned long startms = millis();
@@ -210,15 +221,6 @@ public:
 
                             if (dump == 255)
                                 break;
-
-                            if (dump == '>' || dump == '!' || dump == '$') {
-                                delay(1); //wait 1ms for sure
-
-                                dump = ReadByte();
-
-                                if (dump == 255) 
-                                    break;                            
-                            }
                         }
                     }
                 }
@@ -249,7 +251,35 @@ public:
 
     }
 
+    
 
+    
+
+    
+
+    // virtual Response streamOutBytes(const char *bytes, int count) {
+        // char buf[128] = {0};
+        // beginTransmission();
+        // m_link.write(bytes, count);
+        // endTransmission();
+        // read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
+        // return getResponse("", buf);
+    // }
+
+    // virtual Response streamOutFloats(const float *floats, int count) {
+        // char buf[128] = {0};
+        // beginTransmission();
+        // for(int i=0; i<count; ++i) {
+            // m_link.write((const char *)&floats[i], 4);
+        // }
+        // endTransmission();
+        // read(&buf[0], sizeof(buf), DUELINK_TIMEOUT);
+        // return getResponse("", buf);
+    // }
+    //void WriteByte(uint8_t b) {
+    //    m_link.write(b);
+    //}
+  
     //virtual int read(char *buf, int bytes, unsigned long timeout) {
     //    unsigned long startms = millis();
         
@@ -280,12 +310,7 @@ public:
     //    return p-buf;
     //}
 
-    virtual void WriteCommand(const char *command) {
-        beginTransmission();
-        write(command);
-        write("\n");
-        endTransmission();
-    }
+   
 
     
     
@@ -302,25 +327,7 @@ public:
     //    return getResponse(command, buf);
     //}
     
-    virtual void sync() {
     
-        beginTransmission();
-        write("\n");
-        endTransmission();
-
-        delay(300); 
-        // devive will response 3 byte \r\n>
-        unsigned long startms = millis() + ReadTimeout;
-        int dump = ReadByte();
-
-        if (dump == 255 && millis() < startms) {
-            delay(1); 
-            dump = ReadByte();
-        }
-
-        dump = ReadByte();
-        dump = ReadByte();
-    }
     
     //virtual Response getResponse(String command, String response) {
     //    int cmdIdx = response.indexOf(command);
@@ -342,65 +349,169 @@ public:
       
     //    return {.result = "", .success = success};
     //  }
-    virtual void WriteRawData(const byte* buffer, int offset, int count) {
-        int block = count / TransferBlockSizeMax;
-        int remain = count % TransferBlockSizeMax; 
-        int idx = offset;
-
-        while (block > 0) {
-            WriteBytes(&buffer[idx], TransferBlockSizeMax);
-            idx += TransferBlockSizeMax;
-            block--;
-            delay(TransferBlockDelay);
-        }
-
-        if (remain > 0) {
-            WriteBytes(&buffer[idx], remain);            
-        }
-    }
-    virtual int ReadRawData(byte* buffer, int offset, int count) {
-        unsigned long end = millis() + ReadTimeout;
-        int totalRead = 0;
-        int i = offset;
-        while (end > millis() && totalRead < count) {
-            delay(1); // make sure we have data
-            int read = ReadByte();
-            buffer[i] = read;
-            i++;
-            totalRead++;
-        }
-        
-        return totalRead;
-    }
-
-    virtual void DiscardInBuffer() { // i2c discard
-        while (ReadByte() != 255);
-    }
+    
 private:
     TwoWire &m_link;
     int m_i2cAddress;
 };
 
-// class SerialTransport : public DUELinkTransport {
-// public:
-    // SerialTransport(Stream &link) : m_link(link) {}
+class SerialTransport : public DUELinkTransport {
+public:
+    SerialTransport(Stream &link) : m_link(link) {}
 
-    // virtual void begin() {
+    virtual void begin() {
         
-    // }
+    }
     
-    // virtual void beginTransmission() {
+    virtual void beginTransmission() {
         
-    // }
+    }
 
-    // virtual void write(const char *str) {
-        // m_link.write(str);
-    // }
+    virtual void write(const char *str) {
+        m_link.write(str);
+    }
 
-    // virtual void endTransmission() {
+    virtual void endTransmission() {
        
-    // }
+    }
+    
+    virtual void Disconnect() {
+        
+    }
 
+    virtual void WriteByte(byte b) {
+        beginTransmission();
+        m_link.write(b);
+        endTransmission();
+    }
+
+    virtual void WriteBytes(const byte* data, int count) {
+        beginTransmission();
+        m_link.write(data, count);
+        endTransmission();
+    }
+
+    virtual int ReadByte() {
+        if (m_link.available()) {
+            int c = m_link.read();
+            if (c >= 0 && c <= 127) {
+                return c;
+            }
+            else {
+                return 255;
+            }
+        }
+        return 255;
+    }
+
+
+    virtual Response ReadResponse() {
+        unsigned long startms = millis();
+        char str_arr[128] = {0};
+        int total_receviced = 0;
+        bool responseValid = true;
+        int dump = -1;
+        int data = -1;
+        char *p = &str_arr[0];
+
+        while (millis()  < startms + ReadTimeout) {
+            if (m_link.available() > 0) { 
+                data = ReadByte();
+                *p = data;
+                p++;
+                total_receviced++;
+
+                if (data == '\n') {
+                _process_response:
+                    if (m_link.available() == 0) 
+                        delay(1); //wait 1ms for sure
+
+                    //next byte can be >, &, !, $   
+                    if (m_link.available() > 0) {
+                        dump = ReadByte();
+
+                                         
+                        if (dump == '>' || dump == '!' || dump == '$') {
+                            delay(1); //wait 1ms for sure
+
+                            if (m_link.available() > 0) {
+                                responseValid = false; // still data, this is bad response, there is no \r\n>xxxx
+                            }
+                        }
+                        else if (dump == '\r') {
+                            // user can call println(btnup(0)) example, this will return 0\r\n\r\n> => this is still valid
+                            if (m_link.available() == 0) 
+                                delay(1); //wait 1ms for sure
+                            
+                            if (m_link.available() >0) {
+                                dump = ReadByte();
+
+                                if (dump == '\n') {
+                                    goto _process_response;
+                                }
+                                else {
+                                    responseValid = false; 
+                                }
+                            }
+                            else {
+                                responseValid = false; // after \r must be something, and \n is expected
+                            }
+                        }
+                        else {
+                            // bad data
+                            // One cmd send suppose one response, there is no 1234\r\n5678.... this will consider invalid response
+                            responseValid = false;
+                        }
+                    }
+                    
+                    // once bad response \r\nxxx... or \r\n>xxxx, mean next \r\n is comming, wait timeout to clear them to clean the bus if possible        
+                    if (responseValid == false) {
+                        dump = 0;
+
+                        // \r\n must be comming because \r\nxxxx....\r\n  
+                        while (dump != '\n' && (millis()  < startms + ReadTimeout)) {                            
+                            if (m_link.available() > 0) {
+                                dump = ReadByte();
+                            }
+                            else {
+                                delay(1); //wait 1ms for sure
+                            }
+
+                            if (dump == '\n') {
+                                if (m_link.available() > 0) { // still bad data, repeat clean up
+                                     dump = 0; // reset to repeat the condition while loop
+                                }
+                            }
+                        }
+                    }
+
+                    if (total_receviced < 2) {// reponse valid has to be xxx\r\n or \r\n, mean idx >=2                
+                        responseValid = false;
+                    }
+                    else if (responseValid == true) {
+                        if (str_arr[total_receviced-2] != '\r') {
+                            responseValid = false;
+                        }
+                        else {
+                            // valid response, remove \r\n
+                            str_arr[total_receviced-2] = 0;
+                            str_arr[total_receviced-1] = 0;
+                        }
+                    }
+
+                    break; // \n found, 
+
+                }
+
+                startms = millis(); // reset timeout when new data come
+            }    
+
+        }
+
+        return {.response = str_arr, .success = responseValid};
+
+    }
+    
     // virtual int read(char *buf, int bytes, unsigned long timeout) {
         // unsigned long startms = millis();
         
@@ -490,9 +601,9 @@ private:
         // return {.result = "", .success = success};
     // }
 
-// private:
-    // Stream &m_link;
-// };
+private:
+    Stream &m_link;
+};
 
 String build_bytearray(const char *data, int offset, int count) {
     char buf[5];
