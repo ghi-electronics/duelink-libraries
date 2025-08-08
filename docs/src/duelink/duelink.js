@@ -143,6 +143,7 @@ class SerialInterface {
           console.log("No Response");
       }
 
+      await Util.sleep(1); // As tested, hasData return true even there is no data yet, this return Available > 0 only but data is not in buffer
       while (new Date() <= end || this.portName.hasData()) {
           if (this.portName.hasData()) {
             const data = await this.portName.readbyte();
