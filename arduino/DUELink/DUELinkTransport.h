@@ -38,6 +38,7 @@ public:
     virtual void write(const char *str) = 0;    
     virtual void endTransmission() = 0;
     virtual Response ReadResponse() = 0;
+    virtual Response ReadResponseRaw() = 0;
     virtual int ReadByte() = 0;
     virtual void WriteByte(byte b) = 0;
     virtual void WriteBytes(const byte* data, int count) = 0;
@@ -250,6 +251,36 @@ public:
         return {.response = str_arr, .success = responseValid};
 
     }
+    
+    virtual Response ReadResponseRaw() {
+#ifdef ARDUINO
+        String str;
+#else
+        std::string str;
+#endif
+        unsigned long startms = millis();
+        int len = 0;
+        while (millis()  < startms + ReadTimeout) {
+            byte data = ReadByte();
+
+            if (data > 127) {
+                delay(1); // no data available, it is 255 - No data in i2c
+                continue;
+            }
+            
+            str += (char)data;
+            len++;
+            
+            startms = millis();
+        }
+        
+        if (len > 3) {            
+            return {.response = str.substring(0, len-3), .success = true};
+        }
+        
+        return {.response = "", .success = false};
+        
+    }
         
 private:
     TwoWire &m_link;
@@ -411,6 +442,33 @@ public:
 
         return {.response = str_arr, .success = responseValid};
 
+    }
+    
+    virtual Response ReadResponseRaw() {
+#ifdef ARDUINO
+        String str;
+#else
+        std::string str;
+#endif
+        unsigned long startms = millis();
+        int len = 0;
+        while (millis()  < startms + ReadTimeout) {
+            if (m_link.available() > 0) {
+                byte data = ReadByte();
+
+                str += (char)data;
+                len++;
+                
+                startms = millis();
+            }
+        }
+        
+        if (len > 3) {            
+            return {.response = str.substring(0, len-3), .success = true};
+        }
+        
+        return {.response = "", .success = false};
+        
     }
        
 private:
