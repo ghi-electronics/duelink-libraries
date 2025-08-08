@@ -4,7 +4,7 @@ class RtcController:
         self.serialPort = serialPort
         self.stream = stream
 
-    def RtcW(self, rtc_timedate: bytes)->bool:
+    def Write(self, rtc_timedate: bytes)->bool:
         count = len(rtc_timedate)
         # declare b9 array
         cmd = f"dim b9[{count}]"
@@ -20,7 +20,7 @@ class RtcController:
 
         return r
 
-    def RtcR(self, rtc_timedate: bytearray)->int:
+    def Read(self, rtc_timedate: bytearray)->int:
         count = len(rtc_timedate)
         # declare b9 array
         cmd = f"dim b9[{count}]"
@@ -35,7 +35,7 @@ class RtcController:
 
         return ret
     
-    def RtcShow(self)->bool:
+    def Show(self)->bool:
         self.serialPort.WriteCommand("OtpR(0)")
         r,s = self.serialPort.ReadResponse()
 

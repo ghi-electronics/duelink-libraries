@@ -16,35 +16,35 @@ class FileSystemController:
                 return -1
         return -1
 
-    def FsMnt(self, type: int, cs: int, baud: int, max_handle: int)->int:            
+    def Write(self, type: int, cs: int, baud: int, max_handle: int)->int:            
         cmd = f"FsMnt({type}, {cs}, {baud}, {max_handle})"
         self.serialPort.WriteCommand(cmd)
         
         return self.__ParseReturn()
 
-    def FsUnMnt(self)->int:        
+    def UnMount(self)->int:        
         self.serialPort.WriteCommand("FsUnMnt()")
         return self.__ParseReturn()
     
-    def FsFmt(self, type: int, cs: int, baud: int)->int:            
+    def Format(self, type: int, cs: int, baud: int)->int:            
         cmd = f"FsFmt({type}, {cs}, {baud})"
         self.serialPort.WriteCommand(cmd)
         
         return self.__ParseReturn()
     
-    def FsOpen(self, path: str, mode: int)->int:            
+    def Open(self, path: str, mode: int)->int:            
         cmd = f"FsOpen({path}, {mode})"
         self.serialPort.WriteCommand(cmd)
         
         return self.__ParseReturn()
     
-    def FsClose(self, handle: int)->int:            
+    def Close(self, handle: int)->int:            
         cmd = f"FsClose({handle})"
         self.serialPort.WriteCommand(cmd)
         
         return self.__ParseReturn()
     
-    def FsWrite(self, handle: int, data: bytes)->int:  
+    def Write(self, handle: int, data: bytes)->int:  
         count = len(data)          
         
         cmd = f"dim b9[{count}]"
@@ -57,7 +57,7 @@ class FileSystemController:
         self.serialPort.WriteCommand(cmd)
         return self.__ParseReturn()
     
-    def FsRead(self, handle: int, data: bytearray)->int:  
+    def Read(self, handle: int, data: bytearray)->int:  
         count = len(data)          
         
         cmd = f"dim b9[{count}]"
@@ -71,37 +71,37 @@ class FileSystemController:
         ret = self.stream.ReadBytes("b9",data)
         return ret
     
-    def FsSync(self, handle: int)->int:            
+    def Sync(self, handle: int)->int:            
         cmd = f"FsSync({handle})"
         self.serialPort.WriteCommand(cmd)
         
         return self.__ParseReturn()
     
-    def FsSeek(self, handle: int, offset: int)->int:            
+    def Seek(self, handle: int, offset: int)->int:            
         cmd = f"FsSeek({handle},{offset})"
         self.serialPort.WriteCommand(cmd)
         
         return self.__ParseReturn()
     
-    def FsTell(self, handle: int)->int:            
+    def Tell(self, handle: int)->int:            
         cmd = f"FsTell({handle})"
         self.serialPort.WriteCommand(cmd)
         
         return self.__ParseReturn()
     
-    def FsDel(self, path: str)->int:            
+    def Delete(self, path: str)->int:            
         cmd = f"FsDel({path})"
         self.serialPort.WriteCommand(cmd)
         
         return self.__ParseReturn()
     
-    def FsFind(self, path: str)->int:            
+    def Find(self, path: str)->int:            
         cmd = f"FsFind({path})"
         self.serialPort.WriteCommand(cmd)
         
         return self.__ParseReturn()
     
-    def Fsfsz(self, path: str)->int:            
+    def Size(self, path: str)->int:            
         cmd = f"Fsfsz({path})"
         self.serialPort.WriteCommand(cmd)
         

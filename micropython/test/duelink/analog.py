@@ -3,7 +3,7 @@ class AnalogController:
     def __init__(self, serialPort):
         self.serialPort = serialPort
 
-    def VRead(self, pin):
+    def Read(self, pin):
         cmd = "vread({0})".format(pin)
 
         self.serialPort.WriteCommand(cmd)
@@ -18,7 +18,7 @@ class AnalogController:
 
         return 0
     
-    def PWrite(self, pin, duty_cycle):
+    def Write(self, pin, duty_cycle):
                
         if duty_cycle < 0 or duty_cycle > 1:
             raise ValueError('Duty cycle must be in the range 0..1')
