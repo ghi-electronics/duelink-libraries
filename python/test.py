@@ -3,9 +3,52 @@ from PIL import Image
 from DUELink.DUELinkController import DUELinkController
 import serial
 import time
+from array import array
+
+
 
 availablePort = DUELinkController.GetConnectionPort()
 duelink = DUELinkController(availablePort)
+
+duelink.ReadTimeout = 0.1
+
+duelink.Engine.Stop()
+duelink.Engine.Select(1)
+duelink.Graphics.Clear(1)
+duelink.Graphics.Text("DUELink", 0, 10, 10)
+duelink.Graphics.Show()
+
+
+duelink.Engine.Select(2)
+duelink.Button.Enable(1, 1, 1)
+
+while True:
+    duelink.Engine.Select(2)
+    if (duelink.Button.Down(1)) :
+        duelink.Engine.Select(3)
+        duelink.Frequency.Write(7, 1000, 50, 0.5)    
+
+
+
+
+
+data_w = array('f', [1.0, 2.0])
+data_r = array('f', [0.0, 0.0])
+
+
+duelink.Engine.Run("dim a1[2]")
+w = duelink.Stream.WriteFloats("a1", data_w)
+r = duelink.Stream.ReadFloats("a1", data_r)
+
+print(w)
+print(r)
+
+
+
+
+
+
+
 
 
 # Test digital read
