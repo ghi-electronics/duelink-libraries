@@ -30,7 +30,7 @@ public:
     
 public:
     int ReadTimeout = 3000;
-    int TransferBlockSizeMax = 512;
+    int TransferBlockSizeMax = 128;
     int TransferBlockDelay = 10;
 
     virtual void begin() = 0;
