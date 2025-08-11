@@ -5,6 +5,7 @@ description 'Standard DUELink Library (partial).
 
 See https://www.duelink.com/docs/engine/stdlib'
 variables _dueUseI2C 
+variables _readTimeout 
 
   spec ' ' 'due_useI2C' 'DUELink useI2C _' 'bool' true
   spec 'r' 'due_connected' 'DUELink connected?'
@@ -24,6 +25,33 @@ variables _dueUseI2C
   spec 'r' 'due_runWithResult' 'Write command _ with result' 'str' 'version()'
   spec ' ' '_due_send' '_due send _' 'str'
   spec ' ' '_due send raw' '_due send raw _' 'auto' '10'
+  spec 'r' 'Read raw' 'Read raw _' 'auto' 10
+  spec ' ' 'Write raw data' 'Write raw _ _' 'auto auto' '1,2,3' 0
+  spec 'r' 'Read response' 'Read response'
+  spec ' ' 'Set read timeout' 'Set read timeout _' 'auto' 1000
+
+to 'Read raw' count {
+  local 'buf' ('[data:newByteArray]' count)
+  '[sensors:i2cRead]' 82 buf
+  return buf
+}
+
+to 'Read response' {
+  return ('_due_awaitResult')
+}
+
+to 'Set read timeout' millisecond {
+  _readTimeout = millisecond
+}
+
+to 'Write raw data' data count {
+  local 'offset' 0
+  for i ('[data:range]' 0 count) {
+    local 'buf' ('[data:copyFromTo]' data offset (offset + 1))
+    '[sensors:i2cWrite]' 82 buf
+    offset = (offset + 1)
+  }
+}
 
 to '_due send raw' s {
   comment 'Clear receive buffer.'
@@ -52,7 +80,7 @@ to '_due_awaitResult' {
   local 'result' ('[data:makeList]')
   local 'startT' (millisOp)
   comment 'Receive data until either the next prompt character or a timeout and return the result'
-  repeatUntil ((millisSince startT) > 1000) {
+  repeatUntil ((millisSince startT) > _readTimeout) {
     local 'buf' ('[serial:dueRecv]')
     if ((size buf) != 0) {
       for byte buf {
