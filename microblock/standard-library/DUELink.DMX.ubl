@@ -22,6 +22,6 @@ to 'DMX ready' {
 }
 
 to 'Write data' data {
-  due_run ('_due_templateWith' 'DmxW(%)' data)
+  due_run ('_due_templateWith' 'DmxW([%])' data)
 }
 
