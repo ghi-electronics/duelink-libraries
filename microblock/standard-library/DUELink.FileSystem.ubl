@@ -1,0 +1,74 @@
+module 'DUELink.FileSystem'
+author 'GHI Elelctronics'
+version 0 1 
+depends DUELink 
+description 'DUELink file system'
+
+  spec 'r' 'Mount' 'Mount type _ chip select pin _ speed _ max handles _' 'auto auto auto auto' 0 1 8000 4
+  spec 'r' 'UnMount' 'UnMount'
+  spec 'r' 'Format' 'Format type _ chip select pin _ speed _' 'auto auto auto' 0 1 8000
+  spec 'r' 'Close' 'Close handle _' 'auto' 0
+  spec 'r' 'Write handle' 'Write handle _ data _' 'auto auto' 0 '1,2,3'
+  spec 'r' 'Read handle' 'Read handle _ count _' 'auto auto' 0 3
+  spec 'r' 'Sync handle' 'Sync handle _' 'auto' 0
+  spec 'r' 'Seek handle' 'Seek handle _ from _' 'auto auto' 0 0
+  spec 'r' 'Tell handle' 'Tell handle _' 'auto' 0
+  spec 'r' 'Open' 'Open handle path _ mode _' 'auto num' '""' 10
+  spec 'r' 'Delete file path' 'Delete file path _' 'auto' '""'
+  spec 'r' 'Find file path' 'Find file path _' 'auto' '""'
+  spec 'r' 'File size path' 'File size path _' 'auto' '""'
+
+to Close handle {
+  return (due_runWithResult ('_due_templateWith' 'FsClose(%)' handle))
+}
+
+to 'Delete file path' path {
+  return (due_runWithResult ('_due_templateWith' 'FsDel(%)' path))
+}
+
+to 'File size path' path {
+  return (due_runWithResult ('_due_templateWith' 'fsfsz(%)' path))
+}
+
+to 'Find file path' path {
+  return (due_runWithResult ('_due_templateWith' 'FsFind(%)' path))
+}
+
+to Format type cs speed {
+  return (due_runWithResult ('_due_templateWith' 'FsFmt(%,%,%)' type cs speed))
+}
+
+to Mount type cs speed handles {
+  return (due_runWithResult ('_due_templateWith' 'FsMnt(%,%,%,%)' type cs speed handles))
+}
+
+to Open path mode {
+  return (due_runWithResult ('_due_templateWith' 'FsOpen(%,%)' path mode))
+}
+
+to 'Read handle' handle count {
+  due_run ('_due_templateWith' 'dim b9[%]' count)
+  due_run ('_due_templateWith' 'FsRead(%,b9)' handle)
+  return ('Stream read bytes' 'b9' count)
+}
+
+to 'Seek handle' handle offset {
+  return (due_runWithResult ('_due_templateWith' 'FsSeek(%,%)' handle offset))
+}
+
+to 'Sync handle' handle {
+  return (due_runWithResult ('_due_templateWith' 'FsSync(%)' handle))
+}
+
+to 'Tell handle' handle {
+  return (due_runWithResult ('_due_templateWith' 'FsTell(%)' handle))
+}
+
+to UnMount {
+  return (due_runWithResult 'FsUnMnt()')
+}
+
+to 'Write handle' handle data {
+  return (due_runWithResult ('_due_templateWith' 'FsWrite(%,[%])' handle data))
+}
+

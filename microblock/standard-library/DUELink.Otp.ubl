@@ -1,0 +1,19 @@
+module 'DUELink.Otp'
+author 'GHI Electronics'
+version 0 1 
+depends DUELink 
+description 'DUELink Otp'
+
+  spec 'r' 'Otp write' 'Otp write address _ data _' 'auto auto' 0 '1,2,3,4,5,6,7,8'
+  spec 'r' 'Otp read' 'Otp read address _' 'auto' 0
+
+to 'Otp read' address {
+  '_due_send' ('_due_templateWith' 'OtpR(%)' address)
+  return ('Read response')
+}
+
+to 'Otp write' address data {
+  due_run ('_due_templateWith' 'OtpW(%,[%])' address data)
+  return 1
+}
+
