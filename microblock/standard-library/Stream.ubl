@@ -4,19 +4,20 @@ version 0 1
 depends DUELink 
 description 'DUELink Stream library'
 
-  spec 'r' 'Stream write bytes' 'Stream write bytes _ _' 'auto auto' '1,2,3' 3
+  spec 'r' 'Stream write bytes' 'Stream write bytes _ _' 'auto auto' 'b1' '1,2,3'
 
 to 'Stream write bytes' 'array name' data {
-  local 'buf' ('[data:newByteArray]' 1)
+  local 'buf' ('[data:split]' data ',' true)
+  local 'buf_read' (newList 1)
   local 'found prompt' 0
-  due_run ('_due_templateWith' 'strmwr(%,%)' (v 'array name') (size data))
+  '_due_send' ('_due_templateWith' 'strmwr(%,%)' (v 'array name') (size buf))
   repeatUntil ((v 'found prompt') == 1) {
-    '[sensors:i2cRead]' 82 buf
-    for byte buf {
+    '[sensors:i2cRead]' 82 buf_read
+    for byte buf_read {
       if (byte == 38) {'found prompt' = 1}
     }
   }
-  'Write raw data' data (size data)
-  return ('_due_awaitResult')
+  '[sensors:i2cWrite]' 82 buf
+  return ('[data:convertType]' ('Read response') 'number')
 }
 
