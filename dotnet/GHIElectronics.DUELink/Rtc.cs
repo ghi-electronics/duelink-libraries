@@ -66,7 +66,7 @@ namespace GHIElectronics.DUELink {
             }
 
             public bool Show() {
-                this.serialPort.WriteCommand("OtpR(0)");
+                this.serialPort.WriteCommand("RtcR(0)");
 
                 var ret = this.serialPort.ReadResponse();
 
