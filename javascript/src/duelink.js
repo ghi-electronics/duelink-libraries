@@ -410,7 +410,7 @@ class ButtonController {
       this.serialPort = serialPort;
     }
   
-    async Enable(pin, enable, pull) {
+    async Enable(pin, state) {
       if (
         typeof pin !== "number" ||
         pin < 0 
@@ -418,7 +418,7 @@ class ButtonController {
         throw new Error("Invalid pin");
       }
   
-       const cmd = `btnen(${pin}, ${Number(enable)},${pull})`;
+       const cmd = `btnen(${pin}, ${state})`;
   
       await this.serialPort.WriteCommand(cmd);
       const res = await this.serialPort.ReadResponse();
@@ -459,6 +459,29 @@ class ButtonController {
       }
   
       const cmd = `btnup(${pin})`;
+  
+      await this.serialPort.WriteCommand(cmd);
+      const res = await this.serialPort.ReadResponse();
+  
+      if (res.success) {
+        try {
+          return parseInt(res.response) === 1;
+        } catch {}
+      }
+  
+      return false;
+    }
+    
+    async Read(pin) {
+  
+      if (
+        typeof pin !== "number" ||
+        pin < 0 
+      ) {
+        throw new Error("Invalid pin");
+      }
+  
+      const cmd = `btnread(${pin})`;
   
       await this.serialPort.WriteCommand(cmd);
       const res = await this.serialPort.ReadResponse();
@@ -906,8 +929,8 @@ class InfraredController {
       return res.success
     }
   
-    async Enable(txpin, rxpin, enable) {          
-      const cmd = `iren(${txpin},${rxpin},${Number(enable)})`;
+    async Enable(txpin, rxpin) {          
+      const cmd = `iren(${txpin},${rxpin}})`;
       await this.serialPort.WriteCommand(cmd);
   
       const res = await this.serialPort.ReadResponse();

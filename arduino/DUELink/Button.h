@@ -13,9 +13,9 @@ public:
          m_pTransport = &transport;
     } 
 
-    void Enable(int pin, int state, int pull) {
+    void Enable(int pin, int state) {
         char cmd[64];
-        sprintf(cmd, "btnen(%d,%d,%d)", pin, state,pull);
+        sprintf(cmd, "btnen(%d,%d)", pin, state);
         m_pTransport->WriteCommand(cmd);
         DUELinkTransport::Response result = m_pTransport->ReadResponse();  
     }
@@ -38,7 +38,17 @@ public:
         if (result.success) 
             return result.response[0] == '1';
         return false;
-    }     
+    }  
+
+    bool Read(int pin){
+        char cmd[32];
+        sprintf(cmd, "btnread(%d)", pin); 
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
+        if (result.success) 
+            return result.response[0] == '1';
+        return false;
+    }  
 private:
     DUELinkTransport *m_pTransport = NULL;
     DigitalController m_digital;

@@ -43,9 +43,9 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool Enable(int txpin, int rxpin, bool enable) {
+            public bool Enable(int txpin, int rxpin) {
 
-                var cmd = string.Format("iren({0}, {1}, {2})", txpin, rxpin, enable ? 1:0);
+                var cmd = string.Format("iren({0}, {1})", txpin, rxpin);
 
                 this.serialPort.WriteCommand(cmd);
 
