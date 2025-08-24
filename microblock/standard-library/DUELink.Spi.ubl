@@ -3,9 +3,9 @@ author 'GHI Electronics'
 version 0 1 
 description ''
 
-  spec ' ' 'Spi WriteRead' 'Spi writeread write array _ read array _' 'auto auto' 10 0
   spec ' ' 'Spi Configuration' 'Spi configuration mode _ speed _ KHz' 'auto auto' 0 8000
   spec ' ' 'Spi Write' 'Spi write single byte _' 'auto' 10
+  spec 'r' 'Spi write array' 'Spi write array _ read count _' 'auto auto' '1,2,3' 0
 
 to 'Spi Configuration' mode speed {
   due_run ('_due_templateWith' 'SpiCfg(%,%)' mode speed)
@@ -15,7 +15,27 @@ to 'Spi Write' data {
   due_run ('_due_templateWith' 'SpiWr(%)' data)
 }
 
-to 'Spi WriteRead' 'write array' 'read array' {
-  due_run ('_due_templateWith' 'SpiWrs([%],%)' (v 'write array') (v 'read array'))
+to 'Spi write array' 'write array' 'read count' {
+  local 'cmd' '""'
+  if ((size (v 'write array')) > 0) {
+    due_run ('_due_templateWith' 'dim b9[%]' (size (v 'write array')))
+  }
+  if ((v 'read count') > 0) {
+    due_run ('_due_templateWith' 'dim b8[%]' (v 'read count'))
+  }
+  if (and ((size (v 'write array')) > 0) ((v 'read count') > 0)) {
+    cmd = ('_due_templateWith' 'spiwrs(b9,b8)')
+  } else {
+    if ((size (v 'write array')) > 0) {
+      cmd = ('_due_templateWith' 'spiwrs(b9,0)')
+    } else {
+      cmd = ('_due_templateWith' 'spiwrs(0,b8)')
+    }
+  }
+  due_run cmd
+  if ((v 'read count') > 0) {
+    return ('Stream read bytes' 'b8' (v 'read count'))
+  }
+  return (booleanConstant true)
 }
 

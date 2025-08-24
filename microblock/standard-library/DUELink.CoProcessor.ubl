@@ -1,0 +1,42 @@
+module 'DUELink.CoProcessor'
+author 'GHI Electronics'
+version 0 1 
+depends DUELink 
+description ''
+
+  spec 'r' 'CoProcessor erase all' 'CoProcessor erase all'
+  spec 'r' 'CoProcessor Program' 'CoProcessor program'
+  spec 'r' 'CoProcessor reset' 'CoProcessor reset'
+  spec 'r' 'CoProcessor version' 'CoProcessor version'
+  spec 'r' 'CoProcessor write data' 'CoProcessor write data _' 'auto' '1,2,3'
+  spec 'r' 'CoProcessor read data count' 'CoProcessor read data count _' 'auto' '10'
+
+to 'CoProcessor Program' {
+  return 0
+}
+
+to 'CoProcessor erase all' {
+  due_run 'CoprocE()'
+  return (booleanConstant true)
+}
+
+to 'CoProcessor read data count' count {
+  due_run ('_due_templateWith' 'dim b9[%]' count)
+  due_run 'CoprocR(b9)'
+  return ('Stream read bytes' 'b9' count)
+}
+
+to 'CoProcessor reset' {
+  due_run 'CoprocS()'
+  return (booleanConstant true)
+}
+
+to 'CoProcessor version' {
+  return (due_runWithResult 'CoprocV()')
+}
+
+to 'CoProcessor write data' data {
+  due_run ('_due_templateWith' 'CoprocW([%])' data)
+  return (booleanConstant true)
+}
+

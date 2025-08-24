@@ -4,14 +4,34 @@ version 0 1
 depends DUELink 
 description ''
 
-  spec ' ' 'I2C Write' 'I2c writeread address _ write array _ read array _' 'auto auto auto' '0x38' '1,2,3' 0
   spec ' ' 'Configuration2' 'I2c set speed  _ KHz' 'auto' 100
+  spec 'r' 'I2c write and read address' 'I2c write and read address _ write array _ read count _' 'auto auto auto' '0x38' '1,2,3' 0
 
 to Configuration2 speed {
   due_run ('_due_templateWith' 'i2ccfg(%)' speed)
 }
 
-to 'I2C Write' address 'write array' 'read array' {
-  return (due_runWithResult ('_due_templateWith' 'I2cWr(%,[%],%)' address (v 'write array') (v 'read array')))
+to 'I2c write and read address' address 'write array' 'read count' {
+  local 'cmd' '""'
+  if ((size (v 'write array')) > 0) {
+    due_run ('_due_templateWith' 'dim b9[%]' (size (v 'write array')))
+  }
+  if ((v 'read count') > 0) {
+    due_run ('_due_templateWith' 'dim b8[%]' (v 'read count'))
+  }
+  if (and ((size (v 'write array')) > 0) ((v 'read count') > 0)) {
+    cmd = ('_due_templateWith' 'I2cWr(%,b9,b8)' address)
+  } else {
+    if ((size (v 'write array')) > 0) {
+      cmd = ('_due_templateWith' 'I2cWr(%,b9,0)' address)
+    } else {
+      cmd = ('_due_templateWith' 'I2cWr(%,0,b8)' address)
+    }
+  }
+  due_run cmd
+  if ((v 'read count') > 0) {
+    return ('Stream read bytes' 'b8' (v 'read count'))
+  }
+  return (booleanConstant true)
 }
 

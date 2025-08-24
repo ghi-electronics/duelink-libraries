@@ -1,0 +1,121 @@
+module 'DUELink.Stream'
+author 'GHI Electronics'
+version 0 1 
+depends DUELink 
+description 'DUELink Stream library'
+variables _dueUseI2C 
+
+  spec 'r' 'Stream spi write bytes' 'Stream spi write data _' 'auto' '1,2,3'
+  spec 'r' 'Stream write bytes' 'Stream write to _ data _' 'auto auto' 'b1' '1,2,3'
+  spec 'r' 'Stream read bytes' 'Stream read from _ count _' 'auto auto' 'b1' 3
+
+to 'Stream read bytes' 'array name' count {
+  local 'buf' (newList count)
+  local 'buf_read' (newList 1)
+  local 'found prompt' 0
+  local 'idx' 0
+  local 'buf2' ('[data:makeList]')
+  '_due_send' ('_due_templateWith' 'strmrd(%,%)' (v 'array name') count)
+  repeatUntil ((v 'found prompt') == 1) {
+    if _dueUseI2C {
+      '[sensors:i2cRead]' 82 buf_read
+      for byte buf_read {
+        if (byte == 38) {'found prompt' = 1}
+      }
+    } else {
+      local 'buf3' ('[serial:dueRecv]')
+      if ((size buf3) != 0) {
+        for byte buf3 {
+          if ((v 'found prompt') == 1) {
+            '[data:addLast]' byte buf2
+            idx = (idx + 1)
+          }
+          if (byte == 38) {
+            'found prompt' = 1
+          }
+        }
+      }
+    }
+  }
+  repeatUntil (idx == count) {
+    if _dueUseI2C {
+      '[sensors:i2cRead]' 82 buf_read
+      for byte buf_read {
+        if (byte != 255) {
+          idx = (idx + 1)
+          atPut idx buf byte
+        }
+      }
+    } else {
+      local 'buf3' ('[serial:dueRecv]')
+      if ((size buf3) != 0) {
+        for byte buf3 {
+          '[data:addLast]' byte buf2
+          idx = (idx + 1)
+        }
+      }
+    }
+  }
+  if _dueUseI2C {
+    return ('[data:convertType]' buf 'byte array')
+  } else {
+    return ('[data:convertType]' buf2 'byte array')
+  }
+}
+
+to 'Stream spi write bytes' data {
+  local 'buf' ('[data:split]' data ',' true)
+  local 'buf_read' (newList 1)
+  local 'found prompt' 0
+  '_due_send' ('_due_templateWith' 'strmspi(%)' (size buf))
+  repeatUntil ((v 'found prompt') == 1) {
+    if _dueUseI2C {
+      '[sensors:i2cRead]' 82 buf_read
+      for byte buf_read {
+        if (byte == 38) {'found prompt' = 1}
+      }
+    } else {
+      local 'buf_read' ('[serial:dueRecv]')
+      if ((size buf_read) != 0) {
+        for byte buf_read {
+          if (byte == 38) {'found prompt' = 1}
+        }
+      }
+    }
+  }
+  if _dueUseI2C {
+    '[sensors:i2cWrite]' 82 buf
+  } else {
+    local 'ignore' ('[serial:dueSend]' buf 1)
+  }
+  return ('[data:convertType]' ('Read response') 'number')
+}
+
+to 'Stream write bytes' 'array name' data {
+  local 'buf' ('[data:split]' data ',' true)
+  local 'buf_read' (newList 1)
+  local 'found prompt' 0
+  '_due_send' ('_due_templateWith' 'strmwr(%,%)' (v 'array name') (size buf))
+  repeatUntil ((v 'found prompt') == 1) {
+    if _dueUseI2C {
+      '[sensors:i2cRead]' 82 buf_read
+      for byte buf_read {
+        if (byte == 38) {'found prompt' = 1}
+      }
+    } else {
+      local 'buf_read' ('[serial:dueRecv]')
+      if ((size buf_read) != 0) {
+        for byte buf_read {
+          if (byte == 38) {'found prompt' = 1}
+        }
+      }
+    }
+  }
+  if _dueUseI2C {
+    '[sensors:i2cWrite]' 82 buf
+  } else {
+    local 'ignore' ('[serial:dueSend]' buf 1)
+  }
+  return ('[data:convertType]' ('Read response') 'number')
+}
+

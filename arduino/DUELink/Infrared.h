@@ -34,10 +34,10 @@ public:
         return result.success;
     }
 
-    bool Enable(int txpin, int rxpin, bool enable) 
+    bool Enable(int txpin, int rxpin) 
     {       
         char cmd[32];
-        sprintf(cmd, "iren(%d,%d,%d)", txpin,rxpin,enable);
+        sprintf(cmd, "iren(%d,%d)", txpin,rxpin);
         m_pTransport->WriteCommand(cmd);
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
        

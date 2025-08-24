@@ -4,12 +4,12 @@ version 0 1
 depends DUELink 
 description 'DUELink Infrared library'
 
-  spec ' ' 'Infrared enable tx pin' 'Infrared enable tx pin _ rx pin _ enable _' 'auto auto bool' 5 3 true
   spec 'r' 'myBlock' 'Infrared read'
   spec ' ' 'Infrared write' 'Infrared write command _' 'auto' 1
+  spec ' ' 'Infrared enable tx pin' 'Infrared enable tx pin _ rx pin _ enable' 'auto auto' 5 3
 
-to 'Infrared enable tx pin' tx rx en {
-  due_run ('_due_templateWith' 'IrEn(%,%,%)' tx rx en)
+to 'Infrared enable tx pin' tx rx {
+  due_run ('_due_templateWith' 'IrEn(%,%)' tx rx)
 }
 
 to 'Infrared write' cmd {
