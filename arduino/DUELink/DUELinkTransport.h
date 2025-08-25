@@ -43,27 +43,10 @@ public:
     virtual void WriteByte(byte b) = 0;
     virtual void WriteBytes(const byte* data, int count) = 0;
     virtual void Disconnect() = 0;
-    virtual void sync() {
-    
-        beginTransmission();
-        write("\n");
-        endTransmission();
-
-        delay(300); 
-        // devive will response 3 byte \r\n>
-        unsigned long startms = millis() + ReadTimeout;
-        int dump = ReadByte();
-
-        if (dump == 255 && millis() < startms) {
-            delay(1); 
-            dump = ReadByte();
-        }
-
-        dump = ReadByte();
-        dump = ReadByte();
-    }
+    virtual void sync() = 0;
     
     virtual void WriteCommand(const char *command) {
+        DiscardInBuffer();
         beginTransmission();
         write(command);
         write("\n");
@@ -101,9 +84,7 @@ public:
         return totalRead;
     }
 
-    virtual void DiscardInBuffer() { // i2c discard
-        while (ReadByte() != 255);
-    }
+    virtual void DiscardInBuffer() = 0;
 };
 
 class TwoWireTransport : public DUELinkTransport {
@@ -124,6 +105,28 @@ public:
 
     virtual void endTransmission() {
         m_link.endTransmission();
+    }
+    
+    virtual void sync() {
+    
+        beginTransmission();
+        write("\n");
+        endTransmission();
+
+        delay(400);
+
+        WriteCommand("sel(1)"); //"sel(1)": always return \r\n> no matter Asio or not
+        
+        // devive will response 3 byte \r\n>
+        unsigned long end = millis() + ReadTimeout;
+        int dump = ReadByte();
+
+        if (dump == 255 && millis() < end) {
+            delay(1); 
+            dump = ReadByte();
+        }
+               
+        DiscardInBuffer();
     }
     
     virtual void Disconnect() {
@@ -281,6 +284,10 @@ public:
         return {.response = "", .success = false};
         
     }
+    
+    virtual void DiscardInBuffer() { // i2c discard
+        while (ReadByte() != 255);
+    }
         
 private:
     TwoWire &m_link;
@@ -305,6 +312,28 @@ public:
 
     virtual void endTransmission() {
        
+    }
+    
+    virtual void sync() {
+    
+        beginTransmission();
+        write("\n");
+        endTransmission();
+
+        delay(300);
+
+        WriteCommand("sel(1)"); //"sel(1)": always return \r\n> no matter Asio or not
+        
+        delay(100);
+        
+        // devive will response 3 byte \r\n>
+        unsigned long end = millis() + ReadTimeout;
+
+        if (m_link.available() == 0 && millis() < end) {
+            delay(1);             
+        }        
+               
+        DiscardInBuffer();
     }
     
     virtual void Disconnect() {
@@ -469,6 +498,12 @@ public:
         
         return {.response = "", .success = false};
         
+    }
+    
+    virtual void DiscardInBuffer() { // uart discard
+        while (m_link.available() > 0 ) {
+            byte dump = ReadByte(); // dump all
+        }
     }
        
 private:

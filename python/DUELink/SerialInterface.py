@@ -37,6 +37,16 @@ class SerialInterface:
         self.WriteRawData(cmd, 0, 1)
         
         time.sleep(0.4)
+
+        self.WriteCommand("sel(1)")
+
+        end = datetime.now() + timedelta(seconds=self.ReadTimeout)
+
+        while datetime.now() < end and self.portName.in_waiting == 0:
+            time.sleep(0.001) # wait 1ms for sure
+
+        if  datetime.now() > end:
+            raise Exception("Sync device failed.")
                 
         self.portName.reset_input_buffer()
         self.portName.reset_output_buffer() 
