@@ -20,8 +20,8 @@ class InfraredController:
         r,s = self.serialPort.ReadResponse()
         return r
 
-    def Enable(self, txpin:int, rxpin: int, enable: bool)->bool:
-        cmd = f"iren({txpin}, {rxpin}, {int(enable)})"
+    def Enable(self, txpin:int, rxpin: int)->bool:
+        cmd = f"iren({txpin}, {rxpin}})"
         self.serialPort.WriteCommand(cmd)
 
         r,s = self.serialPort.ReadResponse()

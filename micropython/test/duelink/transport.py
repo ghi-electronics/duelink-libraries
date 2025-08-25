@@ -11,24 +11,43 @@ class I2CTransportController:
         self.TransferBlockDelay = 5 #ms
         #time.sleep(0.2)
         self.sync()
-        
+    
+    def DiscardInBuffer(self):
+        r = self.ReadByte()
+        while (r[0] != 255):
+            r = self.ReadByte()
+            time.sleep(0.001)
+            
         
     def sync(self):
         # Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
         # We jusr send \n as first commands for chain enumeration
         self.i2c.writeto(self.addr, "\n")
         
-        time.sleep(0.3)
+        time.sleep(0.4)
+        
+        self.WriteCommand("sel(1)")
+        #self.i2c.writeto(self.addr, "sel(1)\n")
+        
+        
+        now = time.ticks_ms()
         end = time.ticks_ms() + self.ReadTimeout
         # dump all sync        
         r = self.ReadByte()
         
-        if r[0] == 255 and time.ticks_ms() <  end:
+        while (r[0] == 255 and now <  end):
+            time.sleep(0.001)
+            r = self.ReadByte()            
+            now = time.ticks_ms()
+        
+        if (end < time.ticks_ms()):
+            raise Exception("Sync device failed.")
+        
+        # dump all sync
+        while (r[0] != 255):
             r = self.ReadByte()
             time.sleep(0.001)
-            
-        self.ReadByte()
-        self.ReadByte()
+    
         
         #bytes = self.uart.read(3)
         #if bytes is None or len(bytes)<3: # or bytes[2] != 62:
@@ -80,7 +99,8 @@ class I2CTransportController:
             data[0] = 255 # no data        
             return data                    
         
-    def WriteCommand(self, command):        
+    def WriteCommand(self, command):
+        self.DiscardInBuffer()
         self.WriteBytes(command + "\n")
         
     def ReadResponse(self):
@@ -213,6 +233,11 @@ class UartTransportController:
         self.TransferBlockSizeMax = 512
         self.TransferBlockDelay = 5 #ms
         
+    def DiscardInBuffer(self):        
+        #self.uart.readall()
+        while self.uart.any() > 0:
+            dump = self.ReadByte()    
+        
     def sync(self):
         # Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
         # We jusr send \n as first commands for chain enumeration
@@ -220,8 +245,21 @@ class UartTransportController:
         
         time.sleep(0.4)
         
+        self.WriteCommand("sel(1)")
+        
+        now = time.ticks_ms()
+        end = time.ticks_ms() + self.ReadTimeout
+        
+        while (self.uart.any() == 0 and now <  end):
+            time.sleep(0.001)
+            r = self.ReadByte()            
+            now = time.ticks_ms()
+        
+        if (end < time.ticks_ms()):
+            raise Exception("Sync device failed.")
+        
         # dump all sync
-        self.uart.read()        
+        self.DiscardInBuffer()      
     
     #def write(self, str):
     #    self.uart.write(str+"\n")
@@ -291,7 +329,8 @@ class UartTransportController:
             
         return totalRead
         
-    def WriteCommand(self, command):        
+    def WriteCommand(self, command):
+        self.DiscardInBuffer()
         self.WriteBytes(command + "\n")
         
     def ReadResponse(self):        
