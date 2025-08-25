@@ -162,5 +162,6 @@ to due_runWithResult cmd {
 
 to due_useI2C useI2C {
   _dueUseI2C = useI2C
+  due_run 'sel(1)'
 }
 

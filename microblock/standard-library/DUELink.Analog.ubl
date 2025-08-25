@@ -3,14 +3,20 @@ author GHIElectronics
 version 0 1 
 depends DUELink 
 description 'DUELink.Analog
+
 '
 
-  spec ' ' 'due_pwrite' 'Analog write pin _ pwm _' 'num auto' 0 '0.10'
   spec 'r' 'due_readvcc' 'Read vcc'
-  spec 'r' 'due_vread' 'Volt read pin _' 'num' 0
+  spec 'r' 'due_vread' 'Volt read pin _' 'num' 1
+  spec 'r' 'Analog read pin' 'Analog read pin _' 'auto' 1
+  spec ' ' 'due_pwrite' 'Analog write pin _ pwm _' 'num auto' 1 '0.10'
+
+to 'Analog read pin' pin {
+  return (due_runWithResult ('_due_templateWith' 'aread(%)' pin))
+}
 
 to due_pwrite pin pwm {
-  due_run ('_due_templateWith' 'pwrite(%,%)' pin pwm)
+  due_run ('_due_templateWith' 'awrite(%,%)' pin pwm)
 }
 
 to due_readvcc {
