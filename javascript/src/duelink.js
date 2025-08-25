@@ -45,7 +45,11 @@ class SerialInterface {
 
       await this.WriteRawData(cmd, 0, 1);
 
-      await Util.sleep(400);
+      await Util.sleep(300);
+      
+      await this.WriteCommand("sel(1)");
+      
+      await Util.sleep(100);
 
       this.portName.resetInputBuffer();
       this.portName.resetOutputBuffer();
@@ -362,28 +366,49 @@ class AnalogController {
         this.serialPort = serialPort;
     }
 
-    async Read(pin) {  
+    async VoltRead(pin) {  
         if (!this.serialPort.DeviceConfig.AnalogPins.has(pin))
         {
           throw new Error("Invalid pin");
         }
-    
+
         const cmd = `vread(${pin})`;
-    
+
         await this.serialPort.WriteCommand(cmd);
-    
+
         const res = await this.serialPort.ReadResponse();
-    
+
         if (res.success) {
           try {
             return parseFloat(res.response);
           } catch {}
         }
-    
+
         return -1;
-      }
+    }
     
-      async Write(pin, dc) {
+    async Read(pin) {  
+        if (!this.serialPort.DeviceConfig.AnalogPins.has(pin))
+        {
+          throw new Error("Invalid pin");
+        }
+
+        const cmd = `aread(${pin})`;
+
+        await this.serialPort.WriteCommand(cmd);
+
+        const res = await this.serialPort.ReadResponse();
+
+        if (res.success) {
+          try {
+            return parseFloat(res.response);
+          } catch {}
+        }
+
+        return -1;
+    }
+    
+    async Write(pin, dc) {
         if (!this.serialPort.DeviceConfig.PWMPins.has(pin)) {
           throw new Error("Invalid pin");
         }
@@ -392,7 +417,7 @@ class AnalogController {
           throw new Error("Duty cycle must be in the range 0.0 ... 1.0");
         }
     
-        const cmd = `pwrite(${pin}, ${dc})`;
+        const cmd = `awrite(${pin}, ${dc})`;
         await this.serialPort.WriteCommand(cmd);
     
         const res = await this.serialPort.ReadResponse();
