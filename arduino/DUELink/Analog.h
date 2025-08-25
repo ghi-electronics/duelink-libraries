@@ -14,10 +14,21 @@ public:
         m_pTransport = &transport;
     }
 
-    float Read(int pin)
+    float VoltRead(int pin)
     {
         char cmd[32];
         sprintf(cmd, "vread(%d)", pin);
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
+        if (result.success)
+            return atof(result.response.c_str());
+        return 0;
+    }
+    
+    float Read(int pin)
+    {
+        char cmd[32];
+        sprintf(cmd, "aread(%d)", pin);
         m_pTransport->WriteCommand(cmd);
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
         if (result.success)
@@ -28,7 +39,7 @@ public:
     bool Write(int pin, float power)
     {
         char cmd[32];
-        sprintf(cmd, "pwrite(%d,%g)", pin, power);
+        sprintf(cmd, "awrite(%d,%g)", pin, power);
         m_pTransport->WriteCommand(cmd);
 
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
