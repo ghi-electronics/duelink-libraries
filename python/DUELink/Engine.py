@@ -89,7 +89,10 @@ class EngineController:
         self.serialPort.WriteCommand(cmd)
         res = self.serialPort.ReadResponse()
 
-        return res.response 
+        return res.response
+
+    def Cmd(self, s:str) -> str:
+        return self.WriteCommand(f"cmd({s})")
 
 
     

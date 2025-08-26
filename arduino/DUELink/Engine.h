@@ -90,6 +90,16 @@ public:
 
       return result.success;
     }
+    
+    bool Cmd(const char* s) {
+      char cmd[32];
+      sprintf(cmd, "cmd(%s)", s);
+      
+      m_pTransport->WriteCommand(cmd);
+      DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+      return result.success;
+    }
 
 #ifdef ARDUINO
       String Read()

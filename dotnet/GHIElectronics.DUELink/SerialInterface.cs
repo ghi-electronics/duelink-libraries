@@ -75,17 +75,35 @@ namespace GHIElectronics.DUELink {
 
             // Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
             // We jusr send \n as first commands for chain enumeration
-
+            // After sent /n
+            // imidiately mode: return \r\n>            
+            // Aiso(1) no while loop => return \r\n>
+            // Aiso(1) with while loop => no return
             this.WriteRawData(new byte[] { 10 }, 0, 1);
 
             Thread.Sleep(400);
+                       
+            this.WriteCommand("sel(1)");
+            // "sel(1)": always return \r\n> no matter Asio or not
+            // So check timeout for readbyte is correct
 
-            // \n first command:
-            // immediately mode: response \r\n>
-            // Aiso(1) and while loop: no response
-            // just dump all
+            var end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks;
+            while (end > DateTime.UtcNow.Ticks && this.BytesToRead() == 0) {
+                Thread.Sleep(1);
+            }
+
+            // After timeout if no response, Sync failed
+            if (end < DateTime.UtcNow.Ticks) {
+                throw new Exception("Sync device failed.");
+            }
+
+            //while (this.BytesToRead() > 0) {
+            //    var test = new string(new char[] { (char)this.ReadByte() });
+            //}
+
+
             this.port.DiscardInBuffer();
-            this.port.DiscardOutBuffer();
+            this.port.DiscardOutBuffer();            
         }
 
         private bool Echo { get; set; } = true;

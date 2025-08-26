@@ -1071,6 +1071,10 @@ class EngineController {
   
       return res.response;
     }
+    
+    async Cmd(s) {
+        return await this.WriteCommand(`cmd(${s})`);
+    }
 }
   
 

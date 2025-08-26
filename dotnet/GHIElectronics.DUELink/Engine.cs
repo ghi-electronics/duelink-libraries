@@ -127,6 +127,13 @@ namespace GHIElectronics.DUELink {
                 return response.response;
             }
 
+            public string Cmd(string s) {
+                return this.WriteCommand($"cmd({s})");
+                ;                
+            }
+
+
+
             //public string Execute(string script) {
             //    var cmd = script;
 

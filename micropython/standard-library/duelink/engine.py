@@ -88,6 +88,9 @@ class EngineController:
 
         return s
         
+    def Cmd(self, s:str) -> str:
+        return self.WriteCommand(f"cmd({s})")
+        
 
 
        
