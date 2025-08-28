@@ -10,17 +10,14 @@ from array import array
 availablePort = DUELinkController.GetConnectionPort()
 duelink = DUELinkController(availablePort)
 
-duelink.ReadTimeout = 0.1
 
-duelink.Engine.Stop()
-duelink.Engine.Select(1)
 duelink.Graphics.Clear(1)
 duelink.Graphics.Text("DUELink", 0, 10, 10)
 duelink.Graphics.Show()
 
 
 duelink.Engine.Select(2)
-duelink.Button.Enable(1, 1, 1)
+duelink.Button.Enable(1, 0)
 
 while True:
     duelink.Engine.Select(2)
