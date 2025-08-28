@@ -75,10 +75,9 @@ namespace GHIElectronics.DUELink {
 
             // Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
             // We jusr send \n as first commands for chain enumeration
-            // After sent /n
-            // imidiately mode: return \r\n>            
-            // Aiso(1) no while loop => return \r\n>
-            // Aiso(1) with while loop => no return
+            // After sent \n
+            // from v044: selected device will response \r\n>, don't care asio enable or not
+            
             this.WriteRawData(new byte[] { 10 }, 0, 1);
 
             Thread.Sleep(400);
