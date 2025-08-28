@@ -1,6 +1,6 @@
 class FrequencyController:
-    def __init__(self, serialPort):
-        self.serialPort = serialPort
+    def __init__(self, transport):
+        self.transport = transport
         self.MaxFrequency = 24000000
         self.MinFrequency = 16
 
@@ -13,12 +13,12 @@ class FrequencyController:
         if dutycyle < 0 or dutycyle > 1:
             raise ValueError("dutycyle must be in range 0..100")
         
-        if pin not in self.serialPort.DeviceConfig.PWMPins:
+        if pin not in self.transport.DeviceConfig.PWMPins:
             raise ValueError("Invalid pin used for frequency")
 
         cmd = "freq({}, {}, {}, {})".format(pin, frequency, duration_ms, dutycyle)
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        res = self.serialPort.ReadResponse()
+        res = self.transport.ReadResponse()
 
         return res.success

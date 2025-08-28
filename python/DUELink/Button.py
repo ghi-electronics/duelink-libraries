@@ -2,14 +2,14 @@ from enum import Enum
 
 class ButtonController:   
 
-    def __init__(self, serialPort):
-        self.serialPort = serialPort
+    def __init__(self, transport):
+        self.transport = transport
         
     def Enable(self, pin: int, state: bool) -> bool:         
         cmd = f"btnen({pin}, {int(state)})"
 
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
 
         return res.success
     
@@ -18,8 +18,8 @@ class ButtonController:
       
         cmd = f"btndown({pin})"
 
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
 
         if res.success:
             try:
@@ -33,8 +33,8 @@ class ButtonController:
 
         cmd = f"btnup({pin})"
 
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
 
         if res.success:
             try:
@@ -48,8 +48,8 @@ class ButtonController:
 
         cmd = f"btnread({pin})"
 
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
 
         if res.success:
             try:

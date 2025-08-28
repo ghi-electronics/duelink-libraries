@@ -4,14 +4,14 @@ from DUELink.Stream import StreamController
 
 class CoProcessorController:   
 
-    def __init__(self, serialPort:SerialInterface, stream:StreamController):
-        self.serialPort = serialPort
+    def __init__(self, transport:SerialInterface, stream:StreamController):
+        self.transport = transport
         self.stream = stream
 
     def Erase(self)->bool:
         cmd = "CoprocE()"
-        self.serialPort.WriteCommand(cmd)
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
         return ret.success
 
     def Program(self)->bool:
@@ -20,14 +20,14 @@ class CoProcessorController:
             
     def Reset(self)->bool:
         cmd = "CoprocS()"
-        self.serialPort.WriteCommand(cmd)
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
         return ret.success
 
     def Version(self) -> str:
         cmd = "CoprocV()"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
 
         return res.response
     
@@ -36,15 +36,15 @@ class CoProcessorController:
 
         # declare b9 array
         cmd = f"dim b9[{count}]"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         # write data to b9
         written = self.stream.WriteBytes("b9",dataWrite)
 
         # write b9 to co-pro
-        self.serialPort.WriteCommand("CoprocW(b9)")
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand("CoprocW(b9)")
+        ret = self.transport.ReadResponse()
         
         if written == len(dataWrite):            
             return written
@@ -55,12 +55,12 @@ class CoProcessorController:
 
         # declare b9 array
         cmd = f"dim b9[{count}]"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         # read data to b9
-        self.serialPort.WriteCommand("CoprocR(b9)")
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand("CoprocR(b9)")
+        ret = self.transport.ReadResponse()
 
         # read b9 by stream
         read = self.stream.ReadBytes("b9",dataRead )

@@ -5,8 +5,8 @@ from DUELink.SerialInterface import SerialInterface
 from DUELink.Stream import StreamController
 
 class SpiController:
-    def __init__(self, serialPort:SerialInterface, stream:StreamController):
-        self.serialPort = serialPort
+    def __init__(self, transport:SerialInterface, stream:StreamController):
+        self.transport = transport
         self.stream = stream
 
     # def Write(self, dataWrite: bytes, offset: int = 0, length: Optional[int] = None, chipselect: int = -1) -> bool:
@@ -24,8 +24,8 @@ class SpiController:
             raise ValueError("Invalid frequency. Enter an integer between 200-24000.")
     
         cmd = f"spicfg({mode}, {frequency})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
     
     def WriteByte(self, data: int)->int:
@@ -34,8 +34,8 @@ class SpiController:
             raise ValueError("Enter only one byte as an integer into the data parameter.")
     
         cmd = f"spiwr({data})"
-        self.serialPort.WriteCommand(cmd)
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
         if ret.success:            
             try:
                 value = int(ret.response)
@@ -58,21 +58,21 @@ class SpiController:
 
         # declare b9 to write    
         cmd = f"dim b9[{countWrite}]"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         # declare b8 to read
         cmd = f"dim b8[{countRead}]"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         # write data to b9 by stream
         written = self.stream.WriteBytes("b9", dataWrite)
 
         # issue spi cmd
         cmd = f"i2cwr(b9, b8)"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         # use stream to read data to b8
         read = self.stream.ReadBytes("b8", dataRead)
@@ -92,16 +92,16 @@ class SpiController:
         #     if countRead == 0 :
         #         num = countWrite
 
-        #     if (num > self.serialPort.TransferBlockSizeMax) :
-        #         num = self.serialPort.TransferBlockSizeMax
+        #     if (num > self.transport.TransferBlockSizeMax) :
+        #         num = self.transport.TransferBlockSizeMax
 
         #     if countWrite > 0:
-        #         self.serialPort.WriteRawData(dataWrite, offsetWrite, num)
+        #         self.transport.WriteRawData(dataWrite, offsetWrite, num)
         #         offsetWrite += num
         #         countWrite -= num
 
         #     if countRead > 0:
-        #         self.serialPort.ReadRawData(dataRead, offsetRead, num)
+        #         self.transport.ReadRawData(dataRead, offsetRead, num)
         #         offsetRead += num
         #         countRead -= num            
 
@@ -117,9 +117,9 @@ class SpiController:
         
     #     cmd = f"palette({mode},{frequencyKHz})"
 
-    #     self.serialPort.WriteCommand(cmd)
+    #     self.transport.WriteCommand(cmd)
 
-    #     res = self.serialPort.ReadResponse()
+    #     res = self.transport.ReadResponse()
     #     return res.success
     
 

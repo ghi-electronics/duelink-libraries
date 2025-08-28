@@ -4,31 +4,31 @@ from DUELink.Stream import StreamController
 
 class DMXController:   
 
-    def __init__(self, serialPort:SerialInterface, stream:StreamController):
-        self.serialPort = serialPort
+    def __init__(self, transport:SerialInterface, stream:StreamController):
+        self.transport = transport
         self.stream = stream
 
     def Write(self, channel_data: bytes)->bool:
         count = len(channel_data)
         # declare b9 array
         cmd = f"dim b9[{count}]"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         # write data to b9
         ret = self.stream.WriteBytes("b9",channel_data)
 
         # write b9 to dmx
-        self.serialPort.WriteCommand("DmxW(b9)")
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand("DmxW(b9)")
+        ret = self.transport.ReadResponse()
 
         return ret.success
 
 
     def Read(self, channel: int)->int:
         cmd = f"DmxR({channel})"
-        self.serialPort.WriteCommand(cmd)
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
 
         if ret.success:            
             try:
@@ -41,8 +41,8 @@ class DMXController:
     
     def Ready(self)->int:
         cmd = f"DmxRdy()"
-        self.serialPort.WriteCommand(cmd)
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
 
         if ret.success:            
             try:
@@ -55,8 +55,8 @@ class DMXController:
     
     def Update(self)->bool:
         cmd = f"DmxU()"
-        self.serialPort.WriteCommand(cmd)
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
 
         return ret.success
         

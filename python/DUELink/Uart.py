@@ -2,8 +2,8 @@ from DUELink.SerialInterface import SerialInterface
 from DUELink.Stream import StreamController
 
 class UartController:
-    def __init__(self, serialPort:SerialInterface, stream:StreamController):
-        self.serialPort = serialPort
+    def __init__(self, transport:SerialInterface, stream:StreamController):
+        self.transport = transport
         self.stream = stream
 
     def Configuration(self, baudrate: int, rx_buf_size: int)->bool:
@@ -21,13 +21,13 @@ class UartController:
     def WriteBytes(self, data: bytes)->int:
         count = len(data)
         cmd = f"dim b9[{count}]"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         written = self.stream.WriteBytes("b9", data)
 
         self.serialport.WriteCommand("SerWrs(b9)")
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         if (ret.success):
             return written
@@ -48,12 +48,12 @@ class UartController:
     def ReadBytes(self, data: bytearray, timeout_ms: int)->int:
         count = len(data)
         cmd = f"dim b9[{count}]"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         cmd = f"SerRds(b9, {timeout_ms})"
         self.serialport.WriteCommand(cmd)
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         read = self.stream.ReadBytes("b9",data )
 

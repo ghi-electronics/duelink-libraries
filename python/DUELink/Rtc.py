@@ -4,23 +4,23 @@ from DUELink.Stream import StreamController
 
 class RtcController:   
 
-    def __init__(self, serialPort:SerialInterface, stream:StreamController):
-        self.serialPort = serialPort
+    def __init__(self, transport:SerialInterface, stream:StreamController):
+        self.transport = transport
         self.stream = stream
 
     def Write(self, rtc_timedate: bytes)->bool:
         count = len(rtc_timedate)
         # declare b9 array
         cmd = f"dim b9[{count}]"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         # write data to b9
         ret = self.stream.WriteBytes("b9",rtc_timedate)
 
         # write b9 to dmx
-        self.serialPort.WriteCommand("RtcW(b9)")
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand("RtcW(b9)")
+        ret = self.transport.ReadResponse()
 
         return ret.success
 
@@ -28,20 +28,20 @@ class RtcController:
         count = len(rtc_timedate)
         # declare b9 array
         cmd = f"dim b9[{count}]"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         cmd = f"RtcR(b9)"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
         ret = self.stream.ReadBytes("b9",rtc_timedate)
 
         return ret
     
     def Show(self)->bool:
-        self.serialPort.WriteCommand("OtpR(0)")
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand("OtpR(0)")
+        ret = self.transport.ReadResponse()
 
         return ret.success
         

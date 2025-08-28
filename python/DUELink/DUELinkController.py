@@ -40,44 +40,44 @@ class DUELinkController:
         except:
             raise Exception(f"Could not connect to the comport: {comPort}")
         
-        if self.serialPort is None:
-            raise Exception(f"serialPort is null")
+        if self.transport is None:
+            raise Exception(f"transport is null")
         
-        self.Stream = StreamController(self.serialPort)
-        self.Analog = AnalogController(self.serialPort)
-        self.Digital = DigitalController(self.serialPort)        
-        self.Servo = ServoController(self.serialPort)
-        self.Frequency = FrequencyController(self.serialPort)        
-        self.Infrared = InfraredController(self.serialPort)
-        self.Button = ButtonController(self.serialPort)
-        self.Distance = DistanceSensorController(self.serialPort)
-        self.Graphics = GraphicsController(self.serialPort)
-        self.Touch = TouchController(self.serialPort)        
-        self.Engine = EngineController(self.serialPort)
-        self.Temperature = TemperatureController(self.serialPort)
-        self.Humidity = HudimityController(self.serialPort)
-        self.System = SystemController(self.serialPort)        
+        self.Stream = StreamController(self.transport)
+        self.Analog = AnalogController(self.transport)
+        self.Digital = DigitalController(self.transport)        
+        self.Servo = ServoController(self.transport)
+        self.Frequency = FrequencyController(self.transport)        
+        self.Infrared = InfraredController(self.transport)
+        self.Button = ButtonController(self.transport)
+        self.Distance = DistanceSensorController(self.transport)
+        self.Graphics = GraphicsController(self.transport)
+        self.Touch = TouchController(self.transport)        
+        self.Engine = EngineController(self.transport)
+        self.Temperature = TemperatureController(self.transport)
+        self.Humidity = HudimityController(self.transport)
+        self.System = SystemController(self.transport)        
         self.GraphicsType = GraphicsTypeController()        
-        self.Sound = SoundController(self.serialPort)
+        self.Sound = SoundController(self.transport)
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()       
-        self.Pulse = PulseController(self.serialPort)
+        self.Pulse = PulseController(self.transport)
 
-        self.CoProcessor = CoProcessorController(self.serialPort,self.Stream)
-        self.DMX = DMXController(self.serialPort,self.Stream)
-        self.FileSystem = FileSystemController(self.serialPort,self.Stream)
-        self.Otp = OtpController(self.serialPort,self.Stream)        
-        self.Rtc = RtcController(self.serialPort,self.Stream)
-        self.I2c = I2cController(self.serialPort,self.Stream)
-        self.Spi = SpiController(self.serialPort,self.Stream)
-        self.Uart = UartController(self.serialPort,self.Stream)
+        self.CoProcessor = CoProcessorController(self.transport,self.Stream)
+        self.DMX = DMXController(self.transport,self.Stream)
+        self.FileSystem = FileSystemController(self.transport,self.Stream)
+        self.Otp = OtpController(self.transport,self.Stream)        
+        self.Rtc = RtcController(self.transport,self.Stream)
+        self.I2c = I2cController(self.transport,self.Stream)
+        self.Spi = SpiController(self.transport,self.Stream)
+        self.Uart = UartController(self.transport,self.Stream)
         
     
     def __Connect(self, comPort: str):
-        self.serialPort = SerialInterface(comPort)
-        self.serialPort.Connect()
+        self.transport = SerialInterface(comPort)
+        self.transport.Connect()
 
-        # self.Version = self.serialPort.GetVersion()[1].strip()
+        # self.Version = self.transport.GetVersion()[1].strip()
 
         # if self.Version == "" or self.Version == "GHI Electronics DUELink v00.00:0000:00.09":
         #     raise Exception("The device is not supported.")
@@ -113,15 +113,15 @@ class DUELinkController:
         #     self.DeviceConfig.MaxPinIO = 15
         #     self.DeviceConfig.MaxPinAnalog = 10
 
-        self.serialPort.DeviceConfig = self.DeviceConfig        
+        self.transport.DeviceConfig = self.DeviceConfig        
 
     def Disconnect(self):
-        self.serialPort.Disconnect()
+        self.transport.Disconnect()
     
     def Shutdown(self, pin: int):
         cmd = f'shtdn({pin})'
-        self.serialPort.WriteCommand(cmd)
-        response = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        response = self.transport.ReadResponse()
         return response.success    
 
     def GetConnectionPort():
@@ -143,18 +143,18 @@ class DUELinkController:
         return ""
     
     def __get_ReadTimeout(self):
-        return self.serialPort.ReadTimeout
+        return self.transport.ReadTimeout
 
     def __set_ReadTimeout(self, value: int):
-        self.serialPort.ReadTimeout = value 
+        self.transport.ReadTimeout = value 
 
     ReadTimeout = property(__get_ReadTimeout, __set_ReadTimeout)
 
     def __get_EnabledAsio(self):
-        return self.serialPort.EnabledAsio
+        return self.transport.EnabledAsio
 
     def __set_EnabledAsio(self, value: int):
-        self.serialPort.EnabledAsio = value 
+        self.transport.EnabledAsio = value 
 
     EnabledAsio = property(__get_EnabledAsio, __set_EnabledAsio)
    

@@ -1,14 +1,14 @@
 from DUELink.SerialInterface import SerialInterface
 
 class DistanceSensorController:
-    def __init__(self, serialPort:SerialInterface):
-        self.serialPort = serialPort
+    def __init__(self, transport:SerialInterface):
+        self.transport = transport
 
     def Read(self, trigPin, echoPin)->float:
         cmd = f'dist({trigPin},{echoPin})'
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         if ret.success:
             try:

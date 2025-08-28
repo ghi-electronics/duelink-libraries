@@ -4,16 +4,16 @@ from DUELink.SerialInterface import SerialInterface
 
 class PulseController:   
 
-    def __init__(self, serialPort:SerialInterface):
-        self.serialPort = serialPort
+    def __init__(self, transport:SerialInterface):
+        self.transport = transport
 
 
     def Read(self, pin: int, state: int, timeout_ms: int)->int:                
         cmd = f"PulseIn({pin}, {state}, {timeout_ms})"
-        self.serialPort.WriteCommand(cmd)
-        self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
 
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         if ret.success:            
             try:

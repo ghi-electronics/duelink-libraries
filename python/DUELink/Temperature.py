@@ -23,13 +23,13 @@ class TemperatureSensorType():
     DHT22 = property(__get_Dht22, __set_empty)    
 
 class TemperatureController:
-    def __init__(self, serialPort):
-        self.serialPort = serialPort
+    def __init__(self, transport):
+        self.transport = transport
 
     def Read(self, pin: int, sensortype: int) -> float:
         cmd = f"temp({pin},{sensortype})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        res = self.serialPort.ReadResponse()
+        res = self.transport.ReadResponse()
         return float(res.response)
         

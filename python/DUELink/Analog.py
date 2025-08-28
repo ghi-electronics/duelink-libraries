@@ -1,20 +1,20 @@
 from DUELink.SerialInterface import SerialInterface
 
 class AnalogController:
-    def __init__(self, serialPort:SerialInterface):
-        self.serialPort = serialPort
+    def __init__(self, transport:SerialInterface):
+        self.transport = transport
         self.Fixed_Frequency = 50
 
     def VoltRead(self, pin):
 
-        if pin not in self.serialPort.DeviceConfig.AnalogPins:
+        if pin not in self.transport.DeviceConfig.AnalogPins:
             raise ValueError("Invalid pin. Enter a valid analog pin.")
 
         cmd = "vread({0})".format(pin)
 
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         if ret.success:
             try:
@@ -26,14 +26,14 @@ class AnalogController:
     
     def Read(self, pin):
 
-        if pin not in self.serialPort.DeviceConfig.AnalogPins:
+        if pin not in self.transport.DeviceConfig.AnalogPins:
             raise ValueError("Invalid pin. Enter a valid analog pin.")
 
         cmd = "aread({0})".format(pin)
 
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         if ret.success:
             try:
@@ -45,23 +45,23 @@ class AnalogController:
     
     def Write(self, pin, duty_cycle):
         
-        if pin not in self.serialPort.DeviceConfig.PWMPins: # Led
+        if pin not in self.transport.DeviceConfig.PWMPins: # Led
             raise ValueError('Invalid pin. Enter a valid pwm pin.')
 
         if duty_cycle < 0 or duty_cycle > 1:
             raise ValueError('Duty cycle must be in the range 0..1')
 
         cmd = f'awrite({pin}, {duty_cycle})'
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         return ret.success
     
     def ReadVCC(self):
         cmd = f"readvcc()"
-        self.serialPort.WriteCommand(cmd)
-        ret = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
 
         if ret.success:
             try:

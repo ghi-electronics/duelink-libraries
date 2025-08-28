@@ -9,8 +9,8 @@ class GraphicsType(IntEnum):
 
 
 class GraphicsController:
-    def __init__(self, serialPort):
-        self.serialPort = serialPort
+    def __init__(self, transport):
+        self.transport = transport
     
     def Configuration(self, displayType, config, width, height, mode)->bool:
 
@@ -24,79 +24,79 @@ class GraphicsController:
         inputConfigArray = "{" + inputConfigArray + "}"
         
         cmd = f"gfxcfg({displayType}, {inputConfigArray}, {width}, {height}, {mode})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
         
     def Show(self)->bool:
         cmd = "show()"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
 
     def Clear(self, color)->bool:
         cmd = f"clear({color})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
 
     def Pixel(self, color, x, y)->bool:
         cmd = f"pixel({color},{x},{y})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
 
     def Circle(self, color, x, y, radius)->bool:
         cmd = f"circle({color},{x},{y},{radius})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
 
     def Rect(self, color, x, y, width, height)->bool:
         cmd = f"rect({color},{x},{y},{width},{height})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
 
     def Fill(self, color, x, y, width, height)->bool:
         cmd = f"fill({color},{x},{y},{width},{height})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
 
     def Line(self, color, x1, y1, x2, y2)->bool:
         cmd = f"line({color},{x1},{y1},{x2},{y2})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
 
     def Text(self, text, color, x, y)->bool:
         cmd = f"text(\"{text}\",{color},{x},{y})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
     
     def TextT(self, text, color, x, y)->bool:
         cmd = f"textt(\"{text}\",{color},{x},{y})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
 
     def TextS(self, text, color, x, y, scalewidth, scaleheight)->bool:
         cmd = f"texts(\"{text}\",{color},{x},{y},{scalewidth},{scaleheight})"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         return res.success
 
     # def __Stream(self, data, color_depth: int):
     #     cmd = f"stream({color_depth})"
-    #     self.serialPort.WriteCommand(cmd)
-    #     res = self.serialPort.ReadResponse()
+    #     self.transport.WriteCommand(cmd)
+    #     res = self.transport.ReadResponse()
 
     #     if res.success:
-    #         self.serialPort.WriteRawData(data, 0, len(data))
+    #         self.transport.WriteRawData(data, 0, len(data))
     #         # time.sleep(10)
-    #         res = self.serialPort.ReadResponse()
+    #         res = self.transport.ReadResponse()
 
     #     return res.success
 
@@ -107,13 +107,13 @@ class GraphicsController:
 
         cmd = f"dim b9[{len(img)}]"
 
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
 
         for i in range(len(img)):
             cmd = f"b9[{(i)}] = {img[i]}"
-            self.serialPort.WriteCommand(cmd)
-            res = self.serialPort.ReadResponse()
+            self.transport.WriteCommand(cmd)
+            res = self.transport.ReadResponse()
 
             if (res.success == False):
                 break
@@ -121,13 +121,13 @@ class GraphicsController:
         if (res.success == True):
             cmd = f"imgs(b9, {x}, {y}, {width}, {height}, {scaleWidth}, {scaleHeight}, {transform})"
 
-            self.serialPort.WriteCommand(cmd)
-            res = self.serialPort.ReadResponse()
+            self.transport.WriteCommand(cmd)
+            res = self.transport.ReadResponse()
 
         cmd = "dim b9[0]"
 
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
 
         return res.success
 

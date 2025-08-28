@@ -8,26 +8,26 @@ class SystemController:
         Bootloader = 1
 
 
-    def __init__(self, serialPort):
-        self.serialPort = serialPort
+    def __init__(self, transport):
+        self.transport = transport
         self.Version = ""         
 
     def Reset(self, option : int):
         cmd = "reset({0})".format(1 if option == 1 else 0)
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
         #Erase all send reset twice
         if (option == 1):
-            self.serialPort.ReadResponse()
-            self.serialPort.WriteCommand(cmd)
+            self.transport.ReadResponse()
+            self.transport.WriteCommand(cmd)
 
         # The device will reset in bootloader or system reset
-        self.serialPort.Disconnect()
+        self.transport.Disconnect()
 
     def GetTickMicroseconds(self):
         cmd = "tickus()"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         if res.success:
             try:
                 return int(res.response)
@@ -37,8 +37,8 @@ class SystemController:
     
     def GetTickMilliseconds(self):
         cmd = "tickms()"
-        self.serialPort.WriteCommand(cmd)
-        res = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        res = self.transport.ReadResponse()
         if res.success:
             try:
                 return int(res.response)
@@ -48,9 +48,9 @@ class SystemController:
     
     # def GetVersion(self):
         # command = "version()"
-        # self.serialPort.WriteCommand(command)
+        # self.transport.WriteCommand(command)
 
-        # version = self.serialPort.ReadResponse()
+        # version = self.transport.ReadResponse()
 
         
 
@@ -58,9 +58,9 @@ class SystemController:
 
 
         # if version.success:
-            # self.serialPort.TurnEchoOff()
-            # self.serialPort.portName.reset_input_buffer()
-            # self.serialPort.portName.reset_output_buffer()
+            # self.transport.TurnEchoOff()
+            # self.transport.portName.reset_input_buffer()
+            # self.transport.portName.reset_output_buffer()
             # version.response = version.response[len(command):]
 
         # version_firmware = match.group(2).split(":")[0]
@@ -72,9 +72,9 @@ class SystemController:
     
     def Info(self, code):
         cmd = f"info({code})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        response = self.serialPort.ReadResponse()
+        response = self.transport.ReadResponse()
 
         if response.success:            
             try:
@@ -87,16 +87,16 @@ class SystemController:
         
     def StatLed(self, highPeriod: int, lowPeriod: int, count: int) -> bool:
         cmd = f"statled({highPeriod},{lowPeriod},{count})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        res = self.serialPort.ReadResponse()
+        res = self.transport.ReadResponse()
         return res.success
     
     def Shutdown(self, wkpin: int)-> bool:
         cmd = f"shtdn({wkpin})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        res = self.serialPort.ReadResponse()
+        res = self.transport.ReadResponse()
         return res.success
 
     

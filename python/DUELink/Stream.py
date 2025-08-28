@@ -5,29 +5,29 @@ import struct
 
 class StreamController:   
 
-    def __init__(self, serialPort:SerialInterface):
-        self.serialPort = serialPort
+    def __init__(self, transport:SerialInterface):
+        self.transport = transport
 
     def WriteSpi(self, dataWrite: bytes):
         count = len(dataWrite)
 
         cmd = f"strmspi({count})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
         # wait for prompt &
-        while self.serialPort.BytesToRead() == 0:
+        while self.transport.BytesToRead() == 0:
             time.sleep(0.001)
         
-        prompt = self.serialPort.ReadByte()
+        prompt = self.transport.ReadByte()
 
         if prompt != '&':
             raise Exception("Invalid or no responses")
         
         # ready to write data
-        self.serialPort.WriteRawData(dataWrite,0, count)
+        self.transport.WriteRawData(dataWrite,0, count)
 
         # read x\r\n> (asio(1) not return this)
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         if ret.success:
             try:
@@ -45,22 +45,22 @@ class StreamController:
 
         # declare b1 array
         cmd = f"strmwr({arr},{count})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
         # wait for prompt &
-        while self.serialPort.BytesToRead() == 0:
+        while self.transport.BytesToRead() == 0:
             time.sleep(0.001)
         
-        prompt = self.serialPort.ReadByte()
+        prompt = self.transport.ReadByte()
 
         if prompt != '&':
             raise Exception("Invalid or no responses")
         
         # ready to write data
-        self.serialPort.WriteRawData(dataWrite,0, count)
+        self.transport.WriteRawData(dataWrite,0, count)
 
         # read x\r\n> (asio(1) not return this)
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         if ret.success:
             try:
@@ -77,13 +77,13 @@ class StreamController:
 
         # declare b1 array
         cmd = f"strmwr({arr},{count})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
         # wait for prompt &
-        while self.serialPort.BytesToRead() == 0:
+        while self.transport.BytesToRead() == 0:
             time.sleep(0.001)
         
-        prompt = self.serialPort.ReadByte()
+        prompt = self.transport.ReadByte()
 
         if prompt != '&':
             raise Exception("Invalid or no responses")
@@ -92,10 +92,10 @@ class StreamController:
         for i in range (0, count):
             float_bytes = struct.pack('>f', dataWrite[i])
             float_bytes_lsb = float_bytes[::-1]
-            self.serialPort.WriteRawData(float_bytes_lsb,0, 4)        
+            self.transport.WriteRawData(float_bytes_lsb,0, 4)        
 
         # read x\r\n> (asio(1) not return this)
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         if ret.success:
             try:
@@ -112,22 +112,22 @@ class StreamController:
 
         # declare b1 array
         cmd = f"strmrd({arr},{count})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
         # wait for prompt &
-        while self.serialPort.BytesToRead() == 0:
+        while self.transport.BytesToRead() == 0:
             time.sleep(0.001)
         
-        prompt = self.serialPort.ReadByte()
+        prompt = self.transport.ReadByte()
 
         if prompt != '&':
             raise Exception("Invalid or no responses")
         
         # ready to read data
-        self.serialPort.ReadRawData(dataRead,0, count)
+        self.transport.ReadRawData(dataRead,0, count)
 
         # read x\r\n> (asio(1) not return this)
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         if ret.success:
             try:
@@ -144,13 +144,13 @@ class StreamController:
 
         # declare b1 array
         cmd = f"strmrd({arr},{count})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
         # wait for prompt &
-        while self.serialPort.BytesToRead() == 0:
+        while self.transport.BytesToRead() == 0:
             time.sleep(0.001)
         
-        prompt = self.serialPort.ReadByte()
+        prompt = self.transport.ReadByte()
 
         if prompt != '&':
             raise Exception("Invalid or no responses")
@@ -158,12 +158,12 @@ class StreamController:
         # ready to read data
         raw_bytes = bytearray(4)
         for i in range (0, count):
-            self.serialPort.ReadRawData(raw_bytes,0, 4)
+            self.transport.ReadRawData(raw_bytes,0, 4)
             raw_bytes_lsb = raw_bytes[::-1]
             dataRead[i] = struct.unpack('f', raw_bytes)[0]        
 
         # read x\r\n> (asio(1) not return this)
-        ret = self.serialPort.ReadResponse()
+        ret = self.transport.ReadResponse()
 
         if ret.success:
             try:
