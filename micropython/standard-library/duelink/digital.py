@@ -2,15 +2,15 @@
 class DigitalController:    
 
     def __init__(self, serialPort):
-        self.serialPort = serialPort
+        self.transport = serialPort
 
     def Read(self, pin, pull):
-        self.serialPort.WriteCommand(f"dread({pin},{pull})")        
-        r, s = self.serialPort.ReadResponse()        
+        self.transport.WriteCommand(f"dread({pin},{pull})")        
+        r, s = self.transport.ReadResponse()        
         if r:
             return int(s, 10)        
 
     def Write(self, pin, value):
-        self.serialPort.WriteCommand(f"dwrite({pin},{value})")
-        r, s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(f"dwrite({pin},{value})")
+        r, s = self.transport.ReadResponse()
         return r

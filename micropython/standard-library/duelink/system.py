@@ -2,24 +2,24 @@
 class SystemController:    
 
     def __init__(self, serialPort):
-        self.serialPort = serialPort
+        self.transport = serialPort
 
     def Reset(self, option : int):
         cmd = "reset({0})".format(1 if option == 1 else 0)
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
         #Erase all send reset twice
         if (option == 1):
-            self.serialPort.ReadResponse()
-            self.serialPort.WriteCommand(cmd)
+            self.transport.ReadResponse()
+            self.transport.WriteCommand(cmd)
 
         # The device will reset in bootloader or system reset
-        self.serialPort.Disconnect()
+        self.transport.Disconnect()
 
     def GetTickMicroseconds(self):
         cmd = "tickus()"
-        self.serialPort.WriteCommand(cmd)
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        r,s = self.transport.ReadResponse()
         if r:
             try:
                 return int(s)
@@ -29,8 +29,8 @@ class SystemController:
     
     def GetTickMilliseconds(self):
         cmd = "tickms()"
-        self.serialPort.WriteCommand(cmd)
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        r,s = self.transport.ReadResponse()
         if r:
             try:
                 return int(s)
@@ -40,9 +40,9 @@ class SystemController:
     
     # def GetVersion(self):
         # command = "version()"
-        # self.serialPort.WriteCommand(command)
+        # self.transport.WriteCommand(command)
 
-        # version = self.serialPort.ReadResponse()
+        # version = self.transport.ReadResponse()
 
         
 
@@ -50,9 +50,9 @@ class SystemController:
 
 
         # if version.success:
-            # self.serialPort.TurnEchoOff()
-            # self.serialPort.portName.reset_input_buffer()
-            # self.serialPort.portName.reset_output_buffer()
+            # self.transport.TurnEchoOff()
+            # self.transport.portName.reset_input_buffer()
+            # self.transport.portName.reset_output_buffer()
             # version.response = version.response[len(command):]
 
         # version_firmware = match.group(2).split(":")[0]
@@ -64,9 +64,9 @@ class SystemController:
     
     def Info(self, code):
         cmd = f"info({code})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        r,s = self.serialPort.ReadResponse()
+        r,s = self.transport.ReadResponse()
 
         if r:            
             try:
@@ -79,16 +79,16 @@ class SystemController:
         
     def StatLed(self, highPeriod: int, lowPeriod: int, count: int) -> bool:
         cmd = f"statled({highPeriod},{lowPeriod},{count})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        r,s = self.serialPort.ReadResponse()
+        r,s = self.transport.ReadResponse()
         return r
     
     def Shutdown(self, wkpin: int)-> bool:
         cmd = f"shtdn({wkpin})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        r,s = self.serialPort.ReadResponse()
+        r,s = self.transport.ReadResponse()
         return r
         
     def SetArrayValue(self, var, data, offset=0, count=-1):
@@ -103,14 +103,14 @@ class SystemController:
         ):
             raise Exception("Invalid array variable must be A0..A9 or B0..B9")
                                                                                                          
-        r, s = self.serialPort.execute(f"dim {var}[{count}]")
-        r, s = self.serialPort.execute(f"strmwr({var},{count})")
+        r, s = self.transport.execute(f"dim {var}[{count}]")
+        r, s = self.transport.execute(f"strmwr({var},{count})")
         if not s:
             raise Excpetion(r)
         if count > 0:
             if var[0] == 'b':
-                self.serialPort.streamOutBytes(data[offset:offset+count])
+                self.transport.streamOutBytes(data[offset:offset+count])
             elif var[0] == 'a':
-                self.serialPort.streamOutFloats(data[offset:offset+count])
+                self.transport.streamOutFloats(data[offset:offset+count])
         
         

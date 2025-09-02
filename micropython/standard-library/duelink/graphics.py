@@ -8,7 +8,7 @@ class GraphicsType:
     
 class GraphicsController:
     def __init__(self, serialPort):
-        self.serialPort = serialPort
+        self.transport = serialPort
 
     def Configuration(self, type, config, width, height, mode):
         cfg_array = "{"
@@ -20,86 +20,86 @@ class GraphicsController:
         
         cmd = f"gfxcfg({type},{cfg_array},{width},{height},{mode})"
         
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
     
     def Show(self):
         cmd = "show()"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
         
-        r,s = self.serialPort.ReadResponse()
+        r,s = self.transport.ReadResponse()
 
         return r
     
     def Clear(self, color):
         cmd =f"clear({color})"
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
     
     def Pixel(self, color, x, y):
         cmd =f"pixel({color},{x},{y})"
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
 
     
     def Circle(self, color, x, y, r):
         cmd =f"circle({color},{x},{y},{r})"
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
 
     
     def Rect(self, color, x, y, w, h):
         cmd =f"rect({color},{x},{y},{w},{h})"
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
 
     
     def Fill(self, color, x, y, w, h):
         cmd =f"fill({color},{x},{y},{w},{h})"
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
 
     
     def Line(self, color, x1, y1, x2, y2):
         cmd =f"line({color},{x1},{y1},{x2},{y2})"
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
 
         
     def Text(self, text, color, x, y):
         cmd =f"text(\"{text}\",{color},{x},{y})"
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
 
         
     def TextS(self, text, color, x, y, sx, sy):
         cmd =f"texts(\"{text}\",{color},{x},{y},{sx},{sy})"
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
 
     
     def TextT(self, text, color, x, y):
         cmd =f"textt(\"{text}\",{color},{x},{y})"
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
 
@@ -120,8 +120,8 @@ class GraphicsController:
             raise Exception("Invalid image type '{t}'")
         
         cmd =f"imgs({img_arr},{x},{y},{w},{h},{sx},{sy},{transform})"
-        self.serialPort.WriteCommand(cmd)        
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)        
+        r,s = self.transport.ReadResponse()
 
         return r
 

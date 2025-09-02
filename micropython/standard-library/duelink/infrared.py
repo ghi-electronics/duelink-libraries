@@ -1,11 +1,11 @@
 class InfraredController:
     def __init__(self, serialPort):
-        self.serialPort = serialPort
+        self.transport = serialPort
 
     def Read(self)->int:
         cmd = "irread()"
-        self.serialPort.WriteCommand(cmd)
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        r,s = self.transport.ReadResponse()
 
         if r:
             try:
@@ -16,13 +16,13 @@ class InfraredController:
     
     def Write(self, command: int)->bool:
         cmd = f"IrWrite({command})"
-        self.serialPort.WriteCommand(cmd)
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        r,s = self.transport.ReadResponse()
         return r
 
     def Enable(self, txpin:int, rxpin: int)->bool:
         cmd = f"iren({txpin}, {rxpin}})"
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        r,s = self.serialPort.ReadResponse()
+        r,s = self.transport.ReadResponse()
         return r

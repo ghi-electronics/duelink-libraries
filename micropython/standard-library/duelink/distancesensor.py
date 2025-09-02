@@ -2,13 +2,13 @@
 class DistanceSensorController:    
 
     def __init__(self, serialPort):
-        self.serialPort = serialPort
+        self.transport = serialPort
 
     def Read(self, trigPin, echoPin)->float:
         cmd = f'dist({trigPin},{echoPin})'
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        r,s = self.serialPort.ReadResponse()
+        r,s = self.transport.ReadResponse()
 
         if r == True:
             try:

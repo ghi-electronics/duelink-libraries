@@ -204,7 +204,7 @@ class I2CTransportController:
         while block > 0:
             self.WriteBytes(buffer[idx:idx + self.TransferBlockSizeMax])
             idx += self.TransferBlockSizeMax
-            block -= 1
+            block = block - 1
             time.sleep(self.TransferBlockDelay/1000.0)
 
         if remain > 0:

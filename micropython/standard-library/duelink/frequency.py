@@ -1,7 +1,7 @@
 
 class FrequencyController:    
     def __init__(self, serialPort):
-        self.serialPort = serialPort
+        self.transport = serialPort
 
     def Write(self, pin: int, frequency, duration_ms=0, dutycyle=0.5)->bool:
         if frequency < 16 or frequency > 24000000:
@@ -10,8 +10,8 @@ class FrequencyController:
             raise Exception("Duty cycle must be in range 0..1")
         
         cmd = "freq({}, {}, {}, {})".format(pin, frequency, duration_ms, dutycyle)
-        self.serialPort.WriteCommand(cmd)
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        r,s = self.transport.ReadResponse()
 
         return r
 

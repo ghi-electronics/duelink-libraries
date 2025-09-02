@@ -1,14 +1,14 @@
 
 class AnalogController:        
     def __init__(self, serialPort):
-        self.serialPort = serialPort
+        self.transport = serialPort
 
     def VoltRead(self, pin):
         cmd = "vread({0})".format(pin)
 
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        r,s = self.serialPort.ReadResponse()
+        r,s = self.transport.ReadResponse()
 
         if r:
             try:
@@ -21,9 +21,9 @@ class AnalogController:
     def Read(self, pin):
         cmd = "aread({0})".format(pin)
 
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        r,s = self.serialPort.ReadResponse()
+        r,s = self.transport.ReadResponse()
 
         if r:
             try:
@@ -39,16 +39,16 @@ class AnalogController:
             raise ValueError('Duty cycle must be in the range 0..1')
 
         cmd = f'awrite({pin}, {duty_cycle})'
-        self.serialPort.WriteCommand(cmd)
+        self.transport.WriteCommand(cmd)
 
-        r,s = self.serialPort.ReadResponse()
+        r,s = self.transport.ReadResponse()
 
         return r
     
     def ReadVCC(self):
         cmd = f"readvcc()"
-        self.serialPort.WriteCommand(cmd)
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        r,s = self.transport.ReadResponse()
 
         if r:
             try:

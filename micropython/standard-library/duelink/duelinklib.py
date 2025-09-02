@@ -32,41 +32,41 @@ from duelink.uart import UartController
    
 class DUELinkController:
     def __init__(self, serialPort):
-        self.serialPort = serialPort
-        self.Stream = StreamController(self.serialPort)
-        self.Analog = AnalogController(self.serialPort)
-        self.Digital = DigitalController(self.serialPort)        
-        self.Servo = ServoController(self.serialPort)
-        self.Frequency = FrequencyController(self.serialPort)        
-        self.Infrared = InfraredController(self.serialPort)
-        self.Button = ButtonController(self.serialPort)
-        self.Distance = DistanceSensorController(self.serialPort)
-        self.Graphics = GraphicsController(self.serialPort)
-        self.Touch = TouchController(self.serialPort)        
-        self.Engine = EngineController(self.serialPort)
-        self.Temperature = TemperatureController(self.serialPort)
-        self.Humidity = HudimityController(self.serialPort)
-        self.System = SystemController(self.serialPort)                
-        self.Sound = SoundController(self.serialPort)
+        self.transport = serialPort
+        self.Stream = StreamController(self.transport)
+        self.Analog = AnalogController(self.transport)
+        self.Digital = DigitalController(self.transport)        
+        self.Servo = ServoController(self.transport)
+        self.Frequency = FrequencyController(self.transport)        
+        self.Infrared = InfraredController(self.transport)
+        self.Button = ButtonController(self.transport)
+        self.Distance = DistanceSensorController(self.transport)
+        self.Graphics = GraphicsController(self.transport)
+        self.Touch = TouchController(self.transport)        
+        self.Engine = EngineController(self.transport)
+        self.Temperature = TemperatureController(self.transport)
+        self.Humidity = HudimityController(self.transport)
+        self.System = SystemController(self.transport)                
+        self.Sound = SoundController(self.transport)
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()       
-        self.Pulse = PulseController(self.serialPort)
+        self.Pulse = PulseController(self.transport)
 
-        self.CoProcessor = CoProcessorController(self.serialPort,self.Stream)
-        self.DMX = DMXController(self.serialPort,self.Stream)
-        self.FileSystem = FileSystemController(self.serialPort,self.Stream)
-        self.Otp = OtpController(self.serialPort,self.Stream)        
-        self.Rtc = RtcController(self.serialPort,self.Stream)
-        self.I2c = I2cController(self.serialPort,self.Stream)
-        self.Spi = SpiController(self.serialPort,self.Stream)
-        self.Uart = UartController(self.serialPort,self.Stream)
+        self.CoProcessor = CoProcessorController(self.transport,self.Stream)
+        self.DMX = DMXController(self.transport,self.Stream)
+        self.FileSystem = FileSystemController(self.transport,self.Stream)
+        self.Otp = OtpController(self.transport,self.Stream)        
+        self.Rtc = RtcController(self.transport,self.Stream)
+        self.I2c = I2cController(self.transport,self.Stream)
+        self.Spi = SpiController(self.transport,self.Stream)
+        self.Uart = UartController(self.transport,self.Stream)
         
     
     def __get_ReadTimeout(self):
-        return self.serialPort.ReadTimeout
+        return self.transport.ReadTimeout
 
     def __set_ReadTimeout(self, value: int):
-        self.serialPort.ReadTimeout = value 
+        self.transport.ReadTimeout = value 
 
     ReadTimeout = property(__get_ReadTimeout, __set_ReadTimeout)
     

@@ -22,13 +22,13 @@ class HumiditySensorType():
     
 class HudimityController:
     def __init__(self, serialPort):
-        self.serialPort = serialPort
+        self.transport = serialPort
 
     def Read(self, pin: int, sensortype: int) -> float:
     
         cmd = f"humid({pin},{sensortype})"
-        self.serialPort.WriteCommand(cmd)
-        r,s = self.serialPort.ReadResponse()
+        self.transport.WriteCommand(cmd)
+        r,s = self.transport.ReadResponse()
 
         if r:
             try:
