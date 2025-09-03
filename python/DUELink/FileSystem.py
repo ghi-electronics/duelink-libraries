@@ -37,7 +37,7 @@ class FileSystemController:
         return self.__ParseReturn()
     
     def Open(self, path: str, mode: int)->int:            
-        cmd = f"FsOpen({path}, {mode})"
+        cmd = f"FsOpen(\"{path}\", {mode})"
         self.transport.WriteCommand(cmd)
         
         return self.__ParseReturn()
@@ -94,19 +94,19 @@ class FileSystemController:
         return self.__ParseReturn()
     
     def Delete(self, path: str)->int:            
-        cmd = f"FsDel({path})"
+        cmd = f"FsDel(\"{path}\")"
         self.transport.WriteCommand(cmd)
         
         return self.__ParseReturn()
     
     def Find(self, path: str)->int:            
-        cmd = f"FsFind({path})"
+        cmd = f"FsFind(\"{path}\")"
         self.transport.WriteCommand(cmd)
         
         return self.__ParseReturn()
     
     def Size(self, path: str)->int:            
-        cmd = f"Fsfsz({path})"
+        cmd = f"Fsfsz(\"{path}\")"
         self.transport.WriteCommand(cmd)
         
         return self.__ParseReturn()
