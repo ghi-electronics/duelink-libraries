@@ -21,7 +21,7 @@ class InfraredController:
         return r
 
     def Enable(self, txpin:int, rxpin: int)->bool:
-        cmd = f"iren({txpin}, {rxpin}})"
+        cmd = f"iren({txpin}, {rxpin})"
         self.transport.WriteCommand(cmd)
 
         r,s = self.transport.ReadResponse()
