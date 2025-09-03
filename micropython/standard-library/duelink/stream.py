@@ -47,7 +47,7 @@ class StreamController:
         startms = time.ticks_ms()
         while (time.ticks_ms() - startms < self.transport.ReadTimeout):            
             data = self.transport.ReadByte()
-            if data[0] == ord('&'):
+            if data != None and data[0] == ord('&'):
                 prompt = data[0]
                 break
             
@@ -80,9 +80,10 @@ class StreamController:
 
         # wait for prompt &
         prompt = 0
-        while True:            
+        startms = time.ticks_ms()
+        while (time.ticks_ms() - startms < self.transport.ReadTimeout):            
             data = self.transport.ReadByte()
-            if data[0] == ord('&'):
+            if data != None and data[0] == ord('&'):
                 prompt = data[0]
                 break
         
