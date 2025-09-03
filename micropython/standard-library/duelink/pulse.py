@@ -7,8 +7,7 @@ class PulseController:
 
     def Read(self, pin: int, state: int, timeout_ms: int)->int:                
         cmd = f"PulseIn({pin}, {state}, {timeout_ms})"
-        self.transport.WriteCommand(cmd)
-        self.transport.ReadResponse()
+        self.transport.WriteCommand(cmd)        
 
         r,s = self.transport.ReadResponse()
 
