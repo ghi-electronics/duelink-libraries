@@ -232,6 +232,7 @@ class UartTransportController:
         self.uart.init(115200, bits=8, parity=None, stop=1)        
         self.TransferBlockSizeMax = 512
         self.TransferBlockDelay = 5 #ms
+        self.sync()
         
     def DiscardInBuffer(self):        
         #self.uart.readall()
