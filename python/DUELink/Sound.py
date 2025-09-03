@@ -1,9 +1,11 @@
 from typing import List
 from DUELink.SerialInterface import SerialInterface
+from DUELink.Stream import StreamController
 
 class SoundController:
-    def __init__(self, transport:SerialInterface):
+    def __init__(self, transport:SerialInterface, stream:StreamController):
         self.transport = transport
+        self.stream = stream
 
     def Beep(self, pin:int, frequency:int, duration:int)->bool:
 
@@ -30,11 +32,23 @@ class SoundController:
             if note < 0 or note > 10000:
                 raise ValueError("Note Frequency is within range[0,10000] Hz")
         
-        cmd = "MelodyP({0}, {{{1}}})".format(pin, ", ".join(map(str, notes)))
+        #cmd = "MelodyP({0}, {{{1}}})".format(pin, ", ".join(map(str, notes)))
+         # declare b9 array
+        count = len(notes)
+        # declare b9 array
+        cmd = f"dim a9[{count}]"
         self.transport.WriteCommand(cmd)
-        res = self.transport.ReadResponse()
-        
-        return res.success
+        self.transport.ReadResponse()
+
+        # write data to b9
+        ret = self.stream.WriteFloats("a9",notes)
+
+        # write b9 to dmx
+        cmd = f"MelodyP({pin},a9)"
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
+
+        return ret.success
 
     def MelodyStop(self, pin: int)->bool:
 

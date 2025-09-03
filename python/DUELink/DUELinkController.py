@@ -57,8 +57,7 @@ class DUELinkController:
         self.Temperature = TemperatureController(self.transport)
         self.Humidity = HudimityController(self.transport)
         self.System = SystemController(self.transport)        
-        self.GraphicsType = GraphicsTypeController()        
-        self.Sound = SoundController(self.transport)
+        self.GraphicsType = GraphicsTypeController()                
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()       
         self.Pulse = PulseController(self.transport)
@@ -71,6 +70,7 @@ class DUELinkController:
         self.I2c = I2cController(self.transport,self.Stream)
         self.Spi = SpiController(self.transport,self.Stream)
         self.Uart = UartController(self.transport,self.Stream)
+        self.Sound = SoundController(self.transport,self.Stream)
         
     
     def __Connect(self, comPort: str):
