@@ -1489,7 +1489,7 @@ class UartController {
     }
 
     async WriteBytes(data) {
-      count = data.length
+      const count = data.length
       // declare b9 array
       const cmd = `dim b9[${count}]`;
       await this.serialPort.WriteCommand(cmd);  
@@ -1521,7 +1521,7 @@ class UartController {
     }
 
     async ReadBytes(data, timeout) {
-      count = data.length
+      const count = data.length
       // declare b9 array
       let cmd = `dim b9[${count}]`;
       await this.serialPort.WriteCommand(cmd);  
@@ -1834,7 +1834,7 @@ class CoProcessorController {
   }
 
   async Write(data) {
-    count = data.length
+    const count = data.length
     // declare b9 array
     const cmd = `dim b9[${count}]`;
     await this.serialPort.WriteCommand(cmd);  
@@ -1852,7 +1852,7 @@ class CoProcessorController {
   }
 
   async Read(data) {
-    count = data.length
+    const count = data.length
     // declare b9 array
     const cmd = `dim b9[${count}]`;
     await this.serialPort.WriteCommand(cmd);  
@@ -1876,7 +1876,7 @@ class DMXController {
   }
 
   async Write(data) {
-    count = data.length
+    const count = data.length
 
     // declare b9 array
     const cmd = `dim b9[${count}]`;
@@ -2081,7 +2081,7 @@ class OtpController {
   }
 
   async Write(address, data) {
-    count = data.length
+    const count = data.length
 
     // declare b9 array
     let cmd = `dim b9[${count}]`;
