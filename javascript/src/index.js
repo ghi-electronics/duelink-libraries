@@ -1,24 +1,30 @@
 import {SerialUSB} from './serialusb.js';
 import * as due from './duelink.js';
-import { createCanvas, loadImage } from 'canvas';
+import { Util } from "./util.js";
+import delay from 'delay';
+//import { createCanvas, loadImage } from 'canvas';
 
-let BrainPad = new due.DUELinkController(new SerialUSB());
-await BrainPad.Connect();
-
-async function demo() {
-    const canvas = createCanvas(BrainPad.Display.Width, BrainPad.Display.Height);
-    const ctx = canvas.getContext('2d');
-    const img = await loadImage("C:\\Users\\chris\\OneDrive\\Pictures\\Cape Town 2009\\DSCN0082.JPG");
-
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    let pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    await BrainPad.Display.PaletteFromBuffer(pixels, 3);
-    await BrainPad.Display.DrawBuffer(pixels, 4);
+async function toHex(number, length = 4) {
+    let hexString = number.toString(16);
+    while (hexString.length < length) {
+    hexString = '0' + hexString;
+    }
+    return hexString;
 }
 
-await demo();
 
-//close serial com
-await BrainPad.Disconnect()
+let duelink = new due.DUELinkController(new SerialUSB());
+await duelink.Connect();
 
-console.log("The End!");
+await duelink.System.StatLed(100,100,0);
+
+//await duelink.Sound.Beep(7, 1000, 100);
+
+let pid = await toHex(await duelink.System.Info(0)/1)
+let ver = (await duelink.System.Info(1)/1.0).toString()
+
+console.log(pid)
+console.log(ver)
+
+
+
