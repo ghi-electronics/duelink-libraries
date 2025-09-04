@@ -27,6 +27,7 @@ from DUELink.Otp import OtpController
 from DUELink.Pulse import PulseController
 from DUELink.Rtc import RtcController
 from DUELink.Uart import UartController
+from DUELink.Downlink import DownlinkController
 
 from enum import Enum
 import platform
@@ -60,6 +61,7 @@ class DUELinkController:
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()       
         self.Pulse = PulseController(self.transport)
+        self.Downlink = DownlinkController(self.transport)
 
         self.CoProcessor = CoProcessorController(self.transport,self.Stream)
         self.DMX = DMXController(self.transport,self.Stream)
@@ -71,6 +73,7 @@ class DUELinkController:
         self.Uart = UartController(self.transport,self.Stream)
         self.Sound = SoundController(self.transport,self.Stream)
         self.Graphics = GraphicsController(self.transport,self.Stream)
+        
         
     
     def __Connect(self, comPort: str):

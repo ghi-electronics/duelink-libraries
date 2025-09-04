@@ -118,18 +118,25 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public string WriteCommand(string cmd) {
+            public float ExecuteCommand(string cmd) {
                 this.serialPort.WriteCommand(cmd);
 
                 var response = this.serialPort.ReadResponse();
 
+                if (response.success) {
+                    try {
+                        var value = float.Parse(response.response);
 
-                return response.response;
-            }
+                        return value;
+                    }
+                    catch {
 
-            public string Cmd(string s) {
-                return this.WriteCommand($"cmd({s})");
-                ;                
+                    }
+
+
+                }
+
+                return 0;
             }
 
 

@@ -82,14 +82,18 @@ class EngineController:
         
         return r
     
-    def WriteCommand(self, cmd:str) -> str:
+    def ExecuteCommand(self, cmd:str) -> float:
         self.transport.WriteCommand(cmd)
         r,s = self.transport.ReadResponse()
 
-        return s
+        if r:
+            try:
+                return float(s)
+            except:
+                pass
+
+        return 0
         
-    def Cmd(self, s:str) -> str:
-        return self.WriteCommand(f"cmd({s})")
         
 
 

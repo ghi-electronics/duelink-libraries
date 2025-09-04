@@ -28,6 +28,7 @@ from duelink.otp import OtpController
 from duelink.pulse import PulseController
 from duelink.rtc import RtcController
 from duelink.uart import UartController
+from duelink.downlink import DownlinkController
 
    
 class DUELinkController:
@@ -49,6 +50,7 @@ class DUELinkController:
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()       
         self.Pulse = PulseController(self.transport)
+        self.Downlink = DownlinkController(self.transport)
 
         self.CoProcessor = CoProcessorController(self.transport,self.Stream)
         self.DMX = DMXController(self.transport,self.Stream)
