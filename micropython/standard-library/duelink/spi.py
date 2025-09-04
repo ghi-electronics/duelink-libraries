@@ -28,28 +28,40 @@ class SpiController:
     def WriteRead(self, dataWrite: bytes, dataRead: bytearray) -> bool:
         countWrite = len(dataWrite)
         countRead = len(dataRead)
+        written = 0
+        read = 0
         
 
-        # declare b9 to write    
-        cmd = f"dim b9[{countWrite}]"
-        self.transport.WriteCommand(cmd)
-        self.transport.ReadResponse()
+        # declare b9 to write
+        if countWrite > 0:    
+            cmd = f"dim b9[{countWrite}]"
+            self.transport.WriteCommand(cmd)
+            self.transport.ReadResponse()
 
         # declare b8 to read
-        cmd = f"dim b8[{countRead}]"
-        self.transport.WriteCommand(cmd)
-        self.transport.ReadResponse()
+        if countRead > 0:
+            cmd = f"dim b8[{countRead}]"
+            self.transport.WriteCommand(cmd)
+            self.transport.ReadResponse()
 
         # write data to b9 by stream
-        written = self.stream.WriteBytes("b9", dataWrite)
+        if countWrite > 0:    
+            written = self.stream.WriteBytes("b9", dataWrite)
 
         # issue spi cmd
-        cmd = f"i2cwr(b9, b8)"
+        if countWrite > 0 and countRead > 0:
+            cmd = f"SpiWrs(b9, b8)"
+        elif countWrite > 0:
+            cmd = f"SpiWrs(b9, 0)"
+        else:
+            cmd = f"SpiWrs(0, b8)"
+
         self.transport.WriteCommand(cmd)
         self.transport.ReadResponse()
 
         # use stream to read data to b8
-        read = self.stream.ReadBytes("b8", dataRead)
+        if countRead > 0:
+            read = self.stream.ReadBytes("b8", dataRead)
 
         # return true since we can't check status if Asio(1)
         return (written == countWrite) and (read == countRead)

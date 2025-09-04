@@ -36,7 +36,20 @@ namespace GHIElectronics.DUELink {
 
             //public bool Read(byte address, byte[] data, int offset, int count) => this.WriteRead(address, null, 0, 0, data, offset, count);
 
-            public bool WriteRead(byte address, byte[] dataWrite, byte[] dataRead) => this.WriteRead(address, dataWrite, 0, dataWrite.Length, dataRead, 0, dataRead.Length);
+            public bool WriteRead(byte address, byte[] dataWrite, byte[] dataRead) {
+                var writeLenghth = 0;
+                var readLenghth = 0;
+
+                if (dataWrite != null)
+                    writeLenghth = dataWrite.Length;
+
+                if (dataRead != null)
+                    readLenghth = dataRead.Length;
+
+                return this.WriteRead(address, dataWrite, 0, writeLenghth, dataRead, 0, readLenghth);
+
+
+            }
 
             private bool WriteRead(byte address, byte[] dataWrite, int offsetWrite, int countWrite, byte[] dataRead, int offsetRead, int countRead) {
                 if ((dataWrite == null && dataRead == null) || (countWrite == 0 && countRead == 0))

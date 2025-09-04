@@ -84,7 +84,7 @@ namespace GHIElectronics.DUELink {
                 Array.Copy(dataWrite, offsetWrite, write_array, 0, countWrite);
                 var written = this.stream.WriteBytes("b9", write_array);
 
-                // i2c wr cmd
+                // spi wr cmd
                 if (countWrite > 0 && countRead > 0) {
                     cmd = $"spiwrs(b9,b8)";
                 }
