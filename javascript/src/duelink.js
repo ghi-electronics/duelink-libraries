@@ -150,7 +150,12 @@ class SerialInterface {
       await Util.sleep(1); // As tested, hasData return true even there is no data yet, this return Available > 0 only but data is not in buffer
       while (new Date() <= end || this.portName.hasData()) {
           if (this.portName.hasData()) {
-            const data = await this.portName.readbyte();
+            var data = await this.portName.readbyte();
+            while (data === null) {
+              await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null
+              data = await this.portName.readbyte()
+            }
+
             str += SerialInterface.Decoder.decode(data);
             total_receviced++;
             
@@ -161,8 +166,14 @@ class SerialInterface {
 
               // next byte can be >, &, !, $
               if (this.portName.hasData()) {
-                await Util.sleep(1);                  
-                dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+                await Util.sleep(1);  // As tested, hasData return true even there is no data yet, this return Available > 0 only but data is not in buffer  
+                var b = await this.portName.readbyte()
+                
+                while (b === null) {
+                  await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
+                  b = await this.portName.readbyte()
+                }
+                dump = SerialInterface.Decoder.decode(b)[0];
                 if (dump == '>' || dump == '!' || dump == '$') {
                     // valid data 
                     await Util.sleep(1); // wait 1ms for sure next byte
@@ -265,6 +276,12 @@ class SerialInterface {
       while (new Date() <= end || this.portName.hasData()) {
         if (this.portName.hasData()) {
           const data = await this.portName.readbyte();
+
+          while (data === null) {
+            await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null
+            data = await this.portName.readbyte()
+          }
+
           str += SerialInterface.Decoder.decode(data);
           total_receviced++;
 
@@ -367,10 +384,6 @@ class AnalogController {
     }
 
     async VoltRead(pin) {  
-        if (!this.serialPort.DeviceConfig.AnalogPins.has(pin))
-        {
-          throw new Error("Invalid pin");
-        }
 
         const cmd = `vread(${pin})`;
 
@@ -388,10 +401,6 @@ class AnalogController {
     }
     
     async Read(pin) {  
-        if (!this.serialPort.DeviceConfig.AnalogPins.has(pin))
-        {
-          throw new Error("Invalid pin");
-        }
 
         const cmd = `aread(${pin})`;
 
@@ -427,6 +436,23 @@ class AnalogController {
         }
     
         return false;
+    }
+
+    async ReadVcc() {  
+
+        const cmd = `ReadVCC()`;
+
+        await this.serialPort.WriteCommand(cmd);
+
+        const res = await this.serialPort.ReadResponse();
+
+        if (res.success) {
+          try {
+            return parseFloat(res.response);
+          } catch {}
+        }
+
+        return -1;
     }
 }
 
@@ -821,7 +847,7 @@ class FrequencyController {
       this.stream = stream
     }
       
-    async Configuartion(speed) {
+    async Configuration(speed) {
       const cmd = `i2ccfg(${speed})`;
 
       await this.serialPort.WriteCommand(cmd);
@@ -832,49 +858,22 @@ class FrequencyController {
 
     async WriteRead(
       address,
-      dataWrite,
-      offsetWrite,
-      countWrite,
-      dataRead,
-      offsetRead,
-      countRead
+      dataWrite,     
+      dataRead      
     ) {
-      if (
-        (dataWrite === null && dataRead === null) ||
-        (countWrite === 0 && countRead === 0)
-      ) {
-        throw new Error(
-          "At least one of dataWrite or dataRead must be specified"
-        );
-      }
-  
-      if (dataWrite === null && countWrite !== 0) {
-        throw new Error("dataWrite null but countWrite not zero");
-      }
-  
-      if (dataRead === null && countRead !== 0) {
-        throw new Error("dataRead null but countRead not zero");
-      }
-  
-      if (dataWrite !== null && offsetWrite + countWrite > dataWrite.length) {
-        throw new Error("Invalid range for dataWrite");
-      }
-  
-      if (dataRead !== null && offsetRead + countRead > dataRead.length) {
-        throw new Error("Invalid range for dataRead");
-      }
-  
-      //let write_array = "[";
-  
-      //for (let i = 0; i < countWrite; i++) {
-      //  write_array += dataWrite[i];
-    
-      //  if (i < countWrite - 1)
-      //      write_array += ",";
-      //}
-  
-     // write_array += "]";
+      var offsetWrite = 0
+      var countWrite = 0
+      var offsetRead = 0
+      var countRead = 0
+      
 
+      if (dataWrite != null)
+        countWrite = dataWrite.length
+
+      if (dataRead != null)
+        countRead = dataRead.length
+
+      
     let cmd = ""
     let written = 0;
     let read = 0; 
@@ -882,21 +881,20 @@ class FrequencyController {
     if (countWrite > 0) {
         // declare b9 to write
         cmd = `dim b9[${countWrite}]`;
-        this.serialPort.WriteCommand(cmd);
-        this.serialPort.ReadResponse();
+        await this.serialPort.WriteCommand(cmd);
+        await this.serialPort.ReadResponse();
     }
 
     if (countRead > 0) {
         // declare b9 to write
         cmd = `dim b8[${countRead}]`;
-        this.serialPort.WriteCommand(cmd);
-        this.serialPort.ReadResponse();
+        await this.serialPort.WriteCommand(cmd);
+        await this.serialPort.ReadResponse();
     }
 
     if (countWrite > 0) {
-      // write data to b9 by stream      
-      let write_array = dataWrite.slice(offsetWrite, offsetWrite + countWrite-1);      
-      written = this.stream.WriteBytes("b9", write_array);
+      // write data to b9 by stream                 
+      written = await this.stream.WriteBytes("b9", dataWrite);
     }
 
     // issue i2cwr cmd
@@ -910,17 +908,12 @@ class FrequencyController {
       cmd = `i2cwr(${address},0, b8)`;
     }
 
-    this.serialPort.WriteCommand(cmd);
-    this.serialPort.ReadResponse();
+    await this.serialPort.WriteCommand(cmd);
+    await this.serialPort.ReadResponse();
 
     if (countRead > 0) {
-      // use stream to read data to b8
-      let read_array = dataRead.slice(offsetRead, offsetRead + countRead-1);  
-      read = this.stream.ReadBytes("b8", read_array); 
-      
-      for (let i = 0; i < countRead; i++) {
-        dataRead[offsetRead + i] = read_array[i]
-      }
+      // use stream to read data to b8      
+      read = await this.stream.ReadBytes("b8", dataRead);             
     }
 
     return (written == countWrite) && (read == countRead);
@@ -1151,7 +1144,7 @@ class ServoController {
       //  throw new Error("Please enter a valid PWM pin as an integer.");
       //}
   
-      count = notes.length
+      const count = notes.length
 
       // declare a9 array
       let cmd = `dim a9[${count}]`;
@@ -1222,40 +1215,23 @@ class SpiController {
     //  );
     //}
   
-    async WriteRead(
-      dataWrite,
-      offsetWrite,
-      countWrite,
-      dataRead,
-      offsetRead,
-      countRead
+   async WriteRead(      
+      dataWrite,     
+      dataRead      
     ) {
+      var offsetWrite = 0
+      var countWrite = 0
+      var offsetRead = 0
+      var countRead = 0
+      
+
+      if (dataWrite != null)
+        countWrite = dataWrite.length
+
+      if (dataRead != null)
+        countRead = dataRead.length
   
-      if (
-        (dataWrite === null && dataRead === null) ||
-        (countWrite === 0 && countRead === 0)
-      ) {
-        throw new Error("Invalid arguments");
-      }
-  
-      if (dataWrite !== null && offsetWrite + countWrite > dataWrite.length) {
-        throw new Error("Invalid arguments");
-      }
-  
-      if (dataRead !== null && offsetRead + countRead > dataRead.length) {
-        throw new Error("Invalid arguments");
-      }
-  
-      //let write_array = "[";
-  
-      //for (let i = 0; i < countWrite; i++) {
-      //  write_array += dataWrite[i];
-    
-      //  if (i < countWrite - 1)
-      //      write_array += ",";
-      //}
-  
-      //write_array += "]";
+
       let cmd = ""
       let written = 0;
       let read = 0; 
@@ -1263,21 +1239,20 @@ class SpiController {
       if (countWrite > 0) {
           // declare b9 to write
           cmd = `dim b9[${countWrite}]`;
-          this.serialPort.WriteCommand(cmd);
-          this.serialPort.ReadResponse();
+          await this.serialPort.WriteCommand(cmd);
+          await this.serialPort.ReadResponse();
       }
 
       if (countRead > 0) {
           // declare b9 to write
           cmd = `dim b8[${countRead}]`;
-          this.serialPort.WriteCommand(cmd);
-          this.serialPort.ReadResponse();
+          await this.serialPort.WriteCommand(cmd);
+          await this.serialPort.ReadResponse();
       }
 
       if (countWrite > 0) {
-        // write data to b9 by stream      
-        let write_array = dataWrite.slice(offsetWrite, offsetWrite + countWrite-1);      
-        written = this.stream.WriteBytes("b9", write_array);
+        // write data to b9 by stream              
+        written = await  this.stream.WriteBytes("b9", dataWrite);
       }
 
       // issue i2cwr cmd
@@ -1293,16 +1268,12 @@ class SpiController {
 
       // issue SPI writeread     
       await this.serialPort.WriteCommand(cmd);
-      this.serialPort.ReadResponse();    
+      await this.serialPort.ReadResponse();    
   
       if (countRead > 0) {
-        // use stream to read data to b8
-        let read_array = dataRead.slice(offsetRead, offsetRead + countRead-1);  
-        read = this.stream.ReadBytes("b8", read_array); 
+        // use stream to read data to b8        
+        read = await this.stream.ReadBytes("b8", dataRead); 
         
-        for (let i = 0; i < countRead; i++) {
-          dataRead[offsetRead + i] = read_array[i]
-        }
       }
 
       return (written == countWrite) && (read == countRead);
@@ -1489,7 +1460,7 @@ class UartController {
     }
 
     async WriteBytes(data) {
-      count = data.length
+      const count = data.length
       // declare b9 array
       const cmd = `dim b9[${count}]`;
       await this.serialPort.WriteCommand(cmd);  
@@ -1521,7 +1492,7 @@ class UartController {
     }
 
     async ReadBytes(data, timeout) {
-      count = data.length
+      const count = data.length
       // declare b9 array
       let cmd = `dim b9[${count}]`;
       await this.serialPort.WriteCommand(cmd);  
@@ -1834,7 +1805,7 @@ class CoProcessorController {
   }
 
   async Write(data) {
-    count = data.length
+    const count = data.length
     // declare b9 array
     const cmd = `dim b9[${count}]`;
     await this.serialPort.WriteCommand(cmd);  
@@ -1852,7 +1823,7 @@ class CoProcessorController {
   }
 
   async Read(data) {
-    count = data.length
+    const count = data.length
     // declare b9 array
     const cmd = `dim b9[${count}]`;
     await this.serialPort.WriteCommand(cmd);  
@@ -1876,7 +1847,7 @@ class DMXController {
   }
 
   async Write(data) {
-    count = data.length
+    const count = data.length
 
     // declare b9 array
     const cmd = `dim b9[${count}]`;
@@ -2081,7 +2052,7 @@ class OtpController {
   }
 
   async Write(address, data) {
-    count = data.length
+    const count = data.length
 
     // declare b9 array
     let cmd = `dim b9[${count}]`;
@@ -2144,7 +2115,7 @@ class RtcController {
   }
 
   async Write(rtc_timedate) {
-    count = rtc_timedate.length
+    const count = rtc_timedate.length
 
     // declare b9 array
     let cmd = `dim b9[${count}]`;
@@ -2162,6 +2133,7 @@ class RtcController {
   }
 
   async Read(rtc_timedate) {
+    const count = rtc_timedate.length
     // declare b9 array
     let cmd = `dim b9[${count}]`;
     await this.serialPort.WriteCommand(cmd);  
@@ -2259,8 +2231,7 @@ class DUELinkController {
       this.Servo = new ServoController(this.serialPort);
       this.Frequency = new FrequencyController(this.serialPort);
       
-      this.Infrared = new InfraredController(this.serialPort);
-      this.Uart = new UartController(this.serialPort);
+      this.Infrared = new InfraredController(this.serialPort);      
       this.Button = new ButtonController(this.serialPort);
       this.Distance = new DistanceSensorController(this.serialPort);      
       this.Touch = new TouchController(this.serialPort);
@@ -2279,6 +2250,7 @@ class DUELinkController {
       this.Otp = new OtpController(this.serialPort, this.Stream);
       this.Rtc = new RtcController(this.serialPort, this.Stream);
       this.Graphics = new GraphicsController(this.serialPort,this.Stream);
+      this.Uart = new UartController(this.serialPort,this.Stream);
       
 
   
