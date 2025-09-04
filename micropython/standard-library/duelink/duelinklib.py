@@ -40,8 +40,7 @@ class DUELinkController:
         self.Frequency = FrequencyController(self.transport)        
         self.Infrared = InfraredController(self.transport)
         self.Button = ButtonController(self.transport)
-        self.Distance = DistanceSensorController(self.transport)
-        self.Graphics = GraphicsController(self.transport)
+        self.Distance = DistanceSensorController(self.transport)        
         self.Touch = TouchController(self.transport)        
         self.Engine = EngineController(self.transport)
         self.Temperature = TemperatureController(self.transport)
@@ -60,6 +59,7 @@ class DUELinkController:
         self.Spi = SpiController(self.transport,self.Stream)
         self.Uart = UartController(self.transport,self.Stream)
         self.Sound = SoundController(self.transport,self.Stream)
+        self.Graphics = GraphicsController(self.transport,self.Stream)
         
     
     def __get_ReadTimeout(self):

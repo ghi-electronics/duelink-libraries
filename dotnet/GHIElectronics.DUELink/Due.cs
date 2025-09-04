@@ -86,8 +86,7 @@ namespace GHIElectronics.DUELink {
             this.Frequency = new FrequencyController(this.serialPort);            
             this.Infrared = new InfraredController(this.serialPort);             
             this.Button = new ButtonController(this.serialPort);
-            this.Distance = new DistanceSensorController(this.serialPort);
-            this.Graphics = new GraphicsController(this.serialPort);
+            this.Distance = new DistanceSensorController(this.serialPort);            
             this.Touch = new TouchController(this.serialPort);            
             this.Engine = new EngineController(this.serialPort);
             this.Temperature = new TemperatureController(this.serialPort);
@@ -106,6 +105,7 @@ namespace GHIElectronics.DUELink {
             this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
             this.FileSystem = new FSController(this.serialPort, this.Stream);
             this.I2c = new I2cController(this.serialPort, this.Stream);
+            this.Graphics = new GraphicsController(this.serialPort, this.Stream);
         }
 
         private static IEnumerable<RegistryKey> GetSubKeys(RegistryKey key) {

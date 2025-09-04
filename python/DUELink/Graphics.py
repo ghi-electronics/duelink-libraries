@@ -1,4 +1,5 @@
 from enum import IntEnum
+from DUELink.Stream import StreamController
 
 
 class GraphicsType(IntEnum):    
@@ -9,8 +10,9 @@ class GraphicsType(IntEnum):
 
 
 class GraphicsController:
-    def __init__(self, transport):
+    def __init__(self, transport,stream:StreamController):
         self.transport = transport
+        self.stream = stream
     
     def Configuration(self, displayType, config, width, height, mode)->bool:
 
@@ -100,36 +102,25 @@ class GraphicsController:
 
     #     return res.success
 
-    def DrawImageScale(self, img, x: int, y: int, width: int, height: int, scaleWidth: int, scaleHeight: int, transform: int) -> bool:
+    def DrawImageScale(self, img, x: int, y: int, width: int, height: int, transform: int, scaleWidth: int, scaleHeight: int) -> bool:
 
         if width <= 0 or height <= 0 or len(img) < width * height:
             raise Exception("Invalid arguments")
 
-        cmd = f"dim b9[{len(img)}]"
+        cmd = f"dim a9[{len(img)}]"
 
         self.transport.WriteCommand(cmd)
         res = self.transport.ReadResponse()
 
-        for i in range(len(img)):
-            cmd = f"b9[{(i)}] = {img[i]}"
-            self.transport.WriteCommand(cmd)
-            res = self.transport.ReadResponse()
+        written = self.stream.WriteFloats("a9", img)
 
-            if (res.success == False):
-                break
-
-        if (res.success == True):
-            cmd = f"imgs(b9, {x}, {y}, {width}, {height}, {scaleWidth}, {scaleHeight}, {transform})"
-
-            self.transport.WriteCommand(cmd)
-            res = self.transport.ReadResponse()
-
-        cmd = "dim b9[0]"
+        
+        cmd = f"imgs(a9, {x}, {y}, {width}, {height}, {transform}, {scaleWidth}, {scaleHeight})"
 
         self.transport.WriteCommand(cmd)
         res = self.transport.ReadResponse()
-
+        
         return res.success
 
     def DrawImage(self, img, x: int, y: int, width: int, height: int, transform: int) -> bool:
-        return self.DrawImageScale(img, x, y, width, height, 1, 1, transform)
+        return self.DrawImageScale(img, x, y, width, height, transform, 1, 1)

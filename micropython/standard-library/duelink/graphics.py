@@ -7,8 +7,9 @@ class GraphicsType:
     Matrix5x5 = 4
     
 class GraphicsController:
-    def __init__(self, serialPort):
+    def __init__(self, serialPort, stream):
         self.transport = serialPort
+        self.stream = stream
 
     def Configuration(self, type, config, width, height, mode):
         cfg_array = "{"
@@ -105,24 +106,38 @@ class GraphicsController:
 
     
     def DrawImage(self, img, x, y, w, h, transform):
-        return self.DrawImageScale(img, x, y, w, h, 1, 1, transform)
+        return self.DrawImageScale(img, x, y, w, h, transform, 1, 1)
     
-    def DrawImageScale(self, img, x, y, w, h, sx, sy, transform):
+    def DrawImageScale(self, img, x, y, w, h, transform, sw, sh):
         if (img is None or w<=0 or h<=0):
             raise Exception("Invalid argument")
-        img_arr = ""
-        if isinstance(img, (list)):
-            img_arr = DL.build_floatarray(img)
-        elif isinstance(img, str):
-            img_arr = img
-        else:
-            t = type(img)
-            raise Exception("Invalid image type '{t}'")
+        #img_arr = ""
+        #if isinstance(img, (list)):
+        #    img_arr = DL.build_floatarray(img)
+        #elif isinstance(img, str):
+        #    img_arr = img
+        #else:
+        #    t = type(img)
+        #    raise Exception("Invalid image type '{t}'")
         
-        cmd =f"imgs({img_arr},{x},{y},{w},{h},{sx},{sy},{transform})"
-        self.transport.WriteCommand(cmd)        
-        r,s = self.transport.ReadResponse()
+        #cmd =f"imgs({img_arr},{x},{y},{w},{h},{sx},{sy},{transform})"
+        #self.transport.WriteCommand(cmd)        
+        #r,s = self.transport.ReadResponse()
 
+        #return r
+        cmd = f"dim a9[{len(img)}]"
+
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
+
+        written = self.stream.WriteFloats("a9", img)
+
+        
+        cmd = f"imgs(a9, {x}, {y}, {w}, {h}, {transform}, {sw}, {sh})"
+
+        self.transport.WriteCommand(cmd)
+        r,s = self.transport.ReadResponse()
+        
         return r
 
             

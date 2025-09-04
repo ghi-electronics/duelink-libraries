@@ -14,11 +14,11 @@ namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
         public class GraphicsController {
             SerialInterface serialPort;
-           
+            StreamController stream;
 
-            public GraphicsController(SerialInterface serialPort) {
+            public GraphicsController(SerialInterface serialPort, StreamController stream) {
                 this.serialPort = serialPort; ;
-                
+                this.stream = stream;
             }
 
             public bool Configuration(int type, float[] config, int width, int height, int mode) {
@@ -60,7 +60,7 @@ namespace GHIElectronics.DUELink {
 
                 config_array += "}";
 
-                var cmd = string.Format($"gfxcfg({type.ToString()}, {config_array}, {width}, {height}, {mode})");
+                var cmd = $"gfxcfg({type.ToString()}, {config_array}, {width}, {height}, {mode})";
 
                 this.serialPort.WriteCommand(cmd);
 
@@ -184,8 +184,8 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
-            public bool DrawImage(uint[] img, int x, int y, int w, int h, int transform) => this.DrawImageScale(img, x, y, w, h, 1, 1, transform);
-            public bool DrawImageScale(uint[] img, int x, int y, int width, int height, int scaleWidth, int scaleHeight, int transform) {
+            public bool DrawImage(float[] img, int x, int y, int w, int h, int transform) => this.DrawImageScale(img, x, y, w, h, transform, 1, 1);
+            public bool DrawImageScale(float[] img, int x, int y, int width, int height, int transform, int scaleWidth, int scaleHeight) {
 
                 if (img == null) {
                     throw new ArgumentNullException("Data null.");
@@ -195,11 +195,15 @@ namespace GHIElectronics.DUELink {
                     throw new ArgumentException("Invalid argument.");
                 }
 
-                //var cmd = string.Format("dim b9[{0}]", img.Length);
+                var cmd = string.Format("dim a9[{0}]", img.Length);
 
-                //this.serialPort.WriteCommand(cmd);
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
 
-                //var res = this.serialPort.ReadRespone();
+                var written = this.stream.WriteFloats("a9", img);
+                
+
+
 
                 //for (var i = 0; i < img.Length; i++) {
                 //    cmd = string.Format("b9[{0}] = {1}", (i), img[i]);
@@ -213,20 +217,20 @@ namespace GHIElectronics.DUELink {
                 //    }
                 //}
 
-                var img_array = string.Empty;
+                //var img_array = string.Empty;
 
-                img_array = "[";
+                //img_array = "{";
 
-                for (var i = 0; i < img.Length; i++) {
-                    img_array += img[i];
+                //for (var i = 0; i < img.Length; i++) {
+                //    img_array += img[i];
 
-                    if (i < img.Length - 1)
-                        img_array += ",";
-                }
+                //    if (i < img.Length - 1)
+                //        img_array += ",";
+                //}
 
-                img_array += "]";
+                //img_array += "}";
 
-                var cmd = $"imgs({img_array}, {x}, {y}, {width}, {height}, {scaleWidth}, {scaleHeight}, {transform})";
+                cmd = $"imgs(a9, {x}, {y}, {width}, {height}, {transform}, {scaleWidth}, {scaleHeight})";
 
                 this.serialPort.WriteCommand(cmd);
 
