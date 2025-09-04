@@ -64,6 +64,8 @@ namespace GHIElectronics.DUELink {
         public OtpController Otp { get; internal set; }
         public FSController FileSystem { get; internal set; }
 
+        public DownlinkController Downlink { get; internal set; }
+
         public DUELinkController(string comPort) {
             if (comPort == null)
                 throw new Exception(string.Format("Invalid comport: {0}", comPort));
@@ -94,6 +96,7 @@ namespace GHIElectronics.DUELink {
             this.System = new SystemController(this.serialPort);
                               
             this.Pulse = new PulseController(this.serialPort);
+            this.Downlink = new DownlinkController(this.serialPort);
             
             
             this.DMX = new DMXController(this.serialPort);

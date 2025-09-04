@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GHIElectronics.DUELink {
     public partial class DUELinkController {
-        internal class DownlinkController {
+        public class DownlinkController {
             SerialInterface serialPort;
             public DownlinkController(SerialInterface serialPort) {
                 this.serialPort = serialPort; ;
