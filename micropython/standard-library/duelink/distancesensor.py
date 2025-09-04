@@ -12,8 +12,8 @@ class DistanceSensorController:
 
         if r == True:
             try:
-                return float(ret.response)
+                return float(s)
             except ValueError:
                 pass
 
-        return 0
+        return -1

@@ -16,4 +16,4 @@ class DistanceSensorController:
             except ValueError:
                 pass
 
-        return 0
+        return -1
