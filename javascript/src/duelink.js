@@ -593,8 +593,9 @@ export class GraphicsType {
 
 class GraphicsController {
  
-    constructor(serialPort) {
-      this.serialPort = serialPort;    
+    constructor(serialPort, stream) {
+      this.serialPort = serialPort
+      this.stream = stream
     }
   
     async Configuration(type, config, width, height, mode) {
@@ -692,31 +693,29 @@ class GraphicsController {
       return res.success;
     }
     
-    async DrawImageScale(img, x, y, width, height, scaleWidth, scaleHeight, transform) {
+    async DrawImageScale(img, x, y, width, height, transform, scaleWidth, scaleHeight) {
       if (!img || !width || !height) throw new Error("Invalid argument.");
       
-      let img_array = "[";
-  
-      for (let i = 0; i < width * height; i++) {
-        img_array += img[i];
-    
-        if (i < countWrite - 1)
-          img_array += ",";
-      }
-  
-      img_array += "]";
+      let countWrite = img.length
+
+      let cmd = `dim a9[${countWrite}]`
+      await this.serialPort.WriteCommand(cmd);
+      await this.serialPort.ReadResponse();
+
+      await this.stream.WriteFloats("a9", img);
       
-      cmd = `imgs(${img_array}, ${x}, ${y}, ${width}, ${height},${scaleWidth}, ${scaleHeight}, ${transform})`;
+      
+      cmd = `imgs(a9, ${x}, ${y}, ${width}, ${height}, ${transform},${scaleWidth}, ${scaleHeight})`;
   
       await this.serialPort.WriteCommand(cmd);
   
-      res = await this.serialPort.ReadResponse();
+      const res = await this.serialPort.ReadResponse();
       
       return res.success;
     }
   
     async DrawImage(img, x, y, w, h, transform) {
-      return await this.DrawImageScale(img, x, y, w, h, 1, 1, transform);
+      return await this.DrawImageScale(img, x, y, w, h, transform, 1, 1);
     }
     
 }
@@ -2214,8 +2213,7 @@ class DUELinkController {
       this.Infrared = new InfraredController(this.serialPort);
       this.Uart = new UartController(this.serialPort);
       this.Button = new ButtonController(this.serialPort);
-      this.Distance = new DistanceSensorController(this.serialPort);
-      this.Graphics = new GraphicsController(this.serialPort);
+      this.Distance = new DistanceSensorController(this.serialPort);      
       this.Touch = new TouchController(this.serialPort);
       this.Engine = new EngineController(this.serialPort);
       this.Temperature = new TemperatureController(this.serialPort);
@@ -2230,6 +2228,7 @@ class DUELinkController {
       this.I2c = new I2cController(this.serialPort, this.Stream);
       this.Otp = new OtpController(this.serialPort, this.Stream);
       this.Rtc = new RtcController(this.serialPort, this.Stream);
+      this.Graphics = new GraphicsController(this.serialPort,this.Stream);
       
 
   
