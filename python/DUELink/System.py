@@ -96,8 +96,8 @@ class SystemController:
         cmd = f"shtdn({wkpin})"
         self.transport.WriteCommand(cmd)
 
-        res = self.transport.ReadResponse()
-        return res.success
+        # shutdown no response
+        return True
 
     
 

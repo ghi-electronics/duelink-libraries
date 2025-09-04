@@ -88,8 +88,8 @@ class SystemController:
         cmd = f"shtdn({wkpin})"
         self.transport.WriteCommand(cmd)
 
-        r,s = self.transport.ReadResponse()
-        return r
+        # shutdown no response
+        return True
         
     def SetArrayValue(self, var, data, offset=0, count=-1):
         if count == -1:

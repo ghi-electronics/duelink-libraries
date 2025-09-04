@@ -1417,8 +1417,8 @@ class SystemController {
       await this.serialPort.WriteCommand(cmd);
       
       // does system response?
-      const res = await this.serialPort.ReadResponse();
-      return res.success;
+      //const res = await this.serialPort.ReadResponse();
+      return 1;
     }
   
 }
