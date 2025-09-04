@@ -830,7 +830,7 @@ class FrequencyController {
       this.stream = stream
     }
       
-    async Configuartion(speed) {
+    async Configuration(speed) {
       const cmd = `i2ccfg(${speed})`;
 
       await this.serialPort.WriteCommand(cmd);
@@ -841,49 +841,22 @@ class FrequencyController {
 
     async WriteRead(
       address,
-      dataWrite,
-      offsetWrite,
-      countWrite,
-      dataRead,
-      offsetRead,
-      countRead
+      dataWrite,     
+      dataRead      
     ) {
-      if (
-        (dataWrite === null && dataRead === null) ||
-        (countWrite === 0 && countRead === 0)
-      ) {
-        throw new Error(
-          "At least one of dataWrite or dataRead must be specified"
-        );
-      }
-  
-      if (dataWrite === null && countWrite !== 0) {
-        throw new Error("dataWrite null but countWrite not zero");
-      }
-  
-      if (dataRead === null && countRead !== 0) {
-        throw new Error("dataRead null but countRead not zero");
-      }
-  
-      if (dataWrite !== null && offsetWrite + countWrite > dataWrite.length) {
-        throw new Error("Invalid range for dataWrite");
-      }
-  
-      if (dataRead !== null && offsetRead + countRead > dataRead.length) {
-        throw new Error("Invalid range for dataRead");
-      }
-  
-      //let write_array = "[";
-  
-      //for (let i = 0; i < countWrite; i++) {
-      //  write_array += dataWrite[i];
-    
-      //  if (i < countWrite - 1)
-      //      write_array += ",";
-      //}
-  
-     // write_array += "]";
+      var offsetWrite = 0
+      var countWrite = 0
+      var offsetRead = 0
+      var countRead = 0
+      
 
+      if (dataWrite != null)
+        countWrite = dataWrite.length
+
+      if (dataRead != null)
+        countRead = dataRead.length
+
+      
     let cmd = ""
     let written = 0;
     let read = 0; 
@@ -891,21 +864,20 @@ class FrequencyController {
     if (countWrite > 0) {
         // declare b9 to write
         cmd = `dim b9[${countWrite}]`;
-        this.serialPort.WriteCommand(cmd);
-        this.serialPort.ReadResponse();
+        await this.serialPort.WriteCommand(cmd);
+        await this.serialPort.ReadResponse();
     }
 
     if (countRead > 0) {
         // declare b9 to write
         cmd = `dim b8[${countRead}]`;
-        this.serialPort.WriteCommand(cmd);
-        this.serialPort.ReadResponse();
+        await this.serialPort.WriteCommand(cmd);
+        await this.serialPort.ReadResponse();
     }
 
     if (countWrite > 0) {
-      // write data to b9 by stream      
-      let write_array = dataWrite.slice(offsetWrite, offsetWrite + countWrite-1);      
-      written = this.stream.WriteBytes("b9", write_array);
+      // write data to b9 by stream                 
+      written = await this.stream.WriteBytes("b9", dataWrite);
     }
 
     // issue i2cwr cmd
@@ -919,17 +891,12 @@ class FrequencyController {
       cmd = `i2cwr(${address},0, b8)`;
     }
 
-    this.serialPort.WriteCommand(cmd);
-    this.serialPort.ReadResponse();
+    await this.serialPort.WriteCommand(cmd);
+    await this.serialPort.ReadResponse();
 
     if (countRead > 0) {
-      // use stream to read data to b8
-      let read_array = dataRead.slice(offsetRead, offsetRead + countRead-1);  
-      read = this.stream.ReadBytes("b8", read_array); 
-      
-      for (let i = 0; i < countRead; i++) {
-        dataRead[offsetRead + i] = read_array[i]
-      }
+      // use stream to read data to b8      
+      read = await this.stream.ReadBytes("b8", dataRead);             
     }
 
     return (written == countWrite) && (read == countRead);
