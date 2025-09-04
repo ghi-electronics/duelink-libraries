@@ -1976,7 +1976,7 @@ class FileSystemController {
   }
 
   async Open(path, mode) {
-    const cmd = `FsFmt("${path}",${mode})`;
+    const cmd = `FsOpen("${path}",${mode})`;
 
     await this.serialPort.WriteCommand(cmd); 
 
@@ -1992,7 +1992,7 @@ class FileSystemController {
   }
 
   async Write(handle, data) {
-    count = data.length
+    const count = data.length
 
     // declare b9 array
     const cmd = `dim b9[${count}]`;
@@ -2009,7 +2009,7 @@ class FileSystemController {
   }
 
   async Read(handle, data) {
-    count = data.length
+    const count = data.length
 
     // declare b9 array
     const cmd = `dim b9[${count}]`;
@@ -2017,6 +2017,7 @@ class FileSystemController {
     await this.serialPort.ReadResponse();
 
     await this.serialPort.WriteCommand(`FsRead(${handle}, b9)`); 
+    await this.serialPort.ReadResponse();
 
     const ret = await this.stream.ReadBytes("b9",data)
 
