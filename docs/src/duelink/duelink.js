@@ -276,6 +276,12 @@ class SerialInterface {
       while (new Date() <= end || this.portName.hasData()) {
         if (this.portName.hasData()) {
           const data = await this.portName.readbyte();
+
+          while (data === null) {
+            await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null
+            data = await this.portName.readbyte()
+          }
+
           str += SerialInterface.Decoder.decode(data);
           total_receviced++;
 
