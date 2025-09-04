@@ -2231,8 +2231,7 @@ class DUELinkController {
       this.Servo = new ServoController(this.serialPort);
       this.Frequency = new FrequencyController(this.serialPort);
       
-      this.Infrared = new InfraredController(this.serialPort);
-      this.Uart = new UartController(this.serialPort);
+      this.Infrared = new InfraredController(this.serialPort);      
       this.Button = new ButtonController(this.serialPort);
       this.Distance = new DistanceSensorController(this.serialPort);      
       this.Touch = new TouchController(this.serialPort);
@@ -2251,6 +2250,7 @@ class DUELinkController {
       this.Otp = new OtpController(this.serialPort, this.Stream);
       this.Rtc = new RtcController(this.serialPort, this.Stream);
       this.Graphics = new GraphicsController(this.serialPort,this.Stream);
+      this.Uart = new UartController(this.serialPort,this.Stream);
       
 
   
