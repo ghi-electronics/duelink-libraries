@@ -1171,7 +1171,7 @@ class ServoController {
       //  throw new Error("Please enter a valid PWM pin as an integer.");
       //}
   
-      cmd = `MelodyS(${pin})`;
+      var cmd = `MelodyS(${pin})`;
   
       await this.serialPort.WriteCommand(cmd);
       let res = await this.serialPort.ReadResponse();
