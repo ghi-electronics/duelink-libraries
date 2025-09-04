@@ -18,7 +18,7 @@ class DownlinkController:
         return 0
     
     def Command(self, s:str) -> float:
-        self.transport.WriteCommand(f'cmd({s})')
+        self.transport.WriteCommand(f'cmd(\"{s}\")')
         ret = self.transport.ReadResponse()
 
         if ret.success:

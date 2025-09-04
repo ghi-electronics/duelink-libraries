@@ -32,7 +32,7 @@ namespace GHIElectronics.DUELink {
 
             }
             public float Command(string s) {
-                this.serialPort.WriteCommand($"cmd({s})");
+                this.serialPort.WriteCommand($"cmd(\"{s}\")");
 
                 var response = this.serialPort.ReadResponse();
 
