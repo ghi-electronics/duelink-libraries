@@ -58,7 +58,7 @@ class AnalogController:
 
         return ret.success
     
-    def ReadVCC(self):
+    def ReadVcc(self):
         cmd = f"readvcc()"
         self.transport.WriteCommand(cmd)
         ret = self.transport.ReadResponse()
