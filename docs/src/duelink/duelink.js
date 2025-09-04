@@ -2185,6 +2185,54 @@ class RtcController {
   }
 }
 
+class DownlinkController {
+  constructor(serialPort) {
+    this.serialPort = serialPort
+  }
+
+  async SetMode(mode) {    
+    let cmd = `dlmode(${mode})`;
+    await this.serialPort.WriteCommand(cmd);  
+    const ret = await this.serialPort.ReadResponse();   
+    
+    if (ret.success) {
+      try {
+        const value = parseInt(ret.response);
+        return value === 1;
+      } catch {}
+    }
+    return ret.success;
+  }
+
+  async Command(s) {    
+    let cmd = `cmd("${s}")`;
+    await this.serialPort.WriteCommand(cmd);  
+    const ret = await this.serialPort.ReadResponse();   
+    
+    if (ret.success) {
+      try {
+        const value = parseFloat(ret.response);
+        return value;
+      } catch {}
+    }
+    return 0;
+  }
+
+  async SetTimeout(timeout) {    
+    let cmd = `cmdtmot(${timeout})`;
+    await this.serialPort.WriteCommand(cmd);  
+    const ret = await this.serialPort.ReadResponse();   
+    
+    if (ret.success) {
+      try {
+        const value = parseInt(ret.response);
+        return value === 1;
+      } catch {}
+    }
+    return 0;
+  }
+}
+
 class DUELinkController {
     constructor(serial) {
       this.serialPort = new SerialInterface(serial);
@@ -2218,8 +2266,9 @@ class DUELinkController {
       this.Engine = new EngineController(this.serialPort);
       this.Temperature = new TemperatureController(this.serialPort);
       this.Humidity = new HumidityController(this.serialPort);
-
       this.Pulse = new PulseController(this.serialPort);
+      this.Downlink = new DownlinkController(this.serialPort);
+
       this.Sound = new SoundController(this.serialPort, this.Stream);
       this.Spi = new SpiController(this.serialPort,this.Stream, this.Stream);
       this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
