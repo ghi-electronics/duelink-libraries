@@ -367,10 +367,6 @@ class AnalogController {
     }
 
     async VoltRead(pin) {  
-        if (!this.serialPort.DeviceConfig.AnalogPins.has(pin))
-        {
-          throw new Error("Invalid pin");
-        }
 
         const cmd = `vread(${pin})`;
 
@@ -388,10 +384,6 @@ class AnalogController {
     }
     
     async Read(pin) {  
-        if (!this.serialPort.DeviceConfig.AnalogPins.has(pin))
-        {
-          throw new Error("Invalid pin");
-        }
 
         const cmd = `aread(${pin})`;
 
@@ -427,6 +419,23 @@ class AnalogController {
         }
     
         return false;
+    }
+
+    async ReadVcc() {  
+
+        const cmd = `ReadVCC()`;
+
+        await this.serialPort.WriteCommand(cmd);
+
+        const res = await this.serialPort.ReadResponse();
+
+        if (res.success) {
+          try {
+            return parseFloat(res.response);
+          } catch {}
+        }
+
+        return -1;
     }
 }
 
@@ -1151,7 +1160,7 @@ class ServoController {
       //  throw new Error("Please enter a valid PWM pin as an integer.");
       //}
   
-      count = notes.length
+      const count = notes.length
 
       // declare a9 array
       let cmd = `dim a9[${count}]`;
@@ -2144,7 +2153,7 @@ class RtcController {
   }
 
   async Write(rtc_timedate) {
-    count = rtc_timedate.length
+    const count = rtc_timedate.length
 
     // declare b9 array
     let cmd = `dim b9[${count}]`;
@@ -2162,6 +2171,7 @@ class RtcController {
   }
 
   async Read(rtc_timedate) {
+    const count = rtc_timedate.length
     // declare b9 array
     let cmd = `dim b9[${count}]`;
     await this.serialPort.WriteCommand(cmd);  
