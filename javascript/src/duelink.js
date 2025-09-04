@@ -105,6 +105,17 @@ class SerialInterface {
         // else {
           // await this.__WriteLine(command);
         // }
+        // clear all
+
+        if (this.portName.hasData()) {
+          var dump = await this.portName.readbyte();
+          while (dump === null) {
+            await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null
+            dump = await this.portName.readbyte()
+          }
+        }
+
+
         await this.__WriteLine(command);
     }
 
@@ -191,9 +202,20 @@ class SerialInterface {
                   if (this.portName.hasData()) {
                     dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
 
+                    while (dump === null) {
+                      await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
+                      dump = await this.portName.readbyte()
+                    }
+
                     if (dump == '\n') {
-                        if (this.portName.hasData()) 
+                        if (this.portName.hasData()) {
                             dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+
+                            while (dump === null) {
+                              await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
+                              dump = await this.portName.readbyte()
+                            }
+                        }
                     }
                     else {
                         responseValid = false;
@@ -215,6 +237,11 @@ class SerialInterface {
                 while (dump != '\n' && new Date() <= end) {
                   if (this.portName.hasData()) {
                     dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+
+                    while (dump === null) {
+                      await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
+                      dump = await this.portName.readbyte()
+                    }
                   }
                   else
                   {
@@ -1171,7 +1198,7 @@ class ServoController {
       //  throw new Error("Please enter a valid PWM pin as an integer.");
       //}
   
-      cmd = `MelodyS(${pin})`;
+      var cmd = `MelodyS(${pin})`;
   
       await this.serialPort.WriteCommand(cmd);
       let res = await this.serialPort.ReadResponse();
@@ -1573,7 +1600,12 @@ class StreamController {
       await Util.sleep(1)
     }
 
-    const prompt = await this.serialPort.ReadChar();
+    var prompt = await this.serialPort.ReadChar();
+
+    while (prompt === null) { // As tested, even hasData is true, readbyte() (or readchar) still return null. Poll till data
+      prompt = await this.serialPort.ReadChar();
+      await Util.sleep(1)
+    }
 
     if (prompt != '&') {
         throw new Error("Wrong response package");          
@@ -1610,7 +1642,12 @@ class StreamController {
       await Util.sleep(1)
     }
 
-    const prompt = await this.serialPort.ReadChar();
+    var prompt = await this.serialPort.ReadChar();
+
+    while (prompt === null || prompt != '&') { // As tested, even hasData is true, readbyte() (or readchar) still return null. Poll till data
+      prompt = await this.serialPort.ReadChar();
+      await Util.sleep(1)
+    }
 
     if (prompt != '&') {
         throw new Error("Wrong response package");          
@@ -1647,7 +1684,12 @@ class StreamController {
       await Util.sleep(1)
     }
 
-    const prompt = await this.serialPort.ReadChar();
+    var prompt = await this.serialPort.ReadChar();
+
+    while (prompt === null || prompt != '&') { // As tested, even hasData is true, readbyte() (or readchar) still return null. Poll till data
+      prompt = await this.serialPort.ReadChar();
+      await Util.sleep(1)
+    }
 
     if (prompt != '&') {
         throw new Error("Wrong response package");          
@@ -1697,7 +1739,12 @@ class StreamController {
       await Util.sleep(1)
     }
 
-    const prompt = await this.serialPort.ReadChar();
+    var prompt = await this.serialPort.ReadChar();
+
+    while (prompt === null || prompt != '&') { // As tested, even hasData is true, readbyte() (or readchar) still return null. Poll till data
+      prompt = await this.serialPort.ReadChar();
+      await Util.sleep(1)
+    }
 
     if (prompt != '&') {
         throw new Error("Wrong response package");          
@@ -1734,7 +1781,12 @@ class StreamController {
       await Util.sleep(1)
     }
 
-    const prompt = await this.serialPort.ReadChar();
+    var prompt = await this.serialPort.ReadChar();
+
+    while (prompt === null || prompt != '&') { // As tested, even hasData is true, readbyte() (or readchar) still return null. Poll till data
+      prompt = await this.serialPort.ReadChar();
+      await Util.sleep(1)
+    }
 
     if (prompt != '&') {
         throw new Error("Wrong response package");          
