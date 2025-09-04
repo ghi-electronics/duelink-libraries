@@ -150,7 +150,12 @@ class SerialInterface {
       await Util.sleep(1); // As tested, hasData return true even there is no data yet, this return Available > 0 only but data is not in buffer
       while (new Date() <= end || this.portName.hasData()) {
           if (this.portName.hasData()) {
-            const data = await this.portName.readbyte();
+            var data = await this.portName.readbyte();
+            while (data === null) {
+              await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null
+              data = await this.portName.readbyte()
+            }
+
             str += SerialInterface.Decoder.decode(data);
             total_receviced++;
             
@@ -161,8 +166,14 @@ class SerialInterface {
 
               // next byte can be >, &, !, $
               if (this.portName.hasData()) {
-                await Util.sleep(1);                  
-                dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+                await Util.sleep(1);  // As tested, hasData return true even there is no data yet, this return Available > 0 only but data is not in buffer  
+                var b = await this.portName.readbyte()
+                
+                while (b === null) {
+                  await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
+                  b = await this.portName.readbyte()
+                }
+                dump = SerialInterface.Decoder.decode(b)[0];
                 if (dump == '>' || dump == '!' || dump == '$') {
                     // valid data 
                     await Util.sleep(1); // wait 1ms for sure next byte
@@ -1198,40 +1209,23 @@ class SpiController {
     //  );
     //}
   
-    async WriteRead(
-      dataWrite,
-      offsetWrite,
-      countWrite,
-      dataRead,
-      offsetRead,
-      countRead
+   async WriteRead(      
+      dataWrite,     
+      dataRead      
     ) {
+      var offsetWrite = 0
+      var countWrite = 0
+      var offsetRead = 0
+      var countRead = 0
+      
+
+      if (dataWrite != null)
+        countWrite = dataWrite.length
+
+      if (dataRead != null)
+        countRead = dataRead.length
   
-      if (
-        (dataWrite === null && dataRead === null) ||
-        (countWrite === 0 && countRead === 0)
-      ) {
-        throw new Error("Invalid arguments");
-      }
-  
-      if (dataWrite !== null && offsetWrite + countWrite > dataWrite.length) {
-        throw new Error("Invalid arguments");
-      }
-  
-      if (dataRead !== null && offsetRead + countRead > dataRead.length) {
-        throw new Error("Invalid arguments");
-      }
-  
-      //let write_array = "[";
-  
-      //for (let i = 0; i < countWrite; i++) {
-      //  write_array += dataWrite[i];
-    
-      //  if (i < countWrite - 1)
-      //      write_array += ",";
-      //}
-  
-      //write_array += "]";
+
       let cmd = ""
       let written = 0;
       let read = 0; 
@@ -1239,21 +1233,20 @@ class SpiController {
       if (countWrite > 0) {
           // declare b9 to write
           cmd = `dim b9[${countWrite}]`;
-          this.serialPort.WriteCommand(cmd);
-          this.serialPort.ReadResponse();
+          await this.serialPort.WriteCommand(cmd);
+          await this.serialPort.ReadResponse();
       }
 
       if (countRead > 0) {
           // declare b9 to write
           cmd = `dim b8[${countRead}]`;
-          this.serialPort.WriteCommand(cmd);
-          this.serialPort.ReadResponse();
+          await this.serialPort.WriteCommand(cmd);
+          await this.serialPort.ReadResponse();
       }
 
       if (countWrite > 0) {
-        // write data to b9 by stream      
-        let write_array = dataWrite.slice(offsetWrite, offsetWrite + countWrite-1);      
-        written = this.stream.WriteBytes("b9", write_array);
+        // write data to b9 by stream              
+        written = await  this.stream.WriteBytes("b9", dataWrite);
       }
 
       // issue i2cwr cmd
@@ -1269,16 +1262,12 @@ class SpiController {
 
       // issue SPI writeread     
       await this.serialPort.WriteCommand(cmd);
-      this.serialPort.ReadResponse();    
+      await this.serialPort.ReadResponse();    
   
       if (countRead > 0) {
-        // use stream to read data to b8
-        let read_array = dataRead.slice(offsetRead, offsetRead + countRead-1);  
-        read = this.stream.ReadBytes("b8", read_array); 
+        // use stream to read data to b8        
+        read = await this.stream.ReadBytes("b8", dataRead); 
         
-        for (let i = 0; i < countRead; i++) {
-          dataRead[offsetRead + i] = read_array[i]
-        }
       }
 
       return (written == countWrite) && (read == countRead);
