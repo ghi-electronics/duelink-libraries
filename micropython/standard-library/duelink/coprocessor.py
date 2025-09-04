@@ -43,7 +43,7 @@ class CoProcessorController:
         self.transport.WriteCommand("CoprocW(b9)")
         r,s = self.transport.ReadResponse()
         
-        if written == len(dataWrite):            
+        if r:            
             return written
         return 0        
     

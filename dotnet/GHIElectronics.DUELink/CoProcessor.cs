@@ -53,38 +53,46 @@ namespace GHIElectronics.DUELink {
 
             public int Write(byte[] data) {
 
-                var write_array = string.Empty;
+                //var write_array = string.Empty;
 
-                write_array = "[";
+                //write_array = "[";
 
-                for (var i = 0; i < data.Length; i++) {
-                    write_array += data[i];
+                //for (var i = 0; i < data.Length; i++) {
+                //    write_array += data[i];
 
-                    if (i < data.Length - 1)
-                        write_array += ",";
-                }
+                //    if (i < data.Length - 1)
+                //        write_array += ",";
+                //}
 
-                write_array += "]";
+                //write_array += "]";
 
-                var cmd = string.Format("CoprocW({0})", write_array);
+                var count = data.Length;
+
+                // declare b9 array
+                var cmd = string.Format("dim b9[{0}])", count);
 
                 this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
 
+                // write data to b9
+                var written = this.stream.WriteBytes("b9", data);
+
+                // write b9 to co-pro
+                this.serialPort.WriteCommand("CoprocW(b9)");
                 var ret = this.serialPort.ReadResponse();
 
                 if (ret.success)
-                    return write_array.Length;
+                    return written;
 
                 return 0;
             }
 
             public int Read(byte[] data) {
                 var count = data.Length;
-                // we can't check response as Asio(1) there will be no response                
+                
                 var cmd = string.Format("dim b9[{0}])", count);
 
                 this.serialPort.WriteCommand(cmd);
-
                 this.serialPort.ReadResponse();
 
                 this.serialPort.WriteCommand("CoprocR(b9)");
