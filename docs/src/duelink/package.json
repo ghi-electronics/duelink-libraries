@@ -1,6 +1,6 @@
 {
 	"name": "duelink",
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"description": "DUELink driver",
 	"source": "./duelink.js",
 	"main": "dist/duelink.js",
