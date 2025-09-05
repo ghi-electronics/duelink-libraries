@@ -3,7 +3,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
 	<id>GHIElectronics.DUELink</id>
-	<version>1.2.0</version>
+	<version>1.2.1</version>
 	<title />
 	<authors>GHI Electronics LLC</authors>
 	<owners>GHI Electronics LLC</owners>	
@@ -12,7 +12,7 @@
 	<tags>DUE DUELink BrainPad TinyCLR TinyCLROS FEZ</tags>
 	<licenseUrl>http://files.ghielectronics.com/downloads/TinyCLR/License.txt</licenseUrl>
 	<requireLicenseAcceptance>true</requireLicenseAcceptance>
-	<copyright>Copyright GHI Electronics, LLC 2024</copyright>
+	<copyright>Copyright GHI Electronics, LLC 2025</copyright>
     <dependencies>
       <dependency id="System.IO.Ports" version="7.0.0" />
     </dependencies>
