@@ -159,15 +159,16 @@ namespace GHIElectronics.DUELink {
                 return res.success;
 
             }
-            public void Shutdown(int wkpin) {
+            public bool LowPower(int mode, int pin) {
 
-                var cmd = string.Format("shtdn({0})", wkpin);
+                var cmd = string.Format("lowpwr({0},{pin})", mode, pin);
 
                 this.serialPort.WriteCommand(cmd);
 
                 // does system response?
                 //var ret = this.serialPort.ReadResponse();
                 //return ret.success;
+                return true;
 
 
             }

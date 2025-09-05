@@ -51,7 +51,7 @@ class EngineController:
         cmd = "list"
 
         self.transport.WriteCommand(cmd)
-        r,s = self.transport.ReadResponse()
+        r,s = self.transport.ReadResponseRaw()
 
         return s   
     
@@ -93,6 +93,12 @@ class EngineController:
                 pass
 
         return 0
+    
+    def ExecuteCommandRaw(self, cmd:str):
+        self.transport.WriteCommand(cmd)
+        r,s = self.transport.ReadResponse()
+
+        return s
         
         
 

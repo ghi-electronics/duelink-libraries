@@ -20,14 +20,12 @@ from DUELink.Sound import SoundController
 from DUELink.Temperature import TemperatureSensorType
 from DUELink.Humidity import HumiditySensorType
 from DUELink.Stream import StreamController
-from DUELink.CoProcessor import CoProcessorController
 from DUELink.DMX import DMXController
 from DUELink.FileSystem import FileSystemController
 from DUELink.Otp import OtpController
 from DUELink.Pulse import PulseController
 from DUELink.Rtc import RtcController
 from DUELink.Uart import UartController
-from DUELink.Downlink import DownlinkController
 
 from enum import Enum
 import platform
@@ -60,10 +58,8 @@ class DUELinkController:
         self.GraphicsType = GraphicsTypeController()                
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()       
-        self.Pulse = PulseController(self.transport)
-        self.Downlink = DownlinkController(self.transport)
-
-        self.CoProcessor = CoProcessorController(self.transport,self.Stream)
+        self.Pulse = PulseController(self.transport)        
+        
         self.DMX = DMXController(self.transport,self.Stream)
         self.FileSystem = FileSystemController(self.transport,self.Stream)
         self.Otp = OtpController(self.transport,self.Stream)        

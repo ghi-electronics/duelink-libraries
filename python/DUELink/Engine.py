@@ -96,6 +96,12 @@ class EngineController:
                 pass
 
         return 0
+    
+    def ExecuteCommandRaw(self, cmd:str):
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
+
+        return ret.response
 
 
     

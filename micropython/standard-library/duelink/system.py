@@ -84,8 +84,8 @@ class SystemController:
         r,s = self.transport.ReadResponse()
         return r
     
-    def Shutdown(self, wkpin: int)-> bool:
-        cmd = f"shtdn({wkpin})"
+    def LowPower(self, mode: int, pin:int)-> bool:
+        cmd = f"lowpwr({mode},{pin})"
         self.transport.WriteCommand(cmd)
 
         # shutdown no response

@@ -169,6 +169,26 @@ class I2CTransportController:
     
         success = total_receviced > 1 and responseValid == True
         return (success,str_arr)
+    
+    def ReadResponseRaw(self):
+        startms = time.ticks_ms()
+        str_arr = ""
+        total_receviced = 0                
+        
+        while (time.ticks_ms() - startms < self.ReadTimeout):            
+            data = self.ReadByte()
+               
+            if data[0] > 127:                
+                time.sleep(0.001) # no data available, it is 255 - No data in i2c
+                continue
+            
+            str_arr = str_arr + data.decode("utf-8")
+            total_receviced = total_receviced + 1
+            
+            startms = time.ticks_ms() #reset timeout after valid data
+    
+        success = total_receviced > 1
+        return (success,str_arr)
                     
                     
                     
@@ -404,6 +424,23 @@ class UartTransportController:
                 startms = time.ticks_ms() #reset timeout after valid data 
                 
         success = total_receviced > 1 and responseValid == True
+                
+        return (success,str_arr)
+    
+    def ReadResponseRaw(self):        
+        startms = time.ticks_ms()
+        str_arr = ""
+        total_receviced = 0
+        
+        while (time.ticks_ms() - startms < self.ReadTimeout):            
+            if self.uart.any() > 0:
+                data = self.uart.read(1)                            
+                str_arr = str_arr + data.decode("utf-8")
+                
+                total_receviced = total_receviced + 1                                
+                startms = time.ticks_ms() #reset timeout after valid data 
+                
+        success = total_receviced > 1
                 
         return (success,str_arr)
 

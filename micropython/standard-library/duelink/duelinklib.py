@@ -21,14 +21,12 @@ from duelink.sound import SoundController
 from duelink.temperature import TemperatureSensorType
 from duelink.humidity import HumiditySensorType
 from duelink.stream import StreamController
-from duelink.coprocessor import CoProcessorController
 from duelink.dmx import DMXController
 from duelink.filesystem import FileSystemController
 from duelink.otp import OtpController
 from duelink.pulse import PulseController
 from duelink.rtc import RtcController
 from duelink.uart import UartController
-from duelink.downlink import DownlinkController
 
    
 class DUELinkController:
@@ -49,10 +47,8 @@ class DUELinkController:
         self.System = SystemController(self.transport)                        
         self.TemperatureSensorType = TemperatureSensorType()
         self.HumiditySensorType = HumiditySensorType()       
-        self.Pulse = PulseController(self.transport)
-        self.Downlink = DownlinkController(self.transport)
-
-        self.CoProcessor = CoProcessorController(self.transport,self.Stream)
+        self.Pulse = PulseController(self.transport)        
+        
         self.DMX = DMXController(self.transport,self.Stream)
         self.FileSystem = FileSystemController(self.transport,self.Stream)
         self.Otp = OtpController(self.transport,self.Stream)        

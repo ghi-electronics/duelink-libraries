@@ -60,11 +60,11 @@ namespace GHIElectronics.DUELink {
         public DMXController DMX { get; internal set; }
         public PulseController Pulse { get; internal set; }
         public RtcController Rtc { get; internal set; }
-        public CoProcessorController CoProcessor { get; internal set; }
+        // public CoProcessorController CoProcessor { get; internal set; }
         public OtpController Otp { get; internal set; }
         public FSController FileSystem { get; internal set; }
 
-        public DownlinkController Downlink { get; internal set; }
+        //public DownlinkController Downlink { get; internal set; }
 
         public DUELinkController(string comPort) {
             if (comPort == null)
@@ -96,7 +96,7 @@ namespace GHIElectronics.DUELink {
             this.System = new SystemController(this.serialPort);
                               
             this.Pulse = new PulseController(this.serialPort);
-            this.Downlink = new DownlinkController(this.serialPort);
+            //this.Downlink = new DownlinkController(this.serialPort);
             
             
             this.DMX = new DMXController(this.serialPort);
@@ -105,7 +105,7 @@ namespace GHIElectronics.DUELink {
             this.Uart = new UartController(this.serialPort, this.Stream);
             this.Spi = new SpiController(this.serialPort, this.Stream);
             this.Rtc = new RtcController(this.serialPort, this.Stream);
-            this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
+            //this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
             this.FileSystem = new FSController(this.serialPort, this.Stream);
             this.I2c = new I2cController(this.serialPort, this.Stream);
             this.Graphics = new GraphicsController(this.serialPort, this.Stream);

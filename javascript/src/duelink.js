@@ -1079,21 +1079,31 @@ class EngineController {
       const cmd = "list";
   
       await this.serialPort.WriteCommand(cmd);
-      const res = await this.serialPort.ReadResponse();
-  
-      return res.response;
-    }
-    
-    async WriteCommand(cmd) {
-      await this.serialPort.WriteCommand(cmd);
       const res = await this.serialPort.ReadResponseRaw();
   
       return res.response;
     }
     
-    async Cmd(s) {
-        return await this.WriteCommand(`cmd(${s})`);
+    async ExecuteCommand(cmd) {
+      await this.serialPort.WriteCommand(cmd);
+      const res = await this.serialPort.ReadResponse();
+  
+      if (res.success) {
+        try {
+          return parseFloat(res.response);
+        } catch {}
+      }
+
+      return 0;
+
     }
+
+    async ExecuteCommandRaw(cmd) {
+      await this.serialPort.WriteCommand(cmd);
+      const res = await this.serialPort.ReadResponse();
+  
+      return res.response;
+    }    
 }
   
 
@@ -1412,8 +1422,8 @@ class SystemController {
       return res.success;
     }
 
-    async Shutdown(wkpin) {
-      const cmd = `shtdn(${wkpin})`;
+    async LowPower(mode, pin) {
+      const cmd = `lowpwr(${mode},${pin})`;
       await this.serialPort.WriteCommand(cmd);
       
       // does system response?
@@ -1825,73 +1835,6 @@ class StreamController {
   }
 }
 
-class CoProcessorController {
-  constructor(serialPort, stream) {
-    this.serialPort = serialPort
-    this.stream = stream
-  }
-
-  async Erase() {
-    await this.serialPort.WriteCommand("CoprocE()");  
-    const ret = await this.serialPort.ReadResponse();  
-
-    return ret.success;
-  }
-
-  async Program() {
-    throw new Error("Not implemented");
-  }
-
-  async Reset() {
-    await this.serialPort.WriteCommand("CoprocS()");  
-    const ret = await this.serialPort.ReadResponse();  
-
-    return ret.success;
-  }
-
-  async Version() {
-    await this.serialPort.WriteCommand("CoprocV()");  
-    const ret = await this.serialPort.ReadResponse();  
-
-    return ret.success;
-  }
-
-  async Write(data) {
-    const count = data.length
-    // declare b9 array
-    const cmd = `dim b9[${count}]`;
-    await this.serialPort.WriteCommand(cmd);  
-    await this.serialPort.ReadResponse();  
-
-    // write data to b9
-    const written = await this.stream.WriteBytes("b9",data)
-
-    // write b9 to co-pro
-    await this.serialPort.WriteCommand("CoprocW(b9)"); 
-    
-    const ret = await this.serialPort.ReadResponse();    
-        
-    return written == count;
-  }
-
-  async Read(data) {
-    const count = data.length
-    // declare b9 array
-    const cmd = `dim b9[${count}]`;
-    await this.serialPort.WriteCommand(cmd);  
-    await this.serialPort.ReadResponse();      
-
-    // read data to b9
-    await this.serialPort.WriteCommand("CoprocR(b9)");     
-    await this.serialPort.ReadResponse();  
-    
-    // read b9 by stream
-    const read = await this.stream.ReadBytes("b9",data)
-        
-    return read == count;
-  }
-}
-
 class DMXController {
   constructor(serialPort, stream) {
     this.serialPort = serialPort
@@ -2200,63 +2143,8 @@ class RtcController {
     
   }
 
-  async Show() {    
-
-    await this.serialPort.WriteCommand("OtpR(0)"); 
-
-    const ret = await this.serialPort.ReadResponse();
-
-     return ret.success
-  }
 }
 
-class DownlinkController {
-  constructor(serialPort) {
-    this.serialPort = serialPort
-  }
-
-  async SetMode(mode) {    
-    let cmd = `dlmode(${mode})`;
-    await this.serialPort.WriteCommand(cmd);  
-    const ret = await this.serialPort.ReadResponse();   
-    
-    if (ret.success) {
-      try {
-        const value = parseInt(ret.response);
-        return value === 1;
-      } catch {}
-    }
-    return ret.success;
-  }
-
-  async Command(s) {    
-    let cmd = `cmd("${s}")`;
-    await this.serialPort.WriteCommand(cmd);  
-    const ret = await this.serialPort.ReadResponse();   
-    
-    if (ret.success) {
-      try {
-        const value = parseFloat(ret.response);
-        return value;
-      } catch {}
-    }
-    return 0;
-  }
-
-  async SetTimeout(timeout) {    
-    let cmd = `cmdtmot(${timeout})`;
-    await this.serialPort.WriteCommand(cmd);  
-    const ret = await this.serialPort.ReadResponse();   
-    
-    if (ret.success) {
-      try {
-        const value = parseInt(ret.response);
-        return value === 1;
-      } catch {}
-    }
-    return 0;
-  }
-}
 
 class DUELinkController {
     constructor(serial) {
@@ -2290,12 +2178,10 @@ class DUELinkController {
       this.Engine = new EngineController(this.serialPort);
       this.Temperature = new TemperatureController(this.serialPort);
       this.Humidity = new HumidityController(this.serialPort);
-      this.Pulse = new PulseController(this.serialPort);
-      this.Downlink = new DownlinkController(this.serialPort);
+      this.Pulse = new PulseController(this.serialPort);      
 
       this.Sound = new SoundController(this.serialPort, this.Stream);
-      this.Spi = new SpiController(this.serialPort,this.Stream, this.Stream);
-      this.CoProcessor = new CoProcessorController(this.serialPort, this.Stream);
+      this.Spi = new SpiController(this.serialPort,this.Stream, this.Stream);      
       this.DMX = new DMXController(this.serialPort, this.Stream);
       this.FileSystem = new FileSystemController(this.serialPort, this.Stream);
       this.I2c = new I2cController(this.serialPort, this.Stream);

@@ -65,14 +65,14 @@ namespace GHIElectronics.DUELink {
                 return ret;
             }
 
-            public bool Show() {
-                this.serialPort.WriteCommand("RtcR(0)");
+            //public string ReadFmt() {
+            //    this.serialPort.WriteCommand("RtcR(0)");
 
-                var ret = this.serialPort.ReadResponse();
+            //    var ret = this.serialPort.ReadResponse();
 
-                return ret.success;
+            //    return ret.response;
 
-            }
+            //}
             
         }
     }

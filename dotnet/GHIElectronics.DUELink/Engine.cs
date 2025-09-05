@@ -132,11 +132,16 @@ namespace GHIElectronics.DUELink {
                     catch {
 
                     }
-
-
                 }
-
                 return 0;
+            }
+
+            public string ExecuteCommandRaw(string cmd) {
+                this.serialPort.WriteCommand(cmd);
+
+                var ret = this.serialPort.ReadResponse();
+                
+                return ret.response;
             }
 
 

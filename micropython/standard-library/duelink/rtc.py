@@ -33,13 +33,7 @@ class RtcController:
 
         ret = self.stream.ReadBytes("b9",rtc_timedate)
 
-        return ret
-    
-    def Show(self)->bool:
-        self.transport.WriteCommand("OtpR(0)")
-        r,s = self.transport.ReadResponse()
-
-        return r
+        return ret    
         
         
 
