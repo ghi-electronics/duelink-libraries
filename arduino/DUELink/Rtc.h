@@ -55,15 +55,7 @@ public:
             return read;
 
         return 0;
-    }
-    
-    bool Show() {
-        
-        m_pTransport->WriteCommand("OtpR(0)");
-        DUELinkTransport::Response result = m_pTransport->ReadResponse();     
-        
-        return result.success;
-    }
+    }   
 
 private:
     DUELinkTransport *m_pTransport = NULL;
