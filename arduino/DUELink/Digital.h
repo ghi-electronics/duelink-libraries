@@ -27,11 +27,15 @@ public:
         return false;
     }
 
-    void Write(int pin, int state)
+    bool Write(int pin, int state)
     {
         char cmd[32];
         sprintf(cmd, "dwrite(%d,%d)", pin, state);
         m_pTransport->WriteCommand(cmd);
+        
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
+        
+        return result.success;
     }
 
 private:
