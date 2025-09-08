@@ -23,44 +23,13 @@ namespace GHIElectronics.DUELink {
 
             public bool Configuration(int type, float[] config, int width, int height, int mode) {
 
-                //var cmd_dim_array = string.Format("dim b9[{0}]", config.Length);
+                var cmd = $"dim a9[{config.Length}]";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
 
-                //this.serialPort.WriteCommand(cmd_dim_array);
+                var written = this.stream.WriteFloats("a9", config);
 
-                //var res = this.serialPort.ReadRespone();
-
-                //for (var i = 0; i < config.Length; i++) {
-                //    cmd_dim_array = string.Format("b9[{0}] = {1}", (i), config[i]);
-
-                //    this.serialPort.WriteCommand(cmd_dim_array);
-
-                //    res = this.serialPort.ReadRespone();
-
-                //    if (!res.success) {
-                //        break;
-                //    }
-                //}
-
-                //cmd_dim_array = string.Format("dim b9[0]");
-
-                //this.serialPort.WriteCommand(cmd_dim_array);
-
-                //res = this.serialPort.ReadRespone();
-
-                var config_array = string.Empty;
-
-                config_array = "{";
-
-                for (var i = 0; i < config.Length; i++) {
-                    config_array += config[i];
-
-                    if (i < config.Length - 1)
-                        config_array += ",";
-                }
-
-                config_array += "}";
-
-                var cmd = $"gfxcfg({type.ToString()}, {config_array}, {width}, {height}, {mode})";
+                cmd = $"gfxcfg({type}, a9, {width}, {height}, {mode})";
 
                 this.serialPort.WriteCommand(cmd);
 

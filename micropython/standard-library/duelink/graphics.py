@@ -12,14 +12,24 @@ class GraphicsController:
         self.stream = stream
 
     def Configuration(self, type, config, width, height, mode):
-        cfg_array = "{"
-        for n in config:
-            if len(cfg_array)>1:
-                cfg_array = cfg_array + ","
-            cfg_array = cfg_array + str(n)
-        cfg_array = cfg_array + "}"
+        #cfg_array = "{"
+        #for n in config:
+        #    if len(cfg_array)>1:
+        #        cfg_array = cfg_array + ","
+        #    cfg_array = cfg_array + str(n)
+        #cfg_array = cfg_array + "}"
         
-        cmd = f"gfxcfg({type},{cfg_array},{width},{height},{mode})"
+        # declare a9 array
+        count = len(config)
+        # declare a9 array
+        cmd = f"dim a9[{count}]"
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
+
+        # write data to a9
+        ret = self.stream.WriteFloats("a9",config)
+        
+        cmd = f"gfxcfg({type},a9,{width},{height},{mode})"
         
         self.transport.WriteCommand(cmd)        
         r,s = self.transport.ReadResponse()

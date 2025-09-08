@@ -652,19 +652,27 @@ class GraphicsController {
     }
   
     async Configuration(type, config, width, height, mode) {
-      let cfg_array = "{";
+      //let cfg_array = "{";
   
-      for (let i = 0; i < config.length; i++) {
-        cfg_array += config[i];
+      //for (let i = 0; i < config.length; i++) {
+      //  cfg_array += config[i];
     
-        if (i < config.length - 1)
-          cfg_array += ",";
-      }
+      //  if (i < config.length - 1)
+      //    cfg_array += ",";
+      //}
   
-      cfg_array += "}";
-  
-  
-      let cmd = `gfxcfg(${type},${cfg_array},${width},${height},${mode})`;
+      //cfg_array += "}";
+
+      const count = config.length
+
+      // declare a9 array      
+      await this.serialPort.WriteCommand(`dim a9[${count}]`);  
+      await this.serialPort.ReadResponse();
+
+      // write data to a9
+      const written = await this.stream.WriteFloats("a9",config)
+    
+      let cmd = `gfxcfg(${type},a9,${width},${height},${mode})`;
   
       await this.serialPort.WriteCommand(cmd);
       let res = await this.serialPort.ReadResponse();

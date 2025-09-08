@@ -5,29 +5,36 @@
 #endif
 
 #include "DUELinkTransport.h"
-
-enum class GraphicsType {
-    I2c=1,
-    Spi=2,
-    Neo=3,
-    Matrix5x5=4,
-};
+#include "DlStream.h"
 
 class GraphicsController {
 public:
-    GraphicsController(DUELinkTransport &transport) {
+    GraphicsController(DUELinkTransport &transport,StreamController &stream) {
         m_pTransport = &transport;
+        m_pStream = &stream;
+        
     } 
 
-    bool Configuration(GraphicsType type, const float *config, int configCount, int width, int height, int mode) {
-        String cfg_array = build_floatarray(config, 0, configCount);
-        char *cmd = new char[32+cfg_array.length()];
-        sprintf(cmd, "gfxcfg(%d,%s,%d,%d,%d)", type, cfg_array.c_str(), width, height, mode);
+    bool Configuration(int type, const float *config, int configCount, int width, int height, int mode) {
+        // String cfg_array = build_floatarray(config, 0, configCount);
+        // char *cmd = new char[32+cfg_array.length()];
+        // sprintf(cmd, "gfxcfg(%d,%s,%d,%d,%d)", type, cfg_array.c_str(), width, height, mode);
+        
+        
+        char cmd[32];
 
+        //declare a9 array
+        sprintf(cmd, "dim a9[%d]", configCount);
         m_pTransport->WriteCommand(cmd);
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
         
-        delete []cmd;
+        //write data to a9
+        int written = m_pStream->WriteFloats("a9", config, configCount);
+        
+        sprintf(cmd, "gfxcfg(%d,a9,%d,%d,%d)", type, width, height, mode);
+        m_pTransport->WriteCommand(cmd);
+        result = m_pTransport->ReadResponse();
+                
         return result.success;
     }
 
@@ -110,32 +117,43 @@ public:
     }
 
     bool DrawImage(const void *data, int count, int x, int y, int w, int h, int transform) {
-        return DrawImageScale(data, count, x, y, w, h, 1, 1, transform);
+        return DrawImageScale(data, count, x, y, w, h, transform, 1, 1);
     }
 
-    bool DrawImageScale(const void *data, int count, int x, int y, int w, int h, float sx, float sy, int transform) {
-        String s;
-        const char *arr;
-        int extraBytes;
+    bool DrawImageScale(const void *data, int count, int x, int y, int w, int h, int transform, float sx, float sy) {
+        // String s;
+        // const char *arr;
+        // int extraBytes;
+        
+        char cmd[32];
 
-        if (count < 0) {
-            arr = (const char *)data;
-            extraBytes = strlen(arr)+1;
-        } else {
-            s = build_floatarray((float*)data, 0, count);
-            arr = s.c_str();
-            extraBytes = s.length()+1;
-        }
-        char *cmd = new char[64+extraBytes];
-        sprintf(cmd, "imgs(%s,%d,%d,%d,%d,%g,%g,%d)", arr, x,y,w,h,sx,sy,transform);
+        //declare a9 array
+        sprintf(cmd, "dim a9[%d]", count);
         m_pTransport->WriteCommand(cmd);
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
-        delete []cmd;
+        
+        //write data to a9
+        int written = m_pStream->WriteFloats("a9", (const float*)data, count);
+        
+        // if (count < 0) {
+            // arr = (const char *)data;
+            // extraBytes = strlen(arr)+1;
+        // } else {
+            // s = build_floatarray((float*)data, 0, count);
+            // arr = s.c_str();
+            // extraBytes = s.length()+1;
+        // }
+        // char *cmd = new char[64+extraBytes];
+        sprintf(cmd, "imgs(a9,%d,%d,%d,%d,%d,%g,%g)", x,y,w,h,transform,sx,sy);
+        m_pTransport->WriteCommand(cmd);
+        result = m_pTransport->ReadResponse();
+        // delete []cmd;
         return result.success;
     }
 
 private:
     DUELinkTransport *m_pTransport = NULL;
+    StreamController *m_pStream = NULL;
 
 };
   

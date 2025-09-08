@@ -33,17 +33,17 @@ class SoundController:
                 raise ValueError("Note Frequency is within range[0,10000] Hz")
         
         #cmd = "MelodyP({0}, {{{1}}})".format(pin, ", ".join(map(str, notes)))
-         # declare b9 array
+        # declare a9 array
         count = len(notes)
-        # declare b9 array
+        # declare a9 array
         cmd = f"dim a9[{count}]"
         self.transport.WriteCommand(cmd)
         self.transport.ReadResponse()
 
-        # write data to b9
+        # write data to a9
         ret = self.stream.WriteFloats("a9",notes)
 
-        # write b9 to dmx
+        # write a9 to dmx
         cmd = f"MelodyP({pin},a9)"
         self.transport.WriteCommand(cmd)
         ret = self.transport.ReadResponse()

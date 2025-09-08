@@ -16,16 +16,27 @@ class GraphicsController:
     
     def Configuration(self, displayType, config, width, height, mode)->bool:
 
-        if not isinstance(config, list) or not all(isinstance(x, int) and 0 <= x <= 255 for x in config):
-            raise ValueError("Enter a list with one number into the config with a valid code for a display.")
+        #if not isinstance(config, list) or not all(isinstance(x, int) and 0 <= x <= 255 for x in config):
+        #    raise ValueError("Enter a list with one number into the config with a valid code for a display.")
     
-        inputConfig = map(hex, config)
+        #inputConfig = map(hex, config)
         
-        inputConfigArray = ",".join(inputConfig)
+        #inputConfigArray = ",".join(inputConfig)
         
-        inputConfigArray = "{" + inputConfigArray + "}"
+        #inputConfigArray = "{" + inputConfigArray + "}"
+
+        #cmd = "MelodyP({0}, {{{1}}})".format(pin, ", ".join(map(str, notes)))
+        # declare a9 array
+        count = len(config)
+        # declare a9 array
+        cmd = f"dim a9[{count}]"
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
+
+        # write data to a9
+        ret = self.stream.WriteFloats("a9",config)
         
-        cmd = f"gfxcfg({displayType}, {inputConfigArray}, {width}, {height}, {mode})"
+        cmd = f"gfxcfg({displayType}, a9, {width}, {height}, {mode})"
         self.transport.WriteCommand(cmd)
         res = self.transport.ReadResponse()
         return res.success
