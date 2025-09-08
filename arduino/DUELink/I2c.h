@@ -22,7 +22,7 @@ public:
         return result.success;
     }
 
-    bool WriteRead(uint8_t address, const byte *dataWrite, int offsetWrite, int countWrite, byte *dataRead, int offsetRead, int countRead) {
+    bool WriteRead(uint8_t address, const byte *dataWrite, int countWrite, byte *dataRead, int countRead) {
         if (!dataWrite && !dataRead) return false;
         if (!dataWrite && countWrite) return false;
         if (!dataRead && countRead) return false;
@@ -30,6 +30,8 @@ public:
         char cmd[32];
         int written = 0;
         int read = 0;
+        int offsetWrite = 0;
+        int offsetRead = 0;
         if (countWrite > 0) {
             // declare b9 to write
             sprintf(cmd, "dim b9[%d]", countWrite);
