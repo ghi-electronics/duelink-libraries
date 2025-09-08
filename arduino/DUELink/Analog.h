@@ -47,7 +47,7 @@ public:
         return result.success;
     }
 
-    float ReadVCC()
+    float ReadVcc()
     {       
         m_pTransport->WriteCommand("ReadVCC()");
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
