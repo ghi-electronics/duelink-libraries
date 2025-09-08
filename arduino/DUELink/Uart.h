@@ -22,7 +22,7 @@ public:
         return result.success;
     }
 
-    bool WriteByte(byte b) {
+    bool WriteByte(uint8_t b) {
         char cmd[32];
         sprintf(cmd, "SerWr(%d)", b);
 
@@ -32,7 +32,7 @@ public:
         return result.success;
     }
 
-    int WriteBytes(const byte* data, int count)
+    int WriteBytes(const uint8_t* data, int count)
     {
         char cmd[32];
 
@@ -64,7 +64,7 @@ public:
         return 0;
     }
 
-    int ReadBytes(byte* data, int count, int timeout) {
+    int ReadBytes(uint8_t* data, int count, int timeout) {
 
         char cmd[32];
         //declare b9 array
@@ -74,7 +74,7 @@ public:
 
         //read data to b9
         sprintf(cmd, "SerRds(b9,%d)", timeout);
-        m_pTransport->WriteCommand("CoprocR(b9)");
+        m_pTransport->WriteCommand(cmd);
         result = m_pTransport->ReadResponse();   
 
         //read b9 by stream
