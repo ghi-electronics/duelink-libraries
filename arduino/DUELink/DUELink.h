@@ -13,7 +13,6 @@
 #include "Sound.h"
 #include "Graphics.h"
 #include "DlStream.h"
-#include "CoProcessor.h"
 #include "DistanceSensor.h"
 #include "DMX.h"
 #include "FileSystem.h"
@@ -34,7 +33,7 @@ public:
     DUELink(DUELinkTransport &transport) :
     Stream(transport), Analog(transport), Button(transport), Digital(transport), Engine(transport),
     Frequency(transport), Graphics(transport,Stream), I2c(transport,Stream), Led(transport),
-    Sound(transport), System(transport), CoProcessor(transport,Stream), DistanceSensor(transport),
+    Sound(transport), System(transport), Distance(transport),
     DMX(transport,Stream), FileSystem(transport,Stream),Humidity(transport), Temperature(transport ),
     Infrared(transport), Otp(transport,Stream), Pulse(transport),Rtc(transport,Stream),Servo(transport),
     Spi(transport,Stream),Touch(transport),Uart(transport,Stream)
@@ -60,9 +59,8 @@ public:
     LedController Led;
     SoundController Sound;
     SystemController System;
-    StreamController Stream;
-    CoProcessorController CoProcessor;
-    DistanceSensorController DistanceSensor;
+    StreamController Stream;    
+    DistanceSensorController Distance;
     DMXController DMX;
     FileSystemController FileSystem;
     TemperatureController Temperature;
