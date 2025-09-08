@@ -14,7 +14,7 @@ public:
         m_pTransport = &transport;
     }
 
-    int Read(int pin)
+    int Read()
     {
         m_pTransport->WriteCommand("irread()");
         DUELinkTransport::Response result = m_pTransport->ReadResponse();
