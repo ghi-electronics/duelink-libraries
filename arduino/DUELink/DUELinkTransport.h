@@ -40,8 +40,8 @@ public:
     virtual Response ReadResponse() = 0;
     virtual Response ReadResponseRaw() = 0;
     virtual int ReadByte() = 0;
-    virtual void WriteByte(byte b) = 0;
-    virtual void WriteBytes(const byte* data, int count) = 0;
+    virtual void WriteByte(uint8_t b) = 0;
+    virtual void WriteBytes(const uint8_t* data, int count) = 0;
     virtual void Disconnect() = 0;
     virtual void sync() = 0;
     
@@ -53,7 +53,7 @@ public:
         endTransmission();
     }
     
-    virtual void WriteRawData(const byte* buffer, int offset, int count) {
+    virtual void WriteRawData(const uint8_t* buffer, int offset, int count) {
         int block = count / TransferBlockSizeMax;
         int remain = count % TransferBlockSizeMax; 
         int idx = offset;
@@ -69,7 +69,7 @@ public:
             WriteBytes(&buffer[idx], remain);            
         }
     }
-    virtual int ReadRawData(byte* buffer, int offset, int count) {
+    virtual int ReadRawData(uint8_t* buffer, int offset, int count) {
         unsigned long end = millis() + ReadTimeout;
         int totalRead = 0;
         int i = offset;
@@ -117,7 +117,7 @@ public:
 
         WriteCommand("sel(1)"); //"sel(1)": always return \r\n> no matter Asio or not
         
-        // devive will response 3 byte \r\n>
+        // devive will response 3 uint8_t \r\n>
         unsigned long end = millis() + ReadTimeout;
         int dump = ReadByte();
 
@@ -133,13 +133,13 @@ public:
         m_link.end();
     }
 
-    virtual void WriteByte(byte b) {
+    virtual void WriteByte(uint8_t b) {
         beginTransmission();
         m_link.write(b);
         endTransmission();
     }
 
-    virtual void WriteBytes(const byte* data, int count) {
+    virtual void WriteBytes(const uint8_t* data, int count) {
         beginTransmission();
         m_link.write(data, count);
         endTransmission();
@@ -264,7 +264,7 @@ public:
         unsigned long startms = millis();
         int len = 0;
         while (millis()  < startms + ReadTimeout) {
-            byte data = ReadByte();
+            uint8_t data = ReadByte();
 
             if (data > 127) {
                 delay(1); // no data available, it is 255 - No data in i2c
@@ -340,13 +340,13 @@ public:
         
     }
 
-    virtual void WriteByte(byte b) {
+    virtual void WriteByte(uint8_t b) {
         beginTransmission();
         m_link.write(b);
         endTransmission();
     }
 
-    virtual void WriteBytes(const byte* data, int count) {
+    virtual void WriteBytes(const uint8_t* data, int count) {
         beginTransmission();
         m_link.write(data, count);
         endTransmission();
@@ -483,7 +483,7 @@ public:
         int len = 0;
         while (millis()  < startms + ReadTimeout) {
             if (m_link.available() > 0) {
-                byte data = ReadByte();
+                uint8_t data = ReadByte();
 
                 str += (char)data;
                 len++;
@@ -502,7 +502,7 @@ public:
     
     virtual void DiscardInBuffer() { // uart discard
         while (m_link.available() > 0 ) {
-            byte dump = ReadByte(); // dump all
+            uint8_t dump = ReadByte(); // dump all
         }
     }
        

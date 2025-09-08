@@ -14,7 +14,7 @@ public:
         m_pTransport = &transport;
     }
 
-    int WriteSpi(const byte* data, int count)
+    int WriteSpi(const uint8_t* data, int count)
     {
         char cmd[32];
         sprintf(cmd, "strmspi(%d)", count);
@@ -36,7 +36,7 @@ public:
         return 0;
     }
 
-    int WriteBytes(const char* arr, const byte* data, int count)
+    int WriteBytes(const char* arr, const uint8_t* data, int count)
     {        
         char cmd[32];
         sprintf(cmd, "strmwr(%s,%d)", arr,count);
@@ -88,7 +88,7 @@ public:
         return 0;
     }
 
-    int ReadBytes(const char* arr, byte* data, int count)
+    int ReadBytes(const char* arr, uint8_t* data, int count)
     {        
         char cmd[32];
         sprintf(cmd, "strmrd(%s,%d)", arr,count);

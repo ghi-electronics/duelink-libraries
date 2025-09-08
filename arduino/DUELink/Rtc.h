@@ -17,7 +17,7 @@ public:
         
     }
 
-    bool Write(const byte* data, int count)
+    bool Write(const uint8_t* data, int count)
     {
         char cmd[32];
 
@@ -36,7 +36,7 @@ public:
         return result.success;
     }
 
-    int Read(byte* data, int count) {
+    int Read(uint8_t* data, int count) {
 
         char cmd[32];
         //declare b9 array

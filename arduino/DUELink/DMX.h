@@ -17,7 +17,7 @@ public:
         
     }
 
-    bool Write(const byte* channel_data, int count)
+    bool Write(const uint8_t* channel_data, int count)
     {
         char cmd[32];
 

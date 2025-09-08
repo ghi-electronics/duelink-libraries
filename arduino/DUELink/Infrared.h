@@ -23,7 +23,7 @@ public:
         return -1;
     }
 
-    bool Write(byte data)
+    bool Write(uint8_t data)
     {
         char cmd[32];
         sprintf(cmd, "IrWrite(%d)", data);

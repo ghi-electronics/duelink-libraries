@@ -19,7 +19,7 @@ public:
     }
 
     bool Stop() {
-      byte rawdata[1] = {27};
+      uint8_t rawdata[1] = {27};
 
       m_pTransport->DiscardInBuffer();
       m_pTransport->WriteRawData(rawdata, 0, 1);
@@ -56,7 +56,7 @@ public:
           return false;   
       }
       
-      byte* data = new byte[strlen(script) + 1];
+      uint8_t* data = new uint8_t[strlen(script) + 1];
       
       memcpy(data, script, strlen(script));
       
@@ -68,7 +68,7 @@ public:
         if (!result.success)
             return false;
         
-        m_pTransport->WriteRawData((const byte*)data, 0 , strlen(script));
+        m_pTransport->WriteRawData((const uint8_t*)data, 0 , strlen(script));
         result = m_pTransport->ReadResponse();
         
         return result.success;

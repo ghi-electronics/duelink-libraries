@@ -22,10 +22,12 @@ public:
         return result.success;
     }
 
-    bool WriteRead(uint8_t address, const byte *dataWrite, int offsetWrite, int countWrite, byte *dataRead, int offsetRead, int countRead) {
+    bool WriteRead(const uint8_t *dataWrite,  int countWrite, uint8_t *dataRead,  int countRead) {
         if (!dataWrite && !dataRead) return false;
         if (!dataWrite && countWrite) return false;
         if (!dataRead && countRead) return false;
+        int offsetWrite = 0;
+        int offsetRead = 0;
         
         char cmd[32];
         int written = 0;
@@ -68,7 +70,7 @@ public:
         return (written == countWrite) && (read == countRead);   
     }
 
-    int WriteByte(byte b) {
+    int WriteByte(uint8_t b) {
         char cmd[32];
         sprintf(cmd, "spiwr(%d)", b);
 

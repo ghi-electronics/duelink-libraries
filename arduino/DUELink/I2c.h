@@ -22,7 +22,7 @@ public:
         return result.success;
     }
 
-    bool WriteRead(uint8_t address, const byte *dataWrite, int countWrite, byte *dataRead, int countRead) {
+    bool WriteRead(uint8_t address, const uint8_t *dataWrite, int countWrite, uint8_t *dataRead, int countRead) {
         if (!dataWrite && !dataRead) return false;
         if (!dataWrite && countWrite) return false;
         if (!dataRead && countRead) return false;

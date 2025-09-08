@@ -72,7 +72,7 @@ public:
         return ParseReturn();
     }
 
-    int Write(int handle, const byte* dataWrite, int count) {
+    int Write(int handle, const uint8_t* dataWrite, int count) {
         char cmd[32];
         //declare b9 array
         sprintf(cmd, "dim b9[%d]", count);
@@ -88,7 +88,7 @@ public:
         return ParseReturn();
     }
 
-    int Read(int handle, byte* dataRead, int count) {
+    int Read(int handle, uint8_t* dataRead, int count) {
 
         char cmd[32];
         //declare b9 array

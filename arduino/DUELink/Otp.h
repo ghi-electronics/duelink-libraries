@@ -17,7 +17,7 @@ public:
         
     }
 
-    bool Write(int address, const byte* data, int count)
+    bool Write(int address, const uint8_t* data, int count)
     {
         char cmd[32];
 
