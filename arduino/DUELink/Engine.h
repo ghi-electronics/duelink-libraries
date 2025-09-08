@@ -84,11 +84,25 @@ public:
       return result.success;
     }
 
-    bool WriteCommand(const char* cmd) {
-      m_pTransport->WriteCommand(cmd);
-      DUELinkTransport::Response result = m_pTransport->ReadResponse();
+    float ExecuteCommand(const char* cmd) {
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
 
-      return result.success;
+        if (result.success)
+            return atof(result.response.c_str());
+        return 0;
+    }
+
+#ifdef ARDUINO
+    String ExecuteCommandRaw(const char* cmd) 
+#else
+    std::string ExecuteCommandRaw(const char* cmd) 
+#endif        
+    {
+        m_pTransport->WriteCommand(cmd);
+        DUELinkTransport::Response result = m_pTransport->ReadResponse();
+
+        return result.response.c_str();
     }
 
 #ifdef ARDUINO
