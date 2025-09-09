@@ -6,17 +6,11 @@ description 'DUELink rtc'
 
   spec 'r' 'Rtc write' 'Rtc write _' 'auto' '1,2,3,4,5,6'
   spec 'r' 'Rtc read' 'Rtc read'
-  spec 'r' 'Rtc show' 'Rtc show'
 
 to 'Rtc read' {
   due_run 'dim b9[6]'
   due_run 'RtcR(b9)'
   return ('Stream read bytes' 'b9' 6)
-}
-
-to 'Rtc show' {
-  '_due_send' 'RtcR(0)'
-  return ('Read response')
 }
 
 to 'Rtc write' data {
