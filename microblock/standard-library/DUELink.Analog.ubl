@@ -4,15 +4,17 @@ version 0 1
 depends DUELink 
 description 'DUELink.Analog
 
+
+
 '
 
-  spec 'r' 'due_readvcc' 'Read vcc'
-  spec 'r' 'due_vread' 'Volt read pin _' 'num' 1
   spec 'r' 'Analog read pin' 'Analog read pin _' 'auto' 1
   spec ' ' 'due_pwrite' 'Analog write pin _ pwm _' 'num auto' 1 '0.10'
+  spec 'r' 'due_readvcc' 'Read vcc'
+  spec 'r' 'due_vread' 'Volt read pin _' 'num' 1
 
 to 'Analog read pin' pin {
-  return (due_runWithResult ('_due_templateWith' 'aread(%)' pin))
+  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' '1000*aread(%)' pin)) 'number')
 }
 
 to due_pwrite pin pwm {
@@ -20,10 +22,10 @@ to due_pwrite pin pwm {
 }
 
 to due_readvcc {
-  return (due_runWithResult 'readvcc()')
+  return ('[data:convertType]' (due_runWithResult '1000*readvcc()') 'number')
 }
 
 to due_vread pin {
-  return (due_runWithResult ('_due_templateWith' 'vread(%)' pin))
+  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' '1000*vread(%)' pin)) 'number')
 }
 
