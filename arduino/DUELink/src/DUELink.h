@@ -5,7 +5,6 @@
 
 #include "DUELinkTransport.h"
 #include "System.h"
-#include "Led.h"
 #include "Digital.h"
 #include "Analog.h"
 #include "Button.h"
@@ -34,7 +33,7 @@ class DUELink {
 public:
     DUELink(DUELinkTransport &transport) :
     Stream(transport), Analog(transport), Button(transport), Digital(transport), Engine(transport),
-    Frequency(transport), Graphics(transport,Stream), I2c(transport,Stream), Led(transport),
+    Frequency(transport), Graphics(transport,Stream), I2c(transport,Stream),
     Sound(transport,Stream), System(transport), Distance(transport),
     DMX(transport,Stream), FileSystem(transport,Stream),Humidity(transport), Temperature(transport ),
     Infrared(transport), Otp(transport,Stream), Pulse(transport),Rtc(transport,Stream),Servo(transport),
@@ -52,7 +51,6 @@ public:
     FrequencyController Frequency;
     GraphicsController Graphics;
     I2cController I2c;
-    LedController Led;
     SoundController Sound;
     SystemController System;
     StreamController Stream;    
