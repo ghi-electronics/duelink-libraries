@@ -92,11 +92,26 @@ class I2CTransportController:
     
     def ReadByte(self):
         data = self.i2c.readfrom(self.addr, 1)
+                
         if data is not None and len(data) > 0:
+            if data[0] == 254:
+                time.sleep(0.001)
+                data = self.i2c.readfrom(self.addr, 1)
+                data2 = bytearray(1)
+                if data[0] == 1:
+                    data2[0] = 255
+                elif data[0] == 2:
+                    data2[0] = 254
+                else:
+                    raise Exception("Error: special byte 255 detected")
+                # return 255 or 254 data
+                return data2
+            
+            # return 255 mean no data, other mean data
             return data
-        else:
+        else:            
             data = bytearray(1)
-            data[0] = 255 # no data        
+            data[0] = 255 # no response, just return 255 so mark no data
             return data                    
         
     def WriteCommand(self, command):
