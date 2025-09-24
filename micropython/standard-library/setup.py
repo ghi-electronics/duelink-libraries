@@ -9,7 +9,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name = "duelink-stdlib-mp",
-    version = "0.0.7",
+    version = "0.0.8",
     author = "GHI Electronics",
     author_email = "support@ghielectronics.com",
     license='MIT', 
