@@ -1,6 +1,6 @@
 module 'DUELink Sensors'
-author MicroBlocks
-version 1 0 
+author GHIElectronics
+version 0 4 
 choices dueSensors_axis x y z 
 choices dueSensors_touchPin P0 P1 P2 A B left right up down 
 description 'Sensor library for educational DUELink boards.
