@@ -1,24 +1,31 @@
 module DUELink Comm
 author GHI
-version 0 3
+version 0 4 
 description 'DUELink base library used by all other DUELink libraries.
+
 Handles daisylink communications via I2C or serial (UART).
+
 
 By default, this library uses serial over the Downlink port on DUELink boards and I2C on other boards but that can be changed by using the advanced "DUELink useI2C" block.
 
+
+
 See https://www.duelink.com/docs/engine/stdlib
+
 '
-variables _dueUseI2C _dueReadTimeout
+variables _dueUseI2C _dueReadTimeout 
 
   spec 'r' 'due_connected' 'DUELink connected?'
   space
-  spec ' ' 'due_run' 'Write command _' 'str' 'statled(100,100,5)'
   space
-  spec 'r' 'due_runWithResult' 'Write command _ with result' 'str' 'version()'
-  spec 'r' 'due_readResponse' 'Read response'
+  spec 'r' 'due_runWithResult' 'Write command _ returns string' 'str' 'version()'
+  spec ' ' 'due_run' 'Write command _' 'str' 'statled(100,100,10)'
+  spec 'r' 'Write command' 'Write command _ returns number' 'auto' 'dread(1,2)'
+  spec ' ' 'Set Stat LED to high' 'Set Stat LED to high _ (ms), low _ (ms), count _' 'auto auto auto' 100 100 10
+  spec ' ' 'due_setReadTimeout' 'Set response timeout _ milliseconds' 'auto' 1000
+  spec ' ' 'Select device' 'Select device _' 'auto' 1
   advanced
   spec ' ' 'due_useI2C' 'DUELink useI2C _' 'bool' true
-  spec ' ' 'due_setReadTimeout' 'Set read timeout _' 'auto' 1000
   space
   spec ' ' '_due_init' '_due_init'
   spec 'r' '_due_templateWith' '_due_template _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'test(%)' 123
@@ -27,6 +34,21 @@ variables _dueUseI2C _dueReadTimeout
   spec 'r' '_due_awaitResult' '_due await result'
   spec 'r' '_due_awaitResultI2C' '_due await result (I2C)'
   spec 'r' '_due_endsWithPrompt' '_due byte array ends with prompt _' 'str'
+  spec 'r' 'due_readResponse' 'Read response'
+
+to 'Select device' dev {
+  due_run ('_due_templateWith' 'sel(%)' dev)
+}
+
+to 'Set Stat LED to high' high low count {
+  due_run ('_due_templateWith' 'statled(%,%,%)' high low count)
+}
+
+to 'Write command' cmd {
+  '_due_send' cmd
+  waitMillis 5
+  return ('[data:convertType]' ('_due_awaitResult') 'number')
+}
 
 to '_due send raw' s {
   '_due_init'
@@ -108,9 +130,7 @@ to '_due_endsWithPrompt' buffer {
 }
 
 to '_due_init' {
-  if (_dueReadTimeout == 0) {
-    _dueReadTimeout = 1000
-  }
+  if (_dueReadTimeout == 0) {_dueReadTimeout = 1000}
   if (not (isType _dueUseI2C 'boolean')) {
     comment 'Not yet initialized, set _dueUseI2C.'
     for s ('[data:makeList]' 'CincoBit' 'PixoBit' 'DueSTEM' 'Clipit' 'DUELink') {
@@ -187,8 +207,12 @@ to due_setReadTimeout millisecond {
 
 to due_useI2C useI2C {
   comment 'DUELink defaults to using the serial Downlink port on DUELink boards
+
 and I2C on non-DUELink board. This advanced block is only needed
+
 when one wants to force different behavior from the default
+
 (e.g. to use I2C edge connector pins on a DUE CincoBit or PixoBit).'
   _dueUseI2C = useI2C
 }
+
