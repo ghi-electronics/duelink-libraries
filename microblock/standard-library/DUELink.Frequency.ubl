@@ -4,9 +4,9 @@ version 0 4
 depends DUELink 
 description 'DUELink.Frequency'
 
-  spec ' ' 'due_freq' 'Frequency pin _ frequency _ Hz duration _ dutycycle _' 'auto auto auto auto' 7 1000 500 '0.5'
+  spec ' ' 'due_freq' 'Frequency pin _ frequency _ Hz duration _ dutycycle _ %' 'auto auto auto auto' 7 1000 500 50
 
 to due_freq pin frequency duration dutycycle {
-  due_run ('_due_templateWith' 'freq(%,%,%,%)' pin frequency duration dutycycle)
+  due_run ('_due_templateWith' 'freq(%,%,%,%/100)' pin frequency duration dutycycle)
 }
 
