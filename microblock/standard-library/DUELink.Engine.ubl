@@ -3,16 +3,10 @@ author 'GHI Electronics'
 version 0 4 
 description 'DUELink Engine library'
 
-  spec ' ' 'due_sel' 'Select _' 'num' 1
   spec ' ' 'due_stop' 'Stop'
   spec ' ' 'due_record' 'Record script _' 'auto' 'statled(100,100,10)'
-  spec 'r' 'due_cmd' 'Execute command _' 'auto' 'statled(100,100,10)'
   spec ' ' 'due_exec' 'Run'
   spec 'r' 'due_list' 'Read script'
-
-to due_cmd s {
-  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'cmd(%)' s)) 'number')
-}
 
 to due_exec {
   due_run 'run'
@@ -26,10 +20,6 @@ to due_record script {
   due_exec 'new'
   due_exec 'pgmbrst()'
   '_due send raw' script
-}
-
-to due_sel n {
-  due_exec ('_due_templateWith' 'sel(%)' n)
 }
 
 to due_stop {
