@@ -4,24 +4,24 @@ version 0 4
 depends DUELink 
 description 'DUELink DMX library'
 
-  spec ' ' 'DMX Update' 'DMX update'
-  spec ' ' 'Write data' 'DMX write _' 'auto' '128,255,0,0,0,0,0,0'
-  spec 'r' 'DMX ready' 'DMX ready?'
-  spec 'r' 'DMX Read' 'DMX read channel _' 'auto' 1
+  spec ' ' 'due_dmxu' 'DMX update'
+  spec ' ' 'due_dmxw' 'DMX write _' 'auto' '128,255,0,0,0,0,0,0'
+  spec 'r' 'due_dmxrdy' 'DMX ready?'
+  spec 'r' 'due_dmxr' 'DMX read channel _' 'auto' 1
 
-to 'DMX Read' channel {
-  return (due_runWithResult ('_due_templateWith' 'DmxR(%)' channel))
+to due_dmxr channel {
+  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'DmxR(%)' channel)) 'number')  
 }
 
-to 'DMX Update' {
+to due_dmxu {
   due_run 'DmxU()'
 }
 
-to 'DMX ready' {
-  return (due_runWithResult 'DmxRdy()')
+to due_dmxrdy {
+  return ('[data:convertType]' (due_runWithResult 'DmxRdy()')  'number') 
 }
 
-to 'Write data' data {
+to due_dmxw data {
   due_run ('_due_templateWith' 'DmxW([%])' data)
 }
 
