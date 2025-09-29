@@ -4,14 +4,9 @@ version 0 4
 depends DUELink 
 description 'DUELink Temperature library'
 
-  spec 'r' 'Read CPU temperature' 'Read CPU temperature'
-  spec 'r' 'Read temperature' 'Read temperature on pin _ type _' 'auto auto' 18 4
+  spec 'r' 'due_tempread' 'Read temperature on pin _ type _' 'auto auto' 18 4
 
-to 'Read CPU temperature' {
-  return (due_runWithResult 'Temp(0,0)')
-}
-
-to 'Read temperature' pin type {
-  return (due_runWithResult ('_due_templateWith' 'Temp(%,%)' pin type))
+to due_tempread pin type {
+  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'Temp(%,%)' pin type)) 'number')
 }
 
