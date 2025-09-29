@@ -4,9 +4,9 @@ version 0 4
 depends DUELink 
 description 'DUELink.Pulse'
 
-  spec ' ' 'Read pulse' 'Read pulse pin _ state _ timeout _ ms' 'auto bool auto' 1 true 1000
+  spec ' ' 'due_pulsein' 'Read pulse pin _ state _ timeout _ ms' 'auto bool auto' 1 true 1000
 
-to 'Read pulse' pin state timeout {
-  return (due_runWithResult ('_due_templateWith' 'PulseIn(%,%,%)' pin state timeout))
+to due_pulsein pin state timeout {
+  return '[data:convertType]' (due_runWithResult ('_due_templateWith' 'PulseIn(%,%,%)' pin state timeout)) 'number')
 }
 
