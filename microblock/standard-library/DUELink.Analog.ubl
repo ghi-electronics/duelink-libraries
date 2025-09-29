@@ -9,8 +9,8 @@ description 'DUELink.Analog
 '
 
   spec ' ' 'due_awrite' 'Analog write pin _ pwm _ %' 'num auto' 1 10
-  spec 'r' 'due_readvcc' 'Read vcc'
-  spec 'r' 'due_vread' 'Volt read pin _' 'num' 1
+  spec 'r' 'due_readvcc' 'Read vcc (mA)'
+  spec 'r' 'due_vread' 'Volt read (mA) on pin _' 'num' 1
   spec 'r' 'due_aread' 'Analog read pin _' 'auto' 1
 
 to due_aread pin {
