@@ -1,6 +1,6 @@
 module 'DUELink.FileSystem'
 author 'GHI Elelctronics'
-version 0 4 
+version 0 5 
 depends DUELink 
 description 'DUELink file system'
 
