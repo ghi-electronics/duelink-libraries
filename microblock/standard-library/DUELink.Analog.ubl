@@ -8,16 +8,16 @@ description 'DUELink.Analog
 
 '
 
-  spec 'r' 'Analog read pin' 'Analog read pin _' 'auto' 1
-  spec ' ' 'due_pwrite' 'Analog write pin _ pwm _' 'num auto' 1 '0.10'
+  spec 'r' 'due_aread' 'Analog read pin _' 'auto' 1
+  spec ' ' 'due_awrite' 'Analog write pin _ pwm _' 'num auto' 1 '0.10'
   spec 'r' 'due_readvcc' 'Read vcc'
   spec 'r' 'due_vread' 'Volt read pin _' 'num' 1
 
-to 'Analog read pin' pin {
+to due_aread pin {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' '1000*aread(%)' pin)) 'number')
 }
 
-to due_pwrite pin pwm {
+to due_awrite pin pwm {
   due_run ('_due_templateWith' 'awrite(%,%)' pin pwm)
 }
 
