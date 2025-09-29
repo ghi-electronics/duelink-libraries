@@ -17,15 +17,15 @@ to due_list {
 }
 
 to due_record script {
-  due_exec 'new'
-  due_exec 'pgmbrst()'
+  due_run 'new'
+  due_run 'pgmbrst()'
   '_due send raw' script
 }
 
 to due_stop {
   comment 'Send escape to stop any running scripts'
-  due_exec ('[data:unicodeString]' 27)
-  comment 'Ensure that we are in Immediate mode'
-  due_exec '>'
+  '_due_send' ('[data:unicodeString]' 27)
+  waitMillis 100
+  due_run '>'
 }
 
