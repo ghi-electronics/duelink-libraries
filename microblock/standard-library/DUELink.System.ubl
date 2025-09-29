@@ -3,31 +3,30 @@ author GHIElectronics
 version 0 4 
 depends DUELink 
 description 'DUELink.System'
-variables _myaa 
 
-  spec ' ' 'StatLed' 'StatLed high _ low _ count _' 'str str str' '100' '100' '10'
+  spec ' ' 'due_statled' 'StatLed high _ low _ count _' 'str str str' '100' '100' '10'
   spec 'r' 'due_tickms' 'GetTickMilliseconds'
   spec 'r' 'due_tickus' 'GetTickMicroseconds'
   spec 'r' 'due_info' 'Info _' 'num' 1
-  spec ' ' 'Reset' 'Reset _' 'auto' 0
+  spec ' ' 'due_reset' 'Reset _' 'auto' 0
 
-to Reset type {
+to due_info type {
+  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'info(%)' type)) 'number')
+}
+
+to due_reset type {
   due_run ('_due_templateWith' 'reset(%)' type)
 }
 
-to StatLed high low count {
+to due_statled high low count {
   due_run ('[data:join]' ('[data:asByteArray]' 'statled(') ('[data:asByteArray]' high) ('[data:asByteArray]' ',') ('[data:asByteArray]' low) ('[data:asByteArray]' ',') ('[data:asByteArray]' count) ('[data:asByteArray]' ')'))
 }
 
-to due_info type {
-  return (due_runWithResult ('_due_templateWith' 'info(%)' type))
-}
-
 to due_tickms {
-  return (due_runWithResult 'tickms()')
+  return ('[data:convertType]' (due_runWithResult 'tickms()') 'number')
 }
 
 to due_tickus {
-  return (due_runWithResult 'tickus()')
+  return ('[data:convertType]' (due_runWithResult 'tickus()') 'number')
 }
 
