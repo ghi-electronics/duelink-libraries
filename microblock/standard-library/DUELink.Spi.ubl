@@ -34,8 +34,8 @@ to 'Spi write array' 'write array' 'read count' {
   }
   due_run cmd
   if ((v 'read count') > 0) {
-    return ('Stream read bytes' 'b8' (v 'read count'))
+    return (due_stream_read_bytes 'b8' (v 'read count'))
   }
-  return (booleanConstant true)
+  return 0
 }
 
