@@ -2,19 +2,19 @@ module 'DUELink.Rtc'
 author 'GHI Electronics'
 version 0 4 
 depends DUELink 
-description 'DUELink rtc'
+description 'DUELink rtc
+'
 
-  spec 'r' 'Rtc write' 'Rtc write _' 'auto' '1,2,3,4,5,6'
-  spec 'r' 'Rtc read' 'Rtc read'
+  spec ' ' 'due_rtcw' 'Rtc write _' 'auto' '1,2,3,4,5,6'
+  spec 'r' 'due_rtcr' 'Rtc read'
 
-to 'Rtc read' {
+to due_rtcr {
   due_run 'dim b9[6]'
   due_run 'RtcR(b9)'
-  return ('Stream read bytes' 'b9' 6)
+  return (due_stream_read_bytes 'b9' 6)
 }
 
-to 'Rtc write' data {
+to due_rtcw data {
   due_run ('_due_templateWith' 'RtcW([%])' data)
-  return 1
 }
 
