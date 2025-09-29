@@ -6,8 +6,8 @@ description 'DUELink Stream library
 '
 variables _dueUseI2C 
 
-  spec ' ' 'due_stream_spi_write' 'Stream spi write data _' 'auto' '1,2,3'
-  spec ' ' 'due_stream_write_bytes' 'Stream write to _ data _' 'auto auto' 'b1' '1,2,3'
+  spec ' ' '_due_stream_spi_write' 'Stream spi write data _' 'auto' '1,2,3'
+  spec ' ' '_due_stream_write_bytes' 'Stream write to _ data _' 'auto auto' 'b1' '1,2,3'
   spec 'r' 'due_stream_read_bytes' 'Stream read from _ count _' 'auto auto' 'b1' 3
 
 to due_stream_read_bytes 'array name' count {
@@ -64,7 +64,7 @@ to due_stream_read_bytes 'array name' count {
   }
 }
 
-to due_stream_spi_write data {
+to _due_stream_spi_write data {
   local 'buf' ('[data:split]' data ',' true)
   local 'buf_read' (newList 1)
   local 'found prompt' 0
@@ -93,7 +93,7 @@ to due_stream_spi_write data {
   }
 }
 
-to due_stream_write_bytes 'array name' data {
+to _due_stream_write_bytes 'array name' data {
   local 'buf' ('[data:split]' data ',' true)
   local 'buf_read' (newList 1)
   local 'found prompt' 0
