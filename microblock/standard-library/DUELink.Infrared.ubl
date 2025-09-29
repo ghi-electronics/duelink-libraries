@@ -4,19 +4,19 @@ version 0 4
 depends DUELink 
 description 'DUELink Infrared library'
 
-  spec 'r' 'myBlock' 'Infrared read'
-  spec ' ' 'Infrared write' 'Infrared write command _' 'auto' 1
-  spec ' ' 'Infrared enable tx pin' 'Infrared enable tx pin _ rx pin _ enable' 'auto auto' 5 3
+  spec 'r' 'due_irread' 'Infrared read'
+  spec ' ' 'due_irwrite' 'Infrared write command _' 'auto' 1
+  spec ' ' 'due_irenable' 'Infrared enable tx pin _ rx pin _' 'auto auto' 5 3
 
-to 'Infrared enable tx pin' tx rx {
+to due_irenable tx rx {
   due_run ('_due_templateWith' 'IrEn(%,%)' tx rx)
 }
 
-to 'Infrared write' cmd {
-  due_run ('_due_templateWith' 'IrWrite(%)' cmd)
+to due_irread {
+  return ('[data:convertType]' (due_runWithResult 'IrRead()') 'number')
 }
 
-to myBlock {
-  return (due_runWithResult 'IrRead()')
+to due_irwrite cmd {
+  due_run ('_due_templateWith' 'IrWrite(%)' cmd)
 }
 

@@ -4,14 +4,14 @@ version 0 4
 depends DUELink 
 description ''
 
-  spec ' ' 'Configuration2' 'I2c set speed  _ KHz' 'auto' 100
-  spec 'r' 'I2c write and read address' 'I2c write and read address _ write array _ read count _' 'auto auto auto' '0x38' '1,2,3' 0
+  spec ' ' 'due_i2ccfg' 'I2c set speed  _ KHz' 'auto' 100
+  spec 'r' 'due_i2cwr' 'I2c write and read address _ write array _ read count _' 'auto auto auto' '0x38' '1,2,3' 0
 
-to Configuration2 speed {
+to due_i2ccfg speed {
   due_run ('_due_templateWith' 'i2ccfg(%)' speed)
 }
 
-to 'I2c write and read address' address 'write array' 'read count' {
+to due_i2cwr address 'write array' 'read count' {
   local 'cmd' '""'
   if ((size (v 'write array')) > 0) {
     due_run ('_due_templateWith' 'dim b9[%]' (size (v 'write array')))
