@@ -4,9 +4,9 @@ version 0 4
 depends DUELink 
 description 'DUELink Servo Moto'
 
-  spec ' ' 'Set servo' 'Set servo pin _ position _' 'auto auto' 1 90
+  spec ' ' 'due_servost' 'Set servo pin _ position _' 'auto auto' 1 90
 
-to 'Set servo' pin pos {
+to due_servost pin pos {
   due_run ('_due_templateWith' 'servost(%,%)' pin pos)
 }
 
