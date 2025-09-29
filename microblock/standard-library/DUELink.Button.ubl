@@ -6,12 +6,7 @@ description 'DUELink.Button'
 
   spec 'r' 'due_btndown' 'Button down on pin _' 'num' 20
   spec 'r' 'due_btnup' 'Button up on pin _' 'num' 20
-  spec ' ' 'due_btnen' 'Button enable on pin _ state _' 'num auto' 20 0
-  spec 'r' 'Button read pin' 'Button read on pin _' 'auto' 1
-
-to 'Button read pin' pin {
-  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'btnread(%)' pin)) 'number')
-}
+  spec ' ' 'due_btnen' 'Button enable on pin _ state _' 'num auto' 20 0  
 
 to due_btndown pin {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'btndown(%)' pin)) 'number')
