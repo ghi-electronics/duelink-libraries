@@ -3,19 +3,19 @@ author 'GHI Electronics'
 version 0 4 
 description ''
 
-  spec ' ' 'Spi Configuration' 'Spi configuration mode _ speed _ KHz' 'auto auto' 0 8000
-  spec ' ' 'Spi Write' 'Spi write single byte _' 'auto' 10
-  spec 'r' 'Spi write array' 'Spi write array _ read count _' 'auto auto' '1,2,3' 0
+  spec ' ' 'due_spicfg' 'Spi configuration mode _ speed _ KHz' 'auto auto' 0 8000
+  spec ' ' 'due_spiWrite' 'Spi write single byte _' 'auto' 10
+  spec 'r' 'due_spiwrd' 'Spi write array _ read count _' 'auto auto' '1,2,3' 0
 
-to 'Spi Configuration' mode speed {
-  due_run ('_due_templateWith' 'SpiCfg(%,%)' mode speed)
-}
-
-to 'Spi Write' data {
+to due_spiWrite data {
   due_run ('_due_templateWith' 'SpiWr(%)' data)
 }
 
-to 'Spi write array' 'write array' 'read count' {
+to due_spicfg mode speed {
+  due_run ('_due_templateWith' 'SpiCfg(%,%)' mode speed)
+}
+
+to due_spiwrd 'write array' 'read count' {
   local 'cmd' '""'
   if ((size (v 'write array')) > 0) {
     due_run ('_due_templateWith' 'dim b9[%]' (size (v 'write array')))
