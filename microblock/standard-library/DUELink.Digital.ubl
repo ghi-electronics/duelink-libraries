@@ -3,10 +3,11 @@ author GHIElectronics
 version 0 4 
 depends DUELink 
 description 'DUELink.Digital Library
+
 '
 
-  spec ' ' 'due_dwrite' 'Write pin _ on _' 'num bool' 0 true
-  spec 'r' 'due_dread' 'Read pin _ pull _' 'num num' 0 0
+  spec ' ' 'due_dwrite' 'Write pin _ on _' 'num bool' 1 true
+  spec 'r' 'due_dread' 'Read pin _ pull _' 'num num' 1 0
 
 to due_dread pin pull {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'dread(%,%)' pin pull)) 'number')
