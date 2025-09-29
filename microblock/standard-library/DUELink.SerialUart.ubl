@@ -3,38 +3,37 @@ author 'GHI Electronics'
 version 0 4 
 depends DUELink 
 description 'DUELink.SerialUart'
-'
 
-  spec 'r' 'Uart byte to read' 'Uart byte to read'
-  spec ' ' 'Uart discard' 'Uart discard'
-  spec ' ' 'Uart configuration speed' 'Uart open speed _ receive buffer size _' 'auto auto' 9600 16
-  spec ' ' 'Write bytes array' 'Uart write  array _' 'auto' '1,2,3'
-  spec 'r' 'Read bytes count' 'Uart read  count _ timeout _ milliseconds' 'auto auto' 10 1000
-  spec 'r' 'Uart read byte' 'Uart read byte'
+  spec ' ' 'due_uartdiscard' 'Uart discard'
+  spec ' ' 'due_uartcfg' 'Uart open speed _ receive buffer size _' 'auto auto' 9600 16
+  spec ' ' 'due_uartws' 'Uart write array _' 'auto' '1,2,3'
+  spec 'r' 'due_uartrs' 'Uart read array count _ timeout _ milliseconds' 'auto auto' 10 1000
+  spec 'r' 'due_uartr' 'Uart read byte'
+  spec 'r' 'due_uartb2r' 'Uart byte to read'
 
-to 'Read bytes count' count timeout {
-  due_run ('_due_templateWith' 'dim b9[%]' count)
-  due_run ('_due_templateWith' 'SerRds(b9, %)' timeout)
-  return ('Stream read bytes' 'b9' count)
-}
-
-to 'Uart byte to read' {
+to due_uartb2r {
   return ('[data:convertType]' (due_runWithResult 'SerB2R()') 'number')
 }
 
-to 'Uart configuration speed' speed size {
+to due_uartcfg speed size {
   due_run ('_due_templateWith' 'SerCfg(%,%)' speed size)
 }
 
-to 'Uart discard' {
+to due_uartdiscard {
   due_run 'SerDisc()'
 }
 
-to 'Uart read byte' {
+to due_uartr {
   return ('[data:convertType]' (due_runWithResult 'SerRd()') 'number')
 }
 
-to 'Write bytes array' array {
+to due_uartrs count timeout {
+  due_run ('_due_templateWith' 'dim b9[%]' count)
+  due_run ('_due_templateWith' 'SerRds(b9, %)' timeout)
+  return (due_stream_read_bytes 'b9' count)
+}
+
+to due_uartws array {
   due_run ('_due_templateWith' 'SerWrs([%])' array)
 }
 
