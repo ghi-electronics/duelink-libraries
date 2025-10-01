@@ -1,0 +1,12 @@
+module 'DUELink.Servo'
+author 'GHI Electronics'
+version 0 5 
+depends DUELink 
+description 'DUELink servo motor library'
+
+  spec ' ' 'due_servost' 'Set servo pin _ position _' 'auto auto' 1 90
+
+to due_servost pin pos {
+  due_run ('_due_templateWith' 'servost(%,%)' pin pos)
+}
+

@@ -1,0 +1,32 @@
+module 'DUELink.System'
+author GHIElectronics
+version 0 5 
+depends DUELink 
+description 'DUELink System library'
+
+  spec ' ' 'due_statled' 'StatLed high _ low _ count _' 'str str str' '100' '100' '10'
+  spec 'r' 'due_tickms' 'GetTickMilliseconds'
+  spec 'r' 'due_tickus' 'GetTickMicroseconds'
+  spec 'r' 'due_info' 'Info _' 'num' 1
+  spec ' ' 'due_reset' 'Reset _' 'auto' 0
+
+to due_info type {
+  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'info(%)' type)) 'number')
+}
+
+to due_reset type {
+  due_run ('_due_templateWith' 'reset(%)' type)
+}
+
+to due_statled high low count {
+  due_run ('[data:join]' ('[data:asByteArray]' 'statled(') ('[data:asByteArray]' high) ('[data:asByteArray]' ',') ('[data:asByteArray]' low) ('[data:asByteArray]' ',') ('[data:asByteArray]' count) ('[data:asByteArray]' ')'))
+}
+
+to due_tickms {
+  return ('[data:convertType]' (due_runWithResult 'tickms()') 'number')
+}
+
+to due_tickus {
+  return ('[data:convertType]' (due_runWithResult 'tickus()') 'number')
+}
+

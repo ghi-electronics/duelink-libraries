@@ -1,0 +1,31 @@
+module 'DUELink.Engine'
+author 'GHI Electronics'
+version 0 5 
+description 'DUELink Engine library'
+
+  spec ' ' 'due_stop' 'Stop'
+  spec ' ' 'due_record' 'Record script _' 'auto' 'statled(100,100,10)'
+  spec ' ' 'due_exec' 'Run'
+  spec 'r' 'due_list' 'Read script'
+
+to due_exec {
+  due_run 'run'
+}
+
+to due_list {
+  return ('[data:convertType]' (due_runWithResult 'list') 'string')
+}
+
+to due_record script {
+  due_run 'new'
+  due_run 'pgmbrst()'
+  '_due send raw' script
+}
+
+to due_stop {
+  comment 'Send escape to stop any running scripts'
+  '_due_send' ('[data:unicodeString]' 27)
+  waitMillis 100
+  due_run '>'
+}
+

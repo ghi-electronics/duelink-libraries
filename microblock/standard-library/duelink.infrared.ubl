@@ -1,0 +1,22 @@
+module 'DUELink.Infrared'
+author GHIElectronics
+version 0 5 
+depends DUELink 
+description 'DUELink Infrared library'
+
+  spec 'r' 'due_irread' 'Infrared read'
+  spec ' ' 'due_irwrite' 'Infrared write command _' 'auto' 1
+  spec ' ' 'due_irenable' 'Infrared enable tx pin _ rx pin _' 'auto auto' 5 3
+
+to due_irenable tx rx {
+  due_run ('_due_templateWith' 'IrEn(%,%)' tx rx)
+}
+
+to due_irread {
+  return ('[data:convertType]' (due_runWithResult 'IrRead()') 'number')
+}
+
+to due_irwrite cmd {
+  due_run ('_due_templateWith' 'IrWrite(%)' cmd)
+}
+
