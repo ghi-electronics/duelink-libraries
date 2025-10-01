@@ -1,8 +1,9 @@
 module 'DUELink.RTC'
 author 'GHI Electronics'
 version 0 5 
-depends DUELink 
-description 'DUELink RTC Library'
+depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.stream.ubl' 
+description 'DUELink RTC Library
+'
 
   spec ' ' 'due_rtcw' 'RTC write _' 'auto' '1,2,3,4,5,6'
   spec 'r' 'due_rtcr' 'RTC read'

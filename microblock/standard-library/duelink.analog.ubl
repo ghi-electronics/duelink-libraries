@@ -1,7 +1,7 @@
 module 'DUELink.Analog'
 author GHIElectronics
 version 0 5 
-depends DUELink 
+depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 
 description 'DUELink.Analog Library
 
 

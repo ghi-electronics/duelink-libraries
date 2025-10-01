@@ -1,7 +1,7 @@
 module 'DUELink.Frequency'
 author 'GHI Electronics'
 version 0 5 
-depends DUELink 
+depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 
 description 'DUELink Frequency Library'
 
   spec ' ' 'due_freq' 'Frequency pin _ frequency _ Hz duration _ dutycycle _ %' 'auto auto auto auto' 7 1000 500 50

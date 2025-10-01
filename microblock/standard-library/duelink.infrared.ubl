@@ -1,7 +1,7 @@
 module 'DUELink.Infrared'
 author GHIElectronics
 version 0 5 
-depends DUELink 
+depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 
 description 'DUELink Infrared Library'
 
   spec 'r' 'due_irread' 'Infrared read'

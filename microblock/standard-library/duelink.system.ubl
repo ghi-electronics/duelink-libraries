@@ -1,7 +1,7 @@
 module 'DUELink.System'
 author GHIElectronics
 version 0 5 
-depends DUELink 
+depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 
 description 'DUELink System Library'
 
   spec ' ' 'due_statled' 'StatLed high _ low _ count _' 'str str str' '100' '100' '10'

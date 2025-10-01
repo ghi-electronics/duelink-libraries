@@ -1,7 +1,7 @@
 module 'DUELink.OTP'
 author 'GHI Electronics'
 version 0 5 
-depends DUELink 
+depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 
 description 'DUELink OTP Library'
 
   spec ' ' 'due_otpw' 'Otp write address _ data _' 'auto auto' 0 '1,2,3,4,5,6,7,8'
