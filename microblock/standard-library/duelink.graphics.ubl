@@ -1,6 +1,6 @@
 module 'DUELink.Graphics'
 author 'GHI Electronics'
-version 0 5 
+version 0 6 
 depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 
 description 'DUELink Graphics Library'
 

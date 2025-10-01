@@ -1,6 +1,6 @@
 module 'DUELink.FileSystem'
 author 'GHI Elelctronics'
-version 0 5 
+version 0 6 
 depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.stream.ubl'  
 description 'DUELink FileSystem Library'
 
