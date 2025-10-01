@@ -4,71 +4,71 @@ version 0 5
 depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.stream.ubl'  
 description 'DUELink FileSystem Library'
 
-  spec 'r' 'due_FSMount' 'Mount type _ chip select pin _ speed _ max handles _' 'auto auto auto auto' 0 1 8000 4
-  spec 'r' 'due_FSUnMount' 'UnMount'
-  spec 'r' 'due_FSFormat' 'Format type _ chip select pin _ speed _' 'auto auto auto' 0 1 8000
-  spec 'r' 'due_FSClose' 'Close handle _' 'auto' 0
-  spec 'r' 'due_FSWrite' 'Write handle _ data _' 'auto auto' 0 '1,2,3'
-  spec 'r' 'due_FSRead' 'Read handle _ count _' 'auto auto' 0 3
-  spec 'r' 'due_FSSync' 'Sync handle _' 'auto' 0
-  spec 'r' 'due_FSSeek' 'Seek handle _ from _' 'auto auto' 0 0
-  spec 'r' 'due_FSTell' 'Tell handle _' 'auto' 0
-  spec 'r' 'due_FSOpen' 'Open handle path _ mode _' 'auto num' '""' 10
-  spec 'r' 'due_FSDelete' 'Delete file path _' 'auto' '""'
-  spec 'r' 'due_FSFind' 'Find file path _' 'auto' '""'
-  spec 'r' 'due_FSFile' 'File size path _' 'auto' '""'
+  spec 'r' 'due_fsmount' 'Mount type _ chip select pin _ speed _ max handles _' 'auto auto auto auto' 0 1 8000 4
+  spec 'r' 'due_fusnmount' 'UnMount'
+  spec 'r' 'due_fsformat' 'Format type _ chip select pin _ speed _' 'auto auto auto' 0 1 8000
+  spec 'r' 'due_fsclose' 'Close handle _' 'auto' 0
+  spec 'r' 'due_fswrite' 'Write handle _ data _' 'auto auto' 0 '1,2,3'
+  spec 'r' 'due_fsread' 'Read handle _ count _' 'auto auto' 0 3
+  spec 'r' 'due_fssync' 'Sync handle _' 'auto' 0
+  spec 'r' 'due_fsseek' 'Seek handle _ from _' 'auto auto' 0 0
+  spec 'r' 'due_fstell' 'Tell handle _' 'auto' 0
+  spec 'r' 'due_fsopen' 'Open handle path _ mode _' 'auto num' '""' 10
+  spec 'r' 'due_fsdelete' 'Delete file path _' 'auto' '""'
+  spec 'r' 'due_fsfind' 'Find file path _' 'auto' '""'
+  spec 'r' 'due_fsfile' 'File size path _' 'auto' '""'
 
-to due_FSClose handle {
+to due_fsclose handle {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'FsClose(%)' handle)) 'number')
 }
 
-to due_FSDelete path {
+to due_fsdelete path {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'FsDel(%)' path)) 'number')
 }
 
-to due_FSFile path {
+to due_fsfile path {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'fsfsz(%)' path)) 'number')
 }
 
-to due_FSFind path {
+to due_fsfind path {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'FsFind(%)' path)) 'number')
 }
 
-to due_FSFormat type cs speed {
+to due_fsformat type cs speed {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'FsFmt(%,%,%)' type cs speed)) 'number')
 }
 
-to due_FSMount type cs speed handles {
+to due_fsmount type cs speed handles {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'FsMnt(%,%,%,%)' type cs speed handles)) 'number')
 }
 
-to due_FSOpen path mode {
+to due_fsopen path mode {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'FsOpen(%,%)' path mode)) 'number')
 }
 
-to due_FSRead handle count {
+to due_fsread handle count {
   due_run ('_due_templateWith' 'dim b9[%]' count)
   due_run ('_due_templateWith' 'FsRead(%,b9)' handle)
   return ('[data:convertType]' ('Stream read bytes' 'b9' count) 'number')
 }
 
-to due_FSSeek handle offset {
+to due_fsseek handle offset {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'FsSeek(%,%)' handle offset)) 'number')
 }
 
-to due_FSSync handle {
+to due_fssync handle {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'FsSync(%)' handle)) 'number')
 }
 
-to due_FSTell handle {
+to due_fstell handle {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'FsTell(%)' handle)) 'number')
 }
 
-to due_FSUnMount {
+to due_fusnmount {
   return ('[data:convertType]' (due_runWithResult 'FsUnMnt()') 'number')
 }
 
-to due_FSWrite handle data {
+to due_fswrite handle data {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'FsWrite(%,[%])' handle data)) 'number')
 }
 

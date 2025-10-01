@@ -4,8 +4,8 @@ version 0 5
 depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 
 description 'DUELink OTP Library'
 
-  spec ' ' 'due_otpw' 'Otp write address _ data _' 'auto auto' 0 '1,2,3,4,5,6,7,8'
-  spec 'r' 'due_otpr' 'Otp read address _' 'auto' 0
+  spec ' ' 'due_otpw' 'OTP write address _ data _' 'auto auto' 0 '1,2,3,4,5,6,7,8'
+  spec 'r' 'due_otpr' 'OTP read address _' 'auto' 0
 
 to due_otpr address {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'OtpR(%)' address)) 'number')
