@@ -2,7 +2,7 @@ module 'DUELink.System'
 author GHIElectronics
 version 0 5 
 depends DUELink 
-description 'DUELink.System'
+description 'DUELink System library'
 
   spec ' ' 'due_statled' 'StatLed high _ low _ count _' 'str str str' '100' '100' '10'
   spec 'r' 'due_tickms' 'GetTickMilliseconds'

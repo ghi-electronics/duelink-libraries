@@ -2,7 +2,7 @@ module 'DUELink.Servo'
 author 'GHI Electronics'
 version 0 5 
 depends DUELink 
-description 'DUELink Servo Moto'
+description 'DUELink servo motor library'
 
   spec ' ' 'due_servost' 'Set servo pin _ position _' 'auto auto' 1 90
 

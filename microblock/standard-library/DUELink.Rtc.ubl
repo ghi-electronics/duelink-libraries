@@ -2,8 +2,7 @@ module 'DUELink.Rtc'
 author 'GHI Electronics'
 version 0 5 
 depends DUELink 
-description 'DUELink rtc
-'
+description 'DUELink Rtc library'
 
   spec ' ' 'due_rtcw' 'Rtc write _' 'auto' '1,2,3,4,5,6'
   spec 'r' 'due_rtcr' 'Rtc read'
