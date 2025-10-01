@@ -1,5 +1,5 @@
 module 'DUELink.Digital'
-author GHIElectronics
+author 'GHI Electronics'
 version 0 5 
 depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 
 description 'DUELink.Digital Library
