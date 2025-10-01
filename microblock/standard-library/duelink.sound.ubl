@@ -2,7 +2,7 @@ module 'DUELink.Sound'
 author 'GHI Electronics'
 version 0 5 
 depends DUELink 
-description 'DUELink Sound library'
+description 'DUELink Sound Library'
 
   spec ' ' 'due_beep' 'Beep pin _ frequency _  duration _' 'auto auto auto' 7 1000 1000
   spec ' ' 'due_melodyp' 'Melody play pin _  array _' 'auto auto' 7 '2000, 100, 1000, 100'

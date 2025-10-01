@@ -2,7 +2,7 @@ module 'DUELink.Analog'
 author GHIElectronics
 version 0 5 
 depends DUELink 
-description 'DUELink.Analog
+description 'DUELink.Analog Library
 
 
 

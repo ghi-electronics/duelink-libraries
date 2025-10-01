@@ -1,7 +1,7 @@
 module 'DUELink.Engine'
 author 'GHI Electronics'
 version 0 5 
-description 'DUELink Engine library'
+description 'DUELink Engine Library'
 
   spec ' ' 'due_stop' 'Stop'
   spec ' ' 'due_record' 'Record script _' 'auto' 'statled(100,100,10)'

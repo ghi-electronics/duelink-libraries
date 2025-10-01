@@ -2,7 +2,7 @@ module 'DUELink.Graphics'
 author 'GHI Electronics'
 version 0 5 
 depends DUELink 
-description 'DUELink Graphics library'
+description 'DUELink Graphics Library'
 
   spec ' ' 'due_show' 'Show'
   spec ' ' 'due_text' 'Text _ color _ x _ y _' 'str auto auto auto' 'DUELink' '1' '10' '10'

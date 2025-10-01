@@ -2,7 +2,7 @@ module 'DUELink.Infrared'
 author GHIElectronics
 version 0 5 
 depends DUELink 
-description 'DUELink Infrared library'
+description 'DUELink Infrared Library'
 
   spec 'r' 'due_irread' 'Infrared read'
   spec ' ' 'due_irwrite' 'Infrared write command _' 'auto' 1

@@ -2,7 +2,7 @@ module 'DUELink.Humidity'
 author 'GHI Electronics'
 version 0 5 
 depends DUELink 
-description 'DUELink Humidity library'
+description 'DUELink Humidity Library'
 
   spec 'r' 'due_humid' 'Read humidity on pin _ type _' 'auto auto' 18 4
 

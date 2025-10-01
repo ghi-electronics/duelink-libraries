@@ -1,8 +1,8 @@
-module 'DUELink.Otp'
+module 'DUELink.OTP'
 author 'GHI Electronics'
 version 0 5 
 depends DUELink 
-description 'DUELink Otp library'
+description 'DUELink OTP Library'
 
   spec ' ' 'due_otpw' 'Otp write address _ data _' 'auto auto' 0 '1,2,3,4,5,6,7,8'
   spec 'r' 'due_otpr' 'Otp read address _' 'auto' 0

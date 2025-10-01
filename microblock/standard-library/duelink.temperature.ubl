@@ -2,7 +2,7 @@ module 'DUELink.Temperature'
 author 'GHI Electronics'
 version 0 5 
 depends DUELink 
-description 'DUELink Temperature library'
+description 'DUELink Temperature Library'
 
   spec 'r' 'due_tempread' 'Read temperature on pin _ type _' 'auto auto' 18 4
 

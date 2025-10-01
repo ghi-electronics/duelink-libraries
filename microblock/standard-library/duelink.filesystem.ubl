@@ -2,7 +2,7 @@ module 'DUELink.FileSystem'
 author 'GHI Elelctronics'
 version 0 5 
 depends DUELink 
-description 'DUELink file system'
+description 'DUELink FileSystem Library'
 
   spec 'r' 'due_FSMount' 'Mount type _ chip select pin _ speed _ max handles _' 'auto auto auto auto' 0 1 8000 4
   spec 'r' 'due_FSUnMount' 'UnMount'
