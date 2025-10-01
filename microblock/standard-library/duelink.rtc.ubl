@@ -1,4 +1,4 @@
-module 'DUELink RTC'
+module 'DUELink.RTC'
 author 'GHI Electronics'
 version 0 5 
 depends DUELink 
