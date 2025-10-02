@@ -117,6 +117,7 @@ to '_due_awaitResultI2C' {
       }
       exitLoop
     }
+    waitMillis 1
   }
   return ('[data:convertType]' result 'string')
 }
