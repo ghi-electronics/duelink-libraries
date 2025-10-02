@@ -1,0 +1,42 @@
+module 'Ghizzy Jr'
+author GHIElectronics
+version 0 5 
+description 'DUELink Ghizzy Jr Library
+
+'
+variables _due_ghizzy_enabled _due_ghizzy_oldver 
+
+  spec ' ' 'due_ghizzy_set_left_eye' 'Set left eye red _ green _ blue _' 'num num num' 128 128 128
+  spec ' ' 'due_ghizzy_set_right_eye' 'Set right eye red _ green _ blue _' 'num num num' 128 128 128
+  spec 'r' 'due_ghizzy_button' 'Button pressed'
+  spec ' ' '_due_ghizzy_initialize' 'Initialize'
+
+to '_due_ghizzy_initialize' {
+  if (_due_ghizzy_enabled != 1) {
+    _due_ghizzy_enabled = 1
+    local 'value' 0
+    _due_ghizzy_oldver = (digitalReadOp 17 'up')
+  }
+}
+
+to due_ghizzy_button {
+  return ('[data:convertType]' (digitalReadOp 20 'down') 'boolean')
+}
+
+to due_ghizzy_set_left_eye red green blue {
+  '_due_ghizzy_initialize'
+  analogWriteOp 8 ('[misc:rescale]' red 0 255 0 1023)
+  analogWriteOp 7 ('[misc:rescale]' blue 0 255 0 1023)
+  if _due_ghizzy_oldver {
+    analogWriteOp 9 ('[misc:rescale]' green 0 255 0 1023)
+  } else {
+    analogWriteOp 1 ('[misc:rescale]' green 0 255 0 1023)
+  }
+}
+
+to due_ghizzy_set_right_eye red green blue {
+  analogWriteOp 5 ('[misc:rescale]' red 0 255 0 1023)
+  analogWriteOp 6 ('[misc:rescale]' green 0 255 0 1023)
+  analogWriteOp 4 ('[misc:rescale]' blue 0 255 0 1023)
+}
+

@@ -1,0 +1,76 @@
+module Ghizzy
+author GHIElectronics
+version 0 5 
+depends Tone 
+description 'DUELink Ghizzy Library
+
+'
+variables _due_ghizzy_enabled _due_ghizzy_oldver 
+
+  spec ' ' 'due_ghizzy_set_left_eye' 'Set left eye red _ green _ blue _' 'num num num' 128 128 128
+  spec ' ' 'due_ghizzy_set_right_eye' 'Set right eye red _ green _ blue _' 'num num num' 128 128 128
+  spec ' ' 'due_ghizzy_set_ear' 'Set ear left _ right _' 'bool bool' true true
+  spec ' ' 'due_ghizzy_set_mouth' 'Set mouth on _' 'bool' true
+  spec ' ' 'due_ghizzy_beep' 'Play beep'
+  spec 'r' 'due_ghizzy_button' 'Button pressed'
+  spec ' ' '_due_ghizzy_initialize' 'Initialize'
+
+to '_due_ghizzy_initialize' {
+  if (_due_ghizzy_enabled == 0) {
+    _due_ghizzy_enabled = 1
+    _due_ghizzy_oldver = (digitalReadOp 10 'up')
+    'attach buzzer to pin' 3
+  }
+}
+
+to due_ghizzy_beep {
+  '_due_ghizzy_initialize'
+  'play frequency' 1000 100
+}
+
+to due_ghizzy_button {
+  return ('[data:convertType]' (digitalReadOp 20 'down') 'boolean')
+}
+
+to due_ghizzy_set_ear left right {
+  if (left == (booleanConstant true)) {
+    digitalWriteOp 12 true
+  } else {
+    digitalWriteOp 12 false
+  }
+  if (right == (booleanConstant true)) {
+    digitalWriteOp 13 true
+  } else {
+    digitalWriteOp 13 false
+  }
+}
+
+to due_ghizzy_set_left_eye red green blue {
+  '_due_ghizzy_initialize'
+  analogWriteOp 8 ('[misc:rescale]' red 0 255 0 1023)
+  analogWriteOp 7 ('[misc:rescale]' blue 0 255 0 1023)
+  if _due_ghizzy_oldver {
+    analogWriteOp 9 ('[misc:rescale]' green 0 255 0 1023)
+  } else {
+    analogWriteOp 1 ('[misc:rescale]' green 0 255 0 1023)
+  }
+}
+
+to due_ghizzy_set_mouth on {
+  if (on == (booleanConstant true)) {
+    digitalWriteOp 14 true
+    digitalWriteOp 15 true
+    digitalWriteOp 16 true
+  } else {
+    digitalWriteOp 14 false
+    digitalWriteOp 15 false
+    digitalWriteOp 16 false
+  }
+}
+
+to due_ghizzy_set_right_eye red green blue {
+  analogWriteOp 5 ('[misc:rescale]' red 0 255 0 1023)
+  analogWriteOp 6 ('[misc:rescale]' green 0 255 0 1023)
+  analogWriteOp 4 ('[misc:rescale]' blue 0 255 0 1023)
+}
+
