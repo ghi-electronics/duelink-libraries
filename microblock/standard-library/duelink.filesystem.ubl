@@ -1,7 +1,7 @@
 module 'DUELink.FileSystem'
 author 'GHI Elelctronics'
 version 0 6 
-depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.stream.ubl' 
+depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl'
 description 'DUELink FileSystem Library'
 
   spec 'r' 'due_fsmount' 'Mount type _ chip select pin _ speed _ max handles _' 'auto auto auto auto' 1 17 8000 4
