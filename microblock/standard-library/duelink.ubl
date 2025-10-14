@@ -1,6 +1,6 @@
 module DUELink Comm
 author 'GHI Electronics'
-version 0 7 
+version 0 8 
 description 'DUELink base library used by all other DUELink libraries.
 
 Handles daisylink communications via I2C or serial (UART).
@@ -25,7 +25,7 @@ variables _dueUseI2C _dueReadTimeout
   spec ' ' 'due_setReadTimeout' 'Set response timeout _ milliseconds' 'auto' 1000
   spec ' ' 'Select device' 'Select device _' 'auto' 1
   advanced
-  spec ' ' 'due_useI2C' 'DUELink useI2C _' 'bool' true  
+  spec ' ' 'due_useI2C' 'DUELink useI2C _' 'bool' true
   spec ' ' '_due_init' '_due_init'
   spec 'r' '_due_templateWith' '_due_template _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'test(%)' 123
   spec ' ' '_due_send' '_due send _' 'str'
@@ -37,9 +37,7 @@ variables _dueUseI2C _dueReadTimeout
   space
   space
   spec ' ' 'due_stop' 'Stop'
-  spec ' ' 'due_record' 'Record script _' 'auto' 'statled(100,100,10)'
   spec ' ' 'due_exec' 'Run'
-  spec 'r' 'due_list' 'Read script'
   space
   space
   spec ' ' 'due_otpw' 'OTP write address _ data _' 'auto auto' 0 '1,2,3,4,5,6,7,8'
@@ -183,6 +181,35 @@ to '_due_send' s {
   }
 }
 
+to '_due_stream_write_bytes' 'array name' data {
+  local 'buf' ('[data:split]' data ',' true)
+  local 'buf_read' (newList 1)
+  local 'found prompt' 0
+  '_due_send' ('_due_templateWith' 'strmwr(%,%)' (v 'array name') (size buf))
+  repeatUntil ((v 'found prompt') == 1) {
+    if _dueUseI2C {
+      '[sensors:i2cRead]' 82 buf_read
+      for byte buf_read {
+        if (byte == 38) {'found prompt' = 1}
+      }
+    } else {
+      local 'buf_read' ('[serial:dueRecv]')
+      if ((size buf_read) != 0) {
+        for byte buf_read {
+          if (byte == 38) {'found prompt' = 1}
+        }
+      }
+    }
+  }
+  if _dueUseI2C {
+    '[sensors:i2cWrite]' 82 buf
+  } else {
+    local 'ignore' ('[serial:dueSend]' buf 1)
+  }
+  if ('[data:convertType]' (due_readResponse) 'number') {
+  }
+}
+
 to '_due_templateWith' s optionalArgs {
   local 'parts' ('[data:split]' s '%')
   local 'result' ('[data:makeList]')
@@ -198,6 +225,18 @@ to due_connected {
   '_due_send' ('[data:unicodeString]' 27)
   local 'n' ('[data:convertType]' (random 1 9) 'string')
   return ((due_runWithResult n) == n)
+}
+
+to due_exec {
+  due_run 'run'
+}
+
+to due_otpr address {
+  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'OtpR(%)' address)) 'number')
+}
+
+to due_otpw address data {
+  due_run ('_due_templateWith' 'OtpW(%,[%])' address data)
 }
 
 to due_readResponse {
@@ -219,44 +258,11 @@ to due_setReadTimeout millisecond {
   _dueReadTimeout = millisecond
 }
 
-to due_useI2C useI2C {
-  comment 'DUELink defaults to using the serial Downlink port on DUELink boards
-
-and I2C on non-DUELink board. This advanced block is only needed
-
-when one wants to force different behavior from the default
-
-(e.g. to use I2C edge connector pins on a DUE CincoBit or PixoBit).'
-  _dueUseI2C = useI2C
-}
-
-to due_exec {
-  due_run 'run'
-}
-
-to due_list {
-  return ('[data:convertType]' (due_runWithResult 'list') 'string')
-}
-
-to due_record script {
-  due_run 'new'
-  due_run 'pgmbrst()'
-  '_due send raw' script
-}
-
 to due_stop {
   comment 'Send escape to stop any running scripts'
   '_due_send' ('[data:unicodeString]' 27)
   waitMillis 100
   due_run '>'
-}
-
-to due_otpr address {
-  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'OtpR(%)' address)) 'number')
-}
-
-to due_otpw address data {
-  due_run ('_due_templateWith' 'OtpW(%,[%])' address data)
 }
 
 to due_stream_read_bytes 'array name' count {
@@ -313,32 +319,14 @@ to due_stream_read_bytes 'array name' count {
   }
 }
 
-to _due_stream_write_bytes 'array name' data {
-  local 'buf' ('[data:split]' data ',' true)
-  local 'buf_read' (newList 1)
-  local 'found prompt' 0
-  '_due_send' ('_due_templateWith' 'strmwr(%,%)' (v 'array name') (size buf))
-  repeatUntil ((v 'found prompt') == 1) {
-    if _dueUseI2C {
-      '[sensors:i2cRead]' 82 buf_read
-      for byte buf_read {
-        if (byte == 38) {'found prompt' = 1}
-      }
-    } else {
-      local 'buf_read' ('[serial:dueRecv]')
-      if ((size buf_read) != 0) {
-        for byte buf_read {
-          if (byte == 38) {'found prompt' = 1}
-        }
-      }
-    }
-  }
-  if _dueUseI2C {
-    '[sensors:i2cWrite]' 82 buf
-  } else {
-    local 'ignore' ('[serial:dueSend]' buf 1)
-  }
-  if ('[data:convertType]' (due_readResponse) 'number') {
-  }
+to due_useI2C useI2C {
+  comment 'DUELink defaults to using the serial Downlink port on DUELink boards
+
+and I2C on non-DUELink board. This advanced block is only needed
+
+when one wants to force different behavior from the default
+
+(e.g. to use I2C edge connector pins on a DUE CincoBit or PixoBit).'
+  _dueUseI2C = useI2C
 }
 
