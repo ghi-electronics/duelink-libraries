@@ -1,0 +1,854 @@
+module main
+author unknown
+version 1 0 
+description ''
+
+script 416 54 {
+whenButtonPressed 'A'
+due_rtcw '1,2,3,4,5,6'
+}
+
+script 701 103 {
+whenButtonPressed 'B'
+local 'rtc' ('[data:newByteArray]' 6)
+rtc = (due_rtcr)
+if ((at 6 rtc) == 6) {
+  setUserLED true
+}
+}
+
+script 127 236 {
+whenStarted
+due_useI2C true
+setUserLED false
+}
+
+
+module DUELink Comm
+author 'GHI Electronics'
+version 0 7 
+description 'DUELink base library used by all other DUELink libraries.
+
+Handles daisylink communications via I2C or serial (UART).
+
+
+By default, this library uses serial over the Downlink port on DUELink boards and I2C on other boards but that can be changed by using the advanced "DUELink useI2C" block.
+
+
+
+See https://www.duelink.com/docs/engine/stdlib
+
+'
+variables _dueUseI2C _dueReadTimeout 
+
+  spec 'r' 'due_connected' 'DUELink connected?'
+  space
+  space
+  spec 'r' 'due_runWithResult' 'Write command _ returns string' 'str' 'version()'
+  spec ' ' 'due_run' 'Write command _' 'str' 'statled(100,100,10)'
+  spec 'r' 'Write command' 'Write command _ returns number' 'auto' 'dread(1,2)'
+  spec ' ' 'Set Stat LED to high' 'Set Stat LED to high _ (ms), low _ (ms), count _' 'auto auto auto' 100 100 10
+  spec ' ' 'due_setReadTimeout' 'Set response timeout _ milliseconds' 'auto' 1000
+  spec ' ' 'Select device' 'Select device _' 'auto' 1
+  advanced
+  spec ' ' 'due_useI2C' 'DUELink useI2C _' 'bool' true
+  spec ' ' '_due_init' '_due_init'
+  spec 'r' '_due_templateWith' '_due_template _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'test(%)' 123
+  spec ' ' '_due_send' '_due send _' 'str'
+  spec ' ' '_due send raw' '_due send raw _' 'auto' '10'
+  spec 'r' '_due_awaitResult' '_due await result'
+  spec 'r' '_due_awaitResultI2C' '_due await result (I2C)'
+  spec 'r' '_due_endsWithPrompt' '_due byte array ends with prompt _' 'str'
+  spec 'r' 'due_readResponse' 'Read response'
+  space
+  space
+  spec ' ' 'due_stop' 'Stop'
+  spec ' ' 'due_record' 'Record script _' 'auto' 'statled(100,100,10)'
+  spec ' ' 'due_exec' 'Run'
+  spec 'r' 'due_list' 'Read script'
+  space
+  space
+  spec ' ' 'due_otpw' 'OTP write address _ data _' 'auto auto' 0 '1,2,3,4,5,6,7,8'
+  spec 'r' 'due_otpr' 'OTP read address _' 'auto' 0
+  space
+  space
+  spec ' ' '_due_stream_write_bytes' 'Stream write to _ data _' 'auto auto' 'b1' '1,2,3'
+  spec 'r' 'due_stream_read_bytes' 'Stream read from _ count _' 'auto auto' 'b1' 3
+
+to 'Select device' dev {
+  due_run ('_due_templateWith' 'sel(%)' dev)
+}
+
+to 'Set Stat LED to high' high low count {
+  due_run ('_due_templateWith' 'statled(%,%,%)' high low count)
+}
+
+to 'Write command' cmd {
+  '_due_send' cmd
+  waitMillis 5
+  return ('[data:convertType]' ('_due_awaitResult') 'number')
+}
+
+to '_due send raw' s {
+  '_due_init'
+  comment 'Clear receive buffer.'
+  if _dueUseI2C {
+    '[sensors:i2cRead]' 82 ('[data:newByteArray]' 64)
+  } else {
+    local 'trash' ('[serial:dueRecv]')
+  }
+  if _dueUseI2C {
+    comment 'Assume command is < 64 bytes for now.'
+    '[sensors:i2cWrite]' 82 ('[data:asByteArray]' s)
+  } else {
+    s = ('[data:convertType]' s 'string')
+    local 'i' 1
+    repeatUntil (i > (size s)) {
+      local 'sent' ('[serial:dueSend]' s i)
+      i += sent
+      waitMillis ((sent / 10) + 1)
+    }
+    waitMillis 2
+  }
+}
+
+to '_due_awaitResult' {
+  '_due_init'
+  if _dueUseI2C {
+    return ('_due_awaitResultI2C')
+  }
+  local 'result' ('[data:makeList]')
+  local 'startT' (millisOp)
+  comment 'Receive data until either the next prompt character or a timeout and return the result'
+  repeatUntil ((millisSince startT) > _dueReadTimeout) {
+    local 'buf' ('[serial:dueRecv]')
+    if ((size buf) != 0) {
+      for byte buf {
+        '[data:addLast]' byte result
+      }
+      if ('_due_endsWithPrompt' result) {
+        comment 'Result ends DUE prompt sequence: 10, 13, 62'
+        repeat 3 {
+          '[data:delete]' 'last' result
+        }
+        exitLoop
+      }
+    }
+    waitMicros 5
+  }
+  return ('[data:convertType]' result 'string')
+}
+
+to '_due_awaitResultI2C' {
+  local 'result' (newList 20)
+  '[data:delete]' 'all' result
+  local 'buf' ('[data:newByteArray]' 32)
+  local 'startT' (millisOp)
+  repeatUntil ((millisSince startT) > _dueReadTimeout) {
+    '[sensors:i2cRead]' 82 buf
+    for byte buf {
+      if (byte != 255) {'[data:addLast]' byte result}
+    }
+    if ('_due_endsWithPrompt' result) {
+      comment 'Result ends DUE prompt sequence: 13, 10, 62'
+      repeat 3 {
+        '[data:delete]' 'last' result
+      }
+      exitLoop
+    }
+    waitMillis 1
+  }
+  return ('[data:convertType]' result 'string')
+}
+
+to '_due_endsWithPrompt' buffer {
+  local 'end' (size buffer)
+  if (end < 3) {
+    return (booleanConstant false)
+  }
+  return (and (or ((at end buffer) == 62) ((at end buffer) == 36)) (and ((at (end - 1) buffer) == 10) ((at (end - 2) buffer) == 13)))
+}
+
+to '_due_init' {
+  if (_dueReadTimeout == 0) {_dueReadTimeout = 1000}
+  if (not (isType _dueUseI2C 'boolean')) {
+    comment 'Not yet initialized, set _dueUseI2C.'
+    for s ('[data:makeList]' 'CincoBit' 'PixoBit' 'DueSTEM' 'Clipit' 'DUELink') {
+      if (('[data:find]' s (boardType)) > 0) {
+        comment 'This is a DUELink board; use serial.'
+        _dueUseI2C = (booleanConstant false)
+        return 0
+      }
+    }
+    comment 'Not a DUELink board; use I2C.'
+    _dueUseI2C = (booleanConstant true)
+  }
+}
+
+to '_due_send' s {
+  '_due_init'
+  comment 'Clear receive buffer.'
+  if _dueUseI2C {
+    '[sensors:i2cRead]' 82 ('[data:newByteArray]' 64)
+  } else {
+    local 'trash' ('[serial:dueRecv]')
+  }
+  if _dueUseI2C {
+    comment 'Assume command is < 64 bytes for now.'
+    '[sensors:i2cWrite]' 82 ('[data:join]' ('[data:asByteArray]' s) ('[data:unicodeString]' 10))
+  } else {
+    s = ('[data:convertType]' s 'string')
+    local 'i' 1
+    repeatUntil (i > (size s)) {
+      local 'sent' ('[serial:dueSend]' s i)
+      i += sent
+      waitMillis ((sent / 10) + 1)
+    }
+    i += ('[serial:dueSend]' ('[data:unicodeString]' 10) 1)
+    waitMillis 2
+  }
+}
+
+to '_due_stream_write_bytes' 'array name' data {
+  local 'buf' ('[data:split]' data ',' true)
+  local 'buf_read' (newList 1)
+  local 'found prompt' 0
+  '_due_send' ('_due_templateWith' 'strmwr(%,%)' (v 'array name') (size buf))
+  repeatUntil ((v 'found prompt') == 1) {
+    if _dueUseI2C {
+      '[sensors:i2cRead]' 82 buf_read
+      for byte buf_read {
+        if (byte == 38) {'found prompt' = 1}
+      }
+    } else {
+      local 'buf_read' ('[serial:dueRecv]')
+      if ((size buf_read) != 0) {
+        for byte buf_read {
+          if (byte == 38) {'found prompt' = 1}
+        }
+      }
+    }
+  }
+  if _dueUseI2C {
+    '[sensors:i2cWrite]' 82 buf
+  } else {
+    local 'ignore' ('[serial:dueSend]' buf 1)
+  }
+  if ('[data:convertType]' (due_readResponse) 'number') {
+  }
+}
+
+to '_due_templateWith' s optionalArgs {
+  local 'parts' ('[data:split]' s '%')
+  local 'result' ('[data:makeList]')
+  for i ((size parts) - 1) {
+    '[data:addLast]' (at i parts) result
+    '[data:addLast]' (argOrDefault (i + 1) '') result
+  }
+  '[data:addLast]' (at 'last' parts) result
+  return ('[data:joinStrings]' result)
+}
+
+to due_connected {
+  '_due_send' ('[data:unicodeString]' 27)
+  local 'n' ('[data:convertType]' (random 1 9) 'string')
+  return ((due_runWithResult n) == n)
+}
+
+to due_exec {
+  due_run 'run'
+}
+
+to due_list {
+  return ('[data:convertType]' (due_runWithResult 'list') 'string')
+}
+
+to due_otpr address {
+  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'OtpR(%)' address)) 'number')
+}
+
+to due_otpw address data {
+  due_run ('_due_templateWith' 'OtpW(%,[%])' address data)
+}
+
+to due_readResponse {
+  return ('_due_awaitResult')
+}
+
+to due_record script {
+  due_run 'new'
+  due_run 'pgmbrst()'
+  '_due send raw' script
+}
+
+to due_run cmd {
+  '_due_send' cmd
+  local 'ignore' ('_due_awaitResult')
+}
+
+to due_runWithResult cmd {
+  '_due_send' cmd
+  waitMillis 5
+  return ('_due_awaitResult')
+}
+
+to due_setReadTimeout millisecond {
+  _dueReadTimeout = millisecond
+}
+
+to due_stop {
+  comment 'Send escape to stop any running scripts'
+  '_due_send' ('[data:unicodeString]' 27)
+  waitMillis 100
+  due_run '>'
+}
+
+to due_stream_read_bytes 'array name' count {
+  local 'buf' (newList count)
+  local 'buf_read' (newList 1)
+  local 'found prompt' 0
+  local 'idx' 0
+  local 'buf2' ('[data:makeList]')
+  '_due_send' ('_due_templateWith' 'strmrd(%,%)' (v 'array name') count)
+  repeatUntil ((v 'found prompt') == 1) {
+    if _dueUseI2C {
+      '[sensors:i2cRead]' 82 buf_read
+      for byte buf_read {
+        if (byte == 38) {'found prompt' = 1}
+      }
+    } else {
+      local 'buf3' ('[serial:dueRecv]')
+      if ((size buf3) != 0) {
+        for byte buf3 {
+          if ((v 'found prompt') == 1) {
+            '[data:addLast]' byte buf2
+            idx = (idx + 1)
+          }
+          if (byte == 38) {
+            'found prompt' = 1
+          }
+        }
+      }
+    }
+  }
+  repeatUntil (idx == count) {
+    if _dueUseI2C {
+      '[sensors:i2cRead]' 82 buf_read
+      for byte buf_read {
+        if (byte != 255) {
+          idx = (idx + 1)
+          atPut idx buf byte
+        }
+      }
+    } else {
+      local 'buf3' ('[serial:dueRecv]')
+      if ((size buf3) != 0) {
+        for byte buf3 {
+          '[data:addLast]' byte buf2
+          idx = (idx + 1)
+        }
+      }
+    }
+  }
+  if _dueUseI2C {
+    return ('[data:convertType]' buf 'byte array')
+  } else {
+    return ('[data:convertType]' buf2 'byte array')
+  }
+}
+
+to due_useI2C useI2C {
+  comment 'DUELink defaults to using the serial Downlink port on DUELink boards
+
+and I2C on non-DUELink board. This advanced block is only needed
+
+when one wants to force different behavior from the default
+
+(e.g. to use I2C edge connector pins on a DUE CincoBit or PixoBit).'
+  _dueUseI2C = useI2C
+}
+
+
+module 'DUELink.Rtc'
+author 'GHI Electronics'
+version 0 4 
+depends DUELink 
+description 'DUELink rtc
+'
+
+  spec ' ' 'due_rtcw' 'Rtc write _' 'auto' '1,2,3,4,5,6'
+  spec 'r' 'due_rtcr' 'Rtc read'
+
+to due_rtcr {
+  due_run 'dim b9[6]'
+  due_run 'RtcR(b9)'
+  return (due_stream_read_bytes 'b9' 6)
+}
+
+to due_rtcw data {
+  due_run ('_due_templateWith' 'RtcW([%])' data)
+}
+
+
+module 'Tiny OLED' Output
+author MicroBlocks
+version 1 2 
+description 'Tiny graphics library for a 128x64 pixel monochrome OLED display with a SSD1306 controller.
+Useful on boards with very limited code store space such as the DUELink PixoBit.
+'
+variables _tinyOLED_buffer _tinyOLED_hideUpdates 
+
+  spec ' ' 'tinyOLED_clear' 'clear tiny OLED display'
+  spec ' ' 'tinyOLED_drawString' 'draw string _ x _ y _ white _' 'str num num bool' 'Hello!' 48 52 true
+  spec ' ' 'tinyOLED_drawRect' 'draw rect x _ y _ w _ h _ fill _ white _' 'num num num num bool bool' 44 17 40 30 false true
+  spec ' ' 'tinyOLED_drawCircle' 'draw circle center _ _ radius _ fill _ white _' 'num num num bool bool' 64 32 10 false true
+  spec ' ' 'tinyOLED_drawLine' 'draw line from _ _ to _ _ white _' 'num num num num bool' 0 0 127 63 true
+  spec ' ' 'tinyOLED_drawPixel' 'draw pixel x _ y _ white _' 'num num bool' 20 30 true
+  space
+  spec ' ' 'tinyOLED_setBrightness' 'set tiny OLED brightness _' 'menu.range:1-5' 4
+  space
+  spec ' ' 'tinyOLED_hideUpdates' 'defer tiny OLED display updates'
+  spec ' ' 'tinyOLED_showUpdates' 'show tiny OLED display updates'
+  space
+  spec ' ' 'tinyOLED_setResetPin' 'reset tiny OLED pin _' 'num' 22
+  space
+  spec ' ' '_tinyOLED_init' '_tinyOLED_init'
+  spec ' ' '_tinyOLED_cmd' '_tinyOLED_cmd _' 'auto' 10
+  spec ' ' '_tinyOLED_updateDisplay' '_tinyOLED_updateDisplay'
+  spec ' ' '_tinyOLED_drawChar' '_tinyOLED_drawChar _ x _ y _' 'auto num num' 65 0 0
+  spec ' ' '_tinyOLED_setPixel' '_tinyOLED_setPixel x _ y _ white _' 'num num bool' 0 0 true
+  spec ' ' '_tinyOLED_hline' '_hline startX _ endX _ y _ white _' 'num num num bool' 10 110 10 true
+
+to '_tinyOLED_cmd' cmdString {
+  comment 'Input is a comma separated string of hex values.'
+  local 'i2cAddr' 60
+  for cmd ('[data:split]' ('[data:convertType]' cmdString 'string') ',') {
+    '[sensors:i2cWrite]' i2cAddr ('[data:makeList]' (hexToInt '80') (hexToInt cmd))
+  }
+}
+
+to '_tinyOLED_drawChar' ch x y {
+  '_tinyOLED_init'
+  local 'columns' ('[misc:shapeforChar]' ch)
+  if (columns == 0) {
+    return 0
+  }
+  if (or (y < -7) (y > 63)) {
+    return 0
+  }
+  local 'firstCol' (ifExpression (x < 0) (1 - x) 1)
+  local 'lastCol' (ifExpression (x > 123) (128 - x) 5)
+  if (or (firstCol > 5) (lastCol < 1)) {
+    return 0
+  }
+  local 'offset' (ifExpression (y < 0) (x - 127) ((128 * (y / 8)) + (x + 1)))
+  for i 5 {
+    if (and (i >= firstCol) (i <= lastCol)) {
+      local 'shift' (y % 8)
+      local 'mask' (255 >> (8 - shift))
+      if (y >= 0) {
+        comment 'Draw top part of character if y >= 0'
+        atPut offset _tinyOLED_buffer ((((at offset _tinyOLED_buffer) & mask) | ((at i columns) << shift)) & 255)
+      }
+      if (and (y < 56) (shift != 0)) {
+        comment 'Draw bottom part of character if y not an even multiple of 8'
+        atPut (offset + 128) _tinyOLED_buffer ((((at (offset + 128) _tinyOLED_buffer) & (mask ^ 255)) | ((at i columns) >> (8 - shift))) & 255)
+      }
+    }
+    offset += 1
+  }
+}
+
+to '_tinyOLED_hline' startX endX y white {
+  '_tinyOLED_init'
+  if (or (y < 0) (y > 63)) {
+    return 0
+  }
+  startX = (maximum 0 (minimum startX 127))
+  endX = (maximum 0 (minimum endX 127))
+  local 'byteIndex' ((startX + ((y / 8) * 128)) + 1)
+  local 'bit mask' (1 << (y % 8))
+  repeat ((endX - startX) + 1) {
+    local 'byte' (at byteIndex _tinyOLED_buffer)
+    if white {
+      byte = (byte | (v 'bit mask'))
+    } else {
+      byte = (byte & ('~' (v 'bit mask')))
+    }
+    atPut byteIndex _tinyOLED_buffer byte
+    byteIndex += 1
+  }
+}
+
+to '_tinyOLED_init' {
+  if (_tinyOLED_buffer != 0) {return 0}
+  comment 'Use default reset pin 22 for PixoBit and ClipIt boards.'
+  tinyOLED_setResetPin 22
+}
+
+to '_tinyOLED_setPixel' x y white {
+  comment 'Set the value of pixel at x,y.
+Ranges:
+  x: 0-127
+  y: 0-63
+  byteIndex: 1-1024
+  bitIndex: 0-7
+'
+  comment 'Check ranges'
+  if (or (x < 0) (x > 127)) {
+    return
+  }
+  if (or (y < 0) (y > 63)) {
+    return
+  }
+  local 'byteIndex' ((x + ((y / 8) * 128)) + 1)
+  local 'bitIndex' (y % 8)
+  local 'byte' (at byteIndex _tinyOLED_buffer)
+  if white {
+    byte = (byte | (1 << bitIndex))
+  } else {
+    byte = (byte & ('~' (1 << bitIndex)))
+  }
+  atPut byteIndex _tinyOLED_buffer byte
+}
+
+to '_tinyOLED_updateDisplay' {
+  comment 'Copies contents of virtual _GDBuffer to display via I2C in 64 byte chunks for speed.'
+  if ((booleanConstant true) == _tinyOLED_hideUpdates) {
+    return 0
+  }
+  '_tinyOLED_init'
+  local '_dataPrefix' ('[data:newByteArray]' 1 (hexToInt '40'))
+  local 'idx' 1
+  for j 8 {
+    '_tinyOLED_cmd' '0x10'
+    comment 'Column offset:'
+    '_tinyOLED_cmd' '0x00'
+    '[sensors:i2cWrite]' 60 ('[data:makeList]' (hexToInt '80') ((hexToInt 'B0') + (j - 1)))
+    '[sensors:i2cWrite]' 60 ('[data:join]' _dataPrefix ('[data:copyFromTo]' _tinyOLED_buffer idx (idx + 63)))
+    idx += 64
+    '[sensors:i2cWrite]' 60 ('[data:join]' _dataPrefix ('[data:copyFromTo]' _tinyOLED_buffer idx (idx + 63)))
+    idx += 64
+  }
+}
+
+to tinyOLED_clear {
+  '_tinyOLED_init'
+  atPut 'all' _tinyOLED_buffer 0
+  '_tinyOLED_updateDisplay'
+}
+
+to tinyOLED_drawCircle cx cy r fill white {
+  comment 'Draw a circle with radius r centered at cx,cy using Bresenham circle algorithm.'
+  '_tinyOLED_init'
+  local 'x' (0 - r)
+  local 'y' 0
+  local 'err' (2 - (2 * r))
+  repeatUntil (x >= 0) {
+    if fill {
+      '_tinyOLED_hline' (cx + x) (cx - x) (cy - y) white
+      '_tinyOLED_hline' (cx + x) (cx - x) (cy + y) white
+    } else {
+      '_tinyOLED_setPixel' (cx - x) (cy + y) white
+      '_tinyOLED_setPixel' (cx - y) (cy - x) white
+      '_tinyOLED_setPixel' (cx + x) (cy - y) white
+      '_tinyOLED_setPixel' (cx + y) (cy + x) white
+    }
+    r = err
+    if (r <= y) {
+      y += 1
+      err = (err + ((y * 2) + 1))
+    }
+    if (or (r > x) (err > y)) {
+      x += 1
+      err = (err + ((x * 2) + 1))
+    }
+  }
+  '_tinyOLED_updateDisplay'
+}
+
+to tinyOLED_drawLine x0 y0 x1 y1 white {
+  comment 'Draws a line from x0,y0 to x1,y1 using the Bresenham line algorithm.'
+  '_tinyOLED_init'
+  local 'dx' (absoluteValue (x1 - x0))
+  local 'dy' (-1 * (absoluteValue (y1 - y0)))
+  local 'err' (dx + dy)
+  if (x0 < x1) {
+    local 'sx' 1
+  } else {
+    local 'sx' -1
+  }
+  if (y0 < y1) {
+    local 'sy' 1
+  } else {
+    local 'sy' -1
+  }
+  forever {
+    '_tinyOLED_setPixel' x0 y0 white
+    if (and (x0 == x1) (y0 == y1)) {
+      '_tinyOLED_updateDisplay'
+      return
+    }
+    local 'e2' (2 * err)
+    if (e2 >= dy) {
+      err += dy
+      x0 += sx
+    }
+    if (e2 <= dx) {
+      err += dx
+      y0 += sy
+    }
+  }
+}
+
+to tinyOLED_drawPixel x y white {
+  '_tinyOLED_init'
+  '_tinyOLED_setPixel' x y white
+  '_tinyOLED_updateDisplay'
+}
+
+to tinyOLED_drawRect x y w h fill white {
+  '_tinyOLED_init'
+  x = (maximum 0 (minimum x 127))
+  y = (maximum 0 (minimum y 63))
+  local 'right' (x + w)
+  local 'bottom' (y + h)
+  if fill {
+    repeatUntil (y > bottom) {
+      '_tinyOLED_hline' x right y white
+      y += 1
+    }
+  } else {
+    '_tinyOLED_hline' x right y white
+    repeatUntil (y >= bottom) {
+      '_tinyOLED_setPixel' x y white
+      '_tinyOLED_setPixel' right y white
+      y += 1
+    }
+    '_tinyOLED_hline' x right y white
+  }
+  '_tinyOLED_updateDisplay'
+}
+
+to tinyOLED_drawString s x y white {
+  '_tinyOLED_init'
+  if (not white) {
+    comment 'Clear string rectangle'
+    tinyOLED_drawRect x y (6 * (size s)) 7 true false
+    return
+  }
+  for ch s {
+    '_tinyOLED_drawChar' ch x y
+    x += 6
+  }
+  '_tinyOLED_updateDisplay'
+}
+
+to tinyOLED_hideUpdates {
+  _tinyOLED_hideUpdates = (booleanConstant true)
+}
+
+to tinyOLED_setBrightness level {
+  level = (maximum 1 (minimum level 5))
+  local 'cLevels' ('[data:makeList]' 0 20 40 80 'FF')
+  '_tinyOLED_cmd' ('[data:join]' '81,' (at level cLevels))
+}
+
+to tinyOLED_setResetPin resetPin {
+  _tinyOLED_buffer = ('[data:newByteArray]' 1024)
+  if (resetPin >= 0) {
+    comment 'Toggle OLED reset pin (skip this if resetPin < 0)'
+    digitalWriteOp resetPin false
+    waitMillis 1
+    digitalWriteOp resetPin true
+    waitMillis 1
+  }
+  comment 'Minimal initialization commands:
+A1     - Horizontal flip (A0 or A1)
+C8     - Vertical flip (C0 or C8)
+8D,14  - Enable charge pump
+AF     - Display on'
+  '_tinyOLED_cmd' 'A1,C8,8D,14,AF'
+}
+
+to tinyOLED_showUpdates {
+  _tinyOLED_hideUpdates = (booleanConstant false)
+  '_tinyOLED_updateDisplay'
+}
+
+
+module Tone Output
+author MicroBlocks
+version 1 10 
+tags tone sound music audio note speaker 
+choices tone_NoteName 'nt;c' 'nt;c#' 'nt;d' 'nt;d#' 'nt;e' 'nt;f' 'nt;f#' 'nt;g' 'nt;g#' 'nt;a' 'nt;a#' 'nt;b' 
+description 'Audio tone generation. Make music with MicroBlocks!
+'
+variables _tonePin _toneInitalized _toneLoopOverhead _toneNoteNames _toneArezzoNotes _toneFrequencies 
+
+  spec ' ' 'play tone' 'play note _ octave _ for _ ms' 'str.tone_NoteName num num' 'nt;c' 0 500
+  spec ' ' 'playMIDIKey' 'play midi key _ for _ ms' 'num num' 60 500
+  spec ' ' 'play frequency' 'play frequency _ for _ ms' 'num num' 261 500
+  space
+  spec ' ' 'startTone' 'start tone _ Hz' 'num' 440
+  spec ' ' 'stopTone' 'stop tone'
+  space
+  spec ' ' 'attach buzzer to pin' 'attach buzzer to pin _' 'auto' ''
+  space
+  spec 'r' '_measureLoopOverhead' '_measureLoopOverhead'
+  spec 'r' '_baseFreqForNote' '_baseFreqForNote _' 'auto' 'c'
+  spec 'r' '_baseFreqForSemitone' '_baseFreqForSemitone _' 'num' 0
+  spec ' ' '_toneLoop' '_toneLoop _ for _ ms' 'num num' 440000 100
+  spec 'r' '_trimmedLowercase' '_trimmedLowercase _' 'str' 'A. b C...'
+  spec ' ' '_tone init note names' '_tone init note names'
+
+to '_baseFreqForNote' note {
+  comment 'Return the frequency for the given note in the middle-C octave
+scaled by 1000. For example, return 440000 (440Hz) for A.
+Note names may be upper or lower case. Note names
+may be followed by # for a sharp or b for a flat.'
+  local 'normalized note' ('_trimmedLowercase' note)
+  'normalized note' = (ifExpression ((at 1 (v 'normalized note')) == 'n') (v 'normalized note') ('[data:join]' 'nt;' (v 'normalized note')))
+  '_tone init note names'
+  if (('[data:find]' (v 'normalized note') _toneArezzoNotes) > 0) {
+    return ('_baseFreqForSemitone' ('[data:find]' (v 'normalized note') _toneArezzoNotes))
+  } else {
+    return ('_baseFreqForSemitone' ('[data:find]' (v 'normalized note') _toneNoteNames))
+  }
+}
+
+to '_baseFreqForSemitone' semitone {
+  if (_toneFrequencies == 0) {_toneFrequencies = ('[data:makeList]' 261626 277183 293665 311127 329628 349228 369994 391995 415305 440000 466164 493883 246942 277183 277183 311127 311127 349228 329628 369994 369994 415305 415305 466164 466164 523252)}
+  if (and (1 <= semitone) (semitone <= (size _toneFrequencies))) {
+    return (at semitone _toneFrequencies)
+  } else {
+    comment 'Bad note name; return 10 Hz'
+    return 10000
+  }
+}
+
+to '_measureLoopOverhead' {
+  comment 'Measure the loop overhead on this device'
+  local 'halfCycle' 100
+  local 'startT' (microsOp)
+  repeat 100 {
+    digitalWriteOp _tonePin false
+    waitMicros halfCycle
+    digitalWriteOp _tonePin false
+    waitMicros halfCycle
+  }
+  local 'usecs' ((microsOp) - startT)
+  return ((usecs - 20000) / 200)
+}
+
+to '_tone init note names' {
+  if (_toneNoteNames == 0) {
+    _toneNoteNames = ('[data:makeList]' 'nt;c' 'nt;c#' 'nt;d' 'nt;d#' 'nt;e' 'nt;f' 'nt;f#' 'nt;g' 'nt;g#' 'nt;a' 'nt;a#' 'nt;b' 'nt;c_' 'nt;db' 'nt;d_' 'nt;eb' 'nt;e_' 'nt;e#' 'nt;f_' 'nt;gb' 'nt;g_' 'nt;ab' 'nt;a_' 'nt;bb' 'nt;b_' 'nt;b#')
+    _toneArezzoNotes = ('[data:makeList]' 'nt;do' 'nt;do#' 'nt;re' 'nt;re#' 'nt;mi' 'nt;fa' 'nt;fa#' 'nt;sol' 'nt;sol#' 'nt;la' 'nt;la#' 'nt;si' 'nt;do_' 'nt;dob' 'nt;re_' 'nt;reb' 'nt;mi_' 'nt;mi#' 'nt;fa_' 'nt;solb' 'nt;sol_' 'nt;lab' 'nt;la_' 'nt;sib' 'nt;si_' 'nt;si#')
+  }
+}
+
+to '_toneLoop' scaledFreq ms {
+  if (_toneInitalized == 0) {'attach buzzer to pin' ''}
+  if ('[io:hasTone]') {
+    '[io:playTone]' _tonePin (scaledFreq / 1000)
+    waitMillis ms
+    '[io:playTone]' _tonePin 0
+  } else {
+    local 'halfCycle' ((500000000 / scaledFreq) - _toneLoopOverhead)
+    local 'cycles' ((ms * 500) / halfCycle)
+    repeat cycles {
+      digitalWriteOp _tonePin true
+      waitMicros halfCycle
+      digitalWriteOp _tonePin false
+      waitMicros halfCycle
+    }
+  }
+}
+
+to '_trimmedLowercase' s {
+  comment 'Return a copy of the given string without whitespace
+or periods and all lowercase.'
+  local 'result' (newList (size s))
+  '[data:delete]' 'all' result
+  for i (size s) {
+    local 'ch' ('[data:unicodeAt]' i s)
+    if (and (ch > 32) (ch != 46)) {
+      if (and (65 <= ch) (ch <= 90)) {ch = (ch + 32)}
+      '[data:addLast]' ch result
+    }
+  }
+  return ('[data:unicodeString]' result)
+}
+
+to 'attach buzzer to pin' pinNumber {
+  if (pinNumber == '') {
+    comment 'Pin number not specified; use default pin for this device'
+    if ((boardType) == 'Citilab ED1') {
+      _tonePin = 26
+    } ((boardType) == 'M5Stack-Core') {
+      _tonePin = 25
+    } ((boardType) == 'M5StickC') {
+      _tonePin = 26
+    } ((boardType) == 'Calliope') {
+      digitalWriteOp 23 true
+      digitalWriteOp 24 true
+      _tonePin = 25
+    } ((boardType) == 'D1-Mini') {
+      _tonePin = 12
+    } ((boardType) == 'CodingBox') {
+      _tonePin = 32
+    } else {
+      _tonePin = -1
+    }
+  } else {
+    _tonePin = pinNumber
+  }
+  _toneLoopOverhead = ('_measureLoopOverhead')
+  _toneInitalized = (booleanConstant true)
+}
+
+to 'play frequency' freq ms {
+  '_toneLoop' (freq * 1000) ms
+}
+
+to 'play tone' note octave ms {
+  local 'freq' ('_baseFreqForNote' note)
+  if (freq <= 10000) {
+    waitMillis ms
+    return 0
+  }
+  if (octave < 0) {
+    repeat (absoluteValue octave) {
+      freq = (freq / 2)
+    }
+  }
+  repeat octave {
+    freq = (freq * 2)
+  }
+  '_toneLoop' freq ms
+}
+
+to playMIDIKey key ms {
+  local 'freq' ('_baseFreqForSemitone' ((key % 12) + 1))
+  local 'octave' ((key / 12) - 5)
+  if (octave < 0) {
+    repeat (absoluteValue octave) {
+      freq = (freq / 2)
+    }
+  }
+  repeat octave {
+    freq = (freq * 2)
+  }
+  '_toneLoop' freq ms
+}
+
+to startTone freq {
+  if (_toneInitalized == 0) {'attach buzzer to pin' ''}
+  if ('[io:hasTone]') {'[io:playTone]' _tonePin freq}
+}
+
+to stopTone {
+  startTone 0
+}
+
