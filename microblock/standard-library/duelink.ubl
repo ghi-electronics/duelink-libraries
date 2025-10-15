@@ -293,7 +293,7 @@ to due_stream_read_bytes 'array name' count {
       }
     }
   }
-  repeatUntil (idx == count) {
+  repeatUntil (idx >= count) {
     if _dueUseI2C {
       '[sensors:i2cRead]' 82 buf_read
       for byte buf_read {
@@ -303,9 +303,9 @@ to due_stream_read_bytes 'array name' count {
         }
       }
     } else {
-      local 'buf3' ('[serial:dueRecv]')
-      if ((size buf3) != 0) {
-        for byte buf3 {
+      local 'buf4' ('[serial:dueRecv]')
+      if ((size buf4) != 0) {
+        for byte buf4 {
           '[data:addLast]' byte buf2
           idx = (idx + 1)
         }
@@ -315,7 +315,13 @@ to due_stream_read_bytes 'array name' count {
   if _dueUseI2C {
     return ('[data:convertType]' buf 'byte array')
   } else {
-    return ('[data:convertType]' buf2 'byte array')
+    comment 'buf3 and buf4 may have data, we copied them to buf2 and have all response, we need buf5 to take actual data only, remove xx\r\n>'
+    local 'buf5' ('[data:makeList]')
+    local 'ret' 0
+    for byte buf2 {
+      if (ret < count) {'[data:addLast]' byte buf5}
+    }
+    return ('[data:convertType]' buf5 'byte array')
   }
 }
 
@@ -328,5 +334,10 @@ when one wants to force different behavior from the default
 
 (e.g. to use I2C edge connector pins on a DUE CincoBit or PixoBit).'
   _dueUseI2C = useI2C
+  if _dueUseI2C {
+  } else {
+    comment 'If Uart we need to send 10 or 13 or 27 or ''s'' or ''S'''
+    'Select device' 1
+  }
 }
 
