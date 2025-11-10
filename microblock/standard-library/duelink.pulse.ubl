@@ -4,9 +4,9 @@ version 0 9
 depends 'DUELink Comm' 
 description 'DUELink Pulse Library'
 
-  spec 'r' 'due_pulsein' 'Read pulse pin _ state _ timeout _ ms' 'auto bool auto' 1 true 1000
+  spec 'r' 'due_pulsein' 'Read pulse pin _ charge _ state _ timeout_ms _' 'auto num bool auto' 1 1000 true 100
 
-to due_pulsein pin state timeout {
-  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'PulseIn(%,%,%)' pin state timeout)) 'number')
+to due_pulsein pin charge_us state timeout {
+  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'PulseIn(%,%,%,%)' pin charge_us state timeout)) 'number')
 }
 
