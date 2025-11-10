@@ -1,6 +1,6 @@
 module 'DUELink.Frequency'
 author 'GHI Electronics'
-version 0 8 
+version 0 9 
 depends 'DUELink Comm' 
 description 'DUELink Frequency Library'
 
