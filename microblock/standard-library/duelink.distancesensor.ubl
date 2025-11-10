@@ -1,7 +1,7 @@
 module 'DUELink.DistanceSensor'
 author 'GHI Electronics'
 version 0 8 
-depends 'http://www.duelink.com/code/libraries/microblocks/microblocks-lib/duelink.ubl' 
+depends 'DUELink Comm' 
 description 'DUELink.Distance Library'
 
   spec 'r' 'due_dist' 'Read distance(mm) on pulse pin _ echo pin _' 'auto auto' 3 4
