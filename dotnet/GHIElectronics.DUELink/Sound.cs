@@ -81,6 +81,34 @@ namespace GHIElectronics.DUELink {
 
                 return ret.success;
             }
+
+            public bool Wave(int pin, byte[] buffer, int offset, int count, int freq, int delay_us) {
+
+                var cmd = $"dim b9[{buffer.Length}]";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
+
+                var written = this.stream.WriteBytes("b9", buffer);
+
+                cmd = $"Wave({pin}, b9,{offset}, {count},{freq}, {delay_us})";
+
+                this.serialPort.WriteCommand(cmd);
+
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
+            }
+
+            public bool Sweep(int pin, int freq_start, int freq_end, int vol_start, int vol_end, int duration) {
+
+                var cmd = $"Sweep({pin},{freq_start},{freq_end},{vol_start},{vol_end},{duration})";
+
+                this.serialPort.WriteCommand(cmd);
+
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
+            }
         }
     }
 }

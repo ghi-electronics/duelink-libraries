@@ -1223,6 +1223,34 @@ class ServoController {
       return res.success;
     
     }
+    
+    async Wave(pin, buffer, offset, count, freq, delay_us) {
+
+      // declare b9 array
+      let cmd = `dim b9[${count}]`;
+      await this.serialPort.WriteCommand(cmd);  
+      await this.serialPort.ReadResponse();
+
+      // write data to b9
+      const written = await this.stream.WriteBytes("b9",buffer)
+
+      // play b9
+      cmd = `Wave(${pin}, b9,${offset},${count},${freq},${delay_us})`
+      await this.serialPort.WriteCommand(cmd); 
+      const ret = await this.serialPort.ReadResponse();
+      
+      return ret.success;      
+    }
+    
+    async Sweep(pin, freq_start, freq_end, vol_start, vol_end, duration) {      
+
+      // Sweep
+      let cmd = `Sweep(${pin}, ${freq_start},${freq_end},${vol_start},${vol_end},${duration})`
+      await this.serialPort.WriteCommand(cmd); 
+      const ret = await this.serialPort.ReadResponse();
+      
+      return ret.success;      
+    }
 }
 
 
@@ -1461,28 +1489,7 @@ class TemperatureController {
       let res = await this.serialPort.ReadResponse();
       return parseFloat(res.response);
     }
-  }
-  
-  class TouchController {
-    constructor(serialPort) {
-      this.serialPort = serialPort;
-    }
-  
-    async Read(pin, charge_t, charge_s, timeout) {
-      const cmd = `touch(${pin}, ${charge_t}, ${charge_s}, ${timeout})`;
-      await this.serialPort.WriteCommand(cmd);
-  
-      const res = await this.serialPort.ReadResponse();
-      let val = false;
-      if (res.success) {
-        try {
-          val = parseInt(res.response) === 1;
-          return val;
-        } catch {}
-      }
-      return val;
-    }
-}
+  }  
 
 class UartController {
     constructor(serialPort, stream) {
@@ -2093,9 +2100,9 @@ class PulseController {
   constructor(serialPort) {
     this.serialPort = serialPort    
   }
-
-  async Read(pin, state, timeout) {
-    const cmd = `PulseIn(${pin},${state},${timeout})`;
+  
+ async Read(pin, charge_t, charge_s, timeout) {
+    const cmd = `PulseIn(${pin}, ${charge_t}, ${charge_s}, ${timeout})`;
     await this.serialPort.WriteCommand(cmd);  
 
     const ret = await this.serialPort.ReadResponse();  
@@ -2150,6 +2157,24 @@ class RtcController {
     return ret
     
   }
+  
+  async Alarm(rtc_timedate) {
+    const count = rtc_timedate.length
+
+    // declare b9 array
+    let cmd = `dim b9[${count}]`;
+    await this.serialPort.WriteCommand(cmd);  
+    await this.serialPort.ReadResponse();
+
+    // write data to b9
+    const written = await this.stream.WriteBytes("b9",rtc_timedate)
+
+    // write b9 to otp
+    await this.serialPort.WriteCommand(`RtcA(b9)`); 
+    const ret = await this.serialPort.ReadResponse();
+    
+    return ret.success;
+  }
 
 }
 
@@ -2181,8 +2206,7 @@ class DUELinkController {
       
       this.Infrared = new InfraredController(this.serialPort);      
       this.Button = new ButtonController(this.serialPort);
-      this.Distance = new DistanceSensorController(this.serialPort);      
-      this.Touch = new TouchController(this.serialPort);
+      this.Distance = new DistanceSensorController(this.serialPort);            
       this.Engine = new EngineController(this.serialPort);
       this.Temperature = new TemperatureController(this.serialPort);
       this.Humidity = new HumidityController(this.serialPort);

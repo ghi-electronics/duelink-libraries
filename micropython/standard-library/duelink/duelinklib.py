@@ -12,7 +12,6 @@ from duelink.infrared import InfraredController
 from duelink.system import SystemController
 from duelink.servo import ServoController
 from duelink.spi import SpiController
-from duelink.touch import TouchController
 from duelink.engine import EngineController
 from duelink.deviceconfiguration import DeviceConfiguration
 from duelink.temperature import TemperatureController
@@ -40,7 +39,6 @@ class DUELinkController:
         self.Infrared = InfraredController(self.transport)
         self.Button = ButtonController(self.transport)
         self.Distance = DistanceSensorController(self.transport)        
-        self.Touch = TouchController(self.transport)        
         self.Engine = EngineController(self.transport)
         self.Temperature = TemperatureController(self.transport)
         self.Humidity = HudimityController(self.transport)

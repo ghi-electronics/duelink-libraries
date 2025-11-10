@@ -19,9 +19,9 @@ class SerialUSB {
             }
             // debug
             //if(this.portname === '') 
-            //    this.portname = "COM7"
-            //
-            //
+            //    this.portname = "COM27"
+            
+            
             if(this.portname === '') throw new Error("Device not found.");
             
             this.port = new SerialPort({ path: this.portname, baudRate: this.baudRate });
@@ -47,6 +47,11 @@ class SerialUSB {
         items.forEach(item => {
                 if(item.serialNumber && item.serialNumber.startsWith('DUE')){
                     selected = item.path;                
+                }
+                else {
+                    if(item.productId && item.productId.startsWith('F300')){
+                        selected = item.path;                
+                    }
                 }
             });
         return selected;

@@ -5,8 +5,8 @@ class PulseController:
         self.transport = serialPort
 
 
-    def Read(self, pin: int, state: int, timeout_ms: int)->int:                
-        cmd = f"PulseIn({pin}, {state}, {timeout_ms})"
+    def Read(self, pin: int, charge_t: int, charge_s: int, timeout: int)->int:                
+        cmd = "PulseIn({0}, {1}, {2}, {3})".format(pin, charge_t, charge_s, timeout)
         self.transport.WriteCommand(cmd)        
 
         r,s = self.transport.ReadResponse()

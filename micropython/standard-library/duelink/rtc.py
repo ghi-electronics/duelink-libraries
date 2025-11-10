@@ -33,7 +33,23 @@ class RtcController:
 
         ret = self.stream.ReadBytes("b9",rtc_timedate)
 
-        return ret    
+        return ret
+
+    def Alarm(self, rtc_timedate: bytes)->bool:
+        count = len(rtc_timedate)
+        # declare b9 array
+        cmd = f"dim b9[{count}]"
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
+
+        # write data to b9
+        self.stream.WriteBytes("b9",rtc_timedate)
+
+        # write b9 to rtc
+        self.transport.WriteCommand("RtcA(b9)")
+        r,s = self.transport.ReadResponse()
+
+        return r
         
         
 

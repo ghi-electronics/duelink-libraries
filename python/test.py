@@ -6,6 +6,41 @@ import time
 from array import array
 
 
+import math
+
+def calculate_frequency(note_name, octave, a4_freq=440):
+    """
+    Calculates the frequency of a musical note.
+
+    Args:
+        note_name (str): The name of the note (e.g., 'C', 'C#', 'D', 'A').
+        octave (int): The octave number of the note (e.g., 4 for A4).
+        a4_freq (float): The reference frequency for A4 (default is 440 Hz).
+
+    Returns:
+        float: The calculated frequency in Hz.
+    """
+    notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    
+    # Calculate the semitone index relative to C0
+    note_index = notes.index(note_name.upper())
+    semitones_from_c0 = note_index + (octave * 12)
+
+    # Calculate semitones from A4 (A4 is the 49th semitone from C0)
+    semitones_from_a4 = semitones_from_c0 - 57
+
+    frequency = a4_freq * (2**(semitones_from_a4 / 12))
+    return frequency
+
+c4_freq = calculate_frequency('C', 4)
+print(f"Frequency of C4: {c4_freq:.2f} Hz")
+
+a4_freq_calculated = calculate_frequency('A', 4)
+print(f"Frequency of A4: {a4_freq_calculated:.2f} Hz")
+
+e5_freq = calculate_frequency('E', 5)
+print(f"Frequency of E5: {e5_freq:.2f} Hz")
+
 
 availablePort = DUELinkController.GetConnectionPort()
 duelink = DUELinkController(availablePort)

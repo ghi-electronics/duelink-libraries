@@ -51,7 +51,7 @@ namespace GHIElectronics.DUELink {
         public ButtonController Button { get; internal set; }
         public DistanceSensorController Distance { get; internal set; }
         public GraphicsController Graphics { get; internal set; }
-        public TouchController Touch { get; internal set; }
+        //public TouchController Touch { get; internal set; }
         public EngineController Engine { get; internal set; }
         public TemperatureController Temperature { get; internal set; }
         public HumidityController Humidity { get; internal set; }
@@ -89,7 +89,7 @@ namespace GHIElectronics.DUELink {
             this.Infrared = new InfraredController(this.serialPort);             
             this.Button = new ButtonController(this.serialPort);
             this.Distance = new DistanceSensorController(this.serialPort);            
-            this.Touch = new TouchController(this.serialPort);            
+            //this.Touch = new TouchController(this.serialPort);            
             this.Engine = new EngineController(this.serialPort);
             this.Temperature = new TemperatureController(this.serialPort);
             this.Humidity = new HumidityController(this.serialPort);

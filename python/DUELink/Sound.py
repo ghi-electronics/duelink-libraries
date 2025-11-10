@@ -59,4 +59,34 @@ class SoundController:
         self.transport.WriteCommand(cmd)
         res = self.transport.ReadResponse()
         return res.success
+    
+    def Wave(self, pin: int, buffer: bytes, offset: int, count: int, freq:int, delay_us:int ) -> bool:
+        
+        # declare a9 array
+        count = len(buffer)
+        # declare a9 array
+        cmd = f"dim b9[{count}]"
+        self.transport.WriteCommand(cmd)
+        self.transport.ReadResponse()
+
+        # write data to a9
+        ret = self.stream.WriteBytes("b9",buffer)
+
+        # write a9 
+        cmd = f"Wave({pin},b9, {offset}, {count}, {freq}, {delay_us})"
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
+
+        return ret.success
+    
+    def Sweep(self, pin: int, freq_start: int, freq_end: int, vol_start: int, vol_end:int, delay:int ) -> bool:            
+
+        # write a9
+        cmd = f"Sweep({pin}, {freq_start}, {freq_end}, {vol_start}, {vol_end}, {delay})"
+        self.transport.WriteCommand(cmd)
+        ret = self.transport.ReadResponse()
+
+        return ret.success
+        
+    
         

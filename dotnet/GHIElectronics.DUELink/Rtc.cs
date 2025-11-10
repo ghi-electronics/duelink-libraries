@@ -65,15 +65,24 @@ namespace GHIElectronics.DUELink {
                 return ret;
             }
 
-            //public string ReadFmt() {
-            //    this.serialPort.WriteCommand("RtcR(0)");
+            public bool Alarm(byte[] rtc_timedate) {
 
-            //    var ret = this.serialPort.ReadResponse();
 
-            //    return ret.response;
+                var cmd = $"dim b9[{rtc_timedate.Length}]";
+                this.serialPort.WriteCommand(cmd);
+                this.serialPort.ReadResponse();
 
-            //}
-            
+                var written = this.stream.WriteBytes("b9", rtc_timedate);
+
+                cmd = "RtcA(b9)";
+                this.serialPort.WriteCommand(cmd);
+
+                var ret = this.serialPort.ReadResponse();
+
+                return ret.success;
+
+            }
+
         }
     }
 }

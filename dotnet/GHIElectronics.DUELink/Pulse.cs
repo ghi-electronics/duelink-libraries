@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,11 +12,8 @@ namespace GHIElectronics.DUELink {
 
             public PulseController(SerialInterface serialPort) => this.serialPort = serialPort;
 
-            public int Read(int pin, int state, TimeSpan timeout) {
-                if (pin < 0 || pin >= this.serialPort.DeviceConfig.MaxPinIO)
-                    throw new ArgumentOutOfRangeException("Invalid pin.");
-
-;               var cmd = string.Format("PulseIn({0},{1},{2})", pin, state, timeout.TotalMinutes.ToString());
+            public int Read(int pin, int charge_t, int charge_s, int timeout) { 
+                var cmd = $"PulseIn({pin}, {charge_t}, {charge_s}, {timeout})";
 
                 this.serialPort.WriteCommand(cmd);
 

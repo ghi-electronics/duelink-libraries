@@ -43,6 +43,11 @@ class SerialUSB {
                 if(item.serialNumber && item.serialNumber.startsWith('DUE')){
                     selected = item.path;                
                 }
+                else {
+                    if(item.productId && item.productId.startsWith('F300')){
+                        selected = item.path;                
+                    }
+                }
             });
         return selected;
     }
