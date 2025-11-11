@@ -4,11 +4,7 @@ version 1 0
 description 'DUELink base library used by all other DUELink libraries.
 
 Handles daisylink communications via I2C or serial (UART).
-
-
 By default, this library uses serial over the Downlink port on DUELink boards and I2C on other boards but that can be changed by using the advanced "DUELink useI2C" block.
-
-
 
 See https://www.duelink.com/docs/engine/stdlib
 
