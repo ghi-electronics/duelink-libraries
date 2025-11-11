@@ -1,6 +1,6 @@
 module 'DUELink Comm' Comm
 author 'GHI Electronics'
-version 0 9 
+version 1 0 
 description 'DUELink base library used by all other DUELink libraries.
 
 Handles daisylink communications via I2C or serial (UART).
