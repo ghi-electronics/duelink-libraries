@@ -19,12 +19,13 @@ variables _dueUseI2C _dueReadTimeout
   space
   space
   spec ' ' 'due_select_device' 'select device _' 'auto' 1
-  spec 'r' 'due_runWithResult' 'write command _ returns string' 'str' 'version()'
-  spec ' ' 'due_run' 'write command _' 'str' 'statled(100,100,10)'
+  spec 'r' 'due_device_PID' 'device PID'
+  spec 'r' 'due_device_version' 'device version'
+  spec 'r' 'due_runWithResult' 'write command _ returns string' 'str' 'version()'  
   spec 'r' 'due_write_command' 'write command _ returns number' 'auto' 'dread(1,2)'
-  spec ' ' 'due_set_statled' 'set STAT LED to high _ (ms), low _ (ms), count _' 'auto auto auto' 100 100 10
-  spec 'r' 'device PID' 'device PID'
-  spec 'r' 'device version' 'device version'
+  spec ' ' 'due_run' 'write command _' 'str' 'statled(100,100,10)' 
+  spec 'r' 'due_make_command' 'make command _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'version' 123 nil nil nil nil nil nil nil 'nil'
+  spec ' ' 'due_set_statled' 'set STAT LED to high _ ms, low _ ms, count _' 'auto auto auto' 100 100 10
   advanced
   spec ' ' 'due_setReadTimeout' 'set response timeout _ milliseconds' 'auto' 1000
   spec ' ' 'due_useI2C' 'DUELink useI2C _' 'bool' true
@@ -42,12 +43,12 @@ variables _dueUseI2C _dueReadTimeout
   spec ' ' 'due_exec' 'run'
   space
   space
-  spec ' ' 'due_otpw' 'OTP write address _ data _' 'auto auto' 0 '1,2,3,4,5,6,7,8'
-  spec 'r' 'due_otpr' 'OTP read address _' 'auto' 0
+  spec ' ' '_due_otpw' 'OTP write address _ data _' 'auto auto' 0 '1,2,3,4,5,6,7,8'
+  spec 'r' '_due_otpr' 'OTP read address _' 'auto' 0
   space
   space
   spec ' ' '_due_stream_write_bytes' 'stream write to _ data _' 'auto auto' 'b1' '1,2,3'
-  spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'auto auto' 'b1' 3 
+  spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'auto auto' 'b1' 3  
 
 to '_due send raw' s {
   '_due_init'
@@ -213,22 +214,34 @@ to '_due_templateWith' s optionalArgs {
   return ('[data:joinStrings]' result)
 }
 
-to 'device PID' {
-  return (due_write_command 'info(0)')
-}
-
-to 'device version' {
-  return (due_write_command 'info(1)')
-}
-
 to due_connected {
   '_due_send' ('[data:unicodeString]' 27)
   local 'n' ('[data:convertType]' (random 1 9) 'string')
   return ((due_runWithResult n) == n)
 }
 
+to due_device_PID {
+  return (due_write_command 'info(0)')
+}
+
+to due_device_version {
+  return (due_write_command 'info(1)')
+}
+
 to due_exec {
   due_run 'run'
+}
+
+to due_make_command s optionalArgs args args args args args args args args args args args {
+  local 'result' ('[data:makeList]')
+  '[data:addLast]' s result
+  '[data:addLast]' '(' result
+  for i 7 {
+    if ((argOrDefault (i + 1) '') != '') {'[data:addLast]' (argOrDefault (i + 1) '') result}
+    if ((argOrDefault (i + 2) '') != '') {'[data:addLast]' ',' result}
+  }
+  '[data:addLast]' ')' result
+  return ('[data:joinStrings]' result)
 }
 
 to due_otpr address {
