@@ -23,7 +23,7 @@ variables _dueUseI2C _dueReadTimeout
   spec 'r' 'due_make_command' 'build command _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'version' nil nil nil nil nil nil nil nil 'nil'
   spec ' ' 'due_run' 'write command _' 'str' 'statled(100,100,10)'
   spec 'r' 'due_write_command' 'write command _ returns number' 'auto' 'dread(1,2)'
-  spec 'r' 'due_runWithResult' 'write command _ returns string' 'str' 'version()'
+  spec 'r' 'due_runWithResult' 'write command _ returns string' 'str' 'version()'  
   space
   space
   spec 'r' 'due_device_PID' 'device PID'
@@ -236,11 +236,37 @@ to due_exec {
 
 to due_make_command s optionalArgs args args args args args args args args args args args {
   local 'result' ('[data:makeList]')
+  local 'str' (booleanConstant false)
+  local 'arr' (booleanConstant false)
   '[data:addLast]' s result
   '[data:addLast]' '(' result
   for i 7 {
-    if ((argOrDefault (i + 1) '') != '') {'[data:addLast]' (argOrDefault (i + 1) '') result}
-    if ((argOrDefault (i + 2) '') != '') {'[data:addLast]' ',' result}
+    str = (booleanConstant false)
+    arr = (booleanConstant false)
+    if ((argOrDefault (i + 1) '') != '') {
+      comment 'check if string and ['
+      if (isType (argOrDefault (i + 1) '') 'string') {
+        str = (booleanConstant true)
+        if (('[data:unicodeAt]' 1 (argOrDefault (i + 1) '')) == ('[data:unicodeAt]' 1 '[')) {
+          comment 'Dont add "'
+          arr = (booleanConstant true)
+        } else {
+          '[data:addLast]' '"' result
+        }
+      }
+      '[data:addLast]' (argOrDefault (i + 1) '') result
+      comment 'if this is a string then add "'
+      if str {
+        if arr {
+          comment 'Dont add "'
+        } else {
+          '[data:addLast]' '"' result
+        }
+      }
+    }
+    if ((argOrDefault (i + 2) '') != '') {
+      '[data:addLast]' ',' result
+    }
   }
   '[data:addLast]' ')' result
   return ('[data:joinStrings]' result)
