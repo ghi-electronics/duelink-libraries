@@ -2,7 +2,7 @@ module 'DUELink Digital'
 author 'GHI Electronics'
 version 0 9 
 depends 'DUELink Comm' 
-description 'DUELink.Digital Library
+description 'DUELink Digital Library
 
 '
 
