@@ -1,15 +1,15 @@
-module 'DUELink.Infrared'
+module 'DUELink Infrared'
 author 'GHI Electronics'
 version 0 9 
 depends 'DUELink Comm' 
 description 'DUELink Infrared Library'
 
-  spec 'r' 'due_irread' 'Infrared read'
-  spec ' ' 'due_irwrite' 'Infrared write command _' 'auto' 1
-  spec ' ' 'due_irenable' 'Infrared enable tx pin _ rx pin _' 'auto auto' 5 3
+  spec 'r' 'due_irread' 'infrared read'
+  spec ' ' 'due_irwrite' 'infrared write command _' 'auto' 1
+  spec ' ' 'due_irenable' 'infrared enable tx pin _ rx pin _' 'auto auto' 5 3
 
 to due_irenable tx rx {
-  due_run ('_due_templateWith' 'IrEn(%,%)' tx rx)
+  due_run ('due_make_command' 'IrEn' tx rx)
 }
 
 to due_irread {
@@ -17,6 +17,6 @@ to due_irread {
 }
 
 to due_irwrite cmd {
-  due_run ('_due_templateWith' 'IrWrite(%)' cmd)
+  due_run ('due_make_command' 'IrWrite' cmd)
 }
 
