@@ -248,11 +248,11 @@ to due_make_command s optionalArgs args args args args args args args args args 
   local 'arr' (booleanConstant false)
   '[data:addLast]' s result
   '[data:addLast]' '(' result
-  for i 7 {
+  for i 8 {
     str = (booleanConstant false)
     arr = (booleanConstant false)
     if ((argOrDefault (i + 1) '') != '') {
-      comment 'check if string and ['
+      comment 'check if string and "'
       if (isType (argOrDefault (i + 1) '') 'string') {
         str = (booleanConstant true)
         if (('[data:unicodeAt]' 1 (argOrDefault (i + 1) '')) == ('[data:unicodeAt]' 1 '[')) {
@@ -261,14 +261,41 @@ to due_make_command s optionalArgs args args args args args args args args args 
         } else {
           '[data:addLast]' '"' result
         }
+      } else {
+        comment 'check if array and ['
+        if (isType (argOrDefault (i + 1) '') 'byte array') {
+          '[data:addLast]' '[' result
+        } else {
+          comment 'check if list and {'
+          if (isType (argOrDefault (i + 1) '') 'list') {
+            '[data:addLast]' '{' result
+          }
+        }
       }
-      '[data:addLast]' (argOrDefault (i + 1) '') result
+      if (isType (argOrDefault (i + 1) '') 'list') {
+        local 'arg_list' (argOrDefault (i + 1) '')
+        for x (size arg_list) {
+          '[data:addLast]' (at x arg_list) result
+        }
+      } else {
+        '[data:addLast]' (argOrDefault (i + 1) '') result
+      }
       comment 'if this is a string then add "'
       if str {
         if arr {
           comment 'Dont add "'
         } else {
           '[data:addLast]' '"' result
+        }
+      } else {
+        comment 'check if array and ['
+        if (isType (argOrDefault (i + 1) '') 'byte array') {
+          '[data:addLast]' ']' result
+        } else {
+          comment 'check if list and {'
+          if (isType (argOrDefault (i + 1) '') 'list') {
+            '[data:addLast]' '}' result
+          }
         }
       }
     }
