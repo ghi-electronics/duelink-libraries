@@ -1,12 +1,12 @@
-module 'DUELink.Temperature'
+module 'DUELink Temperature'
 author 'GHI Electronics'
 version 0 9 
 depends 'DUELink Comm'
 description 'DUELink Temperature Library'
 
-  spec 'r' 'due_tempread' 'Read temperature on pin _ type _' 'auto auto' 18 4
+  spec 'r' 'due_tempread' 'read temperature on pin _ type _' 'auto auto' 18 4
 
 to due_tempread pin type {
-  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'Temp(%,%)' pin type)) 'number')
+  return ('[data:convertType]' (due_runWithResult ('due_make_command' 'Temp' pin type)) 'number')
 }
 
