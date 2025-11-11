@@ -23,7 +23,7 @@ variables _dueUseI2C _dueReadTimeout
   spec 'r' 'due_make_command' 'build command _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'version' nil nil nil nil nil nil nil nil 'nil'
   spec ' ' 'due_run' 'write command _' 'str' 'statled(100,100,10)'
   spec 'r' 'due_write_command' 'write command _ returns number' 'auto' 'dread(1,2)'
-  spec 'r' 'due_runWithResult' 'write command _ returns string' 'str' 'version()'  
+  spec 'r' 'due_runWithResult' 'write command _ returns string' 'str' 'version()'
   space
   space
   spec 'r' 'due_device_PID' 'device PID'
@@ -50,7 +50,7 @@ variables _dueUseI2C _dueReadTimeout
   space
   space
   spec ' ' '_due_stream_write_bytes' 'stream write to _ data _' 'auto auto' 'b1' '1,2,3'
-  spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'auto auto' 'b1' 3  
+  spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'auto auto' 'b1' 3
 
 to '_due send raw' s {
   '_due_init'
