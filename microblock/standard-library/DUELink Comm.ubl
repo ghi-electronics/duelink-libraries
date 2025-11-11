@@ -20,10 +20,9 @@ variables _dueUseI2C _dueReadTimeout
   space
   spec ' ' 'due_select_device' 'select device _' 'auto' 1
   spec 'r' 'due_device_PID' 'device PID'
-  spec 'r' 'due_device_version' 'device version'
-  spec 'r' 'due_runWithResult' 'write command _ returns string' 'str' 'version()'  
+  spec 'r' 'due_runWithResult' 'write command _ returns string' 'str' 'version()'
   spec 'r' 'due_write_command' 'write command _ returns number' 'auto' 'dread(1,2)'
-  spec ' ' 'due_run' 'write command _' 'str' 'statled(100,100,10)' 
+  spec ' ' 'due_run' 'write command _' 'str' 'statled(100,100,10)'
   spec 'r' 'due_make_command' 'make command _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'version' 123 nil nil nil nil nil nil nil 'nil'
   spec ' ' 'due_set_statled' 'set STAT LED to high _ ms, low _ ms, count _' 'auto auto auto' 100 100 10
   advanced
@@ -48,7 +47,8 @@ variables _dueUseI2C _dueReadTimeout
   space
   space
   spec ' ' '_due_stream_write_bytes' 'stream write to _ data _' 'auto auto' 'b1' '1,2,3'
-  spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'auto auto' 'b1' 3  
+  spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'auto auto' 'b1' 3
+  spec 'r' 'due_device_version' 'device version'
 
 to '_due send raw' s {
   '_due_init'
@@ -225,7 +225,7 @@ to due_device_PID {
 }
 
 to due_device_version {
-  return (due_write_command 'info(1)')
+  return (due_write_command '100*info(1)')
 }
 
 to due_exec {
