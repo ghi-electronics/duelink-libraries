@@ -10,10 +10,10 @@ description 'DUELink.Digital Library
   spec 'r' 'due_dread' 'read pin _ pull _' 'num num' 1 0
 
 to due_dread pin pull {
-  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'dread(%,%)' pin pull)) 'number')
+  return ('[data:convertType]' (due_runWithResult (due_make_command 'dread' pin pull)) 'number')
 }
 
 to due_dwrite pin onOff {
-  due_run ('_due_templateWith' 'dwrite(%,%)' pin onOff)
+  due_run (due_make_command 'dwrite' pin onOff)
 }
 

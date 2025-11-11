@@ -1,4 +1,4 @@
-module 'DUELink.Analog'
+module 'DUELink Analog'
 author 'GHI Electronics'
 version 0 9 
 depends 'DUELink Comm' 
@@ -8,17 +8,17 @@ description 'DUELink.Analog Library
 
 '
 
-  spec ' ' 'due_awrite' 'Analog write pin _ pwm _ %' 'num auto' 1 10
-  spec 'r' 'due_readvcc' 'Read vcc (mA)'
-  spec 'r' 'due_vread' 'Volt read (mA) on pin _' 'num' 1
-  spec 'r' 'due_aread' 'Analog read pin _' 'auto' 1
+  spec ' ' 'due_awrite' 'analog write pin _ pwm _ %' 'num auto' 1 10
+  spec 'r' 'due_readvcc' 'read vcc (mA)'
+  spec 'r' 'due_vread' 'volt read (mA) on pin _' 'num' 1
+  spec 'r' 'due_aread' 'analog read pin _' 'auto' 1
 
 to due_aread pin {
-  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'aread(%)' pin)) 'number')
+  return ('[data:convertType]' (due_runWithResult (due_make_command 'aread' pin)) 'number')
 }
 
 to due_awrite pin pwm {
-  due_run ('_due_templateWith' 'awrite(%,%/100)' pin pwm)
+  due_run ('[data:join]' 'awrite' '(' pin ',' pwm '/' '100' ')')
 }
 
 to due_readvcc {
@@ -26,6 +26,6 @@ to due_readvcc {
 }
 
 to due_vread pin {
-  return ('[data:convertType]' (due_runWithResult ('_due_templateWith' '1000*vread(%)' pin)) 'number')
+  return ('[data:convertType]' (due_runWithResult (due_make_command '1000*vread' pin)) 'number')
 }
 
