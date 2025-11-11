@@ -1,4 +1,4 @@
-module 'DUELink.Digital'
+module 'DUELink Digital'
 author 'GHI Electronics'
 version 0 9 
 depends 'DUELink Comm' 
@@ -6,8 +6,8 @@ description 'DUELink.Digital Library
 
 '
 
-  spec ' ' 'due_dwrite' 'Write pin _ on _' 'num bool' 1 true
-  spec 'r' 'due_dread' 'Read pin _ pull _' 'num num' 1 0
+  spec ' ' 'due_dwrite' 'write pin _ on _' 'num bool' 1 true
+  spec 'r' 'due_dread' 'read pin _ pull _' 'num num' 1 0
 
 to due_dread pin pull {
   return ('[data:convertType]' (due_runWithResult ('_due_templateWith' 'dread(%,%)' pin pull)) 'number')
