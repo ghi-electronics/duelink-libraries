@@ -8,10 +8,10 @@ description 'DUELink Analog Library
 
 '
 
-  spec ' ' 'due_awrite' 'analog write pin _ pwm _ %' 'num auto' 1 10
+  spec ' ' 'due_awrite' 'analog write pin _ dutycyle _ %' 'num auto' 1 10
   spec 'r' 'due_readvcc' 'read vcc (mA)'
-  spec 'r' 'due_vread' 'volt read (mA) on pin _' 'num' 1
-  spec 'r' 'due_aread' 'analog read pin _' 'auto' 1
+  spec 'r' 'due_vread' 'volt read on pin _ (mA)' 'num' 1
+  spec 'r' 'due_aread' 'analog read pin _ (0-4095)' 'auto' 1
 
 to due_aread pin {
   return ('[data:convertType]' (due_runWithResult (due_make_command 'aread' pin)) 'number')
