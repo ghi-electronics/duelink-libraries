@@ -28,21 +28,26 @@ variables _dueUseI2C _dueReadTimeout
   advanced
   spec ' ' 'due_setReadTimeout' 'set response timeout _ ms' 'auto' 1000
   spec ' ' 'due_useI2C' 'DUELink useI2C _' 'bool' true
+  space
+  space
+  spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'menu.due_combx auto' 'b1' 3
+  space
+  space
+  spec ' ' 'due_stop' 'stop'
+  spec ' ' 'due_exec' 'run'
+  space
+  space
   spec ' ' '_due_init' '_due_init'  
   spec ' ' '_due_send' '_due send _' 'str'
   spec ' ' '_due send raw' '_due send raw _' 'auto' '10'
   spec 'r' '_due_awaitResult' '_due await result'
   spec 'r' '_due_awaitResultI2C' '_due await result (I2C)'
   spec 'r' '_due_endsWithPrompt' '_due byte array ends with prompt _' 'str'
-  spec 'r' '_due_readResponse' 'read response'
-  space
-  space
-  spec ' ' 'due_stop' 'stop'
-  spec ' ' 'due_exec' 'run'
+  spec 'r' '_due_readResponse' '_read response'
   space
   space  
-  spec ' ' '_due_stream_write_bytes' 'stream write to _ data _' 'auto auto' 'b1' '1,2,3'
-  spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'menu.due_combx auto' 'b1' 3
+  spec ' ' '_due_stream_write_bytes' '_stream write to _ data _' 'auto auto' 'b1' '1,2,3'
+  
 
 to '_due send raw' s {
   '_due_init'
