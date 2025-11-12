@@ -1,6 +1,6 @@
 module 'DUELink FileSystem'
 author 'GHI Elelctronics'
-version 1 0 
+version 0 11 
 depends 'DUELink Daisylink' 
 choices due_fstype 'SD/uSD' USB 
 choices due_fsmode read write append 

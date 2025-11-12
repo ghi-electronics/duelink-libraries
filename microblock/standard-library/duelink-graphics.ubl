@@ -1,6 +1,6 @@
 module 'DUELink Graphics'
 author 'GHI Electronics'
-version 1 0 
+version 0 11 
 depends 'DUELink Daisylink' 
 choices due_gfxtype none I2C SPI NeoPixel 'LED matrix scanner' 'LED matrix list' ePaper 
 description 'DUELink Graphics Library'
