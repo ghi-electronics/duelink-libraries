@@ -272,6 +272,9 @@ to due_make_command s optionalArgs args args args args args args args args args 
         local 'arg_list' (argOrDefault (i + 1) '')
         for x (size arg_list) {
           '[data:addLast]' (at x arg_list) result
+          if (x < (size arg_list)) {
+            '[data:addLast]' ',' result
+          }
         }
       } else {
         '[data:addLast]' (argOrDefault (i + 1) '') result
