@@ -51,22 +51,22 @@ to due_fill color x y width height {
 to due_gfxcfg type cfg width height mode {
   comment 'Default values come from OLED 096'
   local 't' 1
-  if (type == 'none') {
+  if (type == ('[data:toString]' 'none')) {
     t = 0
   }
-  if (type == 'SPI') {
+  if (type == ('[data:toString]' 'SPI')) {
     t = 2
   }
-  if (type == 'NeoPixel') {
+  if (type == ('[data:toString]' 'NeoPixel')) {
     t = 3
   }
-  if (type == 'LED matrix scanner') {
+  if (type == ('[data:toString]' 'LED matrix scanner')) {
     t = 4
   }
-  if (type == 'LED matrix list') {
+  if (type == ('[data:toString]' 'LED matrix list')) {
     t = 5
   }
-  if (type == 'ePaper') {
+  if (type == ('[data:toString]' 'ePaper')) {
     t = 6
   }
   if (isType cfg 'list') {

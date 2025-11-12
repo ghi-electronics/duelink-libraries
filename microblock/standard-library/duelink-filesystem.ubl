@@ -41,7 +41,7 @@ to due_fsfind path {
 
 to due_fsformat type cs {
   local 't' 1
-  if (type == 'USB') {
+  if (type == ('[data:toString]' 'USB')) {
     t = 2
   }
   return ('[data:convertType]' (due_returnStr (due_make_command 'FsFmt' t cs 8000)) 'number')
@@ -49,18 +49,18 @@ to due_fsformat type cs {
 
 to due_fsmount type cs {
   local 't' 1
-  if (type == 'USB') {
+  if (type == ('[data:toString]' 'USB')) {
     t = 2
   }
-  return ('[data:convertType]' (due_returnStr (due_make_command 'FsMnt' t cs 8000 10)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsMnt' t cs 8000 4)) 'number')
 }
 
 to due_fsopen path mode {
   local 'm' 1
-  if (mode == 'write') {
+  if (mode == ('[data:toString]' 'write')) {
     m = 10
   }
-  if (mode == 'append') {
+  if (mode == ('[data:toString]' 'append')) {
     m = 48
   }
   return ('[data:convertType]' (due_returnStr (due_make_command 'FsOpen' path m)) 'number')

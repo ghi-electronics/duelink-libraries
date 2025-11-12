@@ -7,21 +7,21 @@ description 'DUELink Button Library'
   spec 'r' 'due_btndown' 'button down on pin _' 'num' 1
   spec 'r' 'due_btnup' 'button up on pin _' 'num' 1
   spec 'r' 'due_btnread' 'button read on pin _' 'num' 1
-  spec ' ' 'due_btnen' 'button enable on pin _ state _' 'num auto' 1 0
+  spec ' ' 'due_btnen' 'button enable on pin _ state _' 'num bool' 1 true
 
 to due_btndown pin {
-  return ('[data:convertType]' (due_returnStr ('due_make_command' 'btndown' pin)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'btndown' pin)) 'number')
 }
 
 to due_btnen pin state {
-  due_run ('due_make_command' 'btnen' pin state)
+  due_run (due_make_command 'btnen' pin state)
 }
 
 to due_btnread pin {
-  return ('[data:convertType]' (due_returnStr ('due_make_command' 'btnread' pin)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'btnread' pin)) 'number')
 }
 
 to due_btnup pin {
-  return ('[data:convertType]' (due_returnStr ('due_make_command' 'btnup' pin)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'btnup' pin)) 'number')
 }
 

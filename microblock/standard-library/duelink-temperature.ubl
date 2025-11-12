@@ -9,16 +9,16 @@ description 'DUELink Temperature Library'
 
 to due_tempread pin type {
   local 't' 4
-  if (t == 'CPU temperature') {
+  if (t == ('[data:toString]' 'CPU temperature')) {
     t = 0
   }
-  if (t == 'DHT11') {
+  if (t == ('[data:toString]' 'DHT11')) {
     t = 1
   }
-  if (t == 'DHT12') {
+  if (t == ('[data:toString]' 'DHT12')) {
     t = 2
   }
-  if (t == 'DHT21') {
+  if (t == ('[data:toString]' 'DHT21')) {
     t = 3
   }
   return ('[data:convertType]' (due_returnStr (due_make_command 'Temp' pin t)) 'number')
