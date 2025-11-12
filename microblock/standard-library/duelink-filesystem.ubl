@@ -56,7 +56,14 @@ to due_fsmount type cs {
 }
 
 to due_fsopen path mode {
-  return ('[data:convertType]' (due_returnStr (due_make_command 'FsOpen' path mode)) 'number')
+  local 'm' 1
+  if (mode == 'write') {
+    m = 10
+  }
+  if (mode == 'append') {
+    m = 48
+  }
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsOpen' path m)) 'number')
 }
 
 to due_fsread handle count {
@@ -78,7 +85,11 @@ to due_fstell handle {
 }
 
 to due_fswrite handle data {
-  return ('[data:convertType]' (due_returnStr ('[data:join]' 'FsWrite(' handle ',' '[' data ']' ')')) 'number')
+  if (isType data 'list') {
+    return 0
+  } else {
+    return ('[data:convertType]' (due_returnStr ('[data:join]' 'FsWrite(' handle ',' '[' data ']' ')')) 'number')
+  }
 }
 
 to due_fusnmount {
