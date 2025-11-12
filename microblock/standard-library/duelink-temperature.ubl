@@ -1,12 +1,26 @@
 module 'DUELink Temperature'
 author 'GHI Electronics'
 version 1 0 
-depends 'DUELink Comm'
+depends 'DUELink Comm' 
+choices due_ttype 'CPU temperature' DHT11 DHT12 DHT21 DHT22 
 description 'DUELink Temperature Library'
 
-  spec 'r' 'due_tempread' 'read temperature on pin _ type _' 'auto auto' 18 4
+  spec 'r' 'due_tempread' 'read temperature on pin _ type _ (x10)' 'auto menu.due_ttype' 18 'DHT22'
 
 to due_tempread pin type {
-  return ('[data:convertType]' (due_runWithResult ('due_make_command' 'Temp' pin type)) 'number')
+  local 't' 4
+  if (t == 'CPU temperature') {
+    t = 0
+  }
+  if (t == 'DHT11') {
+    t = 1
+  }
+  if (t == 'DHT12') {
+    t = 2
+  }
+  if (t == 'DHT21') {
+    t = 3
+  }
+  return ('[data:convertType]' (due_runWithResult (due_make_command 'Temp' pin t)) 'number')
 }
 

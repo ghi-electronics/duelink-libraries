@@ -2,13 +2,13 @@ module 'DUELink Digital'
 author 'GHI Electronics'
 version 1 0 
 depends 'DUELink Comm' 
-choices pinpull none up down 
+choices due_pinpull none up down 
 description 'DUELink Digital Library
 
 '
 
   spec ' ' 'due_dwrite' 'write pin _ on _' 'num bool' 1 true
-  spec 'r' 'due_dread' 'read pin _ pull _' 'num menu.pinpull' 1 'none'
+  spec 'r' 'due_dread' 'read pin _ pull _' 'num menu.due_pinpull' 1 'none'
 
 to due_dread pin pull {
   local 'p' 0
