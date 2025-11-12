@@ -12,8 +12,8 @@ See https://www.duelink.com/docs/engine/stdlib
 '
 variables _dueUseI2C _dueReadTimeout 
 
-  spec ' ' 'due_select_device' 'select device _' 'auto' 1
   spec 'r' 'due_connected' 'DUELink connected?'
+  spec ' ' 'due_select_device' 'select device _' 'auto' 1  
   spec ' ' 'due_set_statled' 'set STAT LED to high _ ms, low _ ms, count _' 'auto auto auto' 100 100 10
   space
   space
@@ -28,8 +28,7 @@ variables _dueUseI2C _dueReadTimeout
   advanced
   spec ' ' 'due_setReadTimeout' 'set response timeout _ ms' 'auto' 1000
   spec ' ' 'due_useI2C' 'DUELink useI2C _' 'bool' true
-  spec ' ' '_due_init' '_due_init'
-  spec 'r' '_due_templateWith' '_due_template _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'test(%)' 123
+  spec ' ' '_due_init' '_due_init'  
   spec ' ' '_due_send' '_due send _' 'str'
   spec ' ' '_due send raw' '_due send raw _' 'auto' '10'
   spec 'r' '_due_awaitResult' '_due await result'
@@ -41,11 +40,7 @@ variables _dueUseI2C _dueReadTimeout
   spec ' ' 'due_stop' 'stop'
   spec ' ' 'due_exec' 'run'
   space
-  space
-  spec ' ' '_due_otpw' 'OTP write address _ data _' 'auto auto' 0 '1,2,3,4,5,6,7,8'
-  spec 'r' '_due_otpr' 'OTP read address _' 'auto' 0
-  space
-  space
+  space  
   spec ' ' '_due_stream_write_bytes' 'stream write to _ data _' 'auto auto' 'b1' '1,2,3'
   spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'menu.due_combx auto' 'b1' 3
 
@@ -145,14 +140,6 @@ to '_due_init' {
   }
 }
 
-to '_due_otpr' address {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'OtpR' address)) 'number')
-}
-
-to '_due_otpw' address data {
-  due_run ('[data:join]' 'OtpW(' address ',[' data '])')
-}
-
 to '_due_readResponse' {
   return ('_due_awaitResult')
 }
@@ -208,17 +195,6 @@ to '_due_stream_write_bytes' 'array name' data {
   }
   if ('[data:convertType]' ('_due_readResponse') 'number') {
   }
-}
-
-to '_due_templateWith' s optionalArgs {
-  local 'parts' ('[data:split]' s '%')
-  local 'result' ('[data:makeList]')
-  for i ((size parts) - 1) {
-    '[data:addLast]' (at i parts) result
-    '[data:addLast]' (argOrDefault (i + 1) '') result
-  }
-  '[data:addLast]' (at 'last' parts) result
-  return ('[data:joinStrings]' result)
 }
 
 to due_connected {
