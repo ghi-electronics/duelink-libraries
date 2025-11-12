@@ -1,4 +1,4 @@
-module 'DUELink Comm' Comm
+module 'DUELink Daisylink' Comm
 author 'GHI Electronics'
 version 1 0 
 choices due_combx b0 b1 b2 b3 b4 b5 b6 b7 
