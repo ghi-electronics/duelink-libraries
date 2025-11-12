@@ -1,7 +1,7 @@
 module 'DUELink Humidity'
 author 'GHI Electronics'
 version 1 0 
-depends 'DUELink Comm' 
+depends 'DUELink Daisylink' 
 choices due_htype DHT11 DHT12 DHT21 DHT22 
 description 'DUELink Humidity Library'
 

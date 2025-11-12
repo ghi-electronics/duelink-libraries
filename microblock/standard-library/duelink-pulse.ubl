@@ -1,7 +1,7 @@
 module 'DUELink Pulse'
 author 'GHI Electronics'
 version 1 0 
-depends 'DUELink Comm' 
+depends 'DUELink Daisylink' 
 description 'DUELink Pulse Library'
 
   spec 'r' 'due_pulsein' 'read pulse pin _ charge _ (us) state _ timeout _ (ms)' 'auto num bool auto' 1 1000 true 100

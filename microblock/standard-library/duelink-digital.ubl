@@ -1,7 +1,7 @@
 module 'DUELink Digital'
 author 'GHI Electronics'
 version 1 0 
-depends 'DUELink Comm' 
+depends 'DUELink Daisylink' 
 choices due_pinpull none up down 
 description 'DUELink Digital Library
 

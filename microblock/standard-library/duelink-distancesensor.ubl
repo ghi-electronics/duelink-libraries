@@ -1,7 +1,7 @@
 module 'DUELink DistanceSensor'
 author 'GHI Electronics'
 version 1 0 
-depends 'DUELink Comm' 
+depends 'DUELink Daisylink' 
 description 'DUELink Distance Library'
 
   spec 'r' 'due_dist' 'read distance(mm) on pulse pin _ echo pin _' 'auto auto' 3 4

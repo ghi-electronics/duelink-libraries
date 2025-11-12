@@ -1,7 +1,7 @@
 module 'DUELink Button'
 author 'GHI Electronics'
 version 1 0 
-depends 'DUELink Comm' 
+depends 'DUELink Daisylink' 
 description 'DUELink Button Library'
 
   spec 'r' 'due_btndown' 'button down on pin _' 'num' 1

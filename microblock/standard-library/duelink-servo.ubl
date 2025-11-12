@@ -1,7 +1,7 @@
 module 'DUELink Servo'
 author 'GHI Electronics'
 version 1 0 
-depends 'DUELink Comm'
+depends 'DUELink Daisylink'
 description 'DUELink Servo Motor Library'
 
   spec ' ' 'due_servost' 'set servo pin _ to _ degrees (0-180)' 'auto auto' 1 90
