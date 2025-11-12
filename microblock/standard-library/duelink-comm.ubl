@@ -1,6 +1,7 @@
 module 'DUELink Comm' Comm
 author 'GHI Electronics'
 version 1 0 
+choices due_combx b0 b1 b2 b3 b4 b5 b6 b7 
 description 'DUELink base library used by all other DUELink libraries.
 
 Handles daisylink communications via I2C or serial (UART).
@@ -46,7 +47,7 @@ variables _dueUseI2C _dueReadTimeout
   space
   space
   spec ' ' '_due_stream_write_bytes' 'stream write to _ data _' 'auto auto' 'b1' '1,2,3'
-  spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'auto auto' 'b1' 3
+  spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'menu.due_combx auto' 'b1' 3
 
 to '_due send raw' s {
   '_due_init'
