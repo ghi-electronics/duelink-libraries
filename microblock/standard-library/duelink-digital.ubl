@@ -2,15 +2,22 @@ module 'DUELink Digital'
 author 'GHI Electronics'
 version 1 0 
 depends 'DUELink Comm' 
+choices pinpull none up down 
 description 'DUELink Digital Library
 
 '
 
   spec ' ' 'due_dwrite' 'write pin _ on _' 'num bool' 1 true
-  spec 'r' 'due_dread' 'read pin _ pull _' 'num num' 1 0
+  spec 'r' 'due_dread' 'read pin _ pull _' 'num menu.pinpull' 1 'none'
 
 to due_dread pin pull {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'dread' pin pull)) 'number')
+  local 'p' 0
+  if (pull == 'up') {
+    p = 1
+  } else {
+    if (pull == 'down') {p = 2}
+  }
+  return ('[data:convertType]' (due_runWithResult (due_make_command 'dread' pin p)) 'number')
 }
 
 to due_dwrite pin onOff {
