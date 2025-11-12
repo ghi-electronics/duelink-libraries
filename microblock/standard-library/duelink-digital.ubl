@@ -17,7 +17,7 @@ to due_dread pin pull {
   } else {
     if (pull == 'down') {p = 2}
   }
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'dread' pin p)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'dread' pin p)) 'number')
 }
 
 to due_dwrite pin onOff {

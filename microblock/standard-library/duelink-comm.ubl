@@ -20,7 +20,7 @@ variables _dueUseI2C _dueReadTimeout
   spec 'r' 'due_make_command' 'command _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'version' nil nil nil nil nil nil nil nil 'nil'
   spec ' ' 'due_run' 'do command _' 'str' 'statled(100,100,10)'
   spec 'r' 'due_returnNum' 'do command _ returns number' 'auto' 'dread(1,2)'
-  spec 'r' 'due_runWithResult' 'do command _ returns string' 'str' 'version()'
+  spec 'r' 'due_returnStr' 'do command _ returns string' 'str' 'version()'
   space
   space
   spec 'r' 'due_device_PID' 'device PID'
@@ -172,7 +172,7 @@ to '_due_send' s {
 to due_connected {
   '_due_send' ('[data:unicodeString]' 27)
   local 'n' ('[data:convertType]' (random 1 9) 'string')
-  return ((due_runWithResult n) == n)
+  return ((due_returnStr n) == n)
 }
 
 to due_device_PID {
@@ -260,7 +260,7 @@ to due_run cmd {
   local 'ignore' ('_due_awaitResult')
 }
 
-to due_runWithResult cmd {
+to due_returnStr cmd {
   '_due_send' cmd
   waitMillis 5
   return ('_due_awaitResult')

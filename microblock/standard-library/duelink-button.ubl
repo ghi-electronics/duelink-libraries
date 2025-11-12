@@ -10,7 +10,7 @@ description 'DUELink Button Library'
   spec ' ' 'due_btnen' 'button enable on pin _ state _' 'num auto' 1 0
 
 to due_btndown pin {
-  return ('[data:convertType]' (due_runWithResult ('due_make_command' 'btndown' pin)) 'number')
+  return ('[data:convertType]' (due_returnStr ('due_make_command' 'btndown' pin)) 'number')
 }
 
 to due_btnen pin state {
@@ -18,10 +18,10 @@ to due_btnen pin state {
 }
 
 to due_btnread pin {
-  return ('[data:convertType]' (due_runWithResult ('due_make_command' 'btnread' pin)) 'number')
+  return ('[data:convertType]' (due_returnStr ('due_make_command' 'btnread' pin)) 'number')
 }
 
 to due_btnup pin {
-  return ('[data:convertType]' (due_runWithResult ('due_make_command' 'btnup' pin)) 'number')
+  return ('[data:convertType]' (due_returnStr ('due_make_command' 'btnup' pin)) 'number')
 }
 

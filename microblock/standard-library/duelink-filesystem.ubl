@@ -24,19 +24,19 @@ description 'DUELink FileSystem Library'
   spec 'r' 'due_fsformat' 'format type _ chip select pin _' 'menu.due_fstype auto' 'uSD/SDCard' 17
 
 to due_fsclose handle {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsClose' handle)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsClose' handle)) 'number')
 }
 
 to due_fsdelete path {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsDel' path)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsDel' path)) 'number')
 }
 
 to due_fsfile path {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'fsfsz' path)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'fsfsz' path)) 'number')
 }
 
 to due_fsfind path {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsFind' path)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsFind' path)) 'number')
 }
 
 to due_fsformat type cs {
@@ -44,7 +44,7 @@ to due_fsformat type cs {
   if (type == 'USB') {
     t = 2
   }
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsFmt' t cs 8000)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsFmt' t cs 8000)) 'number')
 }
 
 to due_fsmount type cs {
@@ -52,11 +52,11 @@ to due_fsmount type cs {
   if (type == 'USB') {
     t = 2
   }
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsMnt' t cs 8000 10)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsMnt' t cs 8000 10)) 'number')
 }
 
 to due_fsopen path mode {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsOpen' path mode)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsOpen' path mode)) 'number')
 }
 
 to due_fsread handle count {
@@ -66,22 +66,22 @@ to due_fsread handle count {
 }
 
 to due_fsseek handle offset {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsSeek' handle offset)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsSeek' handle offset)) 'number')
 }
 
 to due_fssync handle {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsSync' handle)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsSync' handle)) 'number')
 }
 
 to due_fstell handle {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsTell' handle)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'FsTell' handle)) 'number')
 }
 
 to due_fswrite handle data {
-  return ('[data:convertType]' (due_runWithResult ('[data:join]' 'FsWrite(' handle ',' '[' data ']' ')')) 'number')
+  return ('[data:convertType]' (due_returnStr ('[data:join]' 'FsWrite(' handle ',' '[' data ']' ')')) 'number')
 }
 
 to due_fusnmount {
-  return ('[data:convertType]' (due_runWithResult 'FsUnMnt()') 'number')
+  return ('[data:convertType]' (due_returnStr 'FsUnMnt()') 'number')
 }
 

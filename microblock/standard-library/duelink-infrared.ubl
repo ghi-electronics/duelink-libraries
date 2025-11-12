@@ -13,7 +13,7 @@ to due_irenable tx rx {
 }
 
 to due_irread {
-  return ('[data:convertType]' (due_runWithResult 'IrRead()') 'number')
+  return ('[data:convertType]' (due_returnStr 'IrRead()') 'number')
 }
 
 to due_irwrite cmd {

@@ -18,6 +18,6 @@ to due_humid pin type {
   if (t == 'DHT21') {
     t = 3
   }
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'Humid' pin t)) 'number')
+  return ('[data:convertType]' (due_returnStr (due_make_command 'Humid' pin t)) 'number')
 }
 
