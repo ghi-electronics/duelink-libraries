@@ -43,11 +43,7 @@ variables _dueUseI2C _dueReadTimeout
   spec 'r' '_due_awaitResult' '_due await result'
   spec 'r' '_due_awaitResultI2C' '_due await result (I2C)'
   spec 'r' '_due_endsWithPrompt' '_due byte array ends with prompt _' 'str'
-  spec 'r' '_due_readResponse' '_read response'
-  space
-  space  
-  spec ' ' '_due_stream_write_bytes' '_stream write to _ data _' 'auto auto' 'b1' '1,2,3'
-  
+  spec 'r' '_due_readResponse' '_read response'    
 
 to '_due send raw' s {
   '_due_init'
@@ -170,35 +166,6 @@ to '_due_send' s {
     }
     i += ('[serial:dueSend]' ('[data:unicodeString]' 10) 1)
     waitMillis 2
-  }
-}
-
-to '_due_stream_write_bytes' 'array name' data {
-  local 'buf' ('[data:split]' data ',' true)
-  local 'buf_read' (newList 1)
-  local 'found prompt' 0
-  '_due_send' ('[data:join]' 'strmwr(' (v 'array name') ',' (size buf) ')')
-  repeatUntil ((v 'found prompt') == 1) {
-    if _dueUseI2C {
-      '[sensors:i2cRead]' 82 buf_read
-      for byte buf_read {
-        if (byte == 38) {'found prompt' = 1}
-      }
-    } else {
-      local 'buf_read' ('[serial:dueRecv]')
-      if ((size buf_read) != 0) {
-        for byte buf_read {
-          if (byte == 38) {'found prompt' = 1}
-        }
-      }
-    }
-  }
-  if _dueUseI2C {
-    '[sensors:i2cWrite]' 82 buf
-  } else {
-    local 'ignore' ('[serial:dueSend]' buf 1)
-  }
-  if ('[data:convertType]' ('_due_readResponse') 'number') {
   }
 }
 
