@@ -17,7 +17,7 @@ variables _dueUseI2C _dueReadTimeout
   spec ' ' 'due_set_statled' 'set STAT LED to high _ ms, low _ ms, count _' 'auto auto auto' 100 100 10
   space
   space
-  spec 'r' 'due_make_command' 'build command _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'version' nil nil nil nil nil nil nil nil 'nil'
+  spec 'r' 'due_make_command' 'command _ : with _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _ : _' 'str auto auto auto auto auto auto auto auto auto auto auto auto' 'version' nil nil nil nil nil nil nil nil 'nil'
   spec ' ' 'due_run' 'write command _' 'str' 'statled(100,100,10)'
   spec 'r' 'due_write_command' 'write command _ returns number' 'auto' 'dread(1,2)'
   spec 'r' 'due_runWithResult' 'write command _ returns string' 'str' 'version()'
