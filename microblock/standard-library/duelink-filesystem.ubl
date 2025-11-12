@@ -2,11 +2,11 @@ module 'DUELink FileSystem'
 author 'GHI Elelctronics'
 version 1 0 
 depends 'DUELink Comm' 
-choices due_fstype 'uSD/SDCard' USB 
-choices due_fsmode read write append
+choices due_fstype 'SD/uSD' USB 
+choices due_fsmode read write append 
 description 'DUELink FileSystem Library'
 
-  spec 'r' 'due_fsmount' 'mount type _ chip select pin _ speed _ max handles _' 'menu.due_fstype auto auto auto' 'uSD/SDCard' 17 8000 4
+  spec 'r' 'due_fsmount' 'mount type _ chip select pin _' 'menu.due_fstype auto' 'SD/uSD' 17
   space
   spec 'r' 'due_fsopen' 'open handle _ mode _' 'auto menu.due_fsmode' '/duelink.txt' 'read'
   spec 'r' 'due_fsread' 'read handle _ count _' 'auto auto' 1 3
@@ -21,9 +21,8 @@ description 'DUELink FileSystem Library'
   spec 'r' 'due_fsfile' 'file size _' 'auto' '/duelink.txt'
   space
   spec 'r' 'due_fusnmount' 'unmount'
-  spec 'r' 'due_fsformat' 'format type _ chip select pin _ speed _' 'menu.due_fstype auto auto' 'uSD/SDCard' 17 8000
-  
-  
+  spec 'r' 'due_fsformat' 'format type _ chip select pin _' 'menu.due_fstype auto' 'uSD/SDCard' 17
+
 to due_fsclose handle {
   return ('[data:convertType]' (due_runWithResult (due_make_command 'FsClose' handle)) 'number')
 }
@@ -40,12 +39,20 @@ to due_fsfind path {
   return ('[data:convertType]' (due_runWithResult (due_make_command 'FsFind' path)) 'number')
 }
 
-to due_fsformat type cs speed {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsFmt' type cs speed)) 'number')
+to due_fsformat type cs {
+  local 't' 1
+  if (type == 'USB') {
+    t = 2
+  }
+  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsFmt' t cs 8000)) 'number')
 }
 
-to due_fsmount type cs speed handles {
-  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsMnt' type cs speed handles)) 'number')
+to due_fsmount type cs {
+  local 't' 1
+  if (type == 'USB') {
+    t = 2
+  }
+  return ('[data:convertType]' (due_runWithResult (due_make_command 'FsMnt' t cs 8000 10)) 'number')
 }
 
 to due_fsopen path mode {
