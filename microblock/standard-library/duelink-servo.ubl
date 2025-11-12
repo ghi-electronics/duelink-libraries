@@ -4,7 +4,7 @@ version 1 0
 depends 'DUELink Comm'
 description 'DUELink Servo Motor Library'
 
-  spec ' ' 'due_servost' 'set servo pin _ position _' 'auto auto' 1 90
+  spec ' ' 'due_servost' 'set servo pin _ to _ degrees (0-180)' 'auto auto' 1 90
 
 to due_servost pin pos {
   due_run ('due_make_command' 'servost' pin pos)
