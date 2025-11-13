@@ -20,8 +20,26 @@ description 'DUELink FileSystem Library'
   spec 'r' 'due_fsdelete' 'delete file _' 'auto' '/duelink.txt'
   spec 'r' 'due_fsfile' 'file size _' 'auto' '/duelink.txt'
   space
+  spec 'r' 'create directory' 'create directory _' 'str' '/tempdir'
+  spec 'r' 'directory open' 'open directory _' 'str' '/'
+  spec 'r' 'find next' 'find next'
+  space
   spec 'r' 'due_fusnmount' 'unmount'
-  spec 'r' 'due_fsformat' 'format type _ chip select pin _' 'menu.due_fstype auto' 'uSD/SDCard' 17
+  spec 'r' 'due_fsformat' 'format type _ chip select pin _' 'menu.due_fstype auto' 'SD/uSD' 17
+
+to 'create directory' path {
+  if (not (isType path 'string')) {return -1}
+  return (due_returnNum (due_make_command 'FsMkDir' path))
+}
+
+to 'directory open' path {
+  if (not (isType path 'string')) {return -1}
+  if (path == ('[data:toString]' '')) {
+    return (due_returnNum 'FsOpDir("")')
+  } else {
+    return (due_returnNum (due_make_command 'FsOpDir' path))
+  }
+}
 
 to due_fsclose handle {
   return (due_returnNum (due_make_command 'FsClose' handle))
@@ -94,5 +112,27 @@ to due_fswrite handle data {
 
 to due_fusnmount {
   return (due_returnNum 'FsUnMnt()')
+}
+
+to 'find next' {
+  due_run 'dim b7[255]'
+  due_run 'dim b9[255]'
+  local 'flen' 32
+  local 'x' 1
+  local 'b8' ('[data:newByteArray]' 256)
+  if ((due_returnNum 'FSFNext(b7,b9)') == 0) {
+    local 'b7' (due_stream_read_bytes 'b7' flen)
+    atPut (size b7) b7 126
+    if ((due_returnNum 'b9[0]') != 32) {
+      atPut x b8 47
+      x += 1
+    }
+    for i (size b7) {
+      atPut x b8 (at i b7)
+      x += 1
+    }
+    return b8
+  }
+  return ('[data:asByteArray]' flen)
 }
 
