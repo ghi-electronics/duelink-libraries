@@ -13,7 +13,7 @@ See https://www.duelink.com/docs/engine/stdlib
 variables _dueUseI2C _dueReadTimeout 
 
   spec ' ' 'due_select_device' 'select device _' 'auto' 1
-  spec 'r' 'due_connected' 'connected?'  
+  spec 'r' 'due_connected' 'connected?'
   spec ' ' 'due_set_statled' 'set STAT LED to high _ ms, low _ ms, count _' 'auto auto auto' 100 100 10
   space
   space
@@ -350,8 +350,10 @@ to due_stream_read_bytes 'array name' count {
     local 'buf5' ('[data:makeList]')
     local 'ret' 0
     for byte buf2 {
-      if (ret < count) {'[data:addLast]' byte buf5}
-      ret += 1
+      if (ret < count) {
+        '[data:addLast]' byte buf5
+        ret += 1
+      }
     }
     return ('[data:convertType]' buf5 'byte array')
   }
