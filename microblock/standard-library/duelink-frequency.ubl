@@ -4,7 +4,7 @@ version 0 11
 depends 'DUELink Daisylink' 
 description 'DUELink Frequency Library'
 
-  spec ' ' 'due_freq' 'set frequency on pin _ frequency _ Hz duration _ ms dutycycle _ %' 'auto auto auto auto' 7 1000 500 50
+  spec ' ' 'due_freq' 'set frequency on pin _ frequency _ Hz for _ (ms) dutycycle _ %' 'auto auto auto auto' 7 1000 500 50
 
 to due_freq pin frequency duration dutycycle {
   due_run ('[data:join]' 'freq(' pin ',' frequency ',' duration ',' dutycycle '/' '100' ')')
