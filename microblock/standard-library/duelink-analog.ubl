@@ -14,7 +14,7 @@ description 'DUELink Analog Library
   spec 'r' 'due_aread' 'analog read pin _ (0-4095)' 'auto' 1
 
 to due_aread pin {
-  return ('[data:convertType]' (due_returnStr (due_make_command 'aread' pin)) 'number')
+  return (due_returnNum (due_make_command 'aread' pin))
 }
 
 to due_awrite pin pwm {
@@ -22,10 +22,10 @@ to due_awrite pin pwm {
 }
 
 to due_readvcc {
-  return ('[data:convertType]' (due_returnStr '1000*readvcc()') 'number')
+  return (due_returnNum '1000*readvcc()')
 }
 
 to due_vread pin {
-  return ('[data:convertType]' (due_returnStr (due_make_command '1000*vread' pin)) 'number')
+  return (due_returnNum (due_make_command '1000*vread' pin))
 }
 
