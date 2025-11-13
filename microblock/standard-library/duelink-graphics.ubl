@@ -2,11 +2,14 @@ module 'DUELink Graphics'
 author 'GHI Electronics'
 version 0 11 
 depends 'DUELink Daisylink' 
-choices due_gfxtype none I2C SPI NeoPixel 'LED matrix scanner' 'LED matrix list' ePaper 
+choices due_gfxmode direct x1 x2 x3 
+choices due_gfxtrans none 'rotate 90' 'rotate 180' 'rotate 270' 'flip horizontal' 'flip vertical' 
+choices due_gfxtype I2C SPI NeoPixel 'LED matrix scanner' 'LED matrix list' ePaper 
 description 'DUELink Graphics Library'
 
-  spec ' ' 'due_gfxcfg' 'graphics config type _ array _ width _ height _ mode _' 'menu.due_gfxtype auto auto auto auto' 'I2C' '0x3c' 128 64 1
+  spec ' ' 'due_gfxcfg' 'graphics config type _ configuration _ width _ height _ mode _' 'menu.due_gfxtype auto auto auto menu.due_gfxmode' 'I2C' '0x3c' 128 64 'x1'
   space
+  spec ' ' 'due_clear' 'clear color _' 'auto' 0
   spec ' ' 'due_text' 'text _ color _ x _ y _' 'str auto auto auto' 'DUELink' '1' '10' '10'
   spec ' ' 'due_texts' 'text scale _ color _ x _ y _ scale width _ scale height _' 'auto str str str str str' 'DUELink' '1' '10' '10' '3' '3'
   spec ' ' 'due_textt' 'text tiny _ color _ x _ y _' 'auto auto auto auto' 'DUELink' 1 '10' '10'
@@ -14,11 +17,11 @@ description 'DUELink Graphics Library'
   spec ' ' 'due_circle' 'circle color _ x _ y _ radius _' 'auto auto auto auto' 1 20 20 '10'
   spec ' ' 'due_fill' 'fill color _ x _ y _ width _ height _' 'auto auto auto auto auto' 1 '10' '10' '10' '10'
   spec ' ' 'due_line' 'line color _ x1 _ y1 _ x2 _ y2 _' 'auto auto auto auto auto' 1 '10' '10' 20 20
-  spec ' ' 'due_drawimageb' 'drawImageB _ color _ x _ y _ width _ height _' 'auto auto auto auto auto auto' '0,1,255,255' 1 '10' '10' 2 2
-  spec ' ' 'due_drawimage' 'drawImage array _ x _ y _ width _ height _ transform _ scale width _ scale height _' 'auto auto auto auto auto auto auto auto' '1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1' '10' '10' 4 4 0 1 1
+  space
+  spec ' ' 'due_drawimage' 'image _ x _ y _ width _ height _ transform _ scale width _ scale height _' 'auto auto auto auto auto menu.due_gfxtrans auto auto' '1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1' '10' '10' 4 4 'none' 1 1
+  spec ' ' 'due_drawimageb' 'binary image _ color _ x _ y _ width _ height _' 'auto auto auto auto auto auto' '1,3,7,15' 1 '10' '10' 8 4
   space
   spec ' ' 'due_show' 'show'
-  spec ' ' 'due_clear' 'clear color _' 'auto' 0
 
 to due_circle color x y radius {
   due_run (due_make_command 'circle' color x y radius)
@@ -29,10 +32,26 @@ to due_clear color {
 }
 
 to due_drawimage img x y width height transform 'scale width' 'scale height' {
+  local 't' 0
+  if (transform == ('[data:toString]' 'rotate 90')) {
+    t = 1
+  }
+  if (transform == ('[data:toString]' 'rotate180')) {
+    t = 2
+  }
+  if (transform == ('[data:toString]' 'rotate 270')) {
+    t = 3
+  }
+  if (transform == ('[data:toString]' 'flip horizontal')) {
+    t = 4
+  }
+  if (transform == ('[data:toString]' 'flip vertical')) {
+    t = 5
+  }
   if (isType img 'list') {
-    due_run (due_make_command 'imgs' img x y width height transform (v 'scale width') (v 'scale height'))
+    due_run (due_make_command 'imgs' img x y width height t (v 'scale width') (v 'scale height'))
   } else {
-    due_run ('[data:join]' 'imgs({' img '},' x ',' y ',' width ',' height ',' transform ',' (v 'scale width') ',' (v 'scale height') ')')
+    due_run ('[data:join]' 'imgs({' img '},' x ',' y ',' width ',' height ',' t ',' (v 'scale width') ',' (v 'scale height') ')')
   }
 }
 
@@ -51,6 +70,7 @@ to due_fill color x y width height {
 to due_gfxcfg type cfg width height mode {
   comment 'Default values come from OLED 096'
   local 't' 1
+  local 'm' 1
   if (type == ('[data:toString]' 'none')) {
     t = 0
   }
@@ -69,10 +89,22 @@ to due_gfxcfg type cfg width height mode {
   if (type == ('[data:toString]' 'ePaper')) {
     t = 6
   }
+  if (mode == ('[data:toString]' 'direct')) {
+    m = 0
+  }
+  if (mode == ('[data:toString]' 'x1')) {
+    m = 1
+  }
+  if (mode == ('[data:toString]' 'x2')) {
+    m = 2
+  }
+  if (mode == ('[data:toString]' 'x3')) {
+    m = 3
+  }
   if (isType cfg 'list') {
-    due_run (due_make_command 'gfxcfg' t cfg width height mode)
+    due_run (due_make_command 'gfxcfg' t cfg width height m)
   } else {
-    due_run ('[data:join]' 'gfxcfg(' t ',' '{' cfg '},' width ',' height ',' mode ')')
+    due_run ('[data:join]' 'gfxcfg(' t ',' '{' cfg '},' width ',' height ',' m ')')
   }
 }
 
