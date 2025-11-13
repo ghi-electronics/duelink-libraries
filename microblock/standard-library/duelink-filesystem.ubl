@@ -3,7 +3,7 @@ author 'GHI Elelctronics'
 version 0 11 
 depends 'DUELink Daisylink' 
 choices due_fstype 'SD/uSD' USB 
-choices due_fsmode read write append 
+choices due_fsmode read write 'write append' 
 description 'DUELink FileSystem Library'
 
   spec 'r' 'due_fsmount' 'mount type _ chip select pin _' 'menu.due_fstype auto' 'SD/uSD' 17
