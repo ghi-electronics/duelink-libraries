@@ -1,6 +1,6 @@
 module 'DUELink Graphics'
 author 'GHI Electronics'
-version 0 11 
+version 0 12 
 depends 'DUELink Daisylink' 
 choices due_gfxmode direct x1 x2 x3 
 choices due_gfxtrans none 'rotate 90' 'rotate 180' 'rotate 270' 'flip horizontal' 'flip vertical' 
