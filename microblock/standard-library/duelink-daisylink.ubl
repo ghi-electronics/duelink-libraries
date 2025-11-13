@@ -351,6 +351,7 @@ to due_stream_read_bytes 'array name' count {
     local 'ret' 0
     for byte buf2 {
       if (ret < count) {'[data:addLast]' byte buf5}
+      ret += 1
     }
     return ('[data:convertType]' buf5 'byte array')
   }
