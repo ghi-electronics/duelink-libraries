@@ -9,14 +9,14 @@ description 'DUELink Infrared Library'
   spec ' ' 'due_irenable' 'infrared enable tx pin _ rx pin _' 'auto auto' 5 3
 
 to due_irenable tx rx {
-  due_run ('due_make_command' 'IrEn' tx rx)
+  due_run (due_make_command 'IrEn' tx rx)
 }
 
 to due_irread {
-  return ('[data:convertType]' (due_returnStr 'IrRead()') 'number')
+  return (due_returnNum 'IrRead()')
 }
 
 to due_irwrite cmd {
-  due_run ('due_make_command' 'IrWrite' cmd)
+  due_run (due_make_command 'IrWrite' cmd)
 }
 
