@@ -78,8 +78,8 @@ to due_fsopen path mode {
   if (mode == ('[data:toString]' 'write')) {
     m = 10
   }
-  if (mode == ('[data:toString]' 'append')) {
-    m = 48
+  if (mode == ('[data:toString]' 'write append')) {
+    m = 50
   }
   return (due_returnNum (due_make_command 'FsOpen' path m))
 }
