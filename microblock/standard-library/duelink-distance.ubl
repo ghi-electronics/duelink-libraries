@@ -1,0 +1,12 @@
+module 'DUELink Distance'
+author 'GHI Electronics'
+version 0 12 
+depends 'DUELink Daisylink' 
+description 'DUELink Distance Library'
+
+  spec 'r' 'due_dist' 'read distance (mm) on pulse pin _ echo pin _' 'auto auto' 3 4
+
+to due_dist pulse echo {
+  return (due_returnNum (due_make_command '10*dist' pulse echo))
+}
+

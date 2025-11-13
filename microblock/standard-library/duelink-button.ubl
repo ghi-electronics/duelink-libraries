@@ -1,0 +1,27 @@
+module 'DUELink Button'
+author 'GHI Electronics'
+version 0 12 
+depends 'DUELink Daisylink' 
+description 'DUELink Button Library'
+
+  spec 'r' 'due_btndown' 'button down on pin _' 'num' 1
+  spec 'r' 'due_btnup' 'button up on pin _' 'num' 1
+  spec 'r' 'due_btnread' 'button read on pin _' 'num' 1
+  spec ' ' 'due_btnen' 'button enable on pin _ state _' 'num bool' 1 true
+
+to due_btndown pin {
+  return (due_returnNum (due_make_command 'btndown' pin))
+}
+
+to due_btnen pin state {
+  due_run (due_make_command 'btnen' pin state)
+}
+
+to due_btnread pin {
+  return (due_returnNum (due_make_command 'btnread' pin))
+}
+
+to due_btnup pin {
+  return (due_returnNum (due_make_command 'btnup' pin))
+}
+

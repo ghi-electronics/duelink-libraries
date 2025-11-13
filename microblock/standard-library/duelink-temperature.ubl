@@ -1,0 +1,26 @@
+module 'DUELink Temperature'
+author 'GHI Electronics'
+version 0 12 
+depends 'DUELink Daisylink' 
+choices due_ttype 'CPU temperature' DHT11 DHT12 DHT21 DHT22 
+description 'DUELink Temperature Library'
+
+  spec 'r' 'due_tempread' 'read temperature on pin _ type _ (x10)' 'auto menu.due_ttype' 18 'DHT22'
+
+to due_tempread pin type {
+  local 't' 4
+  if (t == ('[data:toString]' 'CPU temperature')) {
+    t = 0
+  }
+  if (t == ('[data:toString]' 'DHT11')) {
+    t = 1
+  }
+  if (t == ('[data:toString]' 'DHT12')) {
+    t = 2
+  }
+  if (t == ('[data:toString]' 'DHT21')) {
+    t = 3
+  }
+  return (due_returnNum (due_make_command '10*Temp' pin t))
+}
+
