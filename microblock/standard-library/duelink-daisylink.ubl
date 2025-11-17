@@ -4,10 +4,17 @@ version 0 12
 choices due_combx b0 b1 b2 b3 b4 b5 b6 b7 
 description 'DUELink base library used by all other DUELink libraries.
 
+
+
 Handles daisylink communications via I2C or serial (UART).
+
 By default, this library uses serial over the Downlink port on DUELink boards and I2C on other boards but that can be changed by using the advanced "DUELink useI2C" block.
 
+
+
 See https://www.duelink.com/docs/engine/stdlib
+
+
 
 '
 variables _dueUseI2C _dueReadTimeout 
@@ -231,7 +238,17 @@ to due_make_command s optionalArgs args args args args args args args args args 
           }
         }
       } else {
-        '[data:addLast]' (argOrDefault (i + 1) '') result
+        if (isType (argOrDefault (i + 1) '') 'byte array') {
+          local 'arg_list' (argOrDefault (i + 1) '')
+          for x (size arg_list) {
+            '[data:addLast]' (at x arg_list) result
+            if (x < (size arg_list)) {
+              '[data:addLast]' ',' result
+            }
+          }
+        } else {
+          '[data:addLast]' (argOrDefault (i + 1) '') result
+        }
       }
       comment 'if this is a string then add "'
       if str {
@@ -362,9 +379,15 @@ to due_stream_read_bytes 'array name' count {
 to due_useI2C useI2C {
   comment 'DUELink defaults to using the serial Downlink port on DUELink boards
 
+
+
 and I2C on non-DUELink board. This advanced block is only needed
 
+
+
 when one wants to force different behavior from the default
+
+
 
 (e.g. to use I2C edge connector pins on a DUE CincoBit or PixoBit).'
   _dueUseI2C = useI2C
