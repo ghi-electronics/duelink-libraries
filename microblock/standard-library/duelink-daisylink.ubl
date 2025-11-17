@@ -31,7 +31,7 @@ variables _dueUseI2C _dueReadTimeout
   space
   space
   spec 'r' 'due_device_PID' 'device PID'
-  spec 'r' 'due_device_version' 'device FW version'
+  spec 'r' 'due_device_version' 'device firmware version'
   advanced
   spec ' ' 'due_setReadTimeout' 'set response timeout _ ms' 'auto' 1000
   spec ' ' 'due_useI2C' 'DUELink useI2C _' 'bool' true
