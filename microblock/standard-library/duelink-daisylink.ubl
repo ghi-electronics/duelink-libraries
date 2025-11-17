@@ -46,12 +46,12 @@ variables _dueUseI2C _dueReadTimeout
   space
   spec ' ' '_due_init' '_due_init'
   spec ' ' '_due_send' '_due send _' 'str'
-  spec ' ' '_due send raw' '_due send raw _' 'auto' '10'
+  spec ' ' '_dueSendRaw' '_due send raw _' 'auto' '10'
   spec 'r' '_due_awaitResult' '_due await result'
   spec 'r' '_due_awaitResultI2C' '_due await result (I2C)'
   spec 'r' '_due_endsWithPrompt' '_due byte array ends with prompt _' 'str'
 
-to '_due send raw' s {
+to '_dueSendRaw' s {
   '_due_init'
   comment 'Clear receive buffer.'
   if _dueUseI2C {
