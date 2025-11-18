@@ -1,20 +1,13 @@
 module 'DUELink Daisylink' Comm
 author 'GHI Electronics'
-version 0 12 
+version 0 13 
 choices due_combx b0 b1 b2 b3 b4 b5 b6 b7 
 description 'DUELink base library used by all other DUELink libraries.
 
-
-
 Handles daisylink communications via I2C or serial (UART).
-
-By default, this library uses serial over the Downlink port on DUELink boards and I2C on other boards but that can be changed by using the advanced "DUELink useI2C" block.
-
-
+By default, this library uses serial over the Downlink port on DUELink boards and I2C on other boards but that can be changed by using the advanced "use I2C" block.
 
 See https://www.duelink.com/docs/engine/stdlib
-
-
 
 '
 variables _dueUseI2C _dueReadTimeout 
@@ -24,7 +17,7 @@ variables _dueUseI2C _dueReadTimeout
   spec ' ' 'due_set_statled' 'set STAT LED to high _ ms, low _ ms, count _' 'auto auto auto' 100 100 10
   space
   space
-  spec 'r' 'due_make_command' 'command _ : with _ : _ : ...' 'str auto auto' 'version' nil nil
+  spec 'r' 'due_make_command' 'command _ : with _ : _ : ...' 'str auto auto' 'version'
   spec ' ' 'due_run' 'do command _' 'str' 'statled(100,100,10)'
   spec 'r' 'due_returnNum' 'do command _ returns number' 'auto' 'dread(1,2)'
   spec 'r' 'due_returnStr' 'do command _ returns string' 'str' 'version()'
@@ -34,7 +27,7 @@ variables _dueUseI2C _dueReadTimeout
   spec 'r' 'due_device_version' 'device firmware version'
   advanced
   spec ' ' 'due_setReadTimeout' 'set response timeout _ ms' 'auto' 1000
-  spec ' ' 'due_useI2C' 'DUELink useI2C _' 'bool' true
+  spec ' ' 'due_useI2C' 'use I2C _' 'bool' true
   space
   space
   spec 'r' 'due_stream_read_bytes' 'stream read from _ count _' 'menu.due_combx auto' 'b1' 3
@@ -135,20 +128,18 @@ to '_due_init' {
   if (_dueReadTimeout == 0) {_dueReadTimeout = 1000}
   if (not (isType _dueUseI2C 'boolean')) {
     comment 'Not yet initialized, set _dueUseI2C.'
-    for s ('[data:makeList]' 'CincoBit' 'PixoBit' 'DueSTEM' 'Clipit' 'DUELink') {
-      if (('[data:find]' s (boardType)) > 0) {
-        comment 'This is a DUELink board; use serial.'
-        _dueUseI2C = (booleanConstant false)
-        if ('[serial:dueSend]' ('[data:unicodeString]' 10) 1) {
-          comment 'Serial need first byte is 10, 13 or ''s'', ''S'''
-        }
-        comment 'Wait a bit because device will see muitlple command'
-        waitMillis 10
-        return 0
+    if (('[misc:dueLinkPID]') > 0) {
+      comment 'This is a DUELink board; use serial.'
+      _dueUseI2C = (booleanConstant false)
+      if ('[serial:dueSend]' ('[data:unicodeString]' 10) 1) {
+        comment 'Serial need first byte is 10, 13 or ''s'', ''S'''
       }
+      comment 'Wait a bit because device will see multiple commands'
+      return 0
+    } else {
+      comment 'Not a DUELink board; use I2C.'
+      _dueUseI2C = (booleanConstant true)
     }
-    comment 'Not a DUELink board; use I2C.'
-    _dueUseI2C = (booleanConstant true)
   }
 }
 
@@ -183,7 +174,13 @@ to due_connected {
 }
 
 to due_device_PID {
-  return (due_returnNum 'info(0)')
+  local 'module PID' (due_returnNum 'info(0)')
+  local 'result' ('[data:makeList]')
+  for i 6 {
+    local 'hexDigit' (((v 'module PID') >> (24 - (4 * i))) & 15)
+    '[data:addLast]' (at (hexDigit + 1) '0123456789ABCDEF') result
+  }
+  return ('[data:joinStrings]' result)
 }
 
 to due_device_version {
@@ -194,7 +191,7 @@ to due_exec {
   due_run 'run'
 }
 
-to due_make_command s optionalArgs args args args args args args args args args args args {
+to due_make_command s optionalArgs {
   local 'result' ('[data:makeList]')
   local 'str' (booleanConstant false)
   local 'arr' (booleanConstant false)
@@ -224,7 +221,7 @@ to due_make_command s optionalArgs args args args args args args args args args 
           }
         }
       }
-      if (isType (argOrDefault (i + 1) '') 'list') {
+      if (or (isType (argOrDefault (i + 1) '') 'list') (isType (argOrDefault (i + 1) '') 'byte array')) {
         local 'arg_list' (argOrDefault (i + 1) '')
         for x (size arg_list) {
           '[data:addLast]' (at x arg_list) result
@@ -233,17 +230,7 @@ to due_make_command s optionalArgs args args args args args args args args args 
           }
         }
       } else {
-        if (isType (argOrDefault (i + 1) '') 'byte array') {
-          local 'arg_list' (argOrDefault (i + 1) '')
-          for x (size arg_list) {
-            '[data:addLast]' (at x arg_list) result
-            if (x < (size arg_list)) {
-              '[data:addLast]' ',' result
-            }
-          }
-        } else {
-          '[data:addLast]' (argOrDefault (i + 1) '') result
-        }
+        '[data:addLast]' (argOrDefault (i + 1) '') result
       }
       comment 'if this is a string then add "'
       if str {
@@ -374,15 +361,9 @@ to due_stream_read_bytes 'array name' count {
 to due_useI2C useI2C {
   comment 'DUELink defaults to using the serial Downlink port on DUELink boards
 
-
-
 and I2C on non-DUELink board. This advanced block is only needed
 
-
-
 when one wants to force different behavior from the default
-
-
 
 (e.g. to use I2C edge connector pins on a DUE CincoBit or PixoBit).'
   _dueUseI2C = useI2C
