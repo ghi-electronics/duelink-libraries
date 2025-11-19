@@ -1,5 +1,5 @@
-export { SerialInterface, DUELinkController, Util }
-import { Util } from "../util.js";
+export { SerialInterface, DUELinkController}
+import { Util } from "dlutil";
 
 class SerialInterface {
     isReady = false;

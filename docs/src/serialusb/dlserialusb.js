@@ -1,5 +1,5 @@
 import { SerialPort } from 'serialport'
-import { RingBuffer } from '../util.js';
+import { RingBuffer } from 'dlutil';
 
 export {SerialUSB}
 
