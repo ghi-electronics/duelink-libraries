@@ -1,4 +1,4 @@
-import { Util, RingBuffer } from 'dlutil';
+import { Util, RingBuffer } from '../util/dlutil.js';
 
 export {WebSerial}
 

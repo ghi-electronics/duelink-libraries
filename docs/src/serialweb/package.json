@@ -19,9 +19,6 @@
 	],
 	"author": "GHI Electronics",
 	"license": "MIT",
-    "dependencies": {		
-        "dlutil": "^1.0.0"
-	},
 	"devDependencies": {
 		"buffer": "^5.7.1",
 		"parcel": "2.8.3",
