@@ -19,9 +19,9 @@
 	],
 	"author": "GHI Electronics",
 	"license": "MIT",
-    "dependencies": {		
-        "duelinkutil": "^1.0.0",
-        "dlserialusb": "^1.0.0"
+	"dependencies": {
+		"dlserialusb": "^1.0.0",
+		"duelinkutil": "^1.0.0"
 	},
 	"devDependencies": {
 		"buffer": "^5.7.1",
