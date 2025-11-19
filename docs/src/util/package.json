@@ -1,9 +1,9 @@
 {
-	"name": "dlutil",
+	"name": "duelinkutil",
 	"version": "1.0.0",
 	"description": "Util for DUELink",
-	"source": "./dlutil.js",
-	"main": "dist/dlutil.js",
+	"source": "./duelinkutil.js",
+	"main": "dist/duelinkutil.js",
 	"module": "dist/module.js",
 	"scripts": {
 		"watch": "parcel watch",
