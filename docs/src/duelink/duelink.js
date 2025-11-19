@@ -1,5 +1,5 @@
 export { SerialInterface, DUELinkController}
-import { Util } from "dlutil";
+import { Util } from "duelinkutil";
 
 class SerialInterface {
     isReady = false;
