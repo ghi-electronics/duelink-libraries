@@ -1,6 +1,6 @@
 {
 	"name": "duelink",
-	"version": "1.2.4",
+	"version": "1.2.5",
 	"description": "DUELink driver",
 	"source": "./duelink.js",
 	"main": "dist/duelink.js",
@@ -19,6 +19,10 @@
 	],
 	"author": "GHI Electronics",
 	"license": "MIT",
+	"dependencies": {
+		"dlserialusb": "^1.0.0",
+		"duelinkutil": "^1.0.0"
+	},
 	"devDependencies": {
 		"buffer": "^5.7.1",
 		"parcel": "2.8.3",
