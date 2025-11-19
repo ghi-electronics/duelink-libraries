@@ -1,5 +1,5 @@
 import { SerialPort } from 'serialport'
-import { RingBuffer } from 'dlutil';
+import { RingBuffer } from 'duelinkutil';
 
 export {SerialUSB}
 

@@ -20,8 +20,8 @@
 	"author": "GHI Electronics",
 	"license": "MIT",
 	"dependencies": {
-		"serialport": "^12.0.0",
-        "dlutil": "^1.0.0"
+		"duelinkutil": "^1.0.0",
+		"serialport": "^12.0.0"
 	},
 	"devDependencies": {
 		"buffer": "^5.7.1",
