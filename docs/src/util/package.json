@@ -1,0 +1,33 @@
+{
+	"name": "dlutil",
+	"version": "1.0.0",
+	"description": "Util for DUELink",
+	"source": "./dlutil.js",
+	"main": "dist/dlutil.js",
+	"module": "dist/module.js",
+	"scripts": {
+		"watch": "parcel watch",
+		"build": "parcel build",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"DUELink",
+		"GHI Electronics",
+		"SITCore",
+		"TinyCLR",
+		"BrainPad"
+	],
+	"author": "GHI Electronics",
+	"license": "MIT",
+	"dependencies": {
+		"serialport": "^12.0.0"
+	},
+	"devDependencies": {
+		"buffer": "^5.7.1",
+		"parcel": "2.8.3",
+		"parcel-bundler": "^1.12.5",
+		"path-browserify": "^1.0.1",
+		"stream-browserify": "^3.0.0",
+		"util": "^0.12.5"
+	}
+}
