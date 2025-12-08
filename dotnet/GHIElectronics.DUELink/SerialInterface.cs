@@ -77,11 +77,11 @@ namespace GHIElectronics.DUELink {
             // We jusr send \n as first commands for chain enumeration
             // After sent \n
             // from v044: selected device will response \r\n>, don't care asio enable or not
-            
+
             this.WriteRawData(new byte[] { 10 }, 0, 1);
 
             Thread.Sleep(400);
-                       
+
             this.WriteCommand("sel(1)");
             // "sel(1)": always return \r\n> no matter Asio or not
             // So check timeout for readbyte is correct
@@ -102,7 +102,7 @@ namespace GHIElectronics.DUELink {
 
 
             this.port.DiscardInBuffer();
-            this.port.DiscardOutBuffer();            
+            this.port.DiscardOutBuffer();
         }
 
         private bool Echo { get; set; } = true;
@@ -216,28 +216,28 @@ namespace GHIElectronics.DUELink {
                                         responseValid = false; // still data, this is bad response, there is no \r\n>xxxx
                                     }
                                 }
-                                else if (dump == '\r') {
-                                    // from v036, this case not happened any more. We changed Asio(1) to return
-                                    // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
-                                    if (this.port.BytesToRead == 0)
-                                        Thread.Sleep(1); // wait 1ms for sure next byte
+                                //else if (dump == '\r') {
+                                //    // from v036, this case not happened any more. We changed Asio(1) to return
+                                //    // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
+                                //    if (this.port.BytesToRead == 0)
+                                //        Thread.Sleep(1); // wait 1ms for sure next byte
 
-                                    if (this.port.BytesToRead > 0) {
-                                        dump = this.port.ReadByte();
+                                //    if (this.port.BytesToRead > 0) {
+                                //        dump = this.port.ReadByte();
 
-                                        if (dump == '\n') {
-                                            if (this.port.BytesToRead > 0)
-                                                dump = this.port.ReadByte();
+                                //        if (dump == '\n') {
+                                //            if (this.port.BytesToRead > 0)
+                                //                dump = this.port.ReadByte();
 
-                                        }
-                                        else {
-                                            responseValid = false;
-                                        }
-                                    }
-                                    else {
-                                        responseValid = false; // after \r must be something, and \n is expected
-                                    }
-                                }
+                                //        }
+                                //        else {
+                                //            responseValid = false;
+                                //        }
+                                //    }
+                                //    else {
+                                //        responseValid = false; // after \r must be something, and \n is expected
+                                //    }
+                                //}
                                 else {
                                     // bad data
                                     // One cmd send suppose one response, there is no 1234\r\n5678.... this will consider invalid response
@@ -283,8 +283,18 @@ namespace GHIElectronics.DUELink {
 
                             break; // \n found, 
                         }
+                        else if (total_receviced == 1 && (data == '>' || data == '&')) {
+                            Thread.Sleep(2);
+                            // "Region(x)", "new" => return '>' only
+                            // "pgmbrst()" return '&'
+                            // there should no more byte after this
+                            if (this.port.BytesToRead == 0) {
+                                response.success = true;
+                                response.response = string.Empty;
 
-
+                                return response;
+                            }
+                        }                        
                         end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks; // reset timeout when new data come                        
                     }
                 }

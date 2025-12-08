@@ -180,6 +180,13 @@ class I2CTransportController:
                         str_arr = str_arr.replace("\r", "")
                 break
             
+            elif data[0] == ord('>') or data[0] == ord('&'):
+                if total_receviced == 1:
+                    time.sleep(0.002) # wait 2ms for sure no data come
+                    dump = self.ReadByte()
+                    if dump[0] == 255: # after > if there is no data stop
+                        return (True,"")
+                
             startms = time.ticks_ms() #reset timeout after valid data
     
         success = total_receviced > 1 and responseValid == True
@@ -435,6 +442,12 @@ class UartTransportController:
                             str_arr = str_arr.replace("\n", "")
                             str_arr = str_arr.replace("\r", "")
                     break
+                
+                elif data[0] == ord('>') or data[0] == ord('&'):
+                    if total_receviced == 1:
+                        time.sleep(0.002) # wait 2ms for sure no data come                    
+                        if self.uart.any() == 0: # after > if there is no data stop
+                            return (True,"")
                 
                 startms = time.ticks_ms() #reset timeout after valid data 
                 

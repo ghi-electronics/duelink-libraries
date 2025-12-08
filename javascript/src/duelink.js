@@ -273,6 +273,14 @@ class SerialInterface {
               break;
 
             }
+            else if ((SerialInterface.Decoder.decode(data)[0] == '>') || (SerialInterface.Decoder.decode(data)[0] == '&')) {
+              await Util.sleep(2); // wait 1ms for sure next byte
+              if (!this.portName.hasData()) {   
+                response.success = true;
+                response.response = "";
+                return response;
+              }
+            }
 
             end = new Date(Date.now() + this.ReadTimeout);
           }            
@@ -1040,7 +1048,7 @@ class EngineController {
       }
       else if (region == 1) {
         await this.serialPort.WriteCommand("Region(1)");
-        const ret = await this.serialPort.ReadResponse();
+        let ret = await this.serialPort.ReadResponse();
 
         if (ret.success == false)
           return false;
@@ -1057,7 +1065,7 @@ class EngineController {
       
         
   
-      const cmd = "pgmstream()";
+      const cmd = "pgmbrst()";
 
       const raw = new TextEncoder().encode(script);
 

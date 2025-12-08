@@ -110,7 +110,7 @@ class SerialInterface:
         str = ""
         end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
-        response = CmdRespone()
+        resp = CmdRespone()
 
         responseValid = True
         dump = 0
@@ -180,7 +180,14 @@ class SerialInterface:
                             str = str.replace("\r", "")
 
                     break
-
+                elif data.decode()[0] == '>' or data.decode()[0] == '&':
+                    if total_receviced == 1:
+                        time.sleep(0.002)
+                        if (self.portName.in_waiting == 0):
+                            resp.success = True
+                            resp.response = ""
+                            return resp
+                    
                 end = datetime.now() + timedelta(seconds=self.ReadTimeout) #reset timeout after valid data 
 
                 
@@ -188,16 +195,16 @@ class SerialInterface:
         self.portName.reset_input_buffer()
         self.portName.reset_output_buffer()
 
-        response.success = (total_receviced > 1) and (responseValid == True)
-        response.response = str
+        resp.success = (total_receviced > 1) and (responseValid == True)
+        resp.response = str
 
-        return response
+        return resp
     
     def ReadResponseRaw(self):
         str = ""
         end = datetime.now() + timedelta(seconds=self.ReadTimeout)
 
-        response = CmdRespone()
+        resp = CmdRespone()
 
         while datetime.now() < end:
             if self.portName.in_waiting > 0:
@@ -210,11 +217,11 @@ class SerialInterface:
 
         if str != "":
             if len(str) >= 3:
-                response.response= str[0:len(str)-3]
+                resp.response= str[0:len(str)-3]
 
-            response.success = True
+            resp.success = True
 
-        return response
+        return resp
 
     TransferBlockSizeMax = 512
     TransferBlockDelay = 0.005
@@ -287,7 +294,7 @@ class CmdRespone:
     #     str = self.leftOver
     #     end = datetime.now() + timedelta(seconds=self.ReadTimeout)
     #
-    #     response = SerialInterface.CmdResponse
+    #     resp = SerialInterface.CmdResponse
     #
     #     while end > datetime.now():
     #         data = self.portName.read()
@@ -305,23 +312,23 @@ class CmdRespone:
     #         idx = idx1 if idx1 != -1 else idx2
     #
     #         self.leftOver = str[idx + 1:]
-    #         response.success = True
-    #         response.response = str[:idx]
+    #         resp.success = True
+    #         resp.response = str[:idx]
     #
     #         idx3 = str.find("!")
-    #         if idx3 != -1 and "error" in response.response:
-    #             response.success = False
+    #         if idx3 != -1 and "error" in resp.response:
+    #             resp.success = False
     #
-    #         return response
+    #         return resp
     #
     #     self.leftOver = ""
     #     self.portName.reset_input_buffer()
     #     self.portName.reset_output_buffer()
     #
-    #     response.success = False
-    #     response.response = ""
+    #     resp.success = False
+    #     resp.response = ""
     #
-    #     return response
+    #     return resp
     #
     # TransferBlockSizeMax = 256
     # TransferBlockDelay = 1
