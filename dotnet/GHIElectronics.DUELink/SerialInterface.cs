@@ -200,8 +200,10 @@ namespace GHIElectronics.DUELink {
                         total_receviced++;
 
                         if (data == '\n') {
-                            if (this.port.BytesToRead == 0) {
-                                Thread.Sleep(1); // wait 1ms for sure
+                            // wait for 50ms if after \n there is no data
+                            var end_newline_expired = DateTime.UtcNow.Add(TimeSpan.FromMilliseconds(50)).Ticks;
+                            while (this.port.BytesToRead == 0 && end_newline_expired > DateTime.UtcNow.Ticks) {
+                                Thread.Yield();
                             }
 
                             // next byte can be >, &, !, $
@@ -297,6 +299,9 @@ namespace GHIElectronics.DUELink {
                         }                        
                         end = DateTime.UtcNow.Add(this.ReadTimeout).Ticks; // reset timeout when new data come                        
                     }
+                    else {
+                        Thread.Yield();
+                    }
                 }
 
                 //this.leftOver = string.Empty;
@@ -332,6 +337,7 @@ namespace GHIElectronics.DUELink {
 
 
                     }
+                    Thread.Yield();
                 }
 
                 this.port.DiscardInBuffer();
@@ -430,7 +436,7 @@ namespace GHIElectronics.DUELink {
                         break;
                     }
 
-
+                    Thread.Yield();
                 }
             }
 

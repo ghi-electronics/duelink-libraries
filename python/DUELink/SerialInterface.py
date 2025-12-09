@@ -124,8 +124,10 @@ class SerialInterface:
                 total_receviced = total_receviced + 1
                 
                 if data.decode()[0] == '\n':
-                    if (self.portName.in_waiting == 0):
-                        time.sleep(0.001) # wait 1ms for sure
+                    end_newline_expired = datetime.now() + timedelta(milliseconds=50) # 50ms timeout for \n
+
+                    while (self.portName.in_waiting == 0 and datetime.now() < end_newline_expired ):
+                        time.sleep(0)
                     
                     # next byte can be >, &, !, $
                     if (self.portName.in_waiting > 0):
