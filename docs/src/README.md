@@ -14,3 +14,6 @@ npm uninstall -g <package_name>
 # Publish
 npm login
 npm publish
+
+# vscode debug
+npx http-server -p 5500
