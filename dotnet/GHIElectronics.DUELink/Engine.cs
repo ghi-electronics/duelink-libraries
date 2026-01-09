@@ -125,9 +125,11 @@ namespace GHIElectronics.DUELink {
 
                 if (response.success) {
                     try {
-                        var value = float.Parse(response.response);
+                        if (response.response != string.Empty) {
+                            var value = float.Parse(response.response);
 
-                        return value;
+                            return value;
+                        }
                     }
                     catch {
 
