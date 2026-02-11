@@ -20,10 +20,12 @@ class I2CTransportController:
             
         
     def sync(self):
-        # Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
         # We jusr send \n as first commands for chain enumeration
-        self.i2c.writeto(self.addr, "\n")
-        
+        self.i2c.writeto(self.addr, "\n")        
+        time.sleep(0.4)
+
+        # After sent \n, we need send 0x1B to stop the while loop in chain
+        self.WriteByte(0x1B)       
         time.sleep(0.4)
         
         self.WriteCommand("sel(1)")
@@ -281,11 +283,13 @@ class UartTransportController:
         while self.uart.any() > 0:
             dump = self.ReadByte()    
         
-    def sync(self):
-        # Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
+    def sync(self):        
         # We jusr send \n as first commands for chain enumeration
-        self.uart.write('\n')
-        
+        self.uart.write('\n')        
+        time.sleep(0.4)
+
+        # After sent \n, we need send 0x1B to stop the while loop in chain
+        self.WriteByte(0x1B)       
         time.sleep(0.4)
         
         self.WriteCommand("sel(1)")

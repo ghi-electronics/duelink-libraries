@@ -72,14 +72,13 @@ namespace GHIElectronics.DUELink {
         }
 
         public void Synchronize() {
-
-            // Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
+            
             // We jusr send \n as first commands for chain enumeration
-            // After sent \n
-            // from v044: selected device will response \r\n>, don't care asio enable or not
-
             this.WriteRawData(new byte[] { 10 }, 0, 1);
+            Thread.Sleep(400);
 
+            // After sent \n, we need send 0x1B to stop the while loop in chain. Issue: https://github.com/ghi-electronics/duelink-libraries/issues/114
+            this.WriteRawData(new byte[] { 0x1B }, 0, 1);
             Thread.Sleep(400);
 
             this.WriteCommand("sel(1)");

@@ -32,10 +32,12 @@ class SerialInterface:
 
     def Synchronize(self):
         cmd = bytearray(1)
-        cmd[0] = 10 # do not terminal loop since we support asio(1) host runs
+        cmd[0] = 10 
+        self.WriteRawData(cmd, 0, 1)        
+        time.sleep(0.4)
 
-        self.WriteRawData(cmd, 0, 1)
-        
+        cmd[0] = 0x1B 
+        self.WriteRawData(cmd, 0, 1)        
         time.sleep(0.4)
 
         self.WriteCommand("sel(1)")

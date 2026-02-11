@@ -38,14 +38,16 @@ class SerialInterface {
     }
 
     async Synchronize() {
-      const cmd = new Uint8Array(1);
-      // Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
+      const cmd = new Uint8Array(1);      
       // We jusr send \n as first commands for chain enumeration
       cmd[0] = 10; 
-
       await this.WriteRawData(cmd, 0, 1);
-
-      await Util.sleep(300);
+      await Util.sleep(400);
+      
+      // After sent \n, we need send 0x1B to stop the while loop in chain. Issue: https://github.com/ghi-electronics/duelink-libraries/issues/114
+      cmd[0] = 0x1B; 
+      await this.WriteRawData(cmd, 0, 1);
+      await Util.sleep(400);
       
       await this.WriteCommand("sel(1)");
       
