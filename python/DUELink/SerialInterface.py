@@ -36,9 +36,9 @@ class SerialInterface:
         self.WriteRawData(cmd, 0, 1)        
         time.sleep(0.4)
 
-        cmd[0] = 0x1B 
-        self.WriteRawData(cmd, 0, 1)        
-        time.sleep(0.4)
+        # cmd[0] = 0x1B 
+        # self.WriteRawData(cmd, 0, 1)        
+        # time.sleep(0.4)
 
         self.WriteCommand("sel(1)")
 

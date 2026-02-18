@@ -60,7 +60,7 @@ class EngineController:
         r,s = self.transport.ReadResponse()        
         return s
     
-    def Stop(self) -> str:                
+    def StopAll(self) -> str:                
         data = bytearray(1)
         data[0] = 27
         self.transport.WriteRawData(data, 0, len(data))

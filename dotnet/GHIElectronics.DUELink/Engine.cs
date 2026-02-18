@@ -24,7 +24,7 @@ namespace GHIElectronics.DUELink {
 
             }
 
-            public bool Stop() {
+            public bool StopAll() {
                 this.serialPort.DiscardInBuffer();
                 this.serialPort.DiscardOutBuffer();
 

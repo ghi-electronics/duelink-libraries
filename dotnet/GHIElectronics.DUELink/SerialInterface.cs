@@ -78,8 +78,8 @@ namespace GHIElectronics.DUELink {
             Thread.Sleep(400);
 
             // After sent \n, we need send 0x1B to stop the while loop in chain. Issue: https://github.com/ghi-electronics/duelink-libraries/issues/114
-            this.WriteRawData(new byte[] { 0x1B }, 0, 1);
-            Thread.Sleep(400);
+            //this.WriteRawData(new byte[] { 0x1B }, 0, 1);
+            //Thread.Sleep(400);
 
             this.WriteCommand("sel(1)");
             // "sel(1)": always return \r\n> no matter Asio or not

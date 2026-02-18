@@ -14,7 +14,7 @@ class EngineController:
 
         return res.response
     
-    def Stop(self) -> str:        
+    def StopAll(self) -> str:        
         self.transport.DiscardInBuffer()
         self.transport.DiscardOutBuffer()
         

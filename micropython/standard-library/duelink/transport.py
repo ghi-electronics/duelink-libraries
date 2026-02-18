@@ -25,8 +25,8 @@ class I2CTransportController:
         time.sleep(0.4)
 
         # After sent \n, we need send 0x1B to stop the while loop in chain
-        self.WriteByte(0x1B)       
-        time.sleep(0.4)
+        # self.WriteByte(0x1B)       
+        # time.sleep(0.4)
         
         self.WriteCommand("sel(1)")
         #self.i2c.writeto(self.addr, "sel(1)\n")
@@ -289,8 +289,8 @@ class UartTransportController:
         time.sleep(0.4)
 
         # After sent \n, we need send 0x1B to stop the while loop in chain
-        self.WriteByte(0x1B)       
-        time.sleep(0.4)
+        # self.WriteByte(0x1B)       
+        # time.sleep(0.4)
         
         self.WriteCommand("sel(1)")
         
