@@ -12,12 +12,12 @@
         {
           "name": "DUELink",
           "architecture": "stm32",
-          "version": "0.0.7",
+          "version": "0.0.8",
           "category": "Contributed",
           "url": "https://github.com/ghi-electronics/duelink-libraries/raw/main/arduino/BoardManager/DUELink.zip",
           "archiveFileName": "DUELink.zip",
-          "checksum": "SHA-256:5FE58225D1D9840956AA28D68B798003D77F64006E3B20229404396C1B5675B2",
-          "size": "71803794",
+          "checksum": "SHA-256:B5533F61B1B01A44EBCDD412C385EFE9507E25E690C6C165FE0F1C99DB0463DD",
+          "size": "71805049",
           "boards": [
             {"name": "DUELink"}            
           ],
