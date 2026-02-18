@@ -2,7 +2,7 @@
   "packages": [
     {
       "name": "DUELink",
-      "websiteURL": "https://github.com/ghi-electronics/duelinkduino",
+      "websiteURL": "https://www.duelink.com/docs/hw/arduino",
       "maintainer": "GHI Electronics",
       "email": "support@ghielectronics.com",
       "help": {
@@ -10,14 +10,14 @@
       },
       "platforms": [          
         {
-          "name": "STM32C07",
+          "name": "DUELink",
           "architecture": "stm32",
-          "version": "0.0.1",
+          "version": "0.0.3",
           "category": "Contributed",
           "url": "https://github.com/ghi-electronics/duelink-libraries/raw/main/arduino/BoardManager/DUELink.zip",
           "archiveFileName": "DUELink.zip",
-          "checksum": "SHA-256:65552B89741022B63DC0482DB0C0A687F5FA9AC2C4B91266C4F47B5FE1ADA115",
-          "size": "71840517",
+          "checksum": "SHA-256:557946DEE0E29B0467629DFFD0CC17A73988972A775A170396B3E9D1223C3AB7",
+          "size": "71840590",
           "boards": [
             {"name": "DUELink"}            
           ],
