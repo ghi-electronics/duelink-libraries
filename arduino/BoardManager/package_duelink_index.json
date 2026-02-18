@@ -10,7 +10,7 @@
       },
       "platforms": [          
         {
-          "name": "DUELink",
+          "name": "STM32C07",
           "architecture": "stm32",
           "version": "0.0.1",
           "category": "Contributed",
