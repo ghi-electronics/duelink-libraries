@@ -1,6 +1,6 @@
 {
 	"name": "duelink",
-	"version": "1.2.6",
+	"version": "1.2.7",
 	"description": "DUELink driver",
 	"source": "./duelink.js",
 	"main": "dist/duelink.js",
@@ -25,9 +25,11 @@
 	},
 	"devDependencies": {
 		"buffer": "^5.7.1",
-		"parcel": "^2.16.3",
+		"parcel": "^2.16.4",
+		"parcel-bundler": "^1.12.5",
 		"path-browserify": "^1.0.1",
 		"stream-browserify": "^3.0.0",
 		"util": "^0.12.5"
-	}
+	},
+	"type": "commonjs"
 }
