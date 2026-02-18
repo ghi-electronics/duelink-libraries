@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="duelink",
-    version="1.2.3",
+    version="1.2.4",
     author="GHI Electronics",
     author_email="support@ghielectronics.com",
     license="MIT",
