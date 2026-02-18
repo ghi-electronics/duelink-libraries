@@ -2,7 +2,7 @@
   "packages": [
     {
       "name": "DUELink",
-      "websiteURL": "https://github.com/ghi-electronics/duelinkduino",
+      "websiteURL": "https://www.duelink.com/docs/hw/arduino",
       "maintainer": "GHI Electronics",
       "email": "support@ghielectronics.com",
       "help": {
