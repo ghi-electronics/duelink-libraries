@@ -535,7 +535,12 @@
         try {
             hideError();
             Check();
-            await duelink.Connect();
+            var ret = await duelink.Connect();
+
+            if (ret == -1) {
+                alert("MicroBlocks firmware detected. This web tool does not support MicroBlocks firmware.");
+                return
+            }
 
             isConnected = true;
             UpdateMainButton();
@@ -543,22 +548,14 @@
             await getInfo();
 
 
-
-
-
-            $("#id-version").text(duelink.Version);
-            $("#id-connect").slideUp();
-            $("#id-inputs").prop("disabled", false);
-
         } catch (e) {
-            //await getInfo();
-            //showError("connect Error" + e);
-            alert("Failed to execute 'open' on 'SerialPort'");
+            if (e.code == 19)
+                alert("Failed to execute 'open' on 'SerialPort'");
 
         }
 
         finally {
-            //UpdateConnectionUI()
+
             UpdateDeviceCard()
             UpdateConnectionUI()
 

@@ -13,7 +13,8 @@ class SerialInterface {
         this.leftOver = "";
         this.ReadTimeout = 3000;
         this.echo = true;
-        this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";                
+        this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined"; 
+        this.pid = 0               
     }
 
     async Connect() {
@@ -23,12 +24,25 @@ class SerialInterface {
             await this.portName.connect();
         }
 
+        // make sure only DUELink Official firmware support
+        const info = this.portName.port.getInfo();
+        const vid = info.usbVendorId;
+        const pid = info.usbProductId;
+
+        if (pid !=0xF300 ) {
+          await this.Disconnect()
+          return -1
+        }
+
 
         this.portName.setTimeout(this.ReadTimeout);
         this.leftOver = "";
         await Util.sleep(100);
         await this.Synchronize();
+
+        return 1
     }
+
 
     async Disconnect() {
         try {
@@ -2244,7 +2258,10 @@ class DUELinkController {
     }
   
     async Connect() {
-      await this.serialPort.Connect();
+      var ret = await this.serialPort.Connect();
+
+      if (ret < 0)
+          return ret
   
       this.DeviceConfig = new DeviceConfiguration();
   
@@ -2252,6 +2269,8 @@ class DUELinkController {
   
       this.serialPort.DeviceConfig = this.DeviceConfig;
       await this.InitDevice();
+
+      return ret
     }
   
     async Disconnect() {
