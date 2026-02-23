@@ -201,13 +201,14 @@ class WebSerial {
         this.port = await navigator.serial.requestPort({ filters: deviceFilters });
         await this.port.open({ baudRate: 115200 });
         this.writer = this.port.writable.getWriter();
+        this.reader = this.port.readable.getReader();
         
         this.__readDataLoop();
     }
 
     async __readDataLoop() {
-        while(this.port.readable) {
-            const reader = this.port.readable.getReader();
+        while(this.reader) {
+            const reader = this.reader;
             try {
                 while(true) {
                     const result = await reader.read();
@@ -270,8 +271,26 @@ class WebSerial {
     }
 
     async close() {
-        await this.writer.close();
-        await this.port.close();       
+        try {
+            if (this.reader) {
+                await this.reader.cancel();
+                this.reader.releaseLock();
+                this.reader = null;
+            }
+
+            if (this.writer) {
+                this.writer.releaseLock();
+                this.writer = null;
+            }
+
+            if (this.port) {
+                await this.port.close();
+                this.port = null;
+            }
+
+        } catch (err) {
+            console.error("Error closing port:", err);
+        }
     }
 
     setTimeout(timeout) {

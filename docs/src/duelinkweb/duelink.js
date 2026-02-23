@@ -18,10 +18,18 @@ class SerialInterface {
     }
 
     async Connect() {
-        if (this.isBrowser) {
-            await this.portName.connect([{ usbVendorId: 0x1B9F }]);
-        } else {
-            await this.portName.connect();
+        try {
+          if (this.isBrowser) {
+              await this.portName.connect([{ usbVendorId: 0x1B9F }]);
+          } else {
+              await this.portName.connect();
+          }
+
+        }
+        catch(e) { 
+          await this.Disconnect()
+          return -2
+
         }
 
         // make sure only DUELink Official firmware support

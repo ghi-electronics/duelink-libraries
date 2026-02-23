@@ -537,8 +537,10 @@
             Check();
             var ret = await duelink.Connect();
 
-            if (ret == -1) {
-                alert("MicroBlocks firmware detected. This web tool does not support MicroBlocks firmware.");
+            if (ret < 0) {
+                if (ret == -1) {
+                    alert("MicroBlocks firmware detected. This web tool does not support MicroBlocks firmware.");                    
+                }
                 return
             }
 
@@ -552,14 +554,12 @@
             if (e.code == 19)
                 alert("Failed to execute 'open' on 'SerialPort'");
 
-        }
-
-        finally {
-
-            UpdateDeviceCard()
-            UpdateConnectionUI()
+            return
 
         }
+
+        UpdateDeviceCard()
+        UpdateConnectionUI()
     }
 
     async function toHex(number, length = 6) {
