@@ -128,7 +128,7 @@
 
         .response-box {
             width: 100%;
-            height: 120px;
+            height: 80px;
             padding: 15px;
             font-size: 16px;
             border-radius: 8px;
@@ -211,6 +211,31 @@
             margin: 10px auto;
             /* center horizontally */
         }
+
+        .fw-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .fw-success {
+            background-color: #e6f4ea;
+            color: #1e7e34;
+        }
+
+        .fw-warning {
+            background-color: #fdecea;
+            color: #b02a37;
+        }
+
+        .command-input:disabled {
+            background-color: #f1f1f1;
+            color: #888;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -247,7 +272,8 @@
 
         <!-- <div id="id-top"></div> -->
         <p style="text-align: center">This web tool demonstrates real-time communication and control of <a
-                href="https://www.duelink.com/" target="_blank">DUELink</a> devices using JavaScript.
+                href="https://www.duelink.com/" target="_blank">DUELink</a> devices using <a
+                href="https://www.duelink.com/docs/language/javascript" target="_blank">JavaScript</a>.
         </p>
 
         <br>
@@ -273,23 +299,24 @@
                 <div class="device-row">
                     <span class="label">Firmware:</span>
                     <span id="deviceFirmwareText"></span>
+                    <span id="firmwareStatus"></span>
                 </div>
 
                 <div class="device-row">
                     <a id="deviceDriverLink" href="#" target="_blank">
-                        View Driver →
+                        View Driver API →
                     </a>
                 </div>
 
                 <div class="device-row">
                     <a id="deviceStardAPILink" href="#" target="_blank">
-                        View Standard API →
+                        View Standard Libraries →
                     </a>
                 </div>
 
                 <div class="device-doc">
                     <a id="deviceDocLinkAnchor" href="#" target="_blank">
-                        View Product Details →
+                        Full Product Details →
                     </a>
                 </div>
 
@@ -308,7 +335,7 @@
             </div>
 
             <div class="command-row">
-                <input type="text" id="cmdInput" class="command-input" placeholder="Example: statled(100,100,10)" />
+                <input type="text" id="cmdInput" class="command-input" placeholder="Example: StatLed(100,100,10)" />
 
                 <button id="btnSend" class="btn-send">
                     Connect
@@ -370,6 +397,9 @@
     }
 
     const btn = document.getElementById("btnSend");
+    UpdateConnectionUI()
+
+    delay(1)
 
     btn.addEventListener("click", function () {
 
@@ -381,6 +411,16 @@
 
     });
 
+    document.getElementById("cmdInput")
+        .addEventListener("keydown", function (event) {
+
+            if (event.key === "Enter") {
+                event.preventDefault();   // prevent default behavior
+                document.getElementById("btnSend").click();
+            }
+
+        });
+
     function UpdateMainButton() {
 
         if (isConnected) {
@@ -390,12 +430,30 @@
         }
     }
 
-    // function UpdateConnectionUI() {
+    function UpdateConnectionUI() {
 
-    //     const btn = document.getElementById("btnSend");
+        const input = document.getElementById("cmdInput");
+        const btn = document.getElementById("btnSend");
 
-    //     btn.disabled = !isConnected;
-    // }
+        if (isConnected) {
+
+            input.disabled = false;
+            input.placeholder = "Example: StatLed(100,100,10)";
+            input.focus();
+
+            btn.textContent = "Send";
+
+        } else {
+
+            input.disabled = true;
+            input.placeholder = "Connect to a device to send commands";
+            input.value = "";   // clear any previous command
+
+            btn.textContent = "Connect";
+        }
+
+
+    }
 
     function UpdateDeviceCard() {
 
@@ -419,6 +477,34 @@
         document.getElementById("deviceDocLinkAnchor").href = deviceDocLink;
 
         document.getElementById("deviceCard").style.display = "flex";
+    }
+
+    function UpdateFirmwareUI(deviceFirmware, isLatest) {
+
+        const fwText = document.getElementById("deviceFirmwareText");
+        const fwStatus = document.getElementById("firmwareStatus");
+
+        fwText.textContent = deviceFirmware;
+        fwText.classList.remove("fw-red");
+        fwStatus.textContent = "";
+        fwStatus.className = "";
+        isLatest = false
+        if (isLatest) {
+            fwStatus.innerHTML = `
+        <span class="fw-badge fw-success">
+            ✓ Up to date
+        </span>
+    `;
+        } else {
+            fwText.classList.add("fw-red");
+
+            fwStatus.innerHTML = `
+        <span class="fw-badge fw-warning">
+            ⚠ Outdated: <a href="https://loader.duelink.com/update" target="_blank">Update</a> your firmware!
+                
+        </span>
+    `;
+        }
     }
 
     const GHI_VID = 0x1B9F;
@@ -464,6 +550,7 @@
         finally {
             //UpdateConnectionUI()
             UpdateDeviceCard()
+            UpdateConnectionUI()
 
         }
     }
@@ -517,11 +604,64 @@
                 devicePID = `0x${dev_num}`
                 deviceFirmware = `${fw_num}`
 
+                const isLatest = await IsLatestFirmware(deviceFirmware);
+
+                UpdateFirmwareUI(deviceFirmware, isLatest);
+
             }
         }
         // else {
         //     output.innerHTML = "";
         // }
+    }
+
+    function NormalizeVersion(versionString) {
+
+        if (!versionString) return "";
+
+        // Remove leading 'v' or 'V'
+        let v = versionString.trim().replace(/^v/i, "");
+
+        // Extract only numeric version (e.g., 0.77 or 1.2.3)
+        const match = v.match(/^\d+(\.\d+)+/);
+
+        return match ? match[0] : v;
+    }
+
+    async function IsLatestFirmware(deviceFirmware) {
+
+        try {
+            const response = await fetch("https://www.duelink.com/duelink-fw.json");
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch firmware data");
+            }
+
+            const data = await response.json();
+
+            // Safety check
+            if (!data.DUELink || !Array.isArray(data.DUELink.versions)) {
+                throw new Error("Invalid firmware JSON structure");
+            }
+
+            const versions = data.DUELink.versions;
+
+            // Find version with highest id
+            const latest = versions.reduce((max, current) =>
+                current.id > max.id ? current : max
+            );
+
+            // Compare firmware string
+            // Normalize both versions before compare
+            const latestVersion = NormalizeVersion(latest.name);
+            const deviceVersion = NormalizeVersion(deviceFirmware);
+
+            return deviceVersion === latestVersion;
+
+        } catch (error) {
+            console.error("Firmware check error:", error);
+            return false; // safest fallback
+        }
     }
 
     async function setLed() {
@@ -715,9 +855,18 @@
         // Get textbox value
         const cmd = document.getElementById("cmdInput").value;
 
+        document.getElementById("cmdResponse").value = `Sending...${cmd}`;
+
         var ret = await duelink.Engine.ExecuteCommandRaw(cmd)
 
-        document.getElementById("cmdResponse").value = ret;
+        document.getElementById("cmdInput").value = "";
+
+        if (ret != "")
+            document.getElementById("cmdResponse").value = `Sent: ${cmd}\nResponse: ${ret}`;
+        else
+            document.getElementById("cmdResponse").value = `Sent: ${cmd}`
+
+        //document.getElementById("cmdResponse").value = ret;
 
     }
 
