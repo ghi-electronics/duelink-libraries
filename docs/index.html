@@ -42,6 +42,175 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        /* Layout */
+        /* Layout */
+        .custom-container {
+            width: 50vw;
+            /* 50% of viewport width */
+            max-width: 900px;
+            /* optional safety limit for huge screens */
+            margin: 20px auto;
+            /* center horizontally */
+        }
+
+        /* Device info */
+        .device-info {
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Divider */
+        .section-divider {
+            margin: 20px 0 30px 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Command Section */
+        .command-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .command-title {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Input row */
+        .command-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .command-input {
+            flex: 1;
+            height: 40px;
+            padding: 0 18px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        .command-input:focus {
+            border-color: #2d74da;
+            box-shadow: 0 0 0 2px rgba(45, 116, 218, 0.15);
+        }
+
+        /* Button */
+        .btn-send {
+            width: 100px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
+            background: linear-gradient(135deg, #3b7ddd, #4c8ef7);
+            cursor: pointer;
+        }
+
+        .btn-send:hover {
+            opacity: 0.9;
+        }
+
+        /* Response */
+        .response-label {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .response-box {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            resize: none;
+            font-family: monospace;
+            background-color: #f9f9f9;
+        }
+
+        /*Card - Device Info*/
+        .device-card {
+            display: flex;
+            gap: 35px;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 14px;
+            padding: 22px 30px;
+            /* ↓ reduced from 30px */
+            max-width: 900px;
+            margin: 20px auto;
+            /* ↓ reduced from 30px */
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+        }
+
+        .device-left {
+            flex: 0 0 240px;
+        }
+
+        .device-image {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .device-right {
+            flex: 1;
+        }
+
+        .device-name {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            /* ↓ reduced */
+        }
+
+        .device-row {
+            font-size: 17px;
+            margin-bottom: 2px;
+            /* ↓ reduced spacing */
+        }
+
+        .device-row .label {
+            font-weight: 600;
+            margin-right: 2px;
+        }
+
+        .device-row a,
+        .device-doc a {
+            color: #2d74da;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .device-row a:hover,
+        .device-doc a:hover {
+            text-decoration: underline;
+        }
+
+        .device-doc {
+            margin-top: 2px;
+            /* ↓ reduced */
+        }
+
+        /*main logo*/
+        /* Logo */
+        .main-logo {
+            max-width: 250px;
+            /* smaller */
+            display: block;
+            /* make it block element */
+            margin: 10px auto;
+            /* center horizontally */
+        }
     </style>
 </head>
 
@@ -59,36 +228,108 @@
 </script>
 
 <body>
+
     <!-- Google Tag Manager (noscript) -->
     <noscript>
         <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5BQ7LG4D" height="0" width="0"
-            style="display:none;visibility:hidden"></iframe>
+            style="display:none;visibility:hidden">
+        </iframe>
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <div class="topnav" id="id-topbar">
-    </div>
+    <img src="../due.png" alt="DUELink Logo" class="main-logo" />
 
-    <div class="alert alert-primary" id="id-connect">
-    </div>
+    <!-- <div class="topnav" id="id-topbar"></div> -->
 
-    <!-- <div class="sidenav" id="id-sidemenu"> -->
-    <!-- </div> -->
+    <!-- <div class="alert alert-primary" id="id-connect"></div> -->
 
-    <div id="id-selections" class="container">
-        <div id="id-top">
-        </div>        
-        <span id="devInfo"></span>
-        <div id="id-bottom">
+    <div id="id-selections" class="custom-container">
+
+        <!-- <div id="id-top"></div> -->
+        <p style="text-align: center">This web tool demonstrates real-time communication and control of <a
+                href="https://www.duelink.com/" target="_blank">DUELink</a> devices using JavaScript.
+        </p>
+
+        <br>
+
+        <!-- Device Info -->
+        <!-- <div class="device-info">
+            <span id="devInfo"></span>
+        </div> -->
+        <div id="deviceCard" class="device-card" style="display:none;">
+
+            <div class="device-left">
+                <img id="deviceImg" class="device-image" src="" alt="Device Image" />
+            </div>
+
+            <div class="device-right">
+                <div class="device-name" id="deviceNameText"></div>
+
+                <div class="device-row">
+                    <span class="label">PID:</span>
+                    <span id="devicePIDText"></span>
+                </div>
+
+                <div class="device-row">
+                    <span class="label">Firmware:</span>
+                    <span id="deviceFirmwareText"></span>
+                </div>
+
+                <div class="device-row">
+                    <a id="deviceDriverLink" href="#" target="_blank">
+                        View Driver →
+                    </a>
+                </div>
+
+                <div class="device-row">
+                    <a id="deviceStardAPILink" href="#" target="_blank">
+                        View Standard API →
+                    </a>
+                </div>
+
+                <div class="device-doc">
+                    <a id="deviceDocLinkAnchor" href="#" target="_blank">
+                        View Product Details →
+                    </a>
+                </div>
+
+            </div>
+
         </div>
 
+        <hr class="section-divider" />
+
+        <!-- Command Section -->
+        <div class="command-section">
+
+            <div class="command-title">
+                Enter command and send to the connected device:
+
+            </div>
+
+            <div class="command-row">
+                <input type="text" id="cmdInput" class="command-input" placeholder="Example: statled(100,100,10)" />
+
+                <button id="btnSend" class="btn-send">
+                    Connect
+                </button>
+            </div>
+
+            <div class="response-label">
+                Response:
+            </div>
+
+            <textarea id="cmdResponse" class="response-box" readonly placeholder="">
+        </textarea>
+
+        </div>
+
+        <div id="id-bottom"></div>
+
     </div>
 
-    <div id="id-status" style="display:none">
-    </div>
-
-    <div id="id-error" style="display: none;">
-    </div>
+    <div id="id-status" style="display:none"></div>
+    <div id="id-error" style="display: none;"></div>
 
 </body>
 
@@ -99,21 +340,23 @@
     import("./src/serialweb/serialweb.js").then(mod => serial = mod);
     import("./src/duelinkweb/duelink.js").then(mod => due = mod);
 
+    let isConnected = false
+
     // Get canvas context
-    let canvas = document.getElementById("surface");        
-        function selectTab(tabIndex) {
-            //Hide All Tabs
-            document.getElementById("tab0Content").style.display = "none";
-            document.getElementById("tab1Content").style.display = "none";
-            document.getElementById("tab2Content").style.display = "none";
-            document.getElementById("tab3Content").style.display = "none";
-            document.getElementById("tab4Content").style.display = "none";
-            document.getElementById("tab5Content").style.display = "none";
-            document.getElementById("tab6Content").style.display = "none";
-            //Show the Selected Tab
-            document.getElementById("tab" + tabIndex + "Content").style.display =
-                "block";
-        }
+    let canvas = document.getElementById("surface");
+    function selectTab(tabIndex) {
+        //Hide All Tabs
+        document.getElementById("tab0Content").style.display = "none";
+        document.getElementById("tab1Content").style.display = "none";
+        document.getElementById("tab2Content").style.display = "none";
+        document.getElementById("tab3Content").style.display = "none";
+        document.getElementById("tab4Content").style.display = "none";
+        document.getElementById("tab5Content").style.display = "none";
+        document.getElementById("tab6Content").style.display = "none";
+        //Show the Selected Tab
+        document.getElementById("tab" + tabIndex + "Content").style.display =
+            "block";
+    }
 
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -122,7 +365,75 @@
     function Check() {
         if (!this.duelink)
             this.duelink = new due.DUELinkController(new serial.WebSerial());
+
+
     }
+
+    const btn = document.getElementById("btnSend");
+
+    btn.addEventListener("click", function () {
+
+        if (isConnected) {
+            DoSendCommand();
+        } else {
+            DoConnect();
+        }
+
+    });
+
+    function UpdateMainButton() {
+
+        if (isConnected) {
+            btn.textContent = "Send";
+        } else {
+            btn.textContent = "Connect";
+        }
+    }
+
+    // function UpdateConnectionUI() {
+
+    //     const btn = document.getElementById("btnSend");
+
+    //     btn.disabled = !isConnected;
+    // }
+
+    function UpdateDeviceCard() {
+
+        const card = document.getElementById("deviceCard");
+
+        if (isConnected) {
+            card.style.display = "flex";   // because your card uses flex
+        } else {
+            card.style.display = "none";
+            return
+        }
+
+
+        document.getElementById("deviceImg").src = deviceImgLink;
+        document.getElementById("deviceNameText").innerText = deviceName;
+        document.getElementById("devicePIDText").innerText = devicePID;
+        document.getElementById("deviceFirmwareText").innerText = deviceFirmware;
+
+        document.getElementById("deviceDriverLink").href = deviceDriverPath;
+        document.getElementById("deviceStardAPILink").href = "https://www.duelink.com/docs/engine/stdlib";
+        document.getElementById("deviceDocLinkAnchor").href = deviceDocLink;
+
+        document.getElementById("deviceCard").style.display = "flex";
+    }
+
+    const GHI_VID = 0x1B9F;
+    const DL_PID = 0xF300;
+
+    async function DoConnect() {
+        try {
+            await connect()
+        } catch (error) {
+
+            return 0;
+        }
+
+    }
+
 
     async function connect() {
         try {
@@ -130,15 +441,29 @@
             Check();
             await duelink.Connect();
 
-            await getInfo(true);
+            isConnected = true;
+            UpdateMainButton();
+
+            await getInfo();
+
+
+
+
 
             $("#id-version").text(duelink.Version);
             $("#id-connect").slideUp();
             $("#id-inputs").prop("disabled", false);
 
         } catch (e) {
-            await getInfo(false);
-            showError("connect Error" + e);
+            //await getInfo();
+            //showError("connect Error" + e);
+            alert("Failed to execute 'open' on 'SerialPort'");
+
+        }
+
+        finally {
+            //UpdateConnectionUI()
+            UpdateDeviceCard()
 
         }
     }
@@ -151,23 +476,52 @@
         return hexString;
     }
 
-    async function getInfo(connected) {
+    let deviceName = ""
+    let devicePartNumber = ""
+    let deviceDriverPath = ""
+    let deviceImgLink = ""
+    let deviceDocLink = ""
+    let devicePID = ""
+    let deviceFirmware = ""
+
+    async function getInfo() {
         Check();
 
-        let output = document.getElementById("devInfo");
+        await loadDLJson();
 
-        if (connected) {
+        //let output = document.getElementById("devInfo");
+
+        if (isConnected) {
             var dev_num = await toHex(await duelink.System.Info(0) / 1);
             var fw_num = (await duelink.System.Info(1) / 1.0).toString();
 
 
 
-            var info = `Device ID: 0x${dev_num} - Firmware: ${fw_num}`
-            output.innerHTML = info;
+            // var info = `Device ID: 0x${dev_num} - Firmware: ${fw_num}`
+            // output.innerHTML = info;
+
+            const device = getDeviceByPID(`0x${dev_num}`);
+
+            if (device === "NA") {
+                console.log("NA");
+                return;
+            } else {
+                const baseImgPath = 'https://www.duelink.com/img/catalog/'
+                const baseDocPath = 'https://www.duelink.com/docs/products/'
+                const baseDriverPath = 'https://www.duelink.com/docs/products/'
+                deviceName = device.name
+                devicePartNumber = device.partNumber
+                deviceImgLink = baseImgPath + devicePartNumber.toLowerCase().slice(4) + "-1.webp"
+                deviceDocLink = baseDocPath + devicePartNumber.toLowerCase().slice(4)
+                deviceDriverPath = deviceDocLink + "?show=driver"
+                devicePID = `0x${dev_num}`
+                deviceFirmware = `${fw_num}`
+
+            }
         }
-        else {
-            output.innerHTML = "";
-        }
+        // else {
+        //     output.innerHTML = "";
+        // }
     }
 
     async function setLed() {
@@ -249,9 +603,9 @@
         var pinSound = $("#pinNumberSound").val() / 1;
         var noteSoundValue = $("#playNote").val() / 1;
 
-        await duelink.Sound.Beep(pinSound, noteSoundValue, 500);				
-			
-        
+        await duelink.Sound.Beep(pinSound, noteSoundValue, 500);
+
+
     }
 
     async function sendImage() {
@@ -316,8 +670,57 @@
         await duelink.Graphics.TextT(msg, c, x, y)
         await duelink.Graphics.Show()
 
-            
+
     }
+
+    let dl_json_data = null;
+    async function loadDLJson() {
+        if (dl_json_data == null) {
+            //const response = await fetch('https://www.duelink.com/duelink.json');
+            const response = await fetch('https://raw.githubusercontent.com/ghi-electronics/duelink-website/refs/heads/dev/static/duelink.json');
+
+            const json = await response.json();
+
+            // Ensure products array exists
+            dl_json_data = Array.isArray(json.products) ? json.products : [];
+        }
+    }
+
+    function getDeviceByPID(pid) {
+        if (dl_json_data == null)
+            return "NA";
+
+        // Convert pid to uppercase for case‑insensitive match
+        const pidStr = String(pid).toUpperCase();
+
+        const item = dl_json_data.find(d => String(d.PID).toUpperCase() === pidStr);
+
+        if (!item) return "NA";
+
+        return {
+            name: item.name ?? "NA",
+            partNumber: item.partNumber ?? "NA"
+        };
+    }
+
+    async function DoSendCommand() {
+        if (!isConnected) {
+            alert("Device not connected!");
+            return
+        }
+
+        Check();
+
+
+        // Get textbox value
+        const cmd = document.getElementById("cmdInput").value;
+
+        var ret = await duelink.Engine.ExecuteCommandRaw(cmd)
+
+        document.getElementById("cmdResponse").value = ret;
+
+    }
+
 
     function hideError() {
         $("#id-error").hide();

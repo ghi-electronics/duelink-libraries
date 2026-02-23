@@ -38,14 +38,16 @@ class SerialInterface {
     }
 
     async Synchronize() {
-      const cmd = new Uint8Array(1);
-      // Synchronize is no longer  send 127 because the device can be host which is runing a loop to control its clients.
+      const cmd = new Uint8Array(1);      
       // We jusr send \n as first commands for chain enumeration
       cmd[0] = 10; 
-
       await this.WriteRawData(cmd, 0, 1);
-
-      await Util.sleep(300);
+      await Util.sleep(400);
+      
+      // After sent \n, we need send 0x1B to stop the while loop in chain. Issue: https://github.com/ghi-electronics/duelink-libraries/issues/114
+      //cmd[0] = 0x1B; 
+      //await this.WriteRawData(cmd, 0, 1);
+      //await Util.sleep(400);
       
       await this.WriteCommand("sel(1)");
       
@@ -79,44 +81,46 @@ class SerialInterface {
     }
 
     async WriteCommand(command) {
-        this.DiscardInBuffer();
-        this.DiscardOutBuffer();
+      await Util.pumpAsync();   // flush all data 
+      
+      this.DiscardInBuffer();
+      this.DiscardOutBuffer();
 
-        // const cmd_lowcase = command.toLowerCase();
+      // const cmd_lowcase = command.toLowerCase();
 
-        // if (cmd_lowcase.indexOf("print") == 0
-            // || cmd_lowcase.indexOf("dim") == 0
-            // || cmd_lowcase.indexOf("run") == 0
-            // || cmd_lowcase.indexOf("list") == 0
-            // || cmd_lowcase.indexOf("new") == 0
-            // || cmd_lowcase.indexOf("echo") == 0
-            // || cmd_lowcase.indexOf("sel") == 0
-            // || cmd_lowcase.indexOf("version") == 0
-            // || cmd_lowcase.indexOf("region") == 0
-            // || cmd_lowcase.indexOf("alias") == 0
-            // || cmd_lowcase.indexOf("sprintf") == 0
-            // ) {
-            // await this.__WriteLine(command);
-        // }
-        // else if (this.EnabledAsio) {
-          // const newCmd = `println(${command})`;
-          // await this.__WriteLine(newCmd);
-        // }
-        // else {
+      // if (cmd_lowcase.indexOf("print") == 0
+          // || cmd_lowcase.indexOf("dim") == 0
+          // || cmd_lowcase.indexOf("run") == 0
+          // || cmd_lowcase.indexOf("list") == 0
+          // || cmd_lowcase.indexOf("new") == 0
+          // || cmd_lowcase.indexOf("echo") == 0
+          // || cmd_lowcase.indexOf("sel") == 0
+          // || cmd_lowcase.indexOf("version") == 0
+          // || cmd_lowcase.indexOf("region") == 0
+          // || cmd_lowcase.indexOf("alias") == 0
+          // || cmd_lowcase.indexOf("sprintf") == 0
+          // ) {
           // await this.__WriteLine(command);
-        // }
-        // clear all
+      // }
+      // else if (this.EnabledAsio) {
+        // const newCmd = `println(${command})`;
+        // await this.__WriteLine(newCmd);
+      // }
+      // else {
+        // await this.__WriteLine(command);
+      // }
+      // clear all
 
-        if (this.portName.hasData()) {
-          var dump = await this.portName.readbyte();
-          while (dump === null) {
-            await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null
-            dump = await this.portName.readbyte()
-          }
+      if (this.portName.hasData()) {
+        var dump = await this.portName.readbyte();
+        while (dump === null) {
+          await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null
+          dump = await this.portName.readbyte()
         }
+      }
 
 
-        await this.__WriteLine(command);
+      await this.__WriteLine(command);        
     }
 
     async __WriteLine(string) {
@@ -158,124 +162,136 @@ class SerialInterface {
           console.log("No Response");
       }
 
-      await Util.sleep(1); // As tested, hasData return true even there is no data yet, this return Available > 0 only but data is not in buffer
-      while (new Date() <= end || this.portName.hasData()) {
-          if (this.portName.hasData()) {
-            var data = await this.portName.readbyte();
-            while (data === null) {
-              await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null
-              data = await this.portName.readbyte()
-            }
+      //await Util.sleep(1); // As tested, hasData return true even there is no data yet, this return Available > 0 only but data is not in buffer
+      while (new Date() <= end || this.portName.hasData()) 
+      {
+        await Util.pumpAsync();
+        if (this.portName.hasData()) 
+        {
+          var data = await this.portName.readbyte();
+          
+          if (data === null) {
+            continue;
+          }
 
-            str += SerialInterface.Decoder.decode(data);
-            total_receviced++;
-            
-            if (SerialInterface.Decoder.decode(data)[0] == '\n') { //'\n'
-              if (!this.portName.hasData()) {
-                await Util.sleep(1);
+          str += SerialInterface.Decoder.decode(data);
+          total_receviced++;
+          
+          if (SerialInterface.Decoder.decode(data)[0] == '\n') { //'\n'            
+            while (new Date() <= end && !this.portName.hasData()){
+              await Util.pumpAsync();
+            }            
+
+            // next byte can be >, &, !, $
+            if (this.portName.hasData()) {              
+              await Util.pumpAsync(); // As tested, hasData return true even there is no data yet, this return Available > 0 only but data is not in buffer  
+              var b = await this.portName.readbyte()
+              
+              while (b === null) { // this case should never happen                
+                await Util.pumpAsync();
+                b = await this.portName.readbyte()
               }
 
-              // next byte can be >, &, !, $
-              if (this.portName.hasData()) {
-                await Util.sleep(1);  // As tested, hasData return true even there is no data yet, this return Available > 0 only but data is not in buffer  
-                var b = await this.portName.readbyte()
-                
-                while (b === null) {
-                  await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
-                  b = await this.portName.readbyte()
-                }
-                dump = SerialInterface.Decoder.decode(b)[0];
-                if (dump == '>' || dump == '!' || dump == '$') {
-                    // valid data 
-                    await Util.sleep(1); // wait 1ms for sure next byte
-
-                    if (this.portName.hasData()) {
-                      responseValid = false; // still data, this is bad response, there is no \r\n>xxxx
-                    }
-                }
-                else if (dump == '\r') {
-                  // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
-                  if (!this.portName.hasData()) {
-                    await Util.sleep(1); // wait 1ms for sure next byte   
-                  }
+              dump = SerialInterface.Decoder.decode(b)[0];
+              if (dump == '>' || dump == '!' || dump == '$') {
+                  // valid data 
+                  await Util.sleep(1); // wait 1ms for sure next byte
 
                   if (this.portName.hasData()) {
-                    dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+                    responseValid = false; // still data, this is bad response, there is no \r\n>xxxx
+                  }
+              }
+              else if (dump == '\r') { 
+                // there is case 0\r\n\r\n> if use println("btnup(0)") example, this is valid
+                if (!this.portName.hasData()) {
+                  await Util.sleep(1); // wait 1ms for sure next byte   
+                }
 
-                    while (dump === null) {
-                      await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
-                      dump = await this.portName.readbyte()
-                    }
+                if (this.portName.hasData()) {
+                  dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
 
-                    if (dump == '\n') {
-                        if (this.portName.hasData()) {
-                            dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+                  while (dump === null) {
+                    await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
+                    dump = await this.portName.readbyte()
+                  }
 
-                            while (dump === null) {
-                              await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
-                              dump = await this.portName.readbyte()
-                            }
-                        }
-                    }
-                    else {
-                        responseValid = false;
-                    }
+                  if (dump == '\n') {
+                      if (this.portName.hasData()) {
+                          dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
+
+                          while (dump === null) {
+                            await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
+                            dump = await this.portName.readbyte()
+                          }
+                      }
                   }
                   else {
                       responseValid = false;
                   }
-                } 
+                }
                 else {
                     responseValid = false;
                 }
-
-                
-              }
-              // once bad response \r\nxxx... or \r\n>xxxx, mean next \r\n is comming, wait timeout to clear them to clean the bus if possible        
-              if (!responseValid) {
-                dump = 0;
-                while (dump != '\n' && new Date() <= end) {
-                  if (this.portName.hasData()) {
-                    dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
-
-                    while (dump === null) {
-                      await Util.sleep(1);  // As tested, hasData return true even there is no data yet, keep reading till no null 
-                      dump = await this.portName.readbyte()
-                    }
-                  }
-                  else
-                  {
-                    await Util.sleep(1); // wait 1ms for sure next byte   
-                  }
-
-                  if (dump == '\n') {
-                    if (this.portName.hasData()) // // still bad data, repeat clean up
-                    {
-                      dump = 0; // reset to repeat the condition while loop
-                    }
-                  }
-                
-                }
-              }
-              
-              // reponse valid has to be xxx\r\n or \r\n, or xxx\r\n> or \r\n> mean idx >=2
-              if (str == "" || str.length < 2 ) {
-                if (str[str.length - 2] != '\r') {
-                  responseValid = false;
-                }
-              }
+              } 
               else {
-                // valid response, remove \r\n
-                str = str.slice(0, str.length -2);
+                  responseValid = false;
               }
               
-
-              break;
-
             }
+            // once bad response \r\nxxx... or \r\n>xxxx, mean next \r\n is comming, wait timeout to clear them to clean the bus if possible        
+            if (!responseValid) {
+              dump = 0;
+              while (dump != '\n' && new Date() <= end) {
+                await Util.pumpAsync();
+                if (this.portName.hasData()) {
+                  dump = SerialInterface.Decoder.decode(await this.portName.readbyte())[0];
 
-            end = new Date(Date.now() + this.ReadTimeout);
-          }            
+                  while (dump === null) {                    
+                    await Util.pumpAsync();
+                    dump = await this.portName.readbyte()
+                  }
+                }
+                else
+                {
+                  await Util.sleep(1); // wait 1ms for sure next byte   
+                }
+
+                if (dump == '\n') {
+                  if (this.portName.hasData()) // // still bad data, repeat clean up
+                  {
+                    dump = 0; // reset to repeat the condition while loop
+                  }
+                }
+              
+              }
+            }
+            
+            // reponse valid has to be xxx\r\n or \r\n, or xxx\r\n> or \r\n> mean idx >=2
+            if (str == "" || str.length < 2 ) {
+              if (str[str.length - 2] != '\r') {
+                responseValid = false;
+              }
+            }
+            else {
+              // valid response, remove \r\n
+              str = str.slice(0, str.length -2);
+            }
+            
+
+            break;
+
+          }
+          else if (total_receviced == 1 && ((SerialInterface.Decoder.decode(data)[0] == '>') || (SerialInterface.Decoder.decode(data)[0] == '&'))) {
+            await Util.sleep(2); // wait 1ms for sure next byte
+            if (!this.portName.hasData()) {   
+              response.success = true;
+              response.response = "";
+              return response;
+            }
+          }
+
+          end = new Date(Date.now() + this.ReadTimeout);
+        }             
       }		      
       this.portName.resetInputBuffer();
       this.portName.resetOutputBuffer();
@@ -1009,7 +1025,7 @@ class EngineController {
       return ret.response;
     }
 
-    async Stop() {
+    async StopAll() {
       this.serialPort.DiscardInBuffer();
       this.serialPort.DiscardOutBuffer();
 
@@ -1040,7 +1056,7 @@ class EngineController {
       }
       else if (region == 1) {
         await this.serialPort.WriteCommand("Region(1)");
-        const ret = await this.serialPort.ReadResponse();
+        let ret = await this.serialPort.ReadResponse();
 
         if (ret.success == false)
           return false;
@@ -1057,7 +1073,7 @@ class EngineController {
       
         
   
-      const cmd = "pgmstream()";
+      const cmd = "pgmbrst()";
 
       const raw = new TextEncoder().encode(script);
 
