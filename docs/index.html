@@ -640,7 +640,7 @@ $(document).ready(function(){
         }
     }
 	
-	async function toHex(number, length = 4) {
+	async function toHex(number, length = 6) {
 	  let hexString = number.toString(16);
 	  while (hexString.length < length) {
 		hexString = '0' + hexString;
