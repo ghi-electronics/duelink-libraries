@@ -396,6 +396,17 @@
 
     }
 
+    navigator.serial.addEventListener("disconnect", (event) => {
+
+        console.log("Device disconnected");
+        if (duelink) {
+            duelink.Disconnect();   // your disconnect function
+            isConnected = false;
+            UpdateConnectionUI();
+            UpdateDeviceCard()
+        }
+    });
+
     const btn = document.getElementById("btnSend");
     UpdateConnectionUI()
 
@@ -446,7 +457,7 @@
         } else {
 
             input.disabled = true;
-            input.placeholder = "Connect to a device to send commands";
+            input.placeholder = "Click 'Connect' to select your DUELink device first!";
             input.value = "";   // clear any previous command
 
             btn.textContent = "Connect";
@@ -488,7 +499,6 @@
         fwText.classList.remove("fw-red");
         fwStatus.textContent = "";
         fwStatus.className = "";
-        isLatest = false
         if (isLatest) {
             fwStatus.innerHTML = `
         <span class="fw-badge fw-success">
@@ -864,7 +874,7 @@
         if (ret != "")
             document.getElementById("cmdResponse").value = `Sent: ${cmd}\nResponse: ${ret}`;
         else
-            document.getElementById("cmdResponse").value = `Sent: ${cmd}`
+            document.getElementById("cmdResponse").value = `Sent: ${cmd}\nResponse: None!`;
 
         //document.getElementById("cmdResponse").value = ret;
 
