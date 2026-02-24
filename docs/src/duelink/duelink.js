@@ -17,10 +17,18 @@ class SerialInterface {
     }
 
     async Connect() {
-        if (this.isBrowser) {
-            await this.portName.connect([{ usbVendorId: 0x1B9F }]);
-        } else {
-            await this.portName.connect();
+        try {
+          if (this.isBrowser) {
+              await this.portName.connect([{ usbVendorId: 0x1B9F }]);
+          } else {
+              await this.portName.connect();
+          }
+
+        }
+        catch(e) {           
+          await this.Disconnect()
+          return -2
+
         }
 
 
@@ -28,7 +36,10 @@ class SerialInterface {
         this.leftOver = "";
         await Util.sleep(100);
         await this.Synchronize();
+
+        return 1
     }
+
 
     async Disconnect() {
         try {
@@ -2244,7 +2255,10 @@ class DUELinkController {
     }
   
     async Connect() {
-      await this.serialPort.Connect();
+      var ret = await this.serialPort.Connect();
+
+      if (ret < 0)
+          return ret
   
       this.DeviceConfig = new DeviceConfiguration();
   
@@ -2252,6 +2266,8 @@ class DUELinkController {
   
       this.serialPort.DeviceConfig = this.DeviceConfig;
       await this.InitDevice();
+
+      return ret
     }
   
     async Disconnect() {
