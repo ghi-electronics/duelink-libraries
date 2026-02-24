@@ -25,13 +25,15 @@ class SerialInterface {
           }
 
         }
-        catch(e) { 
+        catch(e) {           
           await this.Disconnect()
           return -2
 
         }
 
         // make sure only DUELink Official firmware support
+        // Filter is only for WebSerial only.
+        // For local on PC, we need SerialPort, Bluetooth, so can't use filter with VID, PID
         const info = this.portName.port.getInfo();
         const vid = info.usbVendorId;
         const pid = info.usbProductId;
