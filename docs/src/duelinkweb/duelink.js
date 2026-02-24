@@ -13,8 +13,7 @@ class SerialInterface {
         this.leftOver = "";
         this.ReadTimeout = 3000;
         this.echo = true;
-        this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined"; 
-        this.pid = 0               
+        this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";                
     }
 
     async Connect() {
