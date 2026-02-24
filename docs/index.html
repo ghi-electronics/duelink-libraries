@@ -597,8 +597,12 @@
             const device = getDeviceByPID(`0x${dev_num}`);
 
             if (device === "NA") {
-                console.log("NA");
-                return;
+                //console.log("NA");
+                alert("PID not found!");
+                duelink.Disconnect()
+                isConnected = false
+                return
+
             } else {
                 const baseImgPath = 'https://www.duelink.com/img/catalog/'
                 const baseDocPath = 'https://www.duelink.com/docs/products/'
