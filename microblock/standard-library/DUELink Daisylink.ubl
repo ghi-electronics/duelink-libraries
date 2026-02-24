@@ -1,6 +1,6 @@
 module 'DUELink Daisylink' Comm
 author 'GHI Electronics'
-version 0 15 
+version 0 16 
 choices due_combx b0 b1 b2 b3 b4 b5 b6 b7 
 description 'Handles tethered communications via I2C or serial (UART) to DUELink Daisylink module(s).
 
@@ -366,11 +366,23 @@ to due_useI2C useI2C {
 
 
 
+
+
+
+
 and I2C on non-DUELink board. This advanced block is only needed
 
 
 
+
+
+
+
 when one wants to force different behavior from the default
+
+
+
+
 
 
 
@@ -381,7 +393,11 @@ when one wants to force different behavior from the default
     '[sensors:i2cRead]' 82 ('[data:newByteArray]' 64)
     '[sensors:i2cWrite]' 82 ('[data:unicodeString]' 10)
   } else {
-    comment 'If Uart we need to send 10 or 13 or 27 or ''s'' or ''S'''
+    comment 'Serial need first byte is 10, 13 or ''s'', ''S'''
+    if ('[serial:dueSend]' ('[data:unicodeString]' 10) 1) {
+    }
+    waitMillis 255
+    comment 'Device 1 is selected as default enumeration'
     due_select_device 1
   }
   waitMillis 100
