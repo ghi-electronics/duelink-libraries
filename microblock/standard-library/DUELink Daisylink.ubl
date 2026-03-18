@@ -212,9 +212,11 @@ to '_due_textGfxCmd' str {
 }
 
 to discover {
+  comment 'Called only once'
   if (_dueDeviceCount == 0) {
     _dueDeviceCount = (due_returnNum 'getcnt()')
     if (_dueDeviceCount == 0) {
+      comment 'Nothing connected, return 0'
       return 0
     }
     _dueDeviceList = ('[data:makeList]')
@@ -223,6 +225,7 @@ to discover {
       '[data:addLast]' (due_returnNum 'info(0)') _dueDeviceList
     }
   }
+  comment 'return the list'
   return _dueDeviceList
 }
 
@@ -478,21 +481,33 @@ when one wants to force different behavior from the default
 }
 
 to 'find pid' pid {
+  comment 'get the list from discover block'
   local 'device_list' (discover)
   if (device_list == 0) {
     return 0
   }
   local 'pid_list' ('[data:makeList]')
   local 'pid_number' 0
+  comment 'check if pid is a number'
   if (isType pid 'number') {
     pid_number = pid
+  } else {
+    comment 'check if pid is a hex string'
+    if (isType (hexToInt pid) 'number') {
+      pid_number = (hexToInt pid)
+    } else {
+      comment 'invalid pid'
+      return 0
+    }
   }
   for i _dueDeviceCount {
     if (pid_number == (at i device_list)) {'[data:addLast]' i pid_list}
   }
   if ((size pid_list) == 0) {
+    comment 'Not found anything'
     return 0
   }
+  comment 'return the list'
   return pid_list
 }
 
