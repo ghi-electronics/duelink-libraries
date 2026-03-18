@@ -1,6 +1,6 @@
 module 'DUELink Daisylink' Comm
 author 'GHI Electronics'
-version 0 17 
+version 0 18 
 choices due_combx b0 b1 b2 b3 b4 b5 b6 b7 
 description 'Handles tethered communications via I2C or serial (UART) to DUELink Daisylink module(s).
 
@@ -342,7 +342,23 @@ to due_run cmd {
 }
 
 to due_select_device dev {
-  due_run (due_make_command 'sel' dev)
+  if (isType dev 'number') {
+    due_run (due_make_command 'sel' dev)
+  } else {
+    if (isType dev 'string') {
+      due_run ('[data:join]' 'sel(' dev ')')
+    } else {
+      local 'cmd' ('[data:join]' 'sel' '(')
+      for i (size dev) {
+        cmd = ('[data:join]' cmd (at i dev))
+        if (i < (size dev)) {
+          cmd = ('[data:join]' cmd ',')
+        }
+      }
+      cmd = ('[data:join]' cmd ')')
+      due_run cmd
+    }
+  }
 }
 
 to due_setReadTimeout millisecond {
