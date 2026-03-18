@@ -22,8 +22,10 @@ variables _dueUseI2C _dueReadTimeout _dueDeviceList _dueDeviceCount
   spec 'r' 'due_returnStr' 'do command _ returns string' 'str' 'version()'
   space
   space
+  spec 'r' 'due_discover' 'discover'
   spec 'r' 'due_device_PID' 'device PID'
   spec 'r' 'due_device_version' 'device firmware version'
+  spec 'r' 'due_find_pid' 'find PID _' 'auto' '0x50005'
   advanced
   spec ' ' 'due_setReadTimeout' 'set response timeout _ ms' 'auto' 1000
   spec ' ' 'due_useI2C' 'use I2C _' 'bool' true
@@ -45,8 +47,6 @@ variables _dueUseI2C _dueReadTimeout _dueDeviceList _dueDeviceCount
   spec 'r' '_due_endsWithPrompt' '_due byte array ends with prompt _' 'str'
   spec 'r' '_due_isFloat' '_due string is float _' 'auto' '2.3'
   spec 'r' '_due_textGfxCmd' '_due_textGfxCmd _' 'auto' 'textT'
-  spec 'r' 'discover' 'discover'
-  spec 'r' 'find pid' 'find pid _' 'auto' '10'
 
 to '_dueSendRaw' s {
   '_due_init'
@@ -211,24 +211,6 @@ to '_due_textGfxCmd' str {
   return (booleanConstant false)
 }
 
-to discover {
-  comment 'Called only once'
-  if (_dueDeviceCount == 0) {
-    _dueDeviceCount = (due_returnNum 'getcnt()')
-    if (_dueDeviceCount == 0) {
-      comment 'Nothing connected, return 0'
-      return 0
-    }
-    _dueDeviceList = ('[data:makeList]')
-    for i _dueDeviceCount {
-      due_select_device i
-      '[data:addLast]' (due_returnNum 'info(0)') _dueDeviceList
-    }
-  }
-  comment 'return the list'
-  return _dueDeviceList
-}
-
 to due_connected {
   local 'n' ('[data:convertType]' (random 1 9) 'string')
   return ((due_returnStr n) == n)
@@ -248,8 +230,57 @@ to due_device_version {
   return (due_returnNum '100*info(1)')
 }
 
+to due_discover {
+  comment 'Called only once'
+  if (_dueDeviceCount == 0) {
+    _dueDeviceCount = (due_returnNum 'getcnt()')
+    if (_dueDeviceCount == 0) {
+      comment 'Nothing connected, return 0'
+      return 0
+    }
+    _dueDeviceList = ('[data:makeList]')
+    for i _dueDeviceCount {
+      due_select_device i
+      '[data:addLast]' (due_returnNum 'info(0)') _dueDeviceList
+    }
+  }
+  comment 'return the list'
+  return _dueDeviceList
+}
+
 to due_exec {
   due_run 'run'
+}
+
+to due_find_pid pid {
+  comment 'get the list from discover block'
+  local 'device_list' (due_discover)
+  if (device_list == 0) {
+    return 0
+  }
+  local 'pid_list' ('[data:makeList]')
+  local 'pid_number' 0
+  comment 'check if pid is a number'
+  if (isType pid 'number') {
+    pid_number = pid
+  } else {
+    comment 'check if pid is a hex string'
+    if (isType (hexToInt pid) 'number') {
+      pid_number = (hexToInt pid)
+    } else {
+      comment 'invalid pid'
+      return 0
+    }
+  }
+  for i _dueDeviceCount {
+    if (pid_number == (at i device_list)) {'[data:addLast]' i pid_list}
+  }
+  if ((size pid_list) == 0) {
+    comment 'Not found anything'
+    return 0
+  }
+  comment 'return the list'
+  return pid_list
 }
 
 to due_make_command s optionalArgs {
@@ -478,36 +509,5 @@ when one wants to force different behavior from the default
     due_select_device 1
   }
   waitMillis 100
-}
-
-to 'find pid' pid {
-  comment 'get the list from discover block'
-  local 'device_list' (discover)
-  if (device_list == 0) {
-    return 0
-  }
-  local 'pid_list' ('[data:makeList]')
-  local 'pid_number' 0
-  comment 'check if pid is a number'
-  if (isType pid 'number') {
-    pid_number = pid
-  } else {
-    comment 'check if pid is a hex string'
-    if (isType (hexToInt pid) 'number') {
-      pid_number = (hexToInt pid)
-    } else {
-      comment 'invalid pid'
-      return 0
-    }
-  }
-  for i _dueDeviceCount {
-    if (pid_number == (at i device_list)) {'[data:addLast]' i pid_list}
-  }
-  if ((size pid_list) == 0) {
-    comment 'Not found anything'
-    return 0
-  }
-  comment 'return the list'
-  return pid_list
 }
 
