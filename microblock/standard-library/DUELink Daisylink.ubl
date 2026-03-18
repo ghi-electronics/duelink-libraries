@@ -25,7 +25,7 @@ variables _dueUseI2C _dueReadTimeout _dueDeviceList _dueDeviceCount
   spec 'r' 'due_discover' 'discover'
   spec 'r' 'due_device_PID' 'device PID'
   spec 'r' 'due_device_version' 'device firmware version'
-  spec 'r' 'due_find_pid' 'find PID _' 'auto' '0x50005'
+  spec 'r' 'due_find_pid' 'find devices by PID _' 'str' '0x050005'
   advanced
   spec ' ' 'due_setReadTimeout' 'set response timeout _ ms' 'auto' 1000
   spec ' ' 'due_useI2C' 'use I2C _' 'bool' true
@@ -241,7 +241,7 @@ to due_discover {
     _dueDeviceList = ('[data:makeList]')
     for i _dueDeviceCount {
       due_select_device i
-      '[data:addLast]' (due_returnNum 'info(0)') _dueDeviceList
+      '[data:addLast]' (due_device_PID) _dueDeviceList
     }
   }
   comment 'return the list'
@@ -261,16 +261,19 @@ to due_find_pid pid {
   local 'pid_list' ('[data:makeList]')
   local 'pid_number' 0
   comment 'check if pid is a number'
-  if (isType pid 'number') {
-    pid_number = pid
-  } else {
-    comment 'check if pid is a hex string'
-    if (isType (hexToInt pid) 'number') {
-      pid_number = (hexToInt pid)
+  if (isType pid 'string') {
+    if ((size pid) >= 3) {if ((at 2 pid) == 'x') {
+      pid_number = (at 2 ('[data:split]' pid 'x'))
     } else {
-      comment 'invalid pid'
-      return 0
-    }
+      if ((at 2 pid) == 'X') {
+        pid_number = (at 2 ('[data:split]' pid 'X'))
+      } else {
+        pid_number = pid
+      }
+    }}
+  } else {
+    comment 'Invalid input'
+    return 0
   }
   for i _dueDeviceCount {
     if (pid_number == (at i device_list)) {'[data:addLast]' i pid_list}
