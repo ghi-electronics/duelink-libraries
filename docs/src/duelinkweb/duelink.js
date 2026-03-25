@@ -40,7 +40,11 @@ class SerialInterface {
 
         if (pid !=0xF300 ) {
           await this.Disconnect()
-          return -1
+
+          if (pid == 0xF301) // Microblock firmware
+            return -1
+          else
+            return -2
         }
 
 
